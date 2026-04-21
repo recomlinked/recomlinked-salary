@@ -35,12 +35,11 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
 .logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
 .header-right{display:flex;align-items:center;gap:10px;}
-.header-sub{font-size:11px;color:#454d60;letter-spacing:0.04em;font-weight:500;}
 
 /* ── Chat area ─────────────────────────────────────────── */
 .chat-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 20px;display:flex;flex-direction:column;gap:22px;
+  padding:16px 16px 20px;display:flex;flex-direction:column;gap:32px;
 }
 .chat-wrap::-webkit-scrollbar{display:none;}
 
@@ -102,8 +101,8 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 }
 .prob-reason strong{color:#fff;}
 
-/* Score card message — slight extra breathing room above and below */
-.score-card-msg{margin-top:6px;margin-bottom:6px;}
+/* Score card message — extra breathing room around the visually heavy card */
+.score-card-msg{margin-top:10px;margin-bottom:10px;}
 
 /* ── User message ──────────────────────────────────────── */
 .user-msg{display:flex;justify-content:flex-end;padding-left:42px;animation:msgIn 0.28s ease;}
@@ -284,7 +283,6 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 
 <header class="site-header">
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
-  <div class="header-sub">SALARY NEGOTIATION COACH</div>
 </header>
 
 <div class="page-wrap">
