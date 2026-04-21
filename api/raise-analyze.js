@@ -3,10 +3,20 @@
 // Called on chat page load with the assessment profile.
 // Returns: initial range [floor, ceiling], color, context line, first coach message.
 //
+// INPUT: 3-field assessment → { company_situation, last_raise, company_size }.
+// Previously required 5 fields (incl. country + seniority). The landing page
+// reduced its assessment from 4 questions to 3 to optimise funnel velocity.
+// The chat page's Ex1 free-text extraction refines seniority from the user's
+// typed job title; regional nuance is now handled at the coach-prompt layer
+// rather than in the initial range math.
+// (Note: frontend localStorage still stores country:'us' / seniority:'mid'
+// defaults to keep profileHash on the chat page backwards-compatible —
+// those fields are ignored here but not harmful if present in the payload.)
+//
 // The math is DETERMINISTIC in code (see spec § 2). Claude only writes the
 // one-line context that accompanies the initial range — it never picks numbers.
 //
-// Cache key: raise:analyze|{country}|{situation}|{lastRaise}|{seniority}|{size}
+// Cache key: raise:analyze|{situation}|{lastRaise}|{size}
 // TTL: 7 days (same-profile users get the cached context line).
 
 const Anthropic = require('@anthropic-ai/sdk');
@@ -22,6 +32,11 @@ const CACHE_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 // ── Deterministic initial range ───────────────────────────
 // Values from salary-negotiation-coach-spec.md § 2
+// Note: country and seniority modifiers removed in the 3-question redesign.
+// - Country: all users now start from the US baseline; regional nuance is
+//   handled at the coach-prompt layer in raise-exchange.js if/when relevant.
+// - Seniority: initial range uses the mid-level baseline; raise-exchange.js
+//   Ex1 extracts seniority_signal_from_text and can adjust on the first turn.
 function calculateInitialRange(p) {
   let floor   = 40;
   let ceiling = 70;
@@ -39,19 +54,6 @@ function calculateInitialRange(p) {
   // Tier 1 floor lifts
   if (p.company_situation === 'growing')  floor = Math.max(floor, 45);
   if (p.last_raise === '2_plus_years')    floor = Math.min(floor + 10, ceiling - 5);
-
-  // Seniority × company size modifiers
-  const isSenior       = ['senior', 'lead'].includes(p.seniority);
-  const isLargeCompany = ['1000_10000', '10000_plus'].includes(p.company_size);
-  if (isSenior && isLargeCompany) floor = Math.min(floor + 3, ceiling - 5);
-  if (p.seniority === 'junior' && p.company_size === 'under_50') {
-    ceiling = Math.max(ceiling - 3, floor + 5);
-  }
-
-  // Country modifier — slight conservatism outside US
-  if (p.country === 'ca') ceiling = Math.max(ceiling - 2, floor + 5);
-  if (p.country === 'uk') ceiling = Math.max(ceiling - 3, floor + 5);
-  // us, au, other: baseline
 
   // Clamp, ensure min 5pp width
   floor   = Math.max(10, Math.round(floor));
@@ -81,7 +83,7 @@ function dominantFactorCode(p) {
 }
 
 function makeCacheKey(p) {
-  return `raise:analyze|${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`;
+  return `raise:analyze|${p.company_situation}|${p.last_raise}|${p.company_size}`;
 }
 
 async function logToSheet(payload) {
@@ -103,7 +105,7 @@ async function logToSheet(payload) {
 }
 
 // ── System prompt — Claude writes ONLY the context line ───
-const SYSTEM_PROMPT = `You are a salary negotiation coach. The user has just completed a 4-question assessment. Your ONLY job right now is to write a SINGLE short context line (max 18 words) that grounds the user in why their initial probability range is where it is.
+const SYSTEM_PROMPT = `You are a salary negotiation coach. The user has just completed a 3-question assessment (company situation, last raise, company size). Your ONLY job right now is to write a SINGLE short context line (max 18 words) that grounds the user in why their initial probability range is where it is.
 
 Style:
 - Direct, warm, no hype.
@@ -129,21 +131,21 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
+  // Only 3 fields are required after the assessment reduction.
+  // Extra fields (country, seniority) if sent by the frontend are ignored here.
   const {
-    country,
     company_situation,
     last_raise,
-    seniority,
     company_size,
     refSource,
+    reason,
   } = req.body || {};
 
-  // Validation — all 5 fields required
-  if (!country || !company_situation || !last_raise || !seniority || !company_size) {
+  if (!company_situation || !last_raise || !company_size) {
     return res.status(400).json({ error: 'Missing required assessment fields' });
   }
 
-  const profile = { country, company_situation, last_raise, seniority, company_size };
+  const profile = { company_situation, last_raise, company_size };
 
   // ── Deterministic math runs unconditionally ────────────
   const { floor, ceiling } = calculateInitialRange(profile);
@@ -164,10 +166,8 @@ module.exports = async function handler(req, res) {
   // ── If no cache, call Claude for the context line ─────
   if (!contextLine) {
     const userMessage = `User profile:
-- Country: ${country}
 - Company situation: ${company_situation}
 - Last raise: ${last_raise}
-- Seniority: ${seniority}
 - Company size: ${company_size}
 - Dominant factor: ${dominant}
 - Computed range: ${floor}-${ceiling}%
@@ -200,9 +200,10 @@ Write the context line.`;
 
   // ── Log (fire-and-forget) ──────────────────────────────
   logToSheet({
-    country, company_situation, last_raise, seniority, company_size,
+    company_situation, last_raise, company_size,
     floor, ceiling, color, dominant,
     refSource: refSource || '',
+    reason:    reason    || '',
   });
 
   return res.status(200).json({
