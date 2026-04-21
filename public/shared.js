@@ -8,28 +8,29 @@
     document.head.appendChild(l);
   }
 
-  // ── 2. Google Analytics 4 (add your ID and uncomment) ──
-  /*
-  if (!document.querySelector('script[src*="googletagmanager"]')) {
-    var gTag = document.createElement('script');
-    gTag.async = true;
-    gTag.src = 'https://www.googletagmanager.com/gtag/js?id=YOUR_GA4_ID';
-    document.head.appendChild(gTag);
-    var gInline = document.createElement('script');
-    gInline.text = 'window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag("js", new Date()); gtag("config", "YOUR_GA4_ID");';
-    document.head.appendChild(gInline);
-  }
-  */
+  // ── 2. Google Analytics 4 ────────────────────────────
+  (function() {
+    if (document.querySelector('script[src*="googletagmanager"]')) return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=G-C5GQLC5FHP';
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function() { window.dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', 'G-C5GQLC5FHP');
+  })();
 
   // ── 3. Microsoft Clarity (add your ID and uncomment) ──
   /*
-  if (!document.querySelector('script[src*="clarity.ms"]')) {
-    var cScript = document.createElement('script');
-    cScript.async = true;
-    cScript.src = 'https://www.clarity.ms/tag/YOUR_CLARITY_ID';
-    window.clarity = window.clarity || function(){(window.clarity.q = window.clarity.q||[]).push(arguments)};
-    document.head.appendChild(cScript);
-  }
+  (function() {
+    if (document.querySelector('script[src*="clarity.ms"]')) return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.clarity.ms/tag/YOUR_CLARITY_ID';
+    document.head.appendChild(s);
+    window.clarity = window.clarity || function() { (window.clarity.q = window.clarity.q || []).push(arguments); };
+  })();
   */
 
   // ── 4. Remove any existing footer (idempotency) ──────
