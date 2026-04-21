@@ -83,7 +83,9 @@ button { font-family: var(--sans); cursor: pointer; }
   padding: 20px 0 28px;
 }
 .hero h1 {
-  font-size: 30px; line-height: 1.18; font-weight: 800;
+  font-size: clamp(26px, 5vw, 42px);
+  line-height: 1.25;
+  font-weight: 800;
   letter-spacing: -0.8px;
   margin-bottom: 14px;
   color: var(--text);
@@ -100,7 +102,7 @@ button { font-family: var(--sans); cursor: pointer; }
 .hero-trust span { margin: 0 6px; }
 
 @media (max-width: 480px) {
-  .hero h1 { font-size: 26px; letter-spacing: -0.5px; }
+  .hero h1 { letter-spacing: -0.5px; }
   .hero-sub { font-size: 14px; }
 }
 
