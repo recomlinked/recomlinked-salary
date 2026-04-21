@@ -462,6 +462,15 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .pseg.done { background: var(--gold); }
 
+/* Assessment container — generous bottom space so the Continue button
+   sits well above any footer on mobile. Landing keeps the default `.main` padding. */
+#assessment-content {
+  padding-bottom: 140px;
+}
+@media (max-width: 480px) {
+  #assessment-content { padding-bottom: 120px; }
+}
+
 /* ── Step / question styles ───────────────────────────── */
 .step { display: none; }
 .step.active { display: block; animation: fadeUp 0.28s ease both; }
@@ -851,6 +860,7 @@ button { font-family: var(--sans); cursor: pointer; }
     <div class="step-nav">
       <span class="step-counter">1 / 3</span>
       <div class="nav-right">
+        <button class="btn-back" onclick="backToLanding()">← Back</button>
         <button class="btn-continue" id="btn-0" onclick="goStep(1)">Continue →</button>
       </div>
     </div>
@@ -1063,6 +1073,15 @@ function selectOpt(el, groupId) {
 
   refreshButtons();
   hideErr(S.currentStep);
+
+  // Ensure Continue button is visible — scrolls only if it's off-screen
+  // (FA pattern: prevents user from tapping a chip and wondering where Continue went)
+  const btn = document.getElementById('btn-' + S.currentStep);
+  if (btn) {
+    requestAnimationFrame(() => {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
 }
 
 function refreshButtons() {
@@ -1114,6 +1133,20 @@ function validateStep(n) {
   if (n === 1) return !!S.last_raise;
   if (n === 2) return !!S.company_size;
   return true;
+}
+
+// Back from Q1 → return to landing view (no page reload; just toggle display
+// and clean the ?start=1 query param so the URL reflects what's shown).
+function backToLanding() {
+  document.getElementById('assessment-content').style.display = 'none';
+  document.getElementById('landing-content').style.display = 'block';
+  try {
+    if (history.replaceState) {
+      const cleanUrl = location.pathname + (location.hash === '#assessment-top' ? '' : location.hash);
+      history.replaceState({}, '', cleanUrl);
+    }
+  } catch (e) { /* non-fatal */ }
+  window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function showErr(n) {
