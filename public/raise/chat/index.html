@@ -20,7 +20,7 @@
   --radius:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;max-width:100vw;}
+html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;}
 body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14px;display:flex;flex-direction:column;height:100dvh;}
 
 .page-wrap{max-width:700px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
@@ -40,7 +40,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 /* ── Chat area ─────────────────────────────────────────── */
 .chat-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 20px;display:flex;flex-direction:column;gap:16px;
+  padding:16px 16px 20px;display:flex;flex-direction:column;gap:22px;
 }
 .chat-wrap::-webkit-scrollbar{display:none;}
 
@@ -59,24 +59,26 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   background:var(--bg);border-radius:var(--radius);padding:18px 16px;
   position:relative;overflow:hidden;
 }
-.prob-label{
-  font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);
-  letter-spacing:0.09em;text-transform:uppercase;margin-bottom:6px;
+.prob-stage{
+  font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);
+  letter-spacing:0.09em;text-transform:uppercase;margin-bottom:8px;
 }
+.bubble.card-bubble.final-card{
+  box-shadow:0 0 0 1.5px var(--gold), 0 2px 12px rgba(201,168,76,0.22);
+}
+.bubble.card-bubble.final-card .prob-stage{color:var(--gold);}
+
 .prob-range-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:12px;}
 .prob-range{
   font-size:44px;font-weight:800;letter-spacing:-2.5px;line-height:1;
   color:var(--gold);
-  transition:color 0.6s cubic-bezier(0.22,1,0.36,1),opacity 0.3s;
 }
 .prob-range.red   { color:var(--red); }
 .prob-range.amber { color:var(--gold); }
 .prob-range.green { color:var(--teal); }
-.prob-range.fading{ opacity:0.15; transform:translateY(-4px); transition:opacity 0.3s, transform 0.3s; }
 .prob-verdict{
   font-size:10px;font-weight:700;padding-bottom:6px;
   letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);
-  transition:color 0.6s;
 }
 .prob-verdict.red   { color:var(--red); }
 .prob-verdict.amber { color:var(--gold); }
@@ -89,29 +91,19 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .prob-fill{
   height:100%;border-radius:3px;
   background:var(--gold);
-  transition:width 1s cubic-bezier(0.22,1,0.36,1), background 0.6s;
+  transition:width 1s cubic-bezier(0.22,1,0.36,1);
 }
 .prob-fill.red   { background:var(--red); }
 .prob-fill.amber { background:var(--gold); }
 .prob-fill.green { background:var(--teal); }
 
 .prob-reason{
-  font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;
-  min-height:32px;transition:opacity 0.35s;
+  font-size:12px;color:rgba(255,255,255,0.6);line-height:1.55;
 }
 .prob-reason strong{color:#fff;}
-.prob-reason.updating{opacity:0.2;}
 
-/* Counter pills showing exchanges completed */
-.prob-pips{
-  display:flex;gap:4px;margin-top:10px;
-}
-.prob-pip{
-  flex:1;height:3px;border-radius:2px;
-  background:rgba(255,255,255,0.1);
-  transition:background 0.4s;
-}
-.prob-pip.done{background:var(--gold);}
+/* Score card message — slight extra breathing room above and below */
+.score-card-msg{margin-top:6px;margin-bottom:6px;}
 
 /* ── User message ──────────────────────────────────────── */
 .user-msg{display:flex;justify-content:flex-end;padding-left:42px;animation:msgIn 0.28s ease;}
@@ -162,19 +154,37 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 }
 .trust-row span{display:inline-block;}
 
-/* ── Bottom panel (chips + input) ──────────────────────── */
+/* ── Bottom panel (kept for future dashboard section chips) ── */
 .bottom-panel{
   flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
   transition:opacity 0.3s;
 }
 .bottom-panel.dimmed{opacity:0.35;pointer-events:none;}
 
+/* Bottom chips-area stays in DOM but collapses when empty (no answer chips
+   render here anymore — reserved for the paid dashboard's section selector). */
 .chips-area{
   padding:10px 14px 4px;
   display:flex;flex-wrap:wrap;gap:6px;
   max-height:160px;overflow-y:auto;
 }
+.chips-area:empty{padding:0;height:0;overflow:hidden;}
 .chips-area::-webkit-scrollbar{display:none;}
+
+/* ── Inline user-side chips (answer chips below each coach question) ── */
+.chips-msg{
+  flex-direction:column;align-items:flex-end;gap:6px;padding-left:42px;
+}
+.user-chips{
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
+}
+.chips-group{width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.chips-group + .chips-group{margin-top:6px;}
+.chips-sublabel{
+  font-size:10px;font-weight:700;
+  color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;
+}
+
 .chip{
   background:var(--card);color:var(--t2);
   border:1.5px solid var(--divider);
@@ -188,12 +198,6 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .chip:active{transform:scale(0.97);}
 .chip.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;}
 .chip.fadeout{opacity:0;pointer-events:none;}
-
-.chips-sublabel{
-  width:100%;font-size:10px;font-weight:700;
-  color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;
-  margin:4px 0 2px;
-}
 
 /* Input bar */
 .input-bar{
@@ -209,7 +213,10 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .input-row:focus-within{border-color:var(--navy);}
 .input-row input{
   flex:1;border:none;background:transparent;
-  font-size:14px;color:var(--t1);font-family:var(--sans);outline:none;
+  /* 16px minimum to prevent iOS Safari auto-zoom on focus.
+     Anything below 16px causes iOS to zoom the viewport, which
+     in turn forces horizontal scrolling while typing. */
+  font-size:16px;color:var(--t1);font-family:var(--sans);outline:none;
 }
 .input-row input::placeholder{color:var(--t4);}
 .send-btn{
@@ -231,6 +238,8 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   animation:msgIn 0.45s cubic-bezier(0.22,1,0.36,1);
 }
 .thinking-arc{flex-shrink:0;}
+.thinking-spinner{flex-shrink:0;animation:spin 1.05s linear infinite;transform-origin:center;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .thinking-txt{
   font-size:13px;color:var(--t2);line-height:1.5;
   flex:1;min-height:18px;
@@ -286,12 +295,18 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
     <!-- Thinking bubble (shown while analyze in flight) -->
     <div class="thinking-screen" id="thinking-screen">
       <div class="thinking-bubble">
-        <svg class="thinking-arc" width="22" height="22" viewBox="0 0 22 22" id="thinking-arc-svg">
-          <circle cx="11" cy="11" r="8" fill="none" stroke="#eceef2" stroke-width="2"/>
-          <circle cx="11" cy="11" r="8" fill="none" stroke="#c9a84c" stroke-width="2"
-                  stroke-linecap="round" stroke-dasharray="50.27"
-                  stroke-dashoffset="20" id="thinking-arc-fill"
-                  transform="rotate(-90 11 11)" style="transition:stroke-dashoffset 0.9s ease, stroke 0.9s ease;"/>
+        <svg class="thinking-spinner" width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
+          <defs>
+            <linearGradient id="spinner-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#c9a84c" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#c9a84c" stop-opacity="1"/>
+            </linearGradient>
+          </defs>
+          <circle cx="14" cy="14" r="10" fill="none" stroke="#eceef2" stroke-width="2.5"/>
+          <circle cx="14" cy="14" r="10" fill="none"
+                  stroke="url(#spinner-grad)" stroke-width="2.5"
+                  stroke-linecap="round" stroke-dasharray="47 63"
+                  transform="rotate(-90 14 14)"/>
         </svg>
         <span class="thinking-txt" id="thinking-txt"></span>
         <span class="thinking-cursor"></span>
@@ -322,6 +337,16 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 /* ═══════════════════════════════════════════════════════════ */
 /* ══  SALARY NEGOTIATION COACH — CHAT PAGE STATE MACHINE   ══ */
 /* ═══════════════════════════════════════════════════════════ */
+
+// Hide any footer injected by shared.js — chat page uses full-height layout
+document.addEventListener('DOMContentLoaded', function() {
+  var footer = document.querySelector('footer');
+  if (footer) {
+    var wrap = footer.parentElement;
+    if (wrap && wrap !== document.body) wrap.style.display = 'none';
+    else footer.style.display = 'none';
+  }
+});
 
 const LS_PROFILE = 'rl_raise_profile';
 const LS_STATE   = 'rl_raise_state';
@@ -429,9 +454,6 @@ let thinkingRunning = false;
 async function runThinkingAnimation() {
   thinkingRunning = true;
   const txt = $('thinking-txt');
-  const arc = $('thinking-arc-fill');
-  const colors = ['#c9a84c','#00c4a0','#e05555'];
-  const dashMax = 50.27;
 
   let i = 0;
   while (thinkingRunning) {
@@ -443,13 +465,6 @@ async function runThinkingAnimation() {
       await sleep(22);
     }
     if (!thinkingRunning) break;
-
-    // Arc progress nudge + colour shift
-    if (arc) {
-      const progress = (i + 1) / THINKING_ITEMS.length;
-      arc.style.strokeDashoffset = dashMax * (1 - Math.min(0.95, progress));
-      arc.style.stroke = colors[i % colors.length];
-    }
 
     await sleep(650);
     if (!thinkingRunning) break;
@@ -471,89 +486,60 @@ function stopThinkingAnimation() {
 }
 
 /* ── Render probability card (first bubble, persists) ──── */
-function renderInitialCard(range, contextLine) {
+/* ── Score card (one per exchange) ──────────────────────── */
+// exchangeDone: 0 = initial, 1-4 = card posted after that exchange
+const CARD_STAGE_LABEL = {
+  0: 'Starting Range',
+  1: 'After: Role & Industry',
+  2: 'After: Performance',
+  3: 'After: Market & Leverage',
+  4: 'Final Range',
+};
+
+function renderScoreCard(range, reasonLine, exchangeDone) {
   const color = colorFor(range);
   const ceiling = range.ceiling;
-  const cardWrap = el('div', 'coach-msg', '');
-  cardWrap.id = 'prob-card-wrap';
+  const floor   = range.floor;
+  const stageLabel = CARD_STAGE_LABEL[exchangeDone || 0];
+  const isFinal = exchangeDone === 4;
+
+  const cardWrap = el('div', 'coach-msg score-card-msg', '');
+  cardWrap.dataset.exchangeDone = String(exchangeDone || 0);
 
   cardWrap.innerHTML = `
-    <div class="bubble card-bubble">
+    <div class="bubble card-bubble ${isFinal ? 'final-card' : ''}">
       <div class="prob-card">
-        <div class="prob-label">Raise Probability</div>
+        <div class="prob-stage">${stageLabel}</div>
         <div class="prob-range-row">
-          <span class="prob-range ${color}" id="prob-range-display">${range.floor}–${range.ceiling}%</span>
-          <span class="prob-verdict ${color}" id="prob-verdict">${VERDICT_BY_COLOR[color]}</span>
+          <span class="prob-range ${color}">${floor}–${ceiling}%</span>
+          <span class="prob-verdict ${color}">${VERDICT_BY_COLOR[color]}</span>
         </div>
-        <div class="prob-track"><div class="prob-fill ${color}" id="prob-fill" style="width:0%;"></div></div>
-        <div class="prob-reason" id="prob-reason">${contextLine || ''}</div>
-        <div class="prob-pips" id="prob-pips">
-          <div class="prob-pip" data-ex="1"></div>
-          <div class="prob-pip" data-ex="2"></div>
-          <div class="prob-pip" data-ex="3"></div>
-          <div class="prob-pip" data-ex="4"></div>
-        </div>
+        <div class="prob-track"><div class="prob-fill ${color}" style="width:0%;"></div></div>
+        <div class="prob-reason">${reasonLine || ''}</div>
       </div>
     </div>
   `;
   $('messages').appendChild(cardWrap);
 
-  // Animate fill in
+  // Animate fill in after the card mounts
   requestAnimationFrame(() => {
-    const f = $('prob-fill');
+    const f = cardWrap.querySelector('.prob-fill');
     if (f) f.style.width = ceiling + '%';
   });
+
+  scrollChatToBottom();
+  return cardWrap;
 }
 
-function updateCard(newRange, reasonLine, exchangeDone) {
-  const rangeEl   = $('prob-range-display');
-  const verdictEl = $('prob-verdict');
-  const fillEl    = $('prob-fill');
-  const reasonEl  = $('prob-reason');
-  const pips      = document.querySelectorAll('#prob-pips .prob-pip');
-  if (!rangeEl || !fillEl) return;
-
-  const newColor = colorFor(newRange);
-  const oldColorClasses = ['red','amber','green'];
-
-  // Phase 1: fade old range text
-  rangeEl.classList.add('fading');
-  if (reasonEl) reasonEl.classList.add('updating');
-
-  setTimeout(() => {
-    // Phase 2: swap values, new colour, fade back in
-    rangeEl.textContent = `${newRange.floor}–${newRange.ceiling}%`;
-    oldColorClasses.forEach(c => {
-      rangeEl.classList.remove(c);
-      verdictEl.classList.remove(c);
-      fillEl.classList.remove(c);
-    });
-    rangeEl.classList.add(newColor);
-    verdictEl.classList.add(newColor);
-    fillEl.classList.add(newColor);
-    verdictEl.textContent = VERDICT_BY_COLOR[newColor];
-    fillEl.style.width = newRange.ceiling + '%';
-    rangeEl.classList.remove('fading');
-
-    // Reason line
-    if (reasonEl) {
-      reasonEl.innerHTML = reasonLine || '';
-      reasonEl.classList.remove('updating');
-    }
-
-    // Pip for completed exchange
-    if (exchangeDone) {
-      const pip = document.querySelector(`#prob-pips .prob-pip[data-ex="${exchangeDone}"]`);
-      if (pip) pip.classList.add('done');
-    }
-  }, 320);
+// Legacy alias — code that still calls renderInitialCard will work.
+function renderInitialCard(range, contextLine) {
+  return renderScoreCard(range, contextLine, 0);
 }
 
 /* ── Coach bubble with typing effect ────────────────────── */
 async function typeCoachBubble(text) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="bubble-label">Coach</div>
     <div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>
   `;
   $('messages').appendChild(wrap);
@@ -593,7 +579,6 @@ function showCoachTyping() {
   if (currentTypingWrap) return;
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="bubble-label">Coach</div>
     <div class="bubble"><div class="typing-dots"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>
   `;
   $('messages').appendChild(wrap);
@@ -607,33 +592,56 @@ function hideCoachTyping() {
   }
 }
 
-/* ── Chips UI ──────────────────────────────────────────── */
+/* ── Chips UI (inline user-side chips) ──────────────────── */
+// Current active user-chips wrap (so we can remove it when answered)
+let currentChipsWrap = null;
+
 function clearChips() {
+  // Removes whatever inline user-chips wrap is currently active
+  if (currentChipsWrap) {
+    currentChipsWrap.remove();
+    currentChipsWrap = null;
+  }
+  // Also clear the bottom-panel chips-area (future dashboard chips)
   const a = $('chips-area');
   if (a) a.innerHTML = '';
 }
 
-function renderChips(chips, onSelect, sublabel) {
-  const area = $('chips-area');
-  area.innerHTML = '';
-  if (sublabel) {
-    const lbl = el('div', 'chips-sublabel', sublabel);
-    area.appendChild(lbl);
-  }
+function fadeOutChips() {
+  if (!currentChipsWrap) return;
+  currentChipsWrap.querySelectorAll('.chip').forEach(c => c.classList.add('fadeout'));
+  const toRemove = currentChipsWrap;
+  currentChipsWrap = null;
+  setTimeout(() => { toRemove.remove(); }, 260);
+}
+
+/**
+ * Renders chips inline on the user side (right-aligned, below the question).
+ * Tapping a chip runs onSelect(chip, button). Caller is responsible for
+ * clearing / fading via the helpers above.
+ * Returns the wrap element.
+ */
+function renderUserChips(chips, onSelect) {
+  const wrap = el('div', 'user-msg chips-msg', '');
+  const inner = el('div', 'user-chips', '');
   chips.forEach(c => {
     const btn = el('button', 'chip', c.label);
     btn.type = 'button';
     btn.dataset.val = c.value;
     btn.onclick = () => onSelect(c, btn);
-    area.appendChild(btn);
+    inner.appendChild(btn);
   });
+  wrap.appendChild(inner);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  currentChipsWrap = wrap;
+  return wrap;
 }
 
-function fadeOutChips() {
-  const area = $('chips-area');
-  if (!area) return;
-  area.querySelectorAll('.chip').forEach(c => c.classList.add('fadeout'));
-  setTimeout(() => { clearChips(); }, 260);
+// Legacy alias — old code paths still call renderChips().
+// Redirect to user-side rendering.
+function renderChips(chips, onSelect) {
+  return renderUserChips(chips, onSelect);
 }
 
 /* ── Bottom panel enable/disable ───────────────────────── */
@@ -658,7 +666,6 @@ function disableInput(placeholder) {
 function showErrorBubble(message, onRetry) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="bubble-label">Coach</div>
     <div class="bubble err-bubble">
       ${escapeHtml(message)}
       ${onRetry ? '<br/><button type="button" id="err-retry">Retry</button>' : ''}
@@ -851,27 +858,30 @@ async function beginExchange4() {
 }
 
 function renderExchange4Chips() {
-  const area = $('chips-area');
-  area.innerHTML = '';
+  const wrap = el('div', 'user-msg chips-msg ex4-chips', '');
 
-  const row1Label = el('div', 'chips-sublabel', 'Relationship');
-  area.appendChild(row1Label);
+  const row1 = el('div', 'chips-group', '');
+  row1.innerHTML = '<div class="chips-sublabel">Relationship</div>';
   const row1Chips = [
     { value: 'strong',       label: 'Strong — they advocate' },
     { value: 'professional', label: 'Professional but not close' },
     { value: 'complicated',  label: "It's complicated" },
     { value: 'never_asked',  label: "Haven't asked before" },
   ];
+  const row1Inner = el('div', 'user-chips', '');
   row1Chips.forEach(c => {
     const btn = el('button', 'chip', c.label);
     btn.type = 'button';
     btn.dataset.val = c.value;
+    btn.dataset.row = 'relationship';
     btn.onclick = () => pickEx4Row('relationship', c.value, c.label, btn);
-    area.appendChild(btn);
+    row1Inner.appendChild(btn);
   });
+  row1.appendChild(row1Inner);
+  wrap.appendChild(row1);
 
-  const row2Label = el('div', 'chips-sublabel', 'Timing of next review');
-  area.appendChild(row2Label);
+  const row2 = el('div', 'chips-group', '');
+  row2.innerHTML = '<div class="chips-sublabel">Timing of next review</div>';
   const row2Chips = [
     { value: 'imminent',     label: 'Within 1 month' },
     { value: 'soon',         label: '1–3 months' },
@@ -879,13 +889,21 @@ function renderExchange4Chips() {
     { value: 'none',         label: 'No set cycle' },
     { value: 'just_happened',label: 'Review just happened' },
   ];
+  const row2Inner = el('div', 'user-chips', '');
   row2Chips.forEach(c => {
     const btn = el('button', 'chip', c.label);
     btn.type = 'button';
     btn.dataset.val = c.value;
+    btn.dataset.row = 'timing';
     btn.onclick = () => pickEx4Row('timing', c.value, c.label, btn);
-    area.appendChild(btn);
+    row2Inner.appendChild(btn);
   });
+  row2.appendChild(row2Inner);
+  wrap.appendChild(row2);
+
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  currentChipsWrap = wrap;
 }
 
 function pickEx4Row(row, value, label, btn) {
@@ -894,25 +912,11 @@ function pickEx4Row(row, value, label, btn) {
   state.ex4_partial[row + '_label'] = label;
   saveState();
 
-  // Deselect siblings in this row, select this
-  const allChips = $('chips-area').querySelectorAll('.chip');
-  allChips.forEach(c => {
-    if (c === btn) {
-      c.classList.add('selected');
-    } else {
-      // Find whether it's the same row — by checking order relative to sublabels
-      // Simpler: rely on the caller to have stored row, and use DOM walking
-    }
-  });
-
-  // More explicit row deselection using data attributes from row labels:
-  // (We just walk and unset previously-selected within the same row.)
-  const sublabels = $('chips-area').querySelectorAll('.chips-sublabel');
-  const thisRow = (row === 'relationship') ? sublabels[0] : sublabels[1];
-  let node = thisRow.nextElementSibling;
-  while (node && !node.classList.contains('chips-sublabel')) {
-    if (node !== btn && node.classList.contains('chip')) node.classList.remove('selected');
-    node = node.nextElementSibling;
+  // Deselect siblings within this row only (using data-row attribute)
+  if (currentChipsWrap) {
+    currentChipsWrap.querySelectorAll('.chip[data-row="' + row + '"]').forEach(c => {
+      c.classList.toggle('selected', c === btn);
+    });
   }
 
   // If both rows picked, submit
@@ -1008,8 +1012,8 @@ async function runExchangeCall(exchangeNum, answer) {
   }
   saveState();
 
-  // Update the card (pip + range animation)
-  updateCard(state.current_range, result.reason_line, exchangeNum);
+  // Post a fresh score card for this exchange (stacks in the chat history)
+  renderScoreCard(state.current_range, result.reason_line, exchangeNum);
   await sleep(800);
 
   // Exchange 4 complete → paywall
@@ -1056,7 +1060,6 @@ async function showPaywall() {
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="bubble-label">Coach</div>
     <div class="paywall-bubble">
       <p><strong>Your range lands at ${r.floor}–${r.ceiling}%.</strong> That's your realistic probability with a well-prepared negotiation.</p>
       <p>The difference between that and 75%+ almost always comes down to 2–3 specific moves made <em>before</em> the conversation — the exact number to ask for, the opening words, how to handle the pushbacks you're most likely to hear.</p>
