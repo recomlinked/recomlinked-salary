@@ -1,0 +1,15 @@
+{
+  "name": "recomlinked-salary",
+  "version": "1.0.0",
+  "description": "Salary Negotiation Coach — salary.recomlinked.com",
+  "private": true,
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0",
+    "@upstash/redis": "^1.28.0",
+    "resend": "^3.0.0",
+    "stripe": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

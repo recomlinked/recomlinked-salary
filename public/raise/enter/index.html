@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Welcome back · Salary Negotiation Coach</title>
+<meta name="robots" content="noindex"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<style>
+:root{
+  --gold:#c9a84c;--gold2:#d8b75a;
+  --teal:#00c4a0;--red:#e05555;--navy:#1e3d72;
+  --bg:#07090f;--bg4:#1c2030;
+  --page:#f4f5f8;--card:#ffffff;
+  --divider:#dde0e8;--muted:#eceef2;
+  --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;max-width:100vw;overflow-x:hidden;}
+body{
+  background:var(--page);color:var(--t1);
+  font-family:var(--sans);font-size:14px;line-height:1.5;
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+a{color:var(--navy);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.site-header{
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
+.logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
+.logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
+.header-sub{font-size:11px;color:#454d60;letter-spacing:0.04em;font-weight:500;}
+
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+
+.card{
+  background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);
+  padding:28px 26px;max-width:440px;width:100%;
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
+}
+.pill{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.08em;
+  color:var(--gold);background:rgba(201,168,76,0.1);
+  border:1px solid rgba(201,168,76,0.28);
+  padding:4px 10px;border-radius:20px;margin-bottom:14px;
+}
+h1{
+  font-size:22px;font-weight:800;letter-spacing:-0.4px;color:var(--t1);
+  margin-bottom:8px;line-height:1.25;
+}
+.sub{font-size:13.5px;color:var(--t2);line-height:1.6;margin-bottom:20px;}
+
+.input-label{
+  font-size:11px;font-weight:700;letter-spacing:0.06em;
+  color:var(--t3);text-transform:uppercase;margin-bottom:6px;
+}
+.input-field{
+  width:100%;border:1.5px solid var(--divider);border-radius:8px;
+  padding:12px 14px;font-size:15px;color:var(--t1);
+  font-family:var(--sans);outline:none;
+  transition:border-color 0.15s;margin-bottom:6px;
+}
+.input-field:focus{border-color:var(--navy);}
+
+.btn-submit{
+  width:100%;background:var(--gold);color:#07090f;
+  border:none;border-radius:10px;padding:13px;
+  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
+  margin-top:12px;transition:background 0.12s,transform 0.1s,opacity 0.12s;
+}
+.btn-submit:hover{background:var(--gold2);}
+.btn-submit:active{transform:translateY(1px);}
+.btn-submit:disabled{opacity:0.55;cursor:wait;}
+
+.err{
+  font-size:12.5px;color:var(--red);
+  background:rgba(224,85,85,0.07);border-left:2.5px solid var(--red);
+  padding:7px 10px;border-radius:4px;margin-top:8px;
+  display:none;
+}
+.err.show{display:block;}
+
+.hint{
+  font-size:12px;color:var(--t3);line-height:1.55;
+  margin-top:12px;
+}
+
+.divider{
+  height:1px;background:var(--divider);margin:22px 0;
+}
+.footer-link{
+  font-size:12.5px;color:var(--t2);text-align:center;
+}
+.footer-link a{color:var(--navy);font-weight:600;}
+
+/* Success state */
+.success-icon{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(0,196,160,0.12);color:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;font-size:28px;font-weight:800;
+}
+.success-card{text-align:center;}
+
+/* Loader spinner (inside button during submit) */
+.mini-spin{
+  width:14px;height:14px;border:2px solid rgba(0,0,0,0.2);
+  border-top-color:#07090f;border-radius:50%;
+  display:inline-block;animation:spin 0.7s linear infinite;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <div class="header-sub">SALARY NEGOTIATION COACH</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Form state -->
+  <div class="card" id="form-card">
+    <div class="pill">ENTER WITH EMAIL</div>
+    <h1>Welcome back.</h1>
+    <p class="sub">Enter your email and we'll send you a fresh sign-in link. If your 30-day coaching window is still active, you'll be back in your session in under a minute.</p>
+
+    <form id="email-form" autocomplete="on" novalidate>
+      <div class="input-label">EMAIL</div>
+      <input
+        class="input-field" id="email-input"
+        type="email" inputmode="email" autocomplete="email"
+        placeholder="you@example.com" required/>
+      <div class="err" id="err-email">Please enter a valid email address.</div>
+      <button class="btn-submit" type="submit" id="btn-submit">Send me a sign-in link</button>
+    </form>
+
+    <div class="hint">
+      The link is valid for 15 minutes, single-use. If you don't see the email, check spam or request another in 2 minutes.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="footer-link">
+      Haven't started yet? <a href="/raise/">Get your raise probability →</a>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="card success-card" id="success-card" hidden>
+    <div class="success-icon">✓</div>
+    <h1>Check your email.</h1>
+    <p class="sub">
+      If that address has an active coaching window with us, we've just sent a sign-in link. It's good for the next 15 minutes.
+    </p>
+    <div class="hint" style="margin-top:2px;">
+      No email after a minute? Check your spam folder. Still nothing? You can try again in two minutes, or email <a href="mailto:support@recomlinked.com">support@recomlinked.com</a>.
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="footer-link">
+      Wrong email? <a href="#" id="try-again">Try again →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_MAGIC = '/api/raise-magic-link';
+
+const $ = id => document.getElementById(id);
+
+function looksLikeEmail(v) {
+  v = (v || '').trim().toLowerCase();
+  if (v.length < 5) return false;
+  const at = v.indexOf('@');
+  if (at < 1) return false;
+  const domain = v.slice(at + 1);
+  if (!domain.includes('.')) return false;
+  if (domain.endsWith('.')) return false;
+  return true;
+}
+
+$('email-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = $('email-input');
+  const email = (input.value || '').trim();
+  if (!looksLikeEmail(email)) {
+    $('err-email').classList.add('show');
+    input.focus();
+    return;
+  }
+  $('err-email').classList.remove('show');
+
+  const btn = $('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spin"></span>&nbsp; Sending…';
+
+  try {
+    await fetch(API_MAGIC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+  } catch (err) {
+    // Network error — but we still show success (security: never reveal registration status)
+  }
+
+  // Always show success — API pattern is to return 200 regardless
+  $('form-card').hidden = true;
+  $('success-card').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
+
+$('try-again').addEventListener('click', (e) => {
+  e.preventDefault();
+  $('success-card').hidden = true;
+  $('form-card').hidden = false;
+  const btn = $('btn-submit');
+  btn.disabled = false;
+  btn.textContent = 'Send me a sign-in link';
+  const input = $('email-input');
+  input.value = '';
+  input.focus();
+});
+
+// Clear error on typing
+$('email-input').addEventListener('input', () => {
+  $('err-email').classList.remove('show');
+});
+
+// Focus email field on load
+setTimeout(() => $('email-input').focus(), 100);
+</script>
+
+<script defer src="/shared.js"></script>
+</body>
+</html>

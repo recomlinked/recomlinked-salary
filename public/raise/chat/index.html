@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Your Raise Probability · Salary Negotiation Coach</title>
+<meta name="robots" content="noindex"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<style>
+/* ── Variables ─────────────────────────────────────────── */
+:root{
+  --gold:#c9a84c;--gold2:#d8b75a;
+  --teal:#00c4a0;--red:#e05555;
+  --navy:#1e3d72;
+  --bg:#07090f;--bg2:#0f1117;--bg3:#141722;--bg4:#1c2030;
+  --page:#f4f5f8;--card:#ffffff;
+  --divider:#dde0e8;--muted:#eceef2;
+  --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;max-width:100vw;}
+body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14px;display:flex;flex-direction:column;height:100dvh;}
+
+.page-wrap{max-width:700px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
+
+/* ── Header ────────────────────────────────────────────── */
+.site-header{
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
+  position:sticky;top:0;z-index:400;flex-shrink:0;
+}
+.logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
+.logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
+.logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.header-sub{font-size:11px;color:#454d60;letter-spacing:0.04em;font-weight:500;}
+
+/* ── Chat area ─────────────────────────────────────────── */
+.chat-wrap{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px 16px 20px;display:flex;flex-direction:column;gap:16px;
+}
+.chat-wrap::-webkit-scrollbar{display:none;}
+
+/* ── Coach message ─────────────────────────────────────── */
+.coach-msg{display:flex;flex-direction:column;gap:4px;animation:msgIn 0.45s cubic-bezier(0.22,1,0.36,1);}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
+.bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
+.bubble p{font-size:13.5px;color:var(--t1);line-height:1.6;}
+.bubble.card-bubble{padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.coach-msg .cursor{display:inline-block;width:1.5px;height:14px;background:var(--t2);margin-left:1px;vertical-align:middle;animation:blink 0.9s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ── Probability card ──────────────────────────────────── */
+.prob-card{
+  background:var(--bg);border-radius:var(--radius);padding:18px 16px;
+  position:relative;overflow:hidden;
+}
+.prob-label{
+  font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);
+  letter-spacing:0.09em;text-transform:uppercase;margin-bottom:6px;
+}
+.prob-range-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:12px;}
+.prob-range{
+  font-size:44px;font-weight:800;letter-spacing:-2.5px;line-height:1;
+  color:var(--gold);
+  transition:color 0.6s cubic-bezier(0.22,1,0.36,1),opacity 0.3s;
+}
+.prob-range.red   { color:var(--red); }
+.prob-range.amber { color:var(--gold); }
+.prob-range.green { color:var(--teal); }
+.prob-range.fading{ opacity:0.15; transform:translateY(-4px); transition:opacity 0.3s, transform 0.3s; }
+.prob-verdict{
+  font-size:10px;font-weight:700;padding-bottom:6px;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);
+  transition:color 0.6s;
+}
+.prob-verdict.red   { color:var(--red); }
+.prob-verdict.amber { color:var(--gold); }
+.prob-verdict.green { color:var(--teal); }
+
+.prob-track{
+  background:rgba(255,255,255,0.08);border-radius:3px;height:6px;
+  margin-bottom:12px;overflow:hidden;position:relative;
+}
+.prob-fill{
+  height:100%;border-radius:3px;
+  background:var(--gold);
+  transition:width 1s cubic-bezier(0.22,1,0.36,1), background 0.6s;
+}
+.prob-fill.red   { background:var(--red); }
+.prob-fill.amber { background:var(--gold); }
+.prob-fill.green { background:var(--teal); }
+
+.prob-reason{
+  font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;
+  min-height:32px;transition:opacity 0.35s;
+}
+.prob-reason strong{color:#fff;}
+.prob-reason.updating{opacity:0.2;}
+
+/* Counter pills showing exchanges completed */
+.prob-pips{
+  display:flex;gap:4px;margin-top:10px;
+}
+.prob-pip{
+  flex:1;height:3px;border-radius:2px;
+  background:rgba(255,255,255,0.1);
+  transition:background 0.4s;
+}
+.prob-pip.done{background:var(--gold);}
+
+/* ── User message ──────────────────────────────────────── */
+.user-msg{display:flex;justify-content:flex-end;padding-left:42px;animation:msgIn 0.28s ease;}
+.user-bubble{
+  background:var(--navy);color:#fff;
+  border-radius:14px 4px 14px 14px;
+  padding:10px 14px;font-size:13px;line-height:1.5;max-width:82%;
+  word-wrap:break-word;
+}
+
+/* ── Coach typing dots (short inline indicator) ────────── */
+.typing-dots{display:inline-flex;gap:3px;align-items:center;padding:4px 0;}
+.typing-dots .d{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:typD 1.1s infinite;}
+.typing-dots .d:nth-child(2){animation-delay:0.15s;}
+.typing-dots .d:nth-child(3){animation-delay:0.3s;}
+@keyframes typD{0%,100%{opacity:0.25;transform:translateY(0);}40%{opacity:1;transform:translateY(-2px);}}
+
+/* ── Paywall bubble ────────────────────────────────────── */
+.paywall-bubble{
+  background:var(--bg);border-radius:4px 14px 14px 14px;
+  padding:16px 16px 14px;color:#fff;
+}
+.paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.72);line-height:1.65;margin-bottom:10px;}
+.paywall-bubble p strong{color:#fff;}
+.paywall-bubble ul{list-style:none;margin:12px 0;padding:0;}
+.paywall-bubble ul li{
+  font-size:12.5px;color:rgba(255,255,255,0.72);line-height:1.5;
+  padding:4px 0 4px 20px;position:relative;
+}
+.paywall-bubble ul li::before{
+  content:'✓';position:absolute;left:0;top:4px;color:var(--gold);font-weight:700;
+}
+.btn-pay{
+  width:100%;background:var(--gold);color:var(--bg);
+  border:none;border-radius:10px;padding:14px;margin-top:6px;
+  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background 0.12s,transform 0.1s;
+}
+.btn-pay:hover{background:var(--gold2);}
+.btn-pay:active{transform:translateY(1px);}
+.btn-pay:disabled{opacity:0.6;cursor:wait;}
+.btn-pay-arrow{display:inline-block;animation:ap 1.8s ease-in-out infinite;}
+@keyframes ap{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
+.trust-row{
+  display:flex;justify-content:center;gap:12px;margin-top:10px;
+  font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:0.04em;
+}
+.trust-row span{display:inline-block;}
+
+/* ── Bottom panel (chips + input) ──────────────────────── */
+.bottom-panel{
+  flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
+  transition:opacity 0.3s;
+}
+.bottom-panel.dimmed{opacity:0.35;pointer-events:none;}
+
+.chips-area{
+  padding:10px 14px 4px;
+  display:flex;flex-wrap:wrap;gap:6px;
+  max-height:160px;overflow-y:auto;
+}
+.chips-area::-webkit-scrollbar{display:none;}
+.chip{
+  background:var(--card);color:var(--t2);
+  border:1.5px solid var(--divider);
+  border-radius:20px;
+  padding:8px 14px;font-size:12.5px;font-weight:500;
+  cursor:pointer;font-family:var(--sans);
+  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s,opacity 0.18s;
+  line-height:1.3;
+}
+.chip:hover{border-color:var(--navy);color:var(--navy);}
+.chip:active{transform:scale(0.97);}
+.chip.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;}
+.chip.fadeout{opacity:0;pointer-events:none;}
+
+.chips-sublabel{
+  width:100%;font-size:10px;font-weight:700;
+  color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;
+  margin:4px 0 2px;
+}
+
+/* Input bar */
+.input-bar{
+  padding:10px 12px calc(12px + env(safe-area-inset-bottom)) 12px;
+  flex-shrink:0;
+}
+.input-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1.5px solid var(--divider);
+  border-radius:24px;padding:6px 6px 6px 16px;
+  transition:border-color 0.15s;
+}
+.input-row:focus-within{border-color:var(--navy);}
+.input-row input{
+  flex:1;border:none;background:transparent;
+  font-size:14px;color:var(--t1);font-family:var(--sans);outline:none;
+}
+.input-row input::placeholder{color:var(--t4);}
+.send-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--navy);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:background 0.15s,opacity 0.15s;
+}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.send-btn:active:not(:disabled){opacity:0.82;}
+.send-btn svg{width:14px;height:14px;}
+
+/* ── Thinking screen ───────────────────────────────────── */
+.thinking-screen{padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px;}
+.thinking-bubble{
+  background:var(--card);border-radius:4px 14px 14px 14px;
+  padding:14px 16px;border:1px solid var(--divider);
+  display:flex;align-items:center;gap:10px;min-height:48px;
+  animation:msgIn 0.45s cubic-bezier(0.22,1,0.36,1);
+}
+.thinking-arc{flex-shrink:0;}
+.thinking-txt{
+  font-size:13px;color:var(--t2);line-height:1.5;
+  flex:1;min-height:18px;
+}
+.thinking-cursor{
+  display:inline-block;width:1.5px;height:13px;
+  background:var(--t2);margin-left:1px;vertical-align:middle;
+  animation:blink 0.9s infinite;
+}
+
+/* ── Reason change flash (under coach bubble after card update) ─ */
+.reason-flash{
+  font-size:11px;color:var(--t3);font-style:italic;
+  padding:2px 14px 0;
+  animation:flashIn 0.4s ease;
+}
+@keyframes flashIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── Error state ───────────────────────────────────────── */
+.err-bubble{
+  background:#fff;border:1px solid #f4c7c7;
+  border-left:3px solid var(--red);
+  border-radius:4px 10px 10px 10px;padding:12px 14px;
+  font-size:12.5px;color:var(--t2);line-height:1.55;
+}
+.err-bubble button{
+  margin-top:8px;background:var(--navy);color:#fff;
+  border:none;border-radius:8px;padding:8px 14px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);
+}
+
+/* Exchange label pill (small indicator above each new question) */
+.exchange-pill{
+  display:inline-block;font-size:10px;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--t3);padding:2px 0 0;
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <div class="header-sub">SALARY NEGOTIATION COACH</div>
+</header>
+
+<div class="page-wrap">
+
+  <!-- Chat area ──────────────────────────────────────── -->
+  <div class="chat-wrap" id="chat-wrap">
+
+    <!-- Thinking bubble (shown while analyze in flight) -->
+    <div class="thinking-screen" id="thinking-screen">
+      <div class="thinking-bubble">
+        <svg class="thinking-arc" width="22" height="22" viewBox="0 0 22 22" id="thinking-arc-svg">
+          <circle cx="11" cy="11" r="8" fill="none" stroke="#eceef2" stroke-width="2"/>
+          <circle cx="11" cy="11" r="8" fill="none" stroke="#c9a84c" stroke-width="2"
+                  stroke-linecap="round" stroke-dasharray="50.27"
+                  stroke-dashoffset="20" id="thinking-arc-fill"
+                  transform="rotate(-90 11 11)" style="transition:stroke-dashoffset 0.9s ease, stroke 0.9s ease;"/>
+        </svg>
+        <span class="thinking-txt" id="thinking-txt"></span>
+        <span class="thinking-cursor"></span>
+      </div>
+    </div>
+
+    <!-- Coach messages and card render into this area -->
+    <div id="messages"></div>
+
+  </div>
+
+  <!-- Bottom panel ──────────────────────────────────── -->
+  <div class="bottom-panel dimmed" id="bottom-panel">
+    <div class="chips-area" id="chips-area"></div>
+    <div class="input-bar">
+      <div class="input-row">
+        <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
+        <button class="send-btn" id="send-btn" disabled aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════ */
+/* ══  SALARY NEGOTIATION COACH — CHAT PAGE STATE MACHINE   ══ */
+/* ═══════════════════════════════════════════════════════════ */
+
+const LS_PROFILE = 'rl_raise_profile';
+const LS_STATE   = 'rl_raise_state';
+const API_ANALYZE  = '/api/raise-analyze';
+const API_EXCHANGE = '/api/raise-exchange';
+const API_ENRICH   = '/api/raise-enrich';
+const API_CHECKOUT = '/api/raise-checkout';
+
+const state = {
+  profile: null,
+  initial_floor: null,
+  current_range: null,
+  current_exchange: 0,          // 0 before analyze, 1..4 during, 5 = paywall
+  accumulated: {},              // { ex1: {...}, ex2: {...}, ex3: {...}, ex4: {...} }
+  chat_log: [],                 // for rehydration
+  ex4_partial: null,            // { relationship?, timing?, free_text? }
+};
+
+const THINKING_ITEMS = [
+  "Mapping your company situation",
+  "Factoring in your tenure and timing",
+  "Reading your regional market norms",
+  "Calibrating seniority and leverage",
+  "Weighing company-size effects",
+  "Checking industry hiring trends in your field",
+  "Setting your realistic probability floor",
+  "Setting your realistic probability ceiling",
+  "Identifying your structural tailwinds",
+  "Identifying your structural headwinds",
+  "Preparing your coaching questions",
+  "Building your personalised range",
+];
+
+const VERDICT_BY_COLOR = {
+  red:   'Uphill',
+  amber: 'In play',
+  green: 'Favourable',
+};
+
+/* ── Utilities ──────────────────────────────────────────── */
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  return e;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function scrollChatToBottom() {
+  const w = $('chat-wrap');
+  if (!w) return;
+  requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
+}
+function midpoint(r) { return (r.floor + r.ceiling) / 2; }
+function colorFor(range) {
+  const m = midpoint(range);
+  if (m < 40) return 'red';
+  if (m < 60) return 'amber';
+  return 'green';
+}
+
+function saveState() {
+  try { localStorage.setItem(LS_STATE, JSON.stringify(state)); }
+  catch (e) { /* storage may be full / disabled */ }
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(LS_STATE);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function loadProfile() {
+  try {
+    const raw = localStorage.getItem(LS_PROFILE);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (e) { return null; }
+}
+function clearAll() {
+  try {
+    localStorage.removeItem(LS_PROFILE);
+    localStorage.removeItem(LS_STATE);
+  } catch (e) {}
+}
+
+function profileHash() {
+  // Same formula as spec §14 — used to cache enrichment in Redis
+  const p = state.profile || {};
+  const ex = state.accumulated || {};
+  const s = `${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`
+          + `|${ex.ex1?.signal || ''}|${ex.ex2?.signal || ''}`
+          + `|${ex.ex3?.signal || ''}|${ex.ex4?.signal || ''}`;
+  try {
+    return btoa(unescape(encodeURIComponent(s))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
+  } catch (e) {
+    return s.replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
+  }
+}
+
+/* ── Thinking screen ────────────────────────────────────── */
+let thinkingTimer = null;
+let thinkingRunning = false;
+
+async function runThinkingAnimation() {
+  thinkingRunning = true;
+  const txt = $('thinking-txt');
+  const arc = $('thinking-arc-fill');
+  const colors = ['#c9a84c','#00c4a0','#e05555'];
+  const dashMax = 50.27;
+
+  let i = 0;
+  while (thinkingRunning) {
+    const item = THINKING_ITEMS[i % THINKING_ITEMS.length];
+
+    // Type in
+    for (let c = 1; c <= item.length && thinkingRunning; c++) {
+      txt.textContent = item.slice(0, c);
+      await sleep(22);
+    }
+    if (!thinkingRunning) break;
+
+    // Arc progress nudge + colour shift
+    if (arc) {
+      const progress = (i + 1) / THINKING_ITEMS.length;
+      arc.style.strokeDashoffset = dashMax * (1 - Math.min(0.95, progress));
+      arc.style.stroke = colors[i % colors.length];
+    }
+
+    await sleep(650);
+    if (!thinkingRunning) break;
+
+    // Type out
+    for (let c = item.length; c >= 0 && thinkingRunning; c--) {
+      txt.textContent = item.slice(0, c);
+      await sleep(10);
+    }
+    await sleep(180);
+    i++;
+  }
+}
+
+function stopThinkingAnimation() {
+  thinkingRunning = false;
+  const s = $('thinking-screen');
+  if (s) s.style.display = 'none';
+}
+
+/* ── Render probability card (first bubble, persists) ──── */
+function renderInitialCard(range, contextLine) {
+  const color = colorFor(range);
+  const ceiling = range.ceiling;
+  const cardWrap = el('div', 'coach-msg', '');
+  cardWrap.id = 'prob-card-wrap';
+
+  cardWrap.innerHTML = `
+    <div class="bubble card-bubble">
+      <div class="prob-card">
+        <div class="prob-label">Raise Probability</div>
+        <div class="prob-range-row">
+          <span class="prob-range ${color}" id="prob-range-display">${range.floor}–${range.ceiling}%</span>
+          <span class="prob-verdict ${color}" id="prob-verdict">${VERDICT_BY_COLOR[color]}</span>
+        </div>
+        <div class="prob-track"><div class="prob-fill ${color}" id="prob-fill" style="width:0%;"></div></div>
+        <div class="prob-reason" id="prob-reason">${contextLine || ''}</div>
+        <div class="prob-pips" id="prob-pips">
+          <div class="prob-pip" data-ex="1"></div>
+          <div class="prob-pip" data-ex="2"></div>
+          <div class="prob-pip" data-ex="3"></div>
+          <div class="prob-pip" data-ex="4"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  $('messages').appendChild(cardWrap);
+
+  // Animate fill in
+  requestAnimationFrame(() => {
+    const f = $('prob-fill');
+    if (f) f.style.width = ceiling + '%';
+  });
+}
+
+function updateCard(newRange, reasonLine, exchangeDone) {
+  const rangeEl   = $('prob-range-display');
+  const verdictEl = $('prob-verdict');
+  const fillEl    = $('prob-fill');
+  const reasonEl  = $('prob-reason');
+  const pips      = document.querySelectorAll('#prob-pips .prob-pip');
+  if (!rangeEl || !fillEl) return;
+
+  const newColor = colorFor(newRange);
+  const oldColorClasses = ['red','amber','green'];
+
+  // Phase 1: fade old range text
+  rangeEl.classList.add('fading');
+  if (reasonEl) reasonEl.classList.add('updating');
+
+  setTimeout(() => {
+    // Phase 2: swap values, new colour, fade back in
+    rangeEl.textContent = `${newRange.floor}–${newRange.ceiling}%`;
+    oldColorClasses.forEach(c => {
+      rangeEl.classList.remove(c);
+      verdictEl.classList.remove(c);
+      fillEl.classList.remove(c);
+    });
+    rangeEl.classList.add(newColor);
+    verdictEl.classList.add(newColor);
+    fillEl.classList.add(newColor);
+    verdictEl.textContent = VERDICT_BY_COLOR[newColor];
+    fillEl.style.width = newRange.ceiling + '%';
+    rangeEl.classList.remove('fading');
+
+    // Reason line
+    if (reasonEl) {
+      reasonEl.innerHTML = reasonLine || '';
+      reasonEl.classList.remove('updating');
+    }
+
+    // Pip for completed exchange
+    if (exchangeDone) {
+      const pip = document.querySelector(`#prob-pips .prob-pip[data-ex="${exchangeDone}"]`);
+      if (pip) pip.classList.add('done');
+    }
+  }, 320);
+}
+
+/* ── Coach bubble with typing effect ────────────────────── */
+async function typeCoachBubble(text) {
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble-label">Coach</div>
+    <div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  const textEl = wrap.querySelector('.typed-text');
+  const cursorEl = wrap.querySelector('.cursor');
+  const t = text || '';
+  for (let i = 1; i <= t.length; i++) {
+    textEl.textContent = t.slice(0, i);
+    const ch = t[i-1];
+    const delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
+    if (i % 30 === 0) scrollChatToBottom();
+    await sleep(delay);
+  }
+  if (cursorEl) cursorEl.remove();
+  scrollChatToBottom();
+  return wrap;
+}
+
+function appendUserBubble(text) {
+  const wrap = el('div', 'user-msg', '');
+  wrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+
+/* ── Coach typing placeholder while awaiting exchange API ─ */
+let currentTypingWrap = null;
+function showCoachTyping() {
+  if (currentTypingWrap) return;
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble-label">Coach</div>
+    <div class="bubble"><div class="typing-dots"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  currentTypingWrap = wrap;
+}
+function hideCoachTyping() {
+  if (currentTypingWrap) {
+    currentTypingWrap.remove();
+    currentTypingWrap = null;
+  }
+}
+
+/* ── Chips UI ──────────────────────────────────────────── */
+function clearChips() {
+  const a = $('chips-area');
+  if (a) a.innerHTML = '';
+}
+
+function renderChips(chips, onSelect, sublabel) {
+  const area = $('chips-area');
+  area.innerHTML = '';
+  if (sublabel) {
+    const lbl = el('div', 'chips-sublabel', sublabel);
+    area.appendChild(lbl);
+  }
+  chips.forEach(c => {
+    const btn = el('button', 'chip', c.label);
+    btn.type = 'button';
+    btn.dataset.val = c.value;
+    btn.onclick = () => onSelect(c, btn);
+    area.appendChild(btn);
+  });
+}
+
+function fadeOutChips() {
+  const area = $('chips-area');
+  if (!area) return;
+  area.querySelectorAll('.chip').forEach(c => c.classList.add('fadeout'));
+  setTimeout(() => { clearChips(); }, 260);
+}
+
+/* ── Bottom panel enable/disable ───────────────────────── */
+function enableInput(placeholder) {
+  const p = $('bottom-panel');
+  p.classList.remove('dimmed');
+  const input = $('chat-input');
+  input.disabled = false;
+  input.placeholder = placeholder || 'Type your answer…';
+  $('send-btn').disabled = false;
+}
+function disableInput(placeholder) {
+  const p = $('bottom-panel');
+  p.classList.add('dimmed');
+  const input = $('chat-input');
+  input.disabled = true;
+  if (placeholder) input.placeholder = placeholder;
+  $('send-btn').disabled = true;
+}
+
+/* ── Error bubble ──────────────────────────────────────── */
+function showErrorBubble(message, onRetry) {
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble-label">Coach</div>
+    <div class="bubble err-bubble">
+      ${escapeHtml(message)}
+      ${onRetry ? '<br/><button type="button" id="err-retry">Retry</button>' : ''}
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  if (onRetry) {
+    const b = wrap.querySelector('#err-retry');
+    if (b) b.onclick = () => { wrap.remove(); onRetry(); };
+  }
+  return wrap;
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── MAIN FLOW                                           ── */
+/* ───────────────────────────────────────────────────────── */
+
+async function init() {
+  // Rehydration: if state exists and has made progress, resume from there
+  const saved = loadState();
+  const profile = loadProfile();
+
+  if (saved && saved.profile && saved.current_exchange > 0) {
+    Object.assign(state, saved);
+    await resumeFromState();
+    return;
+  }
+
+  if (!profile) {
+    // No profile and no state — they shouldn't be here. Send back to landing.
+    window.location.replace('/raise/');
+    return;
+  }
+
+  state.profile = profile;
+  saveState();
+
+  // Start fresh — thinking animation + analyze call
+  const thinkingPromise = runThinkingAnimation();
+  const minDelay = sleep(2800); // ensure thinking plays for a satisfying minimum
+
+  let result;
+  try {
+    const apiCall = fetch(API_ANALYZE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile),
+    }).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)));
+    const [apiResult] = await Promise.all([apiCall, minDelay]);
+    result = apiResult;
+  } catch (err) {
+    stopThinkingAnimation();
+    showErrorBubble(
+      "I couldn't calculate your starting range just now. Check your connection and try again.",
+      init
+    );
+    return;
+  }
+
+  stopThinkingAnimation();
+
+  // Save initial state
+  state.initial_floor    = result.floor;
+  state.current_range    = { floor: result.floor, ceiling: result.ceiling };
+  state.current_exchange = 1;
+  state.chat_log.push({ type: 'card', ...state.current_range, context: result.context_line });
+  saveState();
+
+  // Render first card + first coach message
+  renderInitialCard(state.current_range, result.context_line);
+  await sleep(400);
+  await typeCoachBubble(result.first_coach_message);
+  await sleep(200);
+
+  // Start exchange 1
+  beginExchange1();
+}
+
+/* ── Resume from saved state (reload, come-back visit) ──── */
+async function resumeFromState() {
+  stopThinkingAnimation();
+
+  // Re-render card using last known range
+  if (!state.current_range) {
+    // corrupted state — reset and redirect
+    clearAll();
+    window.location.replace('/raise/');
+    return;
+  }
+  renderInitialCard(state.current_range, '');
+
+  // Walk chat log to restore bubbles
+  // (We persist minimal — just re-ask the current exchange's question.
+  //  A full transcript restore is out of scope for V1.)
+  await sleep(200);
+  const where = state.current_exchange;
+  if (where === 1)      beginExchange1();
+  else if (where === 2) beginExchange2();
+  else if (where === 3) beginExchange3();
+  else if (where === 4) beginExchange4();
+  else if (where === 5) showPaywall();
+  else                  beginExchange1();
+}
+
+/* ── Exchange 1: Role & industry (free text only) ──────── */
+async function beginExchange1() {
+  clearChips();
+  disableInput('Thinking…');
+  await typeCoachBubble("What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.");
+  await sleep(200);
+  enableInput('Describe your role…');
+  $('chat-input').focus();
+  awaitFreeText((text) => handleExchangeAnswer(1, text));
+}
+
+/* ── Exchange 2: Performance (chips + free text) ───────── */
+async function beginExchange2() {
+  clearChips();
+  disableInput('Thinking…');
+  await typeCoachBubble("How would you describe your performance over the last 12 months?");
+  await sleep(150);
+  showExchange2Chips();
+  enableInput('Or describe it in your own words…');
+  awaitFreeText((text) => handleExchangeAnswer(2, text));
+}
+function showExchange2Chips() {
+  const chips = [
+    { value: 'exceeded',     label: 'Exceeded expectations' },
+    { value: 'specific_win', label: 'Had a strong specific win' },
+    { value: 'met',          label: 'Met expectations' },
+    { value: 'mixed',        label: "It's been a mixed year" },
+  ];
+  renderChips(chips, (c, btn) => {
+    btn.classList.add('selected');
+    fadeOutChips();
+    handleExchangeAnswer(2, c.value, c.label);
+  });
+}
+
+/* ── Exchange 3: Market position & leverage ────────────── */
+async function beginExchange3() {
+  clearChips();
+  disableInput('Thinking…');
+  await typeCoachBubble("Do you have a sense of how your salary compares to market rate — and has anyone approached you about other opportunities recently?");
+  await sleep(150);
+  showExchange3Chips();
+  enableInput('Or describe your situation…');
+  awaitFreeText((text) => handleExchangeAnswer(3, text));
+}
+function showExchange3Chips() {
+  const chips = [
+    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
+    { value: 'competing_offer',    label: 'I have a competing offer' },
+    { value: 'actively_recruited', label: "I'm being actively recruited" },
+    { value: 'none',               label: 'No external leverage right now' },
+  ];
+  renderChips(chips, (c, btn) => {
+    btn.classList.add('selected');
+    fadeOutChips();
+    handleExchangeAnswer(3, c.value, c.label);
+  });
+}
+
+/* ── Exchange 4: Manager + timing (DUAL CHIPS) ─────────── */
+async function beginExchange4() {
+  clearChips();
+  disableInput('Thinking…');
+  state.ex4_partial = {};
+  saveState();
+  await typeCoachBubble("Last one. How's your relationship with whoever decides your salary, and when's your next review or raise cycle?");
+  await sleep(150);
+  renderExchange4Chips();
+  enableInput('Or add any context…');
+  awaitFreeText((text) => {
+    // If user types free text, submit both chips + text (chips may be partial)
+    if (state.ex4_partial?.relationship && state.ex4_partial?.timing) {
+      submitExchange4({ ...state.ex4_partial, free_text: text });
+    } else if (text && text.length > 6) {
+      // Free-text only path — let Claude figure it out
+      submitExchange4({ relationship: state.ex4_partial?.relationship || '', timing: state.ex4_partial?.timing || '', free_text: text });
+    } else {
+      // Nudge
+      const wrap = el('div', 'coach-msg', '');
+      wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Pick one from each row, or write a sentence or two.</p></div>`;
+      $('messages').appendChild(wrap);
+      scrollChatToBottom();
+    }
+  });
+}
+
+function renderExchange4Chips() {
+  const area = $('chips-area');
+  area.innerHTML = '';
+
+  const row1Label = el('div', 'chips-sublabel', 'Relationship');
+  area.appendChild(row1Label);
+  const row1Chips = [
+    { value: 'strong',       label: 'Strong — they advocate' },
+    { value: 'professional', label: 'Professional but not close' },
+    { value: 'complicated',  label: "It's complicated" },
+    { value: 'never_asked',  label: "Haven't asked before" },
+  ];
+  row1Chips.forEach(c => {
+    const btn = el('button', 'chip', c.label);
+    btn.type = 'button';
+    btn.dataset.val = c.value;
+    btn.onclick = () => pickEx4Row('relationship', c.value, c.label, btn);
+    area.appendChild(btn);
+  });
+
+  const row2Label = el('div', 'chips-sublabel', 'Timing of next review');
+  area.appendChild(row2Label);
+  const row2Chips = [
+    { value: 'imminent',     label: 'Within 1 month' },
+    { value: 'soon',         label: '1–3 months' },
+    { value: 'distant',      label: '3–6 months' },
+    { value: 'none',         label: 'No set cycle' },
+    { value: 'just_happened',label: 'Review just happened' },
+  ];
+  row2Chips.forEach(c => {
+    const btn = el('button', 'chip', c.label);
+    btn.type = 'button';
+    btn.dataset.val = c.value;
+    btn.onclick = () => pickEx4Row('timing', c.value, c.label, btn);
+    area.appendChild(btn);
+  });
+}
+
+function pickEx4Row(row, value, label, btn) {
+  state.ex4_partial = state.ex4_partial || {};
+  state.ex4_partial[row] = value;
+  state.ex4_partial[row + '_label'] = label;
+  saveState();
+
+  // Deselect siblings in this row, select this
+  const allChips = $('chips-area').querySelectorAll('.chip');
+  allChips.forEach(c => {
+    if (c === btn) {
+      c.classList.add('selected');
+    } else {
+      // Find whether it's the same row — by checking order relative to sublabels
+      // Simpler: rely on the caller to have stored row, and use DOM walking
+    }
+  });
+
+  // More explicit row deselection using data attributes from row labels:
+  // (We just walk and unset previously-selected within the same row.)
+  const sublabels = $('chips-area').querySelectorAll('.chips-sublabel');
+  const thisRow = (row === 'relationship') ? sublabels[0] : sublabels[1];
+  let node = thisRow.nextElementSibling;
+  while (node && !node.classList.contains('chips-sublabel')) {
+    if (node !== btn && node.classList.contains('chip')) node.classList.remove('selected');
+    node = node.nextElementSibling;
+  }
+
+  // If both rows picked, submit
+  if (state.ex4_partial.relationship && state.ex4_partial.timing) {
+    setTimeout(() => {
+      fadeOutChips();
+      submitExchange4({
+        relationship: state.ex4_partial.relationship,
+        timing:       state.ex4_partial.timing,
+        free_text:    '',
+        displayLabels: {
+          relationship: state.ex4_partial.relationship_label,
+          timing:       state.ex4_partial.timing_label,
+        },
+      });
+    }, 240);
+  }
+}
+
+async function submitExchange4(answer) {
+  // Display the user choice as a bubble
+  let displayText = '';
+  if (answer.displayLabels) {
+    displayText = `${answer.displayLabels.relationship || ''} · ${answer.displayLabels.timing || ''}`;
+    if (answer.free_text) displayText += ` · ${answer.free_text}`;
+  } else if (answer.free_text) {
+    displayText = answer.free_text;
+  } else {
+    displayText = `${answer.relationship} · ${answer.timing}`;
+  }
+  appendUserBubble(displayText);
+
+  await runExchangeCall(4, {
+    relationship: answer.relationship,
+    timing:       answer.timing,
+    free_text:    answer.free_text || '',
+  });
+}
+
+/* ── Common exchange handling (ex1-3) ──────────────────── */
+async function handleExchangeAnswer(exchangeNum, value, displayLabel) {
+  // Display user's choice
+  appendUserBubble(displayLabel || value);
+  clearChips();
+  disableInput('Thinking…');
+
+  await runExchangeCall(exchangeNum, value);
+}
+
+/* ── Call /api/raise-exchange and react to the response ── */
+async function runExchangeCall(exchangeNum, answer) {
+  await sleep(300);
+  showCoachTyping();
+
+  let result;
+  try {
+    const res = await fetch(API_EXCHANGE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exchange:              exchangeNum,
+        answer,
+        profile:               state.profile,
+        current_range:         state.current_range,
+        initial_floor:         state.initial_floor,
+        accumulated_exchanges: state.accumulated,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    result = await res.json();
+  } catch (err) {
+    hideCoachTyping();
+    showErrorBubble(
+      "Something failed reaching your coach. Try again?",
+      () => runExchangeCall(exchangeNum, answer)
+    );
+    return;
+  }
+
+  hideCoachTyping();
+
+  // Save state
+  state.current_range = { floor: result.floor, ceiling: result.ceiling };
+  state.accumulated['ex' + exchangeNum] = {
+    answer,
+    signal:    result.signal,
+    extracted: result.extracted,
+  };
+  if (exchangeNum === 4) {
+    state.current_exchange = 5;
+  } else {
+    state.current_exchange = exchangeNum + 1;
+  }
+  saveState();
+
+  // Update the card (pip + range animation)
+  updateCard(state.current_range, result.reason_line, exchangeNum);
+  await sleep(800);
+
+  // Exchange 4 complete → paywall
+  if (result.is_final) {
+    await sleep(400);
+    await showPaywall();
+    return;
+  }
+
+  // Otherwise, type the next coach question
+  if (result.next_question && result.next_question.question) {
+    await sleep(200);
+    await typeCoachBubble(result.next_question.question);
+    await sleep(150);
+    routeToExchange(exchangeNum + 1);
+  } else {
+    routeToExchange(exchangeNum + 1);
+  }
+}
+
+function routeToExchange(n) {
+  if (n === 2) {
+    showExchange2Chips();
+    enableInput('Or describe it in your own words…');
+  } else if (n === 3) {
+    showExchange3Chips();
+    enableInput('Or describe your situation…');
+  } else if (n === 4) {
+    renderExchange4Chips();
+    enableInput('Or add any context…');
+  }
+}
+
+/* ── Paywall ───────────────────────────────────────────── */
+async function showPaywall() {
+  clearChips();
+  disableInput('Coaching plan unlocks with $49…');
+
+  // Fire enrichment (fire-and-forget)
+  fireEnrichment();
+
+  const r = state.current_range;
+  const verdict = VERDICT_BY_COLOR[colorFor(r)];
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble-label">Coach</div>
+    <div class="paywall-bubble">
+      <p><strong>Your range lands at ${r.floor}–${r.ceiling}%.</strong> That's your realistic probability with a well-prepared negotiation.</p>
+      <p>The difference between that and 75%+ almost always comes down to 2–3 specific moves made <em>before</em> the conversation — the exact number to ask for, the opening words, how to handle the pushbacks you're most likely to hear.</p>
+      <p>For <strong>$49 one-time</strong>, you unlock:</p>
+      <ul>
+        <li>Your specific raise amount range with supporting data</li>
+        <li>The 3 blockers holding your number back — and the fix for each</li>
+        <li>Ready-to-send email template + spoken opening script</li>
+        <li>Role-play mode — practise the conversation with me</li>
+        <li>Responses to the 3 pushbacks most likely for your situation</li>
+        <li>30 days of coaching — I remember every conversation</li>
+      </ul>
+      <button class="btn-pay" id="btn-pay-cta">
+        Get My Coaching Plan · $49 <span class="btn-pay-arrow">→</span>
+      </button>
+      <div class="trust-row">
+        <span>Stripe</span><span>·</span><span>Secure</span><span>·</span><span>One-time</span><span>·</span><span>No subscription</span>
+      </div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  $('btn-pay-cta').onclick = startCheckout;
+}
+
+function fireEnrichment() {
+  // Non-blocking — backend runs Claude generation, stores under profile_hash
+  const body = {
+    profile:      state.profile,
+    exchanges:    state.accumulated,
+    final_range:  state.current_range,
+    profile_hash: profileHash(),
+  };
+  try {
+    fetch(API_ENRICH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (e) { /* non-fatal */ }
+}
+
+async function startCheckout() {
+  const btn = $('btn-pay-cta');
+  if (btn) { btn.disabled = true; btn.textContent = 'Opening Stripe…'; }
+
+  try {
+    const params = new URLSearchParams(location.search);
+    const refSource = params.get('ref') || state.profile.refSource || '';
+    const res = await fetch(API_CHECKOUT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile_hash: profileHash(),
+        profile:      state.profile,
+        final_range:  state.current_range,
+        refSource,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.url) throw new Error('No checkout URL');
+    window.location.href = data.url;
+  } catch (err) {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = 'Get My Coaching Plan · $49 <span class="btn-pay-arrow">→</span>';
+    }
+    showErrorBubble(
+      "Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.",
+      null
+    );
+  }
+}
+
+/* ── Free-text input wiring ────────────────────────────── */
+let pendingSubmitHandler = null;
+
+function awaitFreeText(onSubmit) {
+  pendingSubmitHandler = onSubmit;
+}
+
+function handleSend() {
+  const input = $('chat-input');
+  const val = (input.value || '').trim();
+  if (!val) return;
+  if (!pendingSubmitHandler) return;
+  input.value = '';
+  const h = pendingSubmitHandler;
+  pendingSubmitHandler = null;
+  h(val);
+}
+
+$('send-btn').addEventListener('click', handleSend);
+$('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
+/* ── Kick off ──────────────────────────────────────────── */
+init().catch(err => {
+  console.error('init failed:', err);
+  stopThinkingAnimation();
+  showErrorBubble("Something went wrong loading your session. Refresh to try again.", null);
+});
+</script>
+
+<script defer src="/shared.js"></script>
+</body>
+</html>

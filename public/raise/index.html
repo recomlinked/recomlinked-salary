@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Salary Negotiation Coach — Know Your Real Raise Probability</title>
+<meta name="description" content="Answer 4 quick questions. Get your personalised raise probability. Then let an AI coach help you move it higher. Free to start, $49 for the full plan."/>
+<meta property="og:title" content="Salary Negotiation Coach — Know Your Real Raise Probability"/>
+<meta property="og:description" content="A sales coach for non-sleazy people. Personalised raise probability, specific scripts, 30 days of coaching."/>
+<meta property="og:image" content="https://salary.recomlinked.com/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://salary.recomlinked.com/og-image.png"/>
+<link rel="canonical" href="https://salary.recomlinked.com/raise/"/>
+<link rel="preconnect" href="https://h.clarity.ms">
+<link rel="preconnect" href="https://www.clarity.ms">
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png"/>
+<style>
+/* ── Variables (FA visual system) ─────────────────────── */
+:root {
+  --bg:      #07090f;
+  --bg2:     #0f1117;
+  --bg3:     #141722;
+  --bg4:     #1c2030;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --gold:    #c9a84c;
+  --gold2:   #d8b75a;
+  --teal:    #00c4a0;
+  --red:     #e05555;
+  --text:    #e8eaf2;
+  --text2:   #8a90a8;
+  --text3:   #454d60;
+  --sans:    -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --radius:  6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: var(--sans); cursor: pointer; }
+
+/* ── Header ────────────────────────────────────────────── */
+.site-header {
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.site-subbrand { font-size: 12px; color: var(--text3); letter-spacing: 0.03em; font-weight: 500; }
+.logo-wrap {
+  display: flex; align-items: center;
+  font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
+  text-decoration: none;
+}
+.logo-recom  { background: var(--gold); color: #07090f; padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
+.logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--bg4); border-radius: 0 3px 3px 0; }
+
+/* ── Layout ────────────────────────────────────────────── */
+.main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+@media (max-width: 480px) {
+  .main { padding: 24px 20px 48px; }
+  .site-header { padding: 14px 20px; }
+}
+
+/* ── Hero ──────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 20px 0 28px;
+}
+.hero-pill {
+  display: inline-block;
+  font-size: 11px; font-weight: 600;
+  color: var(--gold); background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.25);
+  padding: 5px 12px; border-radius: 20px;
+  margin-bottom: 18px; letter-spacing: 0.04em;
+}
+.hero h1 {
+  font-size: 30px; line-height: 1.18; font-weight: 800;
+  letter-spacing: -0.8px;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+.hero h1 .accent { color: var(--gold); }
+.hero-sub {
+  font-size: 15px; color: var(--text2); line-height: 1.6;
+  max-width: 520px; margin: 0 auto 24px;
+}
+.hero-trust {
+  font-size: 11px; color: var(--text3); letter-spacing: 0.04em;
+  margin-top: 16px; text-transform: uppercase;
+}
+.hero-trust span { margin: 0 6px; }
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 26px; letter-spacing: -0.5px; }
+  .hero-sub { font-size: 14px; }
+}
+
+/* ── CTAs ──────────────────────────────────────────────── */
+.cta-stack {
+  display: flex; flex-direction: column;
+  gap: 10px; max-width: 440px; margin: 0 auto;
+}
+.cta-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--gold); color: #07090f;
+  border: none; border-radius: 10px;
+  padding: 16px 22px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.12s, opacity 0.12s, background 0.12s;
+  line-height: 1.3; text-align: left;
+}
+.cta-btn:hover { opacity: 0.92; text-decoration: none; }
+.cta-btn:active { transform: translateY(1px); }
+.cta-btn .cta-arrow { font-size: 18px; margin-left: 12px; flex-shrink: 0; }
+.cta-btn.secondary {
+  background: transparent;
+  color: var(--teal);
+  border: 1.5px solid rgba(0,196,160,0.4);
+}
+.cta-btn.secondary:hover { background: rgba(0,196,160,0.06); }
+.cta-badge {
+  display: inline-block;
+  font-size: 10px; font-weight: 600;
+  background: rgba(0,0,0,0.14); color: #07090f;
+  padding: 2px 7px; border-radius: 10px;
+  margin-left: 8px; letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+.cta-btn.secondary .cta-badge {
+  background: rgba(0,196,160,0.14); color: var(--teal);
+}
+
+/* ── Sample card (animated narrowing demo) ─────────────── */
+.sample-section {
+  margin: 36px 0 28px;
+  padding: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.sample-label {
+  font-size: 10px; font-weight: 700; color: var(--text3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 14px; text-align: center;
+}
+.sample-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.sample-range {
+  font-size: 44px; font-weight: 800; color: #1a1d2e;
+  letter-spacing: -2px; line-height: 1;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: center;
+}
+.sample-bar {
+  height: 6px; background: #eceef2; border-radius: 3px; margin: 14px 0 10px;
+  overflow: hidden; position: relative;
+}
+.sample-fill {
+  height: 100%; border-radius: 3px;
+  background: #c9a84c;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1), background 0.8s;
+  width: 55%;
+}
+.sample-reason {
+  font-size: 12px; color: #4a5068; line-height: 1.5;
+  min-height: 34px; text-align: center;
+  transition: opacity 0.35s;
+}
+.sample-reason strong { color: #1a1d2e; }
+.sample-caption {
+  font-size: 11px; color: var(--text3);
+  text-align: center; margin-top: 12px; font-style: italic;
+}
+
+/* ── How it works ──────────────────────────────────────── */
+.section {
+  margin: 40px 0 28px;
+}
+.section h2 {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
+  margin-bottom: 6px; color: var(--text);
+}
+.section .section-sub {
+  font-size: 13px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 20px;
+}
+.step-list { display: flex; flex-direction: column; gap: 14px; }
+.step-card {
+  display: flex; gap: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  background: rgba(201,168,76,0.12);
+  color: var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+}
+.step-content h3 {
+  font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;
+}
+.step-content p {
+  font-size: 13px; color: var(--text2); line-height: 1.55;
+}
+
+/* ── Value cards (free vs paid) ────────────────────────── */
+.value-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+}
+@media (max-width: 560px) {
+  .value-grid { grid-template-columns: 1fr; }
+}
+.value-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+.value-card.paid {
+  border: 1px solid rgba(201,168,76,0.3);
+  background: linear-gradient(180deg, rgba(201,168,76,0.03) 0%, var(--bg2) 40%);
+}
+.value-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.value-tier {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3);
+}
+.value-card.paid .value-tier { color: var(--gold); }
+.value-price {
+  font-size: 13px; font-weight: 800; color: var(--text);
+}
+.value-card.free .value-price { color: var(--teal); }
+.value-card.paid .value-price { color: var(--gold); }
+.value-list { list-style: none; padding: 0; }
+.value-list li {
+  font-size: 12.5px; color: var(--text2); line-height: 1.55;
+  padding: 5px 0 5px 20px;
+  position: relative;
+}
+.value-list li::before {
+  content: '✓';
+  position: absolute; left: 0; top: 5px;
+  color: var(--teal);
+  font-weight: 700;
+}
+.value-card.paid .value-list li::before { color: var(--gold); }
+
+/* ── Why different ─────────────────────────────────────── */
+.why-grid { display: flex; flex-direction: column; gap: 10px; }
+.why-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  align-items: center;
+}
+.why-label {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.why-old {
+  font-size: 12.5px; color: var(--text3);
+  text-decoration: line-through; line-height: 1.5;
+}
+.why-new {
+  font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500;
+}
+
+/* ── Pitch callout ─────────────────────────────────────── */
+.pitch {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 18px 20px;
+  margin: 28px 0;
+}
+.pitch-label {
+  font-size: 10px; font-weight: 700; color: var(--gold);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.pitch-text {
+  font-size: 14px; color: var(--text); line-height: 1.65;
+}
+.pitch-text em { color: var(--text2); font-style: normal; }
+
+/* ── FAQ ──────────────────────────────────────────────── */
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px; overflow: hidden;
+}
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  gap: 12px; user-select: none;
+  transition: background 0.15s;
+}
+.faq-q:hover { background: var(--bg3); }
+.faq-q.open { background: var(--bg3); }
+.faq-icon {
+  font-size: 16px; color: var(--text3); flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.faq-q.open .faq-icon { transform: rotate(45deg); color: var(--gold); }
+.faq-a {
+  display: none;
+  padding: 0 18px 16px;
+  font-size: 13px; color: var(--text2); line-height: 1.75;
+  border-top: 1px solid var(--border);
+}
+.faq-a.open { display: block; }
+.faq-a a { color: var(--gold); }
+
+/* ── Progress indicator (assessment) ───────────────────── */
+.progress {
+  display: flex; gap: 4px;
+  max-width: 640px; margin: 0 auto 22px;
+}
+.pseg {
+  height: 3px; flex: 1;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+  transition: background 0.25s;
+}
+.pseg.done { background: var(--gold); }
+
+/* ── Step / question styles ───────────────────────────── */
+.step { display: none; }
+.step.active { display: block; animation: fadeUp 0.28s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.step-meta {
+  font-size: 11px; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 8px; font-weight: 600;
+}
+.step h2 {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+  margin-bottom: 8px; color: var(--text); line-height: 1.25;
+}
+.step .sub {
+  font-size: 13.5px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 22px;
+}
+
+/* ── Chip / option grids ───────────────────────────────── */
+.opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.opts.row { flex-direction: row; flex-wrap: wrap; }
+.opt {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px; color: var(--text); font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.35;
+}
+.opts.row .opt {
+  flex: 1 1 auto; min-width: 0;
+  padding: 12px 14px; font-size: 13px;
+}
+.opt small {
+  display: block; font-size: 11.5px; color: var(--text3);
+  margin-top: 3px; font-weight: 400;
+}
+.opt.sel {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+.opt.sel small { color: var(--text2); }
+.opt:hover { border-color: var(--border2); background: var(--bg3); }
+.opt.sel:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+
+/* ── Dual column for Q3 ────────────────────────────────── */
+.dual-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin-bottom: 4px;
+}
+@media (max-width: 480px) {
+  .dual-grid { grid-template-columns: 1fr; gap: 18px; }
+}
+.dual-col h3 {
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.dual-col .opts { gap: 6px; }
+.dual-col .opt { padding: 11px 13px; font-size: 13px; }
+
+/* ── Nav ──────────────────────────────────────────────── */
+.step-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.step-counter { font-size: 12px; color: var(--text3); font-weight: 500; }
+.nav-right { display: flex; gap: 10px; }
+.btn-back, .btn-continue {
+  border: none; border-radius: 8px;
+  padding: 11px 18px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--sans);
+  transition: opacity 0.15s, background 0.15s, transform 0.1s;
+}
+.btn-back {
+  background: transparent; color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-back:hover { background: var(--bg3); color: var(--text); }
+.btn-continue {
+  background: var(--gold); color: #07090f;
+  opacity: 0.4; pointer-events: none;
+}
+.btn-continue.active {
+  opacity: 1; pointer-events: auto;
+}
+.btn-continue.active:hover { background: var(--gold2); }
+.btn-continue:active { transform: translateY(1px); }
+.err {
+  display: none;
+  color: var(--red); font-size: 12px; margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(224,85,85,0.08);
+  border-left: 2px solid var(--red);
+  border-radius: 4px;
+}
+.err.show { display: block; }
+
+/* ── Jump button from landing to assessment ───────────── */
+.scroll-cue {
+  text-align: center; margin-top: 24px;
+  font-size: 12px; color: var(--text3);
+}
+
+/* ── Section dividers (below-fold) ─────────────────────── */
+.divider {
+  height: 1px; background: var(--border);
+  margin: 32px 0;
+}
+
+/* ── Footer micro trust line ──────────────────────────── */
+.mini-trust {
+  text-align: center;
+  font-size: 11px; color: var(--text3);
+  margin-top: 32px; letter-spacing: 0.02em;
+}
+.mini-trust strong { color: var(--text2); }
+</style>
+</head>
+
+<body>
+
+<!-- ── Header ───────────────────────────────────────────── -->
+<header class="site-header">
+  <a href="/" class="logo-wrap"><span class="logo-recom">Recom</span><span class="logo-linked">linked</span></a>
+  <div class="site-subbrand">Salary Negotiation Coach</div>
+</header>
+
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ──  LANDING CONTENT                                  ── -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="landing-content">
+
+  <!-- Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-pill">A sales coach for non-sleazy people</div>
+    <h1>What are your real chances of <span class="accent">getting paid what you're worth?</span></h1>
+    <p class="hero-sub">
+      Most raise advice is generic. This isn't.
+      Answer 4 quick questions, get your personalised probability, then let an AI coach help you move it higher — with the exact scripts and amount to ask for.
+    </p>
+
+    <div class="cta-stack">
+      <a href="/raise/?start=1#assessment-top" target="_blank" rel="noopener" class="cta-btn" id="cta-raise">
+        <span>Prepare me for a raise at my current job<span class="cta-badge">LIVE</span></span>
+        <span class="cta-arrow">→</span>
+      </a>
+      <a href="/raise/waitlist/" target="_blank" rel="noopener" class="cta-btn secondary" id="cta-offer">
+        <span>Prepare me for negotiating a new job offer<span class="cta-badge">SOON</span></span>
+        <span class="cta-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="hero-trust">
+      FREE TO START<span>·</span>NO EMAIL REQUIRED<span>·</span>60 SECONDS
+    </div>
+  </section>
+
+  <!-- Animated sample (range narrowing) ────────────────── -->
+  <div class="sample-section" id="sample-anim">
+    <div class="sample-label">WATCH YOUR RANGE NARROW IN REAL TIME</div>
+    <div class="sample-card">
+      <div class="sample-range" id="sample-range">45–65%</div>
+      <div class="sample-bar"><div class="sample-fill" id="sample-fill"></div></div>
+      <div class="sample-reason" id="sample-reason">
+        <strong>Starting point</strong> — based on company situation and tenure only
+      </div>
+    </div>
+    <div class="sample-caption">Each chat exchange tightens the range based on your specific situation.</div>
+  </div>
+
+  <!-- How it works ─────────────────────────────────────── -->
+  <section class="section">
+    <h2>How it works</h2>
+    <p class="section-sub">Three steps. No friction. Built for people who hate wasting time.</p>
+    <div class="step-list">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Answer 4 quick questions (60 seconds)</h3>
+          <p>Tap to select. No typing. Covers country, company situation, tenure, and role. That's your starting probability range.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Chat through 4 short exchanges</h3>
+          <p>Your range narrows as we dig into your role, performance, leverage, and manager relationship. The number on the card updates with each exchange, with a one-line reason why it moved.</p>
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Unlock the full plan ($49 one-time)</h3>
+          <p>Specific raise amount with market data, the blockers holding your number back, the exact words to open the conversation, scripts to handle pushback, role-play mode, and 30 days of coaching that remembers every conversation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Free vs paid ──────────────────────────────────────── -->
+  <section class="section">
+    <h2>What you get</h2>
+    <p class="section-sub">Free is actually useful. Paid is where the negotiation prep happens.</p>
+    <div class="value-grid">
+      <div class="value-card free">
+        <div class="value-head">
+          <span class="value-tier">Free</span>
+          <span class="value-price">$0</span>
+        </div>
+        <ul class="value-list">
+          <li>Your personalised probability range</li>
+          <li>4 coaching exchanges that narrow the range</li>
+          <li>One-line reason the range moves each round</li>
+          <li>No email required to start</li>
+        </ul>
+      </div>
+      <div class="value-card paid">
+        <div class="value-head">
+          <span class="value-tier">Full Plan</span>
+          <span class="value-price">$49</span>
+        </div>
+        <ul class="value-list">
+          <li>Specific raise amount range, with supporting data</li>
+          <li>The 3 blockers holding your number back — and the fix for each</li>
+          <li>Ready-to-send email template</li>
+          <li>Spoken opening script, personalised to your situation</li>
+          <li>Role-play mode — practice the conversation with your coach</li>
+          <li>Responses to the 3 pushbacks you're most likely to hear</li>
+          <li>30-day preparation plan, week by week</li>
+          <li>30 days of coaching — your coach remembers every conversation</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why different ────────────────────────────────────── -->
+  <section class="section">
+    <h2>Why this is different</h2>
+    <p class="section-sub">Most raise advice is generic. Yours shouldn't be.</p>
+    <div class="why-grid">
+      <div class="why-row">
+        <div class="why-label">Probability</div>
+        <div>
+          <div class="why-old">"Here are 7 tips to ask for a raise"</div>
+          <div class="why-new">Your specific probability — and what moves it to 75%+</div>
+        </div>
+      </div>
+      <div class="why-row">
+        <div class="why-label">Context</div>
+        <div>
+          <div class="why-old">Generic scripts from a Forbes article</div>
+          <div class="why-new">Scripts written for your role, industry, and manager dynamic</div>
+        </div>
+      </div>
+      <div class="why-row">
+        <div class="why-label">Practice</div>
+        <div>
+          <div class="why-old">Read advice, hope it sticks</div>
+          <div class="why-new">Role-play the conversation before having it</div>
+        </div>
+      </div>
+      <div class="why-row">
+        <div class="why-label">Memory</div>
+        <div>
+          <div class="why-old">One-shot advice, then you're on your own</div>
+          <div class="why-new">30 days of coaching — your coach remembers every session</div>
+        </div>
+      </div>
+      <div class="why-row">
+        <div class="why-label">Price</div>
+        <div>
+          <div class="why-old">$1,250 for a human coach call</div>
+          <div class="why-new">$49 one-time, for a raise that's typically worth thousands</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pitch callout ────────────────────────────────────── -->
+  <div class="pitch">
+    <div class="pitch-label">THE PITCH</div>
+    <div class="pitch-text">
+      Most people who deserve a raise don't get one — not because they don't deserve it, but because they never get comfortable asking. <em>This is a coach that prepares you for that conversation in 10 minutes, with scripts you can actually say out loud.</em>
+    </div>
+  </div>
+
+  <!-- FAQ ─────────────────────────────────────────────── -->
+  <section class="section">
+    <h2>Common questions</h2>
+    <div style="margin-top: 16px;">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors (company situation, tenure, performance, industry, external leverage, manager relationship, review timing, country norms, and more), then gives you a personalised plan and remembers every conversation for 30 days as you prepare.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The probability is an estimate based on your specific situation and market conditions, not a guarantee. It's calibrated on the structural factors that actually drive raise outcomes (company financial health, your tenure and performance, external leverage, manager dynamics, and timing). It's designed to be directionally accurate so you know whether you're in a strong position, a weak one, or somewhere in between — and what moves it.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What if I'm not sure about some of the answers?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Pick the closest option. The coaching chat handles uncertainty — if you're not sure about your market rate, your manager's political position, or when exactly your review is, the coach will help you figure it out. Every answer can be revised.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What does the 30-day coaching look like?<span class="faq-icon">+</span></div>
+        <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need — your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice — you're working through a specific plan with a coach who knows your situation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do you store my company name or sensitive info?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Anything you share in the chat is stored only for the 30-day coaching window and is used solely to personalise your coaching. We never sell or share your data. You can export or delete it at any time from inside your paid dashboard.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What about a job offer I'm negotiating?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Different product — different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/" target="_blank" rel="noopener">Join the waitlist</a> and we'll let you know when it's live (usually within a few weeks of enough demand).</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Refund policy?<span class="faq-icon">+</span></div>
+        <div class="faq-a">If the plan isn't useful for your situation, email <a href="mailto:support@recomlinked.com">support@recomlinked.com</a> within 14 days and we'll refund you. We'd rather lose $49 than have an unhappy user.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secondary CTA at bottom of landing ───────────────── -->
+  <div style="text-align:center; margin: 36px 0 10px;">
+    <a href="/raise/?start=1#assessment-top" target="_blank" rel="noopener" class="cta-btn" style="display: inline-flex; max-width: 420px;">
+      <span>Get my raise probability — free</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="mini-trust">
+    <strong>Free</strong> · No email needed to start · 60 seconds
+  </div>
+
+</div><!-- /landing-content -->
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ──  ASSESSMENT CONTENT                               ── -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="assessment-content" style="display:none;">
+
+  <div id="assessment-top" style="padding-top: 4px;"></div>
+
+  <!-- Progress ─────────────────────────────────────────── -->
+  <div class="progress">
+    <div class="pseg" id="p0"></div>
+    <div class="pseg" id="p1"></div>
+    <div class="pseg" id="p2"></div>
+    <div class="pseg" id="p3"></div>
+  </div>
+
+  <!-- ── Step 0: Country ── -->
+  <div class="step active" id="step-0">
+    <div class="step-meta">Question 1 of 4</div>
+    <h2>Where are you based?</h2>
+    <p class="sub">Country shapes pay norms, how aggressive anchoring should be, and what typical raises look like.</p>
+    <div class="opts" id="country-opts">
+      <div class="opt" data-val="us" onclick="selectOpt(this,'country-opts')">United States</div>
+      <div class="opt" data-val="ca" onclick="selectOpt(this,'country-opts')">Canada</div>
+      <div class="opt" data-val="uk" onclick="selectOpt(this,'country-opts')">United Kingdom</div>
+      <div class="opt" data-val="au" onclick="selectOpt(this,'country-opts')">Australia</div>
+      <div class="opt" data-val="other" onclick="selectOpt(this,'country-opts')">Other</div>
+    </div>
+    <div class="err" id="err-0">Please select your country.</div>
+    <div class="step-nav">
+      <span class="step-counter">1 / 4</span>
+      <div class="nav-right">
+        <button class="btn-continue" id="btn-0" onclick="goStep(1)">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Step 1: Company situation ── -->
+  <div class="step" id="step-1">
+    <div class="step-meta">Question 2 of 4</div>
+    <h2>How is your company doing right now?</h2>
+    <p class="sub">Company financial health is the single strongest structural factor shaping raise outcomes.</p>
+    <div class="opts" id="company-opts">
+      <div class="opt" data-val="growing" onclick="selectOpt(this,'company-opts')">
+        Growing fast
+        <small>Hiring, expanding, or in a healthy funding/revenue window</small>
+      </div>
+      <div class="opt" data-val="stable" onclick="selectOpt(this,'company-opts')">
+        Stable
+        <small>Steady business, no major growth or cuts</small>
+      </div>
+      <div class="opt" data-val="cutting" onclick="selectOpt(this,'company-opts')">
+        Cutting or restructuring
+        <small>Layoffs, hiring freezes, budget cuts, or pivoting</small>
+      </div>
+    </div>
+    <div class="err" id="err-1">Please select your company's current situation.</div>
+    <div class="step-nav">
+      <span class="step-counter">2 / 4</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="goStep(0)">← Back</button>
+        <button class="btn-continue" id="btn-1" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Step 2: Last raise ── -->
+  <div class="step" id="step-2">
+    <div class="step-meta">Question 3 of 4</div>
+    <h2>When was your last raise?</h2>
+    <p class="sub">Timing is one of the biggest factors. Too soon after a raise, and the answer is usually no. Too long since one, and you have real leverage.</p>
+    <div class="opts" id="raise-opts">
+      <div class="opt" data-val="under_1_year" onclick="selectOpt(this,'raise-opts')">
+        Still under 1 year at this job
+      </div>
+      <div class="opt" data-val="annual_raise_want_more" onclick="selectOpt(this,'raise-opts')">
+        Got my annual raise, want more
+      </div>
+      <div class="opt" data-val="1_2_years" onclick="selectOpt(this,'raise-opts')">
+        1–2 years since my last raise
+      </div>
+      <div class="opt" data-val="2_plus_years" onclick="selectOpt(this,'raise-opts')">
+        2+ years since my last raise
+      </div>
+      <div class="opt" data-val="never_asked" onclick="selectOpt(this,'raise-opts')">
+        I've never asked or received one
+      </div>
+    </div>
+    <div class="err" id="err-2">Please select your last raise timing.</div>
+    <div class="step-nav">
+      <span class="step-counter">3 / 4</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-continue" id="btn-2" onclick="goStep(3)">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Step 3: Seniority + Company size (dual column) ── -->
+  <div class="step" id="step-3">
+    <div class="step-meta">Last question</div>
+    <h2>Tell us about your role</h2>
+    <p class="sub">Seniority and company size together shape how structured (or flexible) raise decisions are at your job.</p>
+
+    <div class="dual-grid">
+      <div class="dual-col">
+        <h3>Your seniority</h3>
+        <div class="opts" id="seniority-opts">
+          <div class="opt" data-val="junior" onclick="selectOpt(this,'seniority-opts')">Junior (0–3 yrs)</div>
+          <div class="opt" data-val="mid"    onclick="selectOpt(this,'seniority-opts')">Mid-level (3–7 yrs)</div>
+          <div class="opt" data-val="senior" onclick="selectOpt(this,'seniority-opts')">Senior (7+ yrs)</div>
+          <div class="opt" data-val="lead"   onclick="selectOpt(this,'seniority-opts')">Manager / Lead</div>
+        </div>
+      </div>
+      <div class="dual-col">
+        <h3>Company size</h3>
+        <div class="opts" id="size-opts">
+          <div class="opt" data-val="under_50"     onclick="selectOpt(this,'size-opts')">Under 50</div>
+          <div class="opt" data-val="50_250"       onclick="selectOpt(this,'size-opts')">50–250</div>
+          <div class="opt" data-val="250_1000"     onclick="selectOpt(this,'size-opts')">250–1,000</div>
+          <div class="opt" data-val="1000_10000"   onclick="selectOpt(this,'size-opts')">1,000–10,000</div>
+          <div class="opt" data-val="10000_plus"   onclick="selectOpt(this,'size-opts')">10,000+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="err" id="err-3">Please select your seniority and company size.</div>
+    <div class="step-nav">
+      <span class="step-counter">4 / 4</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="goStep(2)">← Back</button>
+        <button class="btn-continue" id="btn-3" onclick="submitAssessment()">Get my probability →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /assessment-content -->
+
+</div><!-- /main -->
+
+
+<script>
+/* ───────────────────────────────────────────────────────── */
+/* ── State & initialisation                              ── */
+/* ───────────────────────────────────────────────────────── */
+
+const S = {
+  country:           null,
+  company_situation: null,
+  last_raise:        null,
+  seniority:         null,
+  company_size:      null,
+  currentStep:       0,
+};
+
+// If URL has ?start=1, hide landing content, show assessment
+(function initMode() {
+  const params = new URLSearchParams(location.search);
+  const startMode = params.get('start') === '1';
+  if (startMode) {
+    document.getElementById('landing-content').style.display = 'none';
+    document.getElementById('assessment-content').style.display = 'block';
+    // Scroll to top of assessment after paint
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  }
+})();
+
+/* ───────────────────────────────────────────────────────── */
+/* ── FAQ toggle                                          ── */
+/* ───────────────────────────────────────────────────────── */
+function toggleFaq(qEl) {
+  const answer = qEl.nextElementSibling;
+  qEl.classList.toggle('open');
+  if (answer) answer.classList.toggle('open');
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Animated sample (range narrowing preview)           ── */
+/* ───────────────────────────────────────────────────────── */
+const sampleFrames = [
+  { range: '45–65%', widthPct: 55, color: '#c9a84c', reasonHtml: '<strong>Starting point</strong> — based on company situation and tenure only' },
+  { range: '48–62%', widthPct: 55, color: '#c9a84c', reasonHtml: '<strong>Role & industry</strong> — a hot hiring market tightens and shifts the range' },
+  { range: '52–60%', widthPct: 56, color: '#c9a84c', reasonHtml: '<strong>Performance</strong> — a strong specific win lifts the floor' },
+  { range: '54–58%', widthPct: 56, color: '#00c4a0', reasonHtml: '<strong>Final range</strong> — this is where real coaching starts' },
+];
+
+function playSample() {
+  const rangeEl  = document.getElementById('sample-range');
+  const fillEl   = document.getElementById('sample-fill');
+  const reasonEl = document.getElementById('sample-reason');
+  if (!rangeEl || !fillEl || !reasonEl) return;
+
+  let i = 0;
+  function tick() {
+    const f = sampleFrames[i];
+    reasonEl.style.opacity = 0;
+    setTimeout(() => {
+      rangeEl.textContent   = f.range;
+      fillEl.style.width    = f.widthPct + '%';
+      fillEl.style.background = f.color;
+      reasonEl.innerHTML    = f.reasonHtml;
+      reasonEl.style.opacity = 1;
+    }, 300);
+
+    i = (i + 1) % sampleFrames.length;
+    setTimeout(tick, 2800);
+  }
+  tick();
+}
+
+// Start sample animation after slight delay (so LCP isn't impacted)
+if (document.getElementById('sample-anim')) {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(playSample, 400);
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  obs.observe(document.getElementById('sample-anim'));
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Option selection                                    ── */
+/* ───────────────────────────────────────────────────────── */
+function selectOpt(el, groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+
+  const val = el.dataset.val;
+  if (groupId === 'country-opts')    S.country = val;
+  if (groupId === 'company-opts')    S.company_situation = val;
+  if (groupId === 'raise-opts')      S.last_raise = val;
+  if (groupId === 'seniority-opts')  S.seniority = val;
+  if (groupId === 'size-opts')       S.company_size = val;
+
+  refreshButtons();
+  hideErr(S.currentStep);
+}
+
+function refreshButtons() {
+  // Step 0 → country
+  setBtnActive('btn-0', !!S.country);
+  // Step 1 → company
+  setBtnActive('btn-1', !!S.company_situation);
+  // Step 2 → last raise
+  setBtnActive('btn-2', !!S.last_raise);
+  // Step 3 → both seniority and size required
+  setBtnActive('btn-3', !!(S.seniority && S.company_size));
+}
+
+function setBtnActive(id, on) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('active', !!on);
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Step nav                                            ── */
+/* ───────────────────────────────────────────────────────── */
+function goStep(target) {
+  // Validate current step before advancing
+  if (target > S.currentStep) {
+    if (!validateStep(S.currentStep)) { showErr(S.currentStep); return; }
+  }
+
+  // Hide all, show target
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const next = document.getElementById('step-' + target);
+  if (!next) return;
+  next.classList.add('active');
+
+  // Progress marks (all up-to-and-including active become filled)
+  for (let i = 0; i <= 3; i++) {
+    const p = document.getElementById('p' + i);
+    if (p) p.classList.toggle('done', i <= target);
+  }
+
+  S.currentStep = target;
+  hideErr(target);
+
+  // Scroll to top of assessment (not the whole page — keep header visible)
+  const top = document.getElementById('assessment-top');
+  if (top) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function validateStep(n) {
+  if (n === 0) return !!S.country;
+  if (n === 1) return !!S.company_situation;
+  if (n === 2) return !!S.last_raise;
+  if (n === 3) return !!(S.seniority && S.company_size);
+  return true;
+}
+
+function showErr(n) {
+  const el = document.getElementById('err-' + n);
+  if (el) el.classList.add('show');
+}
+function hideErr(n) {
+  const el = document.getElementById('err-' + n);
+  if (el) el.classList.remove('show');
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Submit: save to localStorage, redirect to chat      ── */
+/* ───────────────────────────────────────────────────────── */
+function submitAssessment() {
+  if (!validateStep(3)) { showErr(3); return; }
+
+  // GA4 event (best-effort)
+  try {
+    if (typeof gtag === 'function') {
+      gtag('event', 'assessment_completed', {
+        product:           'raise',
+        country:           S.country,
+        company_situation: S.company_situation,
+        last_raise:        S.last_raise,
+        seniority:         S.seniority,
+        company_size:      S.company_size,
+      });
+    }
+  } catch (e) { /* non-fatal */ }
+
+  // Referral param passthrough (optional)
+  const params    = new URLSearchParams(location.search);
+  const refSource = params.get('ref') || '';
+
+  // Save profile — chat page picks this up and fires /api/raise-analyze
+  const profile = {
+    country:           S.country,
+    company_situation: S.company_situation,
+    last_raise:        S.last_raise,
+    seniority:         S.seniority,
+    company_size:      S.company_size,
+    refSource,
+    savedAt:           Date.now(),
+  };
+  try {
+    localStorage.setItem('rl_raise_profile', JSON.stringify(profile));
+  } catch (e) {
+    // localStorage disabled — fall back to URL params
+    const q = new URLSearchParams(profile).toString();
+    window.location.href = '/raise/chat/?' + q;
+    return;
+  }
+
+  // Instant redirect — chat page shows the thinking animation
+  window.location.href = '/raise/chat/';
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Initial progress state                              ── */
+/* ───────────────────────────────────────────────────────── */
+(function initProgress() {
+  const p0 = document.getElementById('p0');
+  if (p0) p0.classList.add('done');
+})();
+</script>
+
+<!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
+<script defer src="/shared.js"></script>
+
+</body>
+</html>

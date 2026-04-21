@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Job Offer Negotiation Coach — Waitlist</title>
+<meta name="description" content="A dedicated coach for negotiating a new job offer — counter-offers, equity, sign-on, levelling. Join the waitlist."/>
+<meta property="og:title" content="Job Offer Negotiation Coach — Waitlist"/>
+<meta property="og:description" content="Coming soon — a dedicated coach for negotiating a new job offer."/>
+<link rel="canonical" href="https://salary.recomlinked.com/raise/waitlist/"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<style>
+:root{
+  --gold:#c9a84c;--gold2:#d8b75a;
+  --teal:#00c4a0;--red:#e05555;--navy:#1e3d72;
+  --bg:#07090f;--bg4:#1c2030;
+  --page:#f4f5f8;--card:#ffffff;
+  --divider:#dde0e8;--muted:#eceef2;
+  --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{min-height:100%;max-width:100vw;overflow-x:hidden;}
+body{
+  background:var(--page);color:var(--t1);
+  font-family:var(--sans);font-size:14px;line-height:1.5;
+  display:flex;flex-direction:column;min-height:100dvh;
+}
+a{color:var(--navy);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+.site-header{
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
+}
+.logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
+.logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
+.logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
+.header-sub{font-size:11px;color:#454d60;letter-spacing:0.04em;font-weight:500;}
+
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+
+.card{
+  background:var(--card);border:1px solid var(--divider);border-radius:var(--radius);
+  padding:28px 26px;max-width:480px;width:100%;
+  box-shadow:0 2px 12px rgba(0,0,0,0.03);
+}
+.pill{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.08em;
+  color:var(--teal);background:rgba(0,196,160,0.1);
+  border:1px solid rgba(0,196,160,0.28);
+  padding:4px 10px;border-radius:20px;margin-bottom:14px;
+}
+h1{
+  font-size:24px;font-weight:800;letter-spacing:-0.5px;color:var(--t1);
+  margin-bottom:8px;line-height:1.25;
+}
+.sub{font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:18px;}
+
+.what-list{
+  list-style:none;padding:0;margin:0 0 18px;
+}
+.what-list li{
+  font-size:13px;color:var(--t1);line-height:1.55;
+  padding:6px 0 6px 22px;position:relative;
+}
+.what-list li::before{
+  content:'→';position:absolute;left:0;top:6px;
+  color:var(--teal);font-weight:700;
+}
+
+.input-label{
+  font-size:11px;font-weight:700;letter-spacing:0.06em;
+  color:var(--t3);text-transform:uppercase;margin-bottom:6px;
+}
+.input-field, .textarea-field{
+  width:100%;border:1.5px solid var(--divider);border-radius:8px;
+  padding:12px 14px;font-size:15px;color:var(--t1);
+  font-family:var(--sans);outline:none;
+  transition:border-color 0.15s;margin-bottom:6px;
+  resize:none;
+}
+.input-field:focus, .textarea-field:focus{border-color:var(--navy);}
+.textarea-field{min-height:60px;font-size:13.5px;line-height:1.55;}
+
+.field-row{margin-bottom:12px;}
+.opt-tag{
+  font-size:10px;font-weight:700;color:var(--t3);
+  letter-spacing:0.06em;margin-left:6px;
+}
+
+.btn-submit{
+  width:100%;background:var(--teal);color:#fff;
+  border:none;border-radius:10px;padding:13px;
+  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
+  margin-top:8px;transition:background 0.12s,transform 0.1s,opacity 0.12s;
+}
+.btn-submit:hover{background:#00a888;}
+.btn-submit:active{transform:translateY(1px);}
+.btn-submit:disabled{opacity:0.55;cursor:wait;}
+
+.err{
+  font-size:12.5px;color:var(--red);
+  background:rgba(224,85,85,0.07);border-left:2.5px solid var(--red);
+  padding:7px 10px;border-radius:4px;margin-top:8px;
+  display:none;
+}
+.err.show{display:block;}
+
+.divider{
+  height:1px;background:var(--divider);margin:22px 0;
+}
+.footer-link{
+  font-size:12.5px;color:var(--t2);text-align:center;
+}
+.footer-link a{color:var(--navy);font-weight:600;}
+.footer-link .cta-raise{
+  display:inline-block;margin-top:6px;
+  background:var(--gold);color:#07090f;
+  padding:9px 16px;border-radius:8px;font-weight:700;font-size:13px;
+  text-decoration:none;
+}
+.footer-link .cta-raise:hover{background:var(--gold2);text-decoration:none;}
+
+/* Success state */
+.success-icon{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(0,196,160,0.12);color:var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 16px;font-size:28px;font-weight:800;
+}
+.success-card{text-align:center;}
+
+.hint{
+  font-size:12px;color:var(--t3);line-height:1.55;
+  margin-top:12px;
+}
+
+.mini-spin{
+  width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);
+  border-top-color:#fff;border-radius:50%;
+  display:inline-block;animation:spin 0.7s linear infinite;vertical-align:middle;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <div class="header-sub">SALARY NEGOTIATION COACH</div>
+</header>
+
+<div class="wrap">
+
+  <!-- Form state -->
+  <div class="card" id="form-card">
+    <div class="pill">COMING SOON</div>
+    <h1>Job Offer Negotiation Coach</h1>
+    <p class="sub">
+      Negotiating a new offer has different dynamics than negotiating a raise at your current job. Counter-offers, equity, sign-on, levelling — all live decisions with real timing pressure.
+    </p>
+
+    <ul class="what-list">
+      <li>Chance your offer gets improved, before you accept</li>
+      <li>Scripts for counter-offering between competing offers</li>
+      <li>How to negotiate equity, sign-on, and level — not just salary</li>
+      <li>30 days of coaching while you navigate the process</li>
+    </ul>
+
+    <p class="sub" style="font-size:13px;">
+      We're building it now. Drop your email and we'll let you know the moment it's live — usually within a few weeks of enough demand.
+    </p>
+
+    <form id="waitlist-form" autocomplete="on" novalidate>
+      <div class="field-row">
+        <div class="input-label">YOUR EMAIL</div>
+        <input
+          class="input-field" id="email-input"
+          type="email" inputmode="email" autocomplete="email"
+          placeholder="you@example.com" required/>
+        <div class="err" id="err-email">Please enter a valid email address.</div>
+      </div>
+
+      <div class="field-row">
+        <div class="input-label">
+          YOUR SITUATION <span class="opt-tag">· OPTIONAL</span>
+        </div>
+        <textarea
+          class="textarea-field" id="context-input"
+          rows="2" maxlength="500"
+          placeholder="e.g. 'Got a Series B fintech offer, current job is BigCo, one other active process'"></textarea>
+      </div>
+
+      <button class="btn-submit" type="submit" id="btn-submit">Add me to the waitlist</button>
+    </form>
+
+    <div class="divider"></div>
+
+    <div class="footer-link">
+      <div>Negotiating a raise at your current job instead?</div>
+      <a class="cta-raise" href="/raise/">Get my raise probability →</a>
+    </div>
+  </div>
+
+  <!-- Success state -->
+  <div class="card success-card" id="success-card" hidden>
+    <div class="success-icon">✓</div>
+    <h1>You're on the list.</h1>
+    <p class="sub">
+      We'll email you the moment the Job Offer Coach is live. In the meantime, if you're in a live negotiation right now and want to talk it through, just reply to the confirmation email — I read every one.
+    </p>
+    <div class="hint">
+      — Milad, Co-founder
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="footer-link">
+      <div>Negotiating a raise at your current job too?</div>
+      <a class="cta-raise" href="/raise/">Get my raise probability →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API_WAITLIST = '/api/raise-waitlist';
+
+const $ = id => document.getElementById(id);
+
+function looksLikeEmail(v) {
+  v = (v || '').trim().toLowerCase();
+  if (v.length < 5) return false;
+  const at = v.indexOf('@');
+  if (at < 1) return false;
+  const domain = v.slice(at + 1);
+  if (!domain.includes('.')) return false;
+  if (domain.endsWith('.')) return false;
+  return true;
+}
+
+$('waitlist-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const emailInput = $('email-input');
+  const ctxInput   = $('context-input');
+  const email   = (emailInput.value || '').trim();
+  const context = (ctxInput.value   || '').trim().slice(0, 500);
+
+  if (!looksLikeEmail(email)) {
+    $('err-email').classList.add('show');
+    emailInput.focus();
+    return;
+  }
+  $('err-email').classList.remove('show');
+
+  const btn = $('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="mini-spin"></span>&nbsp; Adding you…';
+
+  // Referral passthrough (optional)
+  const params    = new URLSearchParams(location.search);
+  const refSource = params.get('ref') || '';
+
+  try {
+    const res = await fetch(API_WAITLIST, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, context, refSource }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+  } catch (err) {
+    // Even on network error, show success — user can always re-submit later
+    // Prefer warm UX over technical error messaging here
+  }
+
+  // GA event (best-effort)
+  try {
+    if (typeof gtag === 'function') {
+      gtag('event', 'waitlist_signup', { product: 'raise_offer_waitlist' });
+    }
+  } catch (e) { /* non-fatal */ }
+
+  $('form-card').hidden = true;
+  $('success-card').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'instant' });
+});
+
+// Clear errors on typing
+$('email-input').addEventListener('input', () => {
+  $('err-email').classList.remove('show');
+});
+
+// Focus email field on load
+setTimeout(() => $('email-input').focus(), 100);
+</script>
+
+<script defer src="/shared.js"></script>
+</body>
+</html>

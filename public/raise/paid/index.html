@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Your Coaching Plan · Salary Negotiation Coach</title>
+<meta name="robots" content="noindex"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<style>
+:root{
+  --gold:#c9a84c;--gold2:#d8b75a;
+  --teal:#00c4a0;--red:#e05555;--navy:#1e3d72;
+  --bg:#07090f;--bg2:#0f1117;--bg3:#141722;--bg4:#1c2030;
+  --page:#f4f5f8;--card:#ffffff;
+  --divider:#dde0e8;--muted:#eceef2;
+  --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;max-width:100vw;}
+body{
+  background:var(--page);color:var(--t1);
+  font-family:var(--sans);font-size:14px;
+  display:flex;flex-direction:column;height:100dvh;
+}
+button,input,textarea{font-family:var(--sans);}
+
+.page-wrap{max-width:760px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
+
+/* ── Header ────────────────────────────────────────────── */
+.site-header{
+  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
+  position:sticky;top:0;z-index:400;flex-shrink:0;gap:12px;
+}
+.logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
+.logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
+.logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
+
+.header-right{display:flex;align-items:center;gap:8px;}
+.days-pill{
+  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--gold);background:rgba(201,168,76,0.12);
+  border:1px solid rgba(201,168,76,0.28);
+  padding:4px 10px;border-radius:20px;
+}
+.menu-btn{
+  width:34px;height:34px;border-radius:8px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#e8eaf2;
+}
+.menu-btn:hover{background:rgba(255,255,255,0.08);}
+
+/* Settings dropdown */
+.menu-drop{
+  position:absolute;top:52px;right:12px;z-index:500;
+  background:var(--card);border:1px solid var(--divider);
+  border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.18);
+  min-width:180px;padding:6px;
+}
+.menu-drop[hidden]{display:none;}
+.menu-item{
+  display:block;width:100%;text-align:left;
+  padding:9px 12px;font-size:13px;color:var(--t1);
+  background:transparent;border:none;border-radius:6px;
+  cursor:pointer;text-decoration:none;
+}
+.menu-item:hover{background:var(--muted);}
+.menu-item.danger{color:var(--red);}
+
+/* ── Main scrollable area ──────────────────────────────── */
+.main{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px 16px 12px;display:flex;flex-direction:column;gap:12px;
+}
+.main::-webkit-scrollbar{display:none;}
+
+/* ── States: loading / expired / salary ────────────────── */
+.state-screen{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;gap:16px;
+}
+.loader-ring{
+  width:36px;height:36px;
+  border:2.5px solid var(--divider);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin 0.85s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.state-title{font-size:16px;font-weight:700;color:var(--t1);}
+.state-body{font-size:13px;color:var(--t2);line-height:1.55;max-width:360px;}
+.state-btn{
+  background:var(--navy);color:#fff;border:none;border-radius:8px;
+  padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;
+  margin-top:6px;
+}
+
+/* Salary modal */
+.salary-modal{
+  background:var(--card);border:1px solid var(--divider);
+  border-radius:var(--radius);padding:24px 22px;
+  max-width:440px;margin:16px auto;
+  box-shadow:0 6px 20px rgba(0,0,0,0.06);
+}
+.salary-label{
+  font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:8px;
+}
+.salary-h{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px;line-height:1.3;}
+.salary-sub{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:16px;}
+.salary-row{display:flex;gap:8px;margin-bottom:12px;}
+.salary-currency{
+  background:var(--card);border:1.5px solid var(--divider);
+  border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;
+  cursor:pointer;min-width:78px;
+}
+.salary-input{
+  flex:1;background:var(--card);border:1.5px solid var(--divider);
+  border-radius:8px;padding:10px 12px;font-size:14px;
+  outline:none;transition:border-color 0.15s;
+}
+.salary-input:focus{border-color:var(--navy);}
+.salary-actions{display:flex;gap:8px;}
+.salary-btn{
+  flex:1;border:none;border-radius:8px;padding:11px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
+}
+.salary-btn.primary{background:var(--gold);color:var(--bg);}
+.salary-btn.primary:hover{background:var(--gold2);}
+.salary-btn.skip{background:transparent;color:var(--t3);border:1px solid var(--divider);}
+.salary-btn.skip:hover{background:var(--muted);color:var(--t2);}
+
+/* ── Dashboard sections ────────────────────────────────── */
+.plan-section{
+  background:var(--card);border:1px solid var(--divider);
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 1px 3px rgba(0,0,0,0.03);
+}
+
+/* Summary card (special — dark, headline numbers) */
+.summary-card{
+  background:var(--bg);color:#fff;
+  border-radius:var(--radius);padding:20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+}
+.summary-hi{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  margin-bottom:16px;flex-wrap:wrap;
+}
+.summary-block{
+  flex:1;min-width:120px;
+}
+.summary-block-label{
+  font-size:9px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;
+  color:rgba(255,255,255,0.35);margin-bottom:3px;
+}
+.summary-block-val{
+  font-size:22px;font-weight:800;letter-spacing:-1px;
+  color:#fff;line-height:1.1;
+}
+.summary-block-val.gold{color:var(--gold);}
+.summary-block-val.teal{color:var(--teal);}
+.summary-block-sub{
+  font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px;
+}
+.summary-line{
+  font-size:13px;color:rgba(255,255,255,0.78);line-height:1.65;
+  padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);
+}
+.summary-line strong{color:#fff;}
+
+/* Plan section header (expandable) */
+.section-head{
+  padding:16px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  cursor:pointer;user-select:none;
+  border-bottom:1px solid var(--divider);
+}
+.section-head.collapsed{border-bottom:none;}
+.section-head-left{display:flex;align-items:center;gap:10px;min-width:0;}
+.section-idx{
+  font-size:9px;font-weight:800;letter-spacing:0.09em;
+  color:var(--t3);flex-shrink:0;
+}
+.section-title{
+  font-size:14px;font-weight:800;color:var(--t1);line-height:1.3;
+  letter-spacing:-0.2px;
+}
+.section-caret{
+  font-size:14px;color:var(--t3);transition:transform 0.2s;flex-shrink:0;
+}
+.section-head.collapsed .section-caret{transform:rotate(-90deg);}
+
+.section-body{padding:4px 18px 18px;}
+.section-body[hidden]{display:none;}
+
+/* Blockers */
+.blocker-card{
+  background:var(--page);border-radius:8px;padding:14px 16px;
+  margin-bottom:10px;border-left:3px solid var(--red);
+}
+.blocker-card:last-child{margin-bottom:0;}
+.blocker-name{
+  font-size:13px;font-weight:800;color:var(--t1);margin-bottom:4px;
+  letter-spacing:-0.1px;
+}
+.blocker-why{font-size:12.5px;color:var(--t2);line-height:1.55;margin-bottom:8px;}
+.blocker-fix{
+  font-size:12.5px;color:var(--t1);line-height:1.55;
+  padding-top:8px;border-top:1px dashed var(--divider);
+}
+.blocker-fix-label{
+  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:3px;
+}
+
+/* Opening script */
+.script-card{
+  background:var(--page);border-radius:8px;padding:14px 16px;
+  margin-bottom:10px;
+}
+.script-label{
+  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--t3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;
+}
+.copy-btn{
+  font-size:10px;font-weight:700;letter-spacing:0.06em;
+  color:var(--navy);background:transparent;border:1px solid var(--divider);
+  border-radius:6px;padding:3px 8px;cursor:pointer;
+  transition:background 0.12s, color 0.12s;
+}
+.copy-btn:hover{background:var(--navy);color:#fff;}
+.copy-btn.copied{background:var(--teal);color:#fff;border-color:var(--teal);}
+.script-text{
+  font-size:13.5px;color:var(--t1);line-height:1.6;
+}
+.script-text.quote{
+  border-left:2.5px solid var(--gold);padding-left:12px;
+  font-style:italic;
+}
+.roleplay-btn{
+  width:100%;background:var(--navy);color:#fff;
+  border:none;border-radius:8px;padding:11px;
+  font-size:13px;font-weight:700;cursor:pointer;
+  margin-top:4px;transition:background 0.12s;
+}
+.roleplay-btn:hover{background:#162f5c;}
+
+/* Pushback */
+.pushback-card{
+  background:var(--page);border-radius:8px;padding:12px 14px;
+  margin-bottom:10px;
+}
+.pushback-card:last-child{margin-bottom:0;}
+.pushback-q{
+  font-size:12.5px;font-weight:600;color:var(--red);
+  line-height:1.5;margin-bottom:6px;
+}
+.pushback-q::before{content:'"';}
+.pushback-q::after{content:'"';}
+.pushback-a{
+  font-size:12.5px;color:var(--t1);line-height:1.55;
+  padding-top:8px;border-top:1px dashed var(--divider);
+}
+.pushback-a-label{
+  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:3px;
+}
+
+/* Timing */
+.timing-box{
+  background:rgba(201,168,76,0.06);
+  border:1px solid rgba(201,168,76,0.25);
+  border-radius:8px;padding:14px 16px;
+  font-size:13px;color:var(--t1);line-height:1.6;
+}
+
+/* Email */
+.email-subject-row{
+  background:var(--page);border-radius:8px;padding:10px 14px;margin-bottom:8px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.email-subject-row .script-label{margin:0;}
+.email-subject-row .subject-text{
+  flex:1;font-size:13px;font-weight:600;color:var(--t1);
+}
+.email-body-card{
+  background:var(--page);border-radius:8px;padding:14px 16px;
+  font-size:13px;line-height:1.65;color:var(--t1);
+  white-space:pre-wrap;
+}
+.email-body-card .copy-btn{float:right;margin-top:-4px;}
+
+/* 30-day plan */
+.week-card{
+  background:var(--page);border-radius:8px;padding:12px 14px;
+  margin-bottom:8px;
+}
+.week-card:last-child{margin-bottom:0;}
+.week-head{
+  font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:6px;
+}
+.week-actions{list-style:none;padding:0;margin:0;}
+.week-actions li{
+  font-size:12.5px;color:var(--t1);line-height:1.55;
+  padding:4px 0 4px 20px;position:relative;
+}
+.week-actions li::before{
+  content:'○';position:absolute;left:0;top:4px;
+  color:var(--navy);font-weight:700;font-size:12px;
+}
+
+/* Coach section */
+.coach-intro{
+  padding:14px 18px 8px;font-size:12.5px;color:var(--t2);line-height:1.55;
+}
+.coach-messages{
+  padding:0 18px 12px;display:flex;flex-direction:column;gap:12px;
+  max-height:none;
+}
+.coach-msg{animation:msgIn 0.3s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.coach-bubble{
+  background:var(--page);border-radius:4px 12px 12px 12px;
+  padding:11px 13px;font-size:13px;color:var(--t1);line-height:1.6;
+  white-space:pre-wrap;word-break:break-word;
+}
+.user-msg{display:flex;justify-content:flex-end;}
+.user-bubble{
+  background:var(--navy);color:#fff;
+  border-radius:12px 4px 12px 12px;
+  padding:10px 13px;font-size:13px;line-height:1.5;max-width:82%;
+  word-break:break-word;
+}
+.typing-dots{display:inline-flex;gap:3px;align-items:center;padding:4px 2px;}
+.typing-dots .d{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:typD 1.1s infinite;}
+.typing-dots .d:nth-child(2){animation-delay:0.15s;}
+.typing-dots .d:nth-child(3){animation-delay:0.3s;}
+@keyframes typD{0%,100%{opacity:0.25;transform:translateY(0);}40%{opacity:1;transform:translateY(-2px);}}
+
+/* ── Sticky input bar ──────────────────────────────────── */
+.input-bar-wrap{
+  flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
+  padding:10px 12px calc(12px + env(safe-area-inset-bottom)) 12px;
+}
+.input-bar-wrap[hidden]{display:none;}
+.input-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1.5px solid var(--divider);
+  border-radius:24px;padding:6px 6px 6px 16px;
+  transition:border-color 0.15s;
+}
+.input-row:focus-within{border-color:var(--navy);}
+.input-row input{
+  flex:1;border:none;background:transparent;
+  font-size:14px;color:var(--t1);font-family:var(--sans);outline:none;
+}
+.input-row input::placeholder{color:var(--t4);}
+.send-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--navy);border:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:background 0.15s,opacity 0.15s;
+}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.send-btn svg{width:14px;height:14px;}
+
+/* ── Confirmation overlay for delete ───────────────────── */
+.confirm-overlay{
+  position:fixed;inset:0;
+  background:rgba(7,9,15,0.66);
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;z-index:600;
+}
+.confirm-overlay[hidden]{display:none;}
+.confirm-box{
+  background:var(--card);border-radius:12px;
+  padding:22px 20px;max-width:380px;width:100%;
+}
+.confirm-box h3{font-size:15px;font-weight:800;color:var(--t1);margin-bottom:8px;}
+.confirm-box p{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:14px;}
+.confirm-actions{display:flex;gap:8px;}
+.confirm-actions button{
+  flex:1;padding:10px;border:none;border-radius:8px;
+  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
+}
+.confirm-actions .cancel{background:var(--muted);color:var(--t2);}
+.confirm-actions .danger{background:var(--red);color:#fff;}
+
+/* Utility */
+.mt-8{margin-top:8px;}
+.mt-14{margin-top:14px;}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <div class="header-right">
+    <span class="days-pill" id="days-pill" hidden>— days left</span>
+    <button class="menu-btn" id="menu-btn" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+      </svg>
+    </button>
+    <div class="menu-drop" id="menu-drop" hidden>
+      <button class="menu-item" id="menu-export">Export my data</button>
+      <button class="menu-item" id="menu-salary">Update salary</button>
+      <button class="menu-item danger" id="menu-delete">Delete my data</button>
+    </div>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <!-- Loading -->
+  <div class="main state-screen" id="loading-screen">
+    <div class="loader-ring"></div>
+    <div class="state-title" id="loading-title">Loading your coaching plan…</div>
+    <div class="state-body" id="loading-body">Your coach is being briefed on your specific situation.</div>
+  </div>
+
+  <!-- Expired / invalid -->
+  <div class="main state-screen" id="expired-screen" hidden>
+    <div class="state-title">Your access link has expired.</div>
+    <div class="state-body" id="expired-body">If you're still within your 30-day coaching window, enter your email and we'll send you a fresh link.</div>
+    <a class="state-btn" href="/raise/enter/">Get a new link →</a>
+  </div>
+
+  <!-- Pending plan -->
+  <div class="main state-screen" id="pending-screen" hidden>
+    <div class="loader-ring"></div>
+    <div class="state-title">Finalising your plan…</div>
+    <div class="state-body">This usually takes 10–30 seconds after payment. We're writing your coaching plan now.</div>
+  </div>
+
+  <!-- Main dashboard -->
+  <div class="main" id="dashboard" hidden>
+
+    <!-- Salary prompt (first visit) -->
+    <div class="salary-modal" id="salary-prompt" hidden>
+      <div class="salary-label">ONE QUICK THING</div>
+      <div class="salary-h">What's your current annual salary?</div>
+      <div class="salary-sub">This stays on your device. We use it only to show your raise target in real dollars — not just percentages.</div>
+      <div class="salary-row">
+        <select class="salary-currency" id="salary-currency">
+          <option value="USD">USD</option>
+          <option value="CAD">CAD</option>
+          <option value="GBP">GBP</option>
+          <option value="AUD">AUD</option>
+          <option value="EUR">EUR</option>
+        </select>
+        <input class="salary-input" id="salary-input" type="number" inputmode="numeric" min="0" placeholder="e.g. 85000"/>
+      </div>
+      <div class="salary-actions">
+        <button class="salary-btn skip" id="salary-skip">Skip for now</button>
+        <button class="salary-btn primary" id="salary-save">Show my amount →</button>
+      </div>
+    </div>
+
+    <!-- Summary card -->
+    <div class="summary-card" id="summary-card">
+      <div class="summary-hi">
+        <div class="summary-block">
+          <div class="summary-block-label">Your probability</div>
+          <div class="summary-block-val gold" id="summary-range">—</div>
+          <div class="summary-block-sub" id="summary-range-sub">With a prepared negotiation</div>
+        </div>
+        <div class="summary-block">
+          <div class="summary-block-label">Amount to target</div>
+          <div class="summary-block-val teal" id="summary-amount">—</div>
+          <div class="summary-block-sub" id="summary-amount-sub">Enter salary to see dollars</div>
+        </div>
+        <div class="summary-block">
+          <div class="summary-block-label">Days left</div>
+          <div class="summary-block-val" id="summary-days">—</div>
+          <div class="summary-block-sub">Coaching window</div>
+        </div>
+      </div>
+      <div class="summary-line" id="summary-line">—</div>
+    </div>
+
+    <!-- Blockers -->
+    <div class="plan-section" id="sec-blockers">
+      <div class="section-head" onclick="toggleSection('sec-blockers')">
+        <div class="section-head-left">
+          <div class="section-idx">01</div>
+          <div class="section-title">The 3 blockers holding your number back</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="blockers-body"></div>
+    </div>
+
+    <!-- Opening script -->
+    <div class="plan-section" id="sec-script">
+      <div class="section-head" onclick="toggleSection('sec-script')">
+        <div class="section-head-left">
+          <div class="section-idx">02</div>
+          <div class="section-title">Your opening script</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="script-body"></div>
+    </div>
+
+    <!-- Pushback -->
+    <div class="plan-section" id="sec-pushback">
+      <div class="section-head" onclick="toggleSection('sec-pushback')">
+        <div class="section-head-left">
+          <div class="section-idx">03</div>
+          <div class="section-title">Handling the 3 likely pushbacks</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="pushback-body"></div>
+    </div>
+
+    <!-- Timing -->
+    <div class="plan-section" id="sec-timing">
+      <div class="section-head" onclick="toggleSection('sec-timing')">
+        <div class="section-head-left">
+          <div class="section-idx">04</div>
+          <div class="section-title">When to ask</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="timing-body"></div>
+    </div>
+
+    <!-- Email template -->
+    <div class="plan-section" id="sec-email">
+      <div class="section-head" onclick="toggleSection('sec-email')">
+        <div class="section-head-left">
+          <div class="section-idx">05</div>
+          <div class="section-title">Ready-to-send email</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="email-body"></div>
+    </div>
+
+    <!-- 30-day plan -->
+    <div class="plan-section" id="sec-prep">
+      <div class="section-head" onclick="toggleSection('sec-prep')">
+        <div class="section-head-left">
+          <div class="section-idx">06</div>
+          <div class="section-title">Your 30-day prep plan</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="prep-body"></div>
+    </div>
+
+    <!-- Coach chat -->
+    <div class="plan-section" id="sec-coach">
+      <div class="section-head" onclick="toggleSection('sec-coach')">
+        <div class="section-head-left">
+          <div class="section-idx">07</div>
+          <div class="section-title">Your coach · live chat</div>
+        </div>
+        <div class="section-caret">▾</div>
+      </div>
+      <div class="section-body" id="coach-body">
+        <div class="coach-intro">
+          Ask me anything. I remember every conversation in your coaching window. Try: <em>"Let's role-play the conversation"</em> or <em>"What if my manager says there's no budget?"</em>
+        </div>
+        <div class="coach-messages" id="coach-messages"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sticky input bar (shown once dashboard loads) -->
+  <div class="input-bar-wrap" id="input-bar-wrap" hidden>
+    <div class="input-row">
+      <input type="text" id="chat-input" placeholder="Ask your coach anything…" autocomplete="off"/>
+      <button class="send-btn" id="send-btn" aria-label="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Delete confirmation overlay -->
+<div class="confirm-overlay" id="confirm-overlay" hidden>
+  <div class="confirm-box">
+    <h3>Delete your data?</h3>
+    <p>This permanently removes your plan, chat history, and all notes your coach has taken. This cannot be undone. Your Stripe payment is not refunded automatically — email <a href="mailto:support@recomlinked.com">support</a> if you need that.</p>
+    <div class="confirm-actions">
+      <button class="cancel" id="confirm-cancel">Cancel</button>
+      <button class="danger" id="confirm-delete">Delete everything</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════ */
+/* ══  PAID DASHBOARD — controller                          ══ */
+/* ═══════════════════════════════════════════════════════════ */
+
+const LS_TOKEN  = 'rl_raise_access_token';
+const LS_SALARY = 'rl_raise_salary';
+const API_VERIFY   = '/api/raise-verify';
+const API_COACH    = '/api/raise-coach';
+const API_EXPORT   = '/api/raise-export';
+const API_DELETE   = '/api/raise-delete';
+
+const dash = {
+  token: null,
+  profile: null,
+  plan: null,
+  days_left: 0,
+  chat_history: [],  // local render only — server keeps canonical
+};
+
+/* ── Utilities ─────────────────────────────────────────── */
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  return e;
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+function showScreen(id) {
+  ['loading-screen','expired-screen','pending-screen','dashboard'].forEach(s => {
+    const n = $(s); if (n) n.hidden = (s !== id);
+  });
+  if (id === 'dashboard') $('input-bar-wrap').hidden = false;
+  else $('input-bar-wrap').hidden = true;
+}
+
+function formatMoney(amount, currency) {
+  try {
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
+  } catch (e) {
+    return `${currency} ${Math.round(amount).toLocaleString()}`;
+  }
+}
+
+/* ── Init ──────────────────────────────────────────────── */
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const urlToken   = params.get('token');
+  const urlSession = params.get('session_id');
+
+  // Priority: URL token > URL session > localStorage token
+  let token = urlToken || localStorage.getItem(LS_TOKEN) || null;
+
+  // Build verify URL
+  let verifyUrl;
+  if (urlToken) {
+    verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(urlToken)}`;
+  } else if (urlSession) {
+    verifyUrl = `${API_VERIFY}?session_id=${encodeURIComponent(urlSession)}`;
+  } else if (token) {
+    verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(token)}`;
+  } else {
+    // No identifier at all → send to re-entry
+    window.location.replace('/raise/enter/');
+    return;
+  }
+
+  // Fetch verification
+  let data;
+  try {
+    const res = await fetch(verifyUrl);
+    if (!res.ok) {
+      if (res.status === 401) {
+        showScreen('expired-screen');
+        return;
+      }
+      throw new Error('HTTP ' + res.status);
+    }
+    data = await res.json();
+  } catch (err) {
+    $('loading-title').textContent = 'Could not load your plan.';
+    $('loading-body').textContent  = 'Check your connection and refresh.';
+    return;
+  }
+
+  if (!data.valid) {
+    showScreen('expired-screen');
+    return;
+  }
+
+  dash.profile   = data.profile;
+  dash.plan      = data.plan || null;
+  dash.days_left = data.days_left || 0;
+  dash.token     = data.profile?.access_token || token;
+
+  // Persist token for same-device return visits
+  if (dash.token) {
+    try { localStorage.setItem(LS_TOKEN, dash.token); } catch (e) {}
+    // Clean URL (remove ?session_id or ?token from visible URL)
+    if (urlSession || urlToken) {
+      history.replaceState({}, '', '/raise/paid/');
+    }
+  }
+
+  // If plan is still pending (webhook race), poll for up to 30s
+  if (dash.plan && dash.plan.pending) {
+    showScreen('pending-screen');
+    dash.plan = await pollForPlan();
+    if (!dash.plan) {
+      $('loading-title').textContent = 'Plan is taking longer than usual.';
+      $('loading-body').textContent  = 'Email support@recomlinked.com if this persists.';
+      showScreen('loading-screen');
+      return;
+    }
+  }
+
+  renderDashboard();
+}
+
+async function pollForPlan() {
+  const maxAttempts = 15;
+  for (let i = 0; i < maxAttempts; i++) {
+    await sleep(2200);
+    try {
+      const res = await fetch(`${API_VERIFY}?token=${encodeURIComponent(dash.token)}`);
+      if (res.ok) {
+        const d = await res.json();
+        if (d.plan && !d.plan.pending) return d.plan;
+      }
+    } catch (e) { /* continue */ }
+  }
+  return null;
+}
+
+/* ── Render ────────────────────────────────────────────── */
+function renderDashboard() {
+  showScreen('dashboard');
+
+  // Days pill
+  const pill = $('days-pill');
+  pill.textContent = `${dash.days_left} day${dash.days_left === 1 ? '' : 's'} left`;
+  pill.hidden = false;
+
+  // Check salary — show prompt if first visit and no salary stored
+  const salary = getSalary();
+  if (!salary) {
+    $('salary-prompt').hidden = false;
+  }
+
+  renderSummary();
+  renderBlockers();
+  renderScript();
+  renderPushback();
+  renderTiming();
+  renderEmail();
+  renderPrep();
+  // Coach chat is pre-rendered empty; user drives it via input bar
+}
+
+function renderSummary() {
+  const fr   = dash.profile?.final_range || {};
+  const plan = dash.plan || {};
+
+  $('summary-range').textContent = (fr.floor && fr.ceiling) ? `${fr.floor}–${fr.ceiling}%` : '—';
+  $('summary-days').textContent  = String(dash.days_left);
+
+  // Amount in money (uses saved salary if present)
+  const salary = getSalary();
+  const ar = plan.amount_range;
+  if (salary && ar?.low_pct != null && ar?.high_pct != null) {
+    const lo = Math.round(salary.amount * ar.low_pct  / 100);
+    const hi = Math.round(salary.amount * ar.high_pct / 100);
+    $('summary-amount').textContent = `${formatMoney(lo, salary.currency)}–${formatMoney(hi, salary.currency)}`;
+    $('summary-amount-sub').textContent = `${ar.low_pct}–${ar.high_pct}% of current`;
+  } else if (ar?.low_pct != null) {
+    $('summary-amount').textContent = `${ar.low_pct}–${ar.high_pct}%`;
+    $('summary-amount-sub').textContent = 'Raise as % of current';
+  } else {
+    $('summary-amount').textContent = '—';
+  }
+
+  // Headline summary
+  const line = plan.headline_summary || 'Your coaching plan is ready.';
+  $('summary-line').innerHTML = escapeHtml(line);
+}
+
+function renderBlockers() {
+  const body = $('blockers-body');
+  body.innerHTML = '';
+  const list = dash.plan?.top_3_blockers || [];
+  if (list.length === 0) {
+    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">No blockers loaded yet.</div>';
+    return;
+  }
+  list.forEach(b => {
+    const card = el('div', 'blocker-card', `
+      <div class="blocker-name">${escapeHtml(b.blocker || '')}</div>
+      <div class="blocker-why">${escapeHtml(b.why || '')}</div>
+      <div class="blocker-fix">
+        <div class="blocker-fix-label">Fix</div>
+        ${escapeHtml(b.fix || '')}
+      </div>
+    `);
+    body.appendChild(card);
+  });
+}
+
+function renderScript() {
+  const body = $('script-body');
+  body.innerHTML = '';
+  const s = dash.plan?.opening_script;
+  if (!s) {
+    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Script not loaded.</div>';
+    return;
+  }
+
+  if (s.one_liner) {
+    const card = el('div', 'script-card', `
+      <div class="script-label">ONE-LINER
+        <button class="copy-btn" data-copy="${escapeHtml(s.one_liner)}">Copy</button>
+      </div>
+      <div class="script-text quote">${escapeHtml(s.one_liner)}</div>
+    `);
+    body.appendChild(card);
+  }
+
+  if (s.full_opener) {
+    const card = el('div', 'script-card', `
+      <div class="script-label">FULL OPENER
+        <button class="copy-btn" data-copy="${escapeHtml(s.full_opener)}">Copy</button>
+      </div>
+      <div class="script-text">${escapeHtml(s.full_opener)}</div>
+    `);
+    body.appendChild(card);
+  }
+
+  const btn = el('button', 'roleplay-btn', 'Practise this with your coach →');
+  btn.onclick = startRolePlay;
+  body.appendChild(btn);
+
+  wireCopyButtons(body);
+}
+
+function renderPushback() {
+  const body = $('pushback-body');
+  body.innerHTML = '';
+  const list = dash.plan?.pushback_responses || [];
+  if (list.length === 0) {
+    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Pushback responses not loaded.</div>';
+    return;
+  }
+  list.forEach(p => {
+    const card = el('div', 'pushback-card', `
+      <div class="pushback-q">${escapeHtml(p.pushback || '')}</div>
+      <div class="pushback-a">
+        <div class="pushback-a-label">What to say</div>
+        ${escapeHtml(p.response || '')}
+      </div>
+    `);
+    body.appendChild(card);
+  });
+}
+
+function renderTiming() {
+  const body = $('timing-body');
+  const t = dash.plan?.timing_recommendation || 'Timing not loaded.';
+  body.innerHTML = `<div class="timing-box">${escapeHtml(t)}</div>`;
+}
+
+function renderEmail() {
+  const body = $('email-body');
+  body.innerHTML = '';
+  const em = dash.plan?.email_template;
+  if (!em) {
+    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Email template not loaded.</div>';
+    return;
+  }
+
+  if (em.subject) {
+    const row = el('div', 'email-subject-row', `
+      <div style="flex:1;">
+        <div class="script-label" style="margin-bottom:2px;">SUBJECT</div>
+        <div class="subject-text">${escapeHtml(em.subject)}</div>
+      </div>
+      <button class="copy-btn" data-copy="${escapeHtml(em.subject)}">Copy</button>
+    `);
+    body.appendChild(row);
+  }
+
+  if (em.body) {
+    const card = el('div', 'email-body-card', '');
+    card.innerHTML = `<button class="copy-btn" data-copy="${escapeHtml(em.body)}">Copy</button>${escapeHtml(em.body)}`;
+    body.appendChild(card);
+  }
+
+  wireCopyButtons(body);
+}
+
+function renderPrep() {
+  const body = $('prep-body');
+  body.innerHTML = '';
+  const plan = dash.plan?.['30_day_prep_plan'] || dash.plan?.prep_plan_30_day || [];
+  if (plan.length === 0) {
+    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Prep plan not loaded.</div>';
+    return;
+  }
+  plan.forEach(wk => {
+    const actions = (wk.actions || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+    const card = el('div', 'week-card', `
+      <div class="week-head">Week ${wk.week}</div>
+      <ul class="week-actions">${actions}</ul>
+    `);
+    body.appendChild(card);
+  });
+}
+
+/* ── Copy buttons ──────────────────────────────────────── */
+function wireCopyButtons(root) {
+  root.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      const text = btn.dataset.copy;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        // Fallback — select a hidden textarea
+        const ta = document.createElement('textarea');
+        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); } catch(e2) {}
+        document.body.removeChild(ta);
+      }
+      btn.classList.add('copied');
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.textContent = orig;
+      }, 1600);
+    };
+  });
+}
+
+/* ── Expandable sections ───────────────────────────────── */
+function toggleSection(id) {
+  const sec = $(id);
+  if (!sec) return;
+  const head = sec.querySelector('.section-head');
+  const body = sec.querySelector('.section-body');
+  const collapsed = head.classList.toggle('collapsed');
+  body.hidden = collapsed;
+}
+
+/* ── Salary handling ───────────────────────────────────── */
+function getSalary() {
+  try {
+    const raw = localStorage.getItem(LS_SALARY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (obj && obj.amount > 0 && obj.currency) return obj;
+  } catch (e) {}
+  return null;
+}
+function saveSalary(amount, currency) {
+  try { localStorage.setItem(LS_SALARY, JSON.stringify({ amount, currency, savedAt: Date.now() })); } catch (e) {}
+}
+function clearSalary() {
+  try { localStorage.removeItem(LS_SALARY); } catch (e) {}
+}
+
+$('salary-save').onclick = () => {
+  const amt = parseInt($('salary-input').value, 10);
+  const cur = $('salary-currency').value;
+  if (!(amt > 0)) return;
+  saveSalary(amt, cur);
+  $('salary-prompt').hidden = true;
+  renderSummary();
+};
+$('salary-skip').onclick = () => {
+  $('salary-prompt').hidden = true;
+};
+
+/* ── Coach chat ────────────────────────────────────────── */
+let coachBusy = false;
+
+function appendUserBubble(text) {
+  const wrap = el('div', 'coach-msg user-msg', `<div class="user-bubble">${escapeHtml(text)}</div>`);
+  $('coach-messages').appendChild(wrap);
+  scrollToCoach(true);
+}
+function appendCoachBubble(text) {
+  const wrap = el('div', 'coach-msg', `<div class="coach-bubble">${escapeHtml(text)}</div>`);
+  $('coach-messages').appendChild(wrap);
+  scrollToCoach(true);
+}
+function appendTypingIndicator() {
+  const wrap = el('div', 'coach-msg', `<div class="coach-bubble"><div class="typing-dots"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>`);
+  wrap.id = 'typing-indicator-wrap';
+  $('coach-messages').appendChild(wrap);
+  scrollToCoach(true);
+}
+function removeTypingIndicator() {
+  const w = $('typing-indicator-wrap');
+  if (w) w.remove();
+}
+
+function scrollToCoach(smooth) {
+  const sec = $('sec-coach');
+  if (!sec) return;
+  // ensure coach section is expanded
+  const head = sec.querySelector('.section-head');
+  const body = sec.querySelector('.section-body');
+  if (head && head.classList.contains('collapsed')) {
+    head.classList.remove('collapsed');
+    body.hidden = false;
+  }
+  requestAnimationFrame(() => {
+    const messages = $('coach-messages');
+    if (messages && messages.lastElementChild) {
+      messages.lastElementChild.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
+    } else {
+      sec.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+    }
+  });
+}
+
+async function sendToCoach(text) {
+  if (coachBusy || !text) return;
+  coachBusy = true;
+  $('send-btn').disabled = true;
+
+  appendUserBubble(text);
+  appendTypingIndicator();
+
+  try {
+    const res = await fetch(API_COACH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: dash.token, message: text }),
+    });
+    const data = await res.json();
+    removeTypingIndicator();
+    if (res.status === 401 || data.error === 'expired') {
+      appendCoachBubble("Your coaching window has ended. If you believe this is a mistake, email support@recomlinked.com.");
+    } else if (data.reply) {
+      appendCoachBubble(data.reply);
+    } else {
+      appendCoachBubble("I couldn't respond just now. Try again?");
+    }
+  } catch (err) {
+    removeTypingIndicator();
+    appendCoachBubble("Something interrupted our connection. Please try again.");
+  } finally {
+    coachBusy = false;
+    $('send-btn').disabled = false;
+    $('chat-input').focus();
+  }
+}
+
+function startRolePlay() {
+  const text = "Let's role-play the actual negotiation conversation. You play my manager. Start by opening the meeting naturally, and I'll respond.";
+  $('chat-input').value = '';
+  sendToCoach(text);
+}
+
+/* ── Input wiring ──────────────────────────────────────── */
+$('send-btn').addEventListener('click', () => {
+  const input = $('chat-input');
+  const v = (input.value || '').trim();
+  if (!v) return;
+  input.value = '';
+  sendToCoach(v);
+});
+$('chat-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    $('send-btn').click();
+  }
+});
+
+/* ── Menu ──────────────────────────────────────────────── */
+$('menu-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const d = $('menu-drop');
+  d.hidden = !d.hidden;
+});
+document.addEventListener('click', () => { $('menu-drop').hidden = true; });
+
+$('menu-export').onclick = () => {
+  if (!dash.token) return;
+  window.open(`${API_EXPORT}?token=${encodeURIComponent(dash.token)}`, '_blank');
+};
+
+$('menu-salary').onclick = () => {
+  const s = getSalary();
+  if (s) {
+    $('salary-input').value = s.amount;
+    $('salary-currency').value = s.currency;
+  }
+  $('salary-prompt').hidden = false;
+  $('salary-prompt').scrollIntoView({ behavior: 'smooth' });
+};
+
+$('menu-delete').onclick = () => {
+  $('confirm-overlay').hidden = false;
+};
+$('confirm-cancel').onclick = () => { $('confirm-overlay').hidden = true; };
+$('confirm-delete').onclick = async () => {
+  $('confirm-delete').disabled = true;
+  try {
+    await fetch(API_DELETE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: dash.token, confirm: 'yes' }),
+    });
+  } catch (e) {}
+  try {
+    localStorage.removeItem(LS_TOKEN);
+    localStorage.removeItem(LS_SALARY);
+    localStorage.removeItem('rl_raise_profile');
+    localStorage.removeItem('rl_raise_state');
+  } catch (e) {}
+  window.location.replace('/raise/');
+};
+
+/* ── Kick off ──────────────────────────────────────────── */
+init().catch(err => {
+  console.error('init failed:', err);
+  $('loading-title').textContent = 'Something went wrong.';
+  $('loading-body').textContent  = 'Refresh to try again.';
+});
+</script>
+
+<script defer src="/shared.js"></script>
+</body>
+</html>
