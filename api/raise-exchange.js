@@ -4,6 +4,14 @@
 // Receives: current state + user's new answer.
 // Returns: new range, movement reason line, extracted fields, next question (or null if ex4).
 //
+// INPUT (re. the 3-question assessment reduction): `profile` from the chat page
+// contains 3 real user-selected fields (company_situation, last_raise, company_size)
+// plus 2 legacy default fields kept for chat-page profileHash compatibility
+// (country:'us', seniority:'mid'). This file ignores the legacy defaults when
+// building prompts so Claude doesn't treat them as real user answers.
+// Ex1 now extracts seniority_signal_from_text from the user's role description,
+// which downstream (raise-enrich.js) can use in place of the default.
+//
 // Claude's job: extract structured fields from free-text OR validate chip choice,
 // classify the overall signal (strong_positive | positive | neutral | negative),
 // and write the reason line. The range math itself runs DETERMINISTICALLY in code
@@ -94,6 +102,8 @@ Fields to extract:
 - function: one of [finance, product, engineering, sales, marketing, ops, hr, design, cs, legal, data, other]
 - industry: one of [saas, fintech, healthcare, retail, manufacturing, media, consulting, government, nonprofit, energy, education, other]
 - company_type: one of [startup, scaleup, public, private_mid, government, nonprofit, unknown]
+- seniority_signal_from_text: one of [junior, mid, senior, lead, exec, unclear]
+  (Infer from the title and any years/context mentioned. Examples: "Junior Analyst" → junior; "Senior PM, 8 years" → senior; "Director of Eng" → lead; "VP" or "Head of" → exec. Default to "unclear" if no signal.)
 
 Signal classification (how their field affects raise probability):
 - strong_positive: hot market, tight talent supply, high retention pressure
@@ -109,7 +119,7 @@ Reason line (max 20 words):
 
 Respond ONLY with valid JSON, no preamble:
 {
-  "extracted": { "job_title_normalised": "...", "function": "...", "industry": "...", "company_type": "..." },
+  "extracted": { "job_title_normalised": "...", "function": "...", "industry": "...", "company_type": "...", "seniority_signal_from_text": "..." },
   "signal": "strong_positive|positive|neutral|negative|strong_negative",
   "reason_line": "..."
 }`;
@@ -271,7 +281,7 @@ module.exports = async function handler(req, res) {
   const {
     exchange,              // 1 | 2 | 3 | 4
     answer,                // free-text answer OR a single chip value OR {row1, row2} for ex4
-    profile,               // assessment profile (country, company_situation, last_raise, seniority, company_size)
+    profile,               // chat-page profile: 3 real fields (company_situation, last_raise, company_size) + 2 legacy defaults (country, seniority) — only the real 3 are sent to Claude
     current_range,         // { floor, ceiling }
     initial_floor,         // from analyze response — used to enforce canonical floor rule
     accumulated_exchanges, // previous exchanges' extracted data (for context only)
@@ -288,6 +298,16 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Answer required' });
   }
 
+  // Strip legacy default fields (country, seniority) before exposing the
+  // profile to Claude — those are defaults carried in localStorage for the
+  // chat page's profileHash, not real user answers, and we don't want the
+  // coach to treat them as user-stated preferences.
+  const cleanProfile = {
+    company_situation: profile.company_situation,
+    last_raise:        profile.last_raise,
+    company_size:      profile.company_size,
+  };
+
   // ── Build user message for Claude ──────────────────────
   let userMessage;
   if (exchange === 4) {
@@ -302,7 +322,7 @@ Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}`;
   } else {
     userMessage = `User answer: ${typeof answer === 'string' ? answer : JSON.stringify(answer)}
 Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
-Assessment: ${JSON.stringify(profile)}`;
+Assessment: ${JSON.stringify(cleanProfile)}`;
   }
 
   // ── Call Claude ────────────────────────────────────────
