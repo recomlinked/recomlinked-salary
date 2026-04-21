@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Salary Negotiation Coach — Know Your Real Raise Probability</title>
-<meta name="description" content="Answer 4 quick questions. Get your personalised raise probability. Then let an AI coach help you move it higher. Free to start, $49 for the full plan."/>
-<meta property="og:title" content="Salary Negotiation Coach — Know Your Real Raise Probability"/>
-<meta property="og:description" content="A sales coach for non-sleazy people. Personalised raise probability, specific scripts, 30 days of coaching."/>
+<title>How to Negotiate Your Salary: A Plan Written for Your Exact Job</title>
+<meta name="description" content="People who negotiate earn an average of 7.4% more. Up to $1M more over a career. Answer 4 quick questions, get a negotiation plan written for your role, manager, and timing. Free to start, $49 for the full plan."/>
+<meta property="og:title" content="How to Negotiate Your Salary: A Plan Crafted Just for You"/>
+<meta property="og:description" content="Not general tips. Scripts, timing, and pushback responses written for your exact job. 30 days of coaching. $49 one-time, no subscription."/>
 <meta property="og:image" content="https://salary.recomlinked.com/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
@@ -58,7 +58,6 @@ button { font-family: var(--sans); cursor: pointer; }
   display: flex; align-items: center; justify-content: space-between;
   border-bottom: 1px solid var(--border);
 }
-.site-subbrand { font-size: 12px; color: var(--text3); letter-spacing: 0.03em; font-weight: 500; }
 .logo-wrap {
   display: flex; align-items: center;
   font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
@@ -83,14 +82,6 @@ button { font-family: var(--sans); cursor: pointer; }
   text-align: center;
   padding: 20px 0 28px;
 }
-.hero-pill {
-  display: inline-block;
-  font-size: 11px; font-weight: 600;
-  color: var(--gold); background: rgba(201,168,76,0.08);
-  border: 1px solid rgba(201,168,76,0.25);
-  padding: 5px 12px; border-radius: 20px;
-  margin-bottom: 18px; letter-spacing: 0.04em;
-}
 .hero h1 {
   font-size: 30px; line-height: 1.18; font-weight: 800;
   letter-spacing: -0.8px;
@@ -104,7 +95,7 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .hero-trust {
   font-size: 11px; color: var(--text3); letter-spacing: 0.04em;
-  margin-top: 16px; text-transform: uppercase;
+  margin-top: 24px; text-transform: uppercase;
 }
 .hero-trust span { margin: 0 6px; }
 
@@ -115,88 +106,174 @@ button { font-family: var(--sans); cursor: pointer; }
 
 /* ── CTAs ──────────────────────────────────────────────── */
 .cta-stack {
-  display: flex; flex-direction: column;
-  gap: 10px; max-width: 440px; margin: 0 auto;
+  display: flex; flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin: 32px auto 0;
 }
 .cta-btn {
-  display: flex; align-items: center; justify-content: space-between;
+  display: inline-flex; align-items: center; justify-content: center;
   background: var(--gold); color: #07090f;
-  border: none; border-radius: 10px;
-  padding: 16px 22px;
+  border: none; border-radius: 8px;
+  padding: 17px 34px;
   font-size: 15px; font-weight: 700;
   text-decoration: none;
   transition: transform 0.12s, opacity 0.12s, background 0.12s;
-  line-height: 1.3; text-align: left;
+  line-height: 1.3; text-align: center;
+  white-space: nowrap;
 }
 .cta-btn:hover { opacity: 0.92; text-decoration: none; }
 .cta-btn:active { transform: translateY(1px); }
-.cta-btn .cta-arrow { font-size: 18px; margin-left: 12px; flex-shrink: 0; }
+.cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
 .cta-btn.secondary {
   background: transparent;
-  color: var(--teal);
-  border: 1.5px solid rgba(0,196,160,0.4);
+  color: var(--text3);
+  border: 1.5px solid var(--border2);
+  opacity: 0.85;
 }
-.cta-btn.secondary:hover { background: rgba(0,196,160,0.06); }
-.cta-badge {
-  display: inline-block;
-  font-size: 10px; font-weight: 600;
-  background: rgba(0,0,0,0.14); color: #07090f;
-  padding: 2px 7px; border-radius: 10px;
-  margin-left: 8px; letter-spacing: 0.04em;
-  vertical-align: middle;
-}
-.cta-btn.secondary .cta-badge {
-  background: rgba(0,196,160,0.14); color: var(--teal);
+.cta-btn.secondary:hover { background: var(--bg3); opacity: 1; }
+@media (max-width: 420px) {
+  .cta-btn { padding: 15px 26px; font-size: 14.5px; white-space: normal; }
+  .cta-stack { gap: 10px; margin-top: 24px; }
 }
 
-/* ── Sample card (animated narrowing demo) ─────────────── */
-.sample-section {
-  margin: 36px 0 28px;
-  padding: 20px;
+/* ── Sample report card (FA-style, personas cycle) ────── */
+.rep-section {
+  margin: 32px 0 32px;
+}
+.rep-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.rep-link:hover { text-decoration: none; }
+.rep-card {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
-.sample-label {
-  font-size: 10px; font-weight: 700; color: var(--text3);
-  letter-spacing: 0.08em; text-transform: uppercase;
-  margin-bottom: 14px; text-align: center;
+.rep-link:hover .rep-card {
+  border-color: rgba(201,168,76,0.45);
+  box-shadow: 0 0 0 1px rgba(201,168,76,0.15);
 }
-.sample-card {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 18px 16px;
-  position: relative;
+.rep-link:hover .rep-cta-text { text-decoration: underline; }
+.rep-link:active .rep-card { transform: translateY(1px); }
+.rep-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.rep-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--gold); flex-shrink: 0;
+}
+.rep-hlabel {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text3);
+}
+.rep-body { padding: 20px 20px 16px; }
+.rep-score-row {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 18px;
+}
+.rep-ring-wrap {
+  position: relative; width: 64px; height: 64px;
+  flex-shrink: 0;
+}
+.rep-ring-wrap svg { width: 64px; height: 64px; }
+.rep-ring-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.rep-score-num {
+  font-size: 16px; font-weight: 800;
+  color: var(--text); line-height: 1;
+}
+.rep-score-lbl {
+  font-size: 8px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+.rep-ring-track { fill: none; stroke: var(--bg4); stroke-width: 5; }
+.rep-ring-fill {
+  fill: none; stroke-width: 5; stroke-linecap: round;
+  transform: rotate(-90deg); transform-origin: 32px 32px;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.22,1,0.36,1), stroke 0.6s;
+}
+.rep-role {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 3px;
+}
+.rep-verdict {
+  font-size: 15px; font-weight: 800;
+  margin-bottom: 3px; line-height: 1.25;
+}
+.rep-desc {
+  font-size: 11.5px; color: var(--text2); line-height: 1.5;
+}
+.rep-dims {
+  display: flex; flex-direction: column; gap: 7px;
+  margin-bottom: 14px;
+}
+.rep-dim-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.rep-dim-name {
+  font-size: 11px; color: var(--text2);
+  width: 148px; flex-shrink: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rep-track {
+  flex: 1; height: 5px;
+  background: var(--bg4); border-radius: 3px;
   overflow: hidden;
 }
-.sample-range {
-  font-size: 44px; font-weight: 800; color: #1a1d2e;
-  letter-spacing: -2px; line-height: 1;
-  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+.rep-fill {
+  height: 100%; border-radius: 3px; width: 0;
+  transition: width 0.8s cubic-bezier(0.22,1,0.36,1), background 0.6s;
+}
+.rep-pct {
+  font-size: 11px; width: 32px; text-align: right;
+  color: var(--text2);
+}
+.rep-divider {
+  height: 1px; background: var(--border);
+  margin: 4px 0 12px;
+}
+.rep-more-label {
+  font-size: 11px; font-weight: 800;
+  color: var(--text2); margin-bottom: 8px;
+}
+.rep-tags {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  margin-bottom: 14px;
+}
+.rep-tag {
+  font-size: 10px; color: var(--gold);
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.rep-cta {
   text-align: center;
 }
-.sample-bar {
-  height: 6px; background: #eceef2; border-radius: 3px; margin: 14px 0 10px;
-  overflow: hidden; position: relative;
+.rep-cta-text {
+  font-size: 11px; color: var(--gold); font-weight: 700;
+  letter-spacing: 0.03em; cursor: pointer;
 }
-.sample-fill {
-  height: 100%; border-radius: 3px;
-  background: #c9a84c;
-  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1), background 0.8s;
-  width: 55%;
-}
-.sample-reason {
-  font-size: 12px; color: #4a5068; line-height: 1.5;
-  min-height: 34px; text-align: center;
-  transition: opacity 0.35s;
-}
-.sample-reason strong { color: #1a1d2e; }
-.sample-caption {
-  font-size: 11px; color: var(--text3);
-  text-align: center; margin-top: 12px; font-style: italic;
+.rep-cta-text:hover { text-decoration: underline; }
+@media (max-width: 480px) {
+  .rep-dim-name { width: 110px; font-size: 10.5px; }
 }
 
-/* ── How it works ──────────────────────────────────────── */
+/* ── Section ──────────────────────────────────────────── */
 .section {
   margin: 40px 0 28px;
 }
@@ -208,117 +285,121 @@ button { font-family: var(--sans); cursor: pointer; }
   font-size: 13px; color: var(--text2); line-height: 1.55;
   margin-bottom: 20px;
 }
-.step-list { display: flex; flex-direction: column; gap: 14px; }
-.step-card {
-  display: flex; gap: 14px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px 18px;
-}
-.step-num {
-  flex-shrink: 0;
-  width: 28px; height: 28px;
-  background: rgba(201,168,76,0.12);
-  color: var(--gold);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800;
-}
-.step-content h3 {
-  font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px;
-}
-.step-content p {
-  font-size: 13px; color: var(--text2); line-height: 1.55;
-}
 
-/* ── Value cards (free vs paid) ────────────────────────── */
-.value-grid {
+/* ── Why different (icon grid) ─────────────────────────── */
+.val-grid {
   display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
 }
-@media (max-width: 560px) {
-  .value-grid { grid-template-columns: 1fr; }
+@media (max-width: 480px) {
+  .val-grid { grid-template-columns: 1fr; gap: 10px; }
 }
-.value-card {
+.val-card {
   background: var(--bg2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 18px;
+  padding: 18px 16px;
 }
-.value-card.paid {
-  border: 1px solid rgba(201,168,76,0.3);
-  background: linear-gradient(180deg, rgba(201,168,76,0.03) 0%, var(--bg2) 40%);
+.val-icon {
+  width: 28px; height: 28px;
+  color: var(--gold);
+  margin-bottom: 10px;
+  display: block;
 }
-.value-head {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px;
+.val-icon svg {
+  width: 100%; height: 100%;
+  stroke: currentColor; stroke-width: 1.6;
+  fill: none; stroke-linecap: round; stroke-linejoin: round;
 }
-.value-tier {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--text3);
+.val-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px;
 }
-.value-card.paid .value-tier { color: var(--gold); }
-.value-price {
-  font-size: 13px; font-weight: 800; color: var(--text);
-}
-.value-card.free .value-price { color: var(--teal); }
-.value-card.paid .value-price { color: var(--gold); }
-.value-list { list-style: none; padding: 0; }
-.value-list li {
+.val-body {
   font-size: 12.5px; color: var(--text2); line-height: 1.55;
-  padding: 5px 0 5px 20px;
-  position: relative;
 }
-.value-list li::before {
-  content: '✓';
-  position: absolute; left: 0; top: 5px;
-  color: var(--teal);
-  font-weight: 700;
-}
-.value-card.paid .value-list li::before { color: var(--gold); }
 
-/* ── Why different ─────────────────────────────────────── */
-.why-grid { display: flex; flex-direction: column; gap: 10px; }
-.why-row {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  background: var(--bg2);
-  border: 1px solid var(--border);
+/* ── Proof bar ────────────────────────────────────────── */
+.proof-bar {
+  margin: 28px 0;
+  padding: 18px 20px;
+  background: linear-gradient(180deg, rgba(0,196,160,0.06) 0%, rgba(0,196,160,0.02) 100%);
+  border: 1px solid rgba(0,196,160,0.22);
   border-radius: 10px;
-  padding: 14px 16px;
-  align-items: center;
+  text-align: center;
 }
-.why-label {
-  font-size: 11px; font-weight: 700; color: var(--text3);
+.proof-stat {
+  font-size: 15.5px; font-weight: 800;
+  color: var(--text); line-height: 1.5;
+  margin-bottom: 6px;
+}
+.proof-stat .proof-num { color: var(--teal); }
+.proof-src {
+  font-size: 10.5px; color: var(--text3);
   letter-spacing: 0.04em; text-transform: uppercase;
 }
-.why-old {
-  font-size: 12.5px; color: var(--text3);
-  text-decoration: line-through; line-height: 1.5;
+
+/* ── Reasons grid (Which one sounds like you?) ─────────── */
+.reasons-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
-.why-new {
-  font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500;
+@media (max-width: 480px) {
+  .reasons-grid { grid-template-columns: 1fr; }
+}
+.reason-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px; color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  line-height: 1.4;
+  gap: 10px;
+}
+.reason-chip:hover {
+  border-color: rgba(201,168,76,0.5);
+  background: var(--bg3);
+  text-decoration: none;
+}
+.reason-chip:active { transform: translateY(1px); }
+.reason-chip .reason-arrow {
+  font-size: 14px; color: var(--gold);
+  flex-shrink: 0; opacity: 0.6;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.reason-chip:hover .reason-arrow {
+  opacity: 1; transform: translateX(2px);
 }
 
-/* ── Pitch callout ─────────────────────────────────────── */
-.pitch {
+/* ── Closing CTA (non-sleazy block) ────────────────────── */
+.closing-pitch {
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--gold);
-  border-radius: 8px;
-  padding: 18px 20px;
-  margin: 28px 0;
+  border-top: 1px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  padding: 28px 24px;
+  margin: 40px 0 28px;
+  text-align: center;
 }
-.pitch-label {
-  font-size: 10px; font-weight: 700; color: var(--gold);
-  letter-spacing: 0.08em; text-transform: uppercase;
-  margin-bottom: 8px;
+.closing-pitch h3 {
+  font-size: 18px; font-weight: 800;
+  color: var(--text); margin-bottom: 10px;
+  letter-spacing: -0.3px;
 }
-.pitch-text {
-  font-size: 14px; color: var(--text); line-height: 1.65;
+.closing-pitch h3 .accent { color: var(--gold); }
+.closing-pitch p {
+  font-size: 13.5px; color: var(--text2);
+  line-height: 1.6; margin: 0 auto 18px;
+  max-width: 440px;
 }
-.pitch-text em { color: var(--text2); font-style: normal; }
+.closing-pitch .cta-btn {
+  max-width: 380px; margin: 0 auto;
+}
+.closing-pitch .mini-trust {
+  margin-top: 14px;
+}
 
 /* ── FAQ ──────────────────────────────────────────────── */
 .faq-item {
@@ -493,7 +574,6 @@ button { font-family: var(--sans); cursor: pointer; }
 <!-- ── Header ───────────────────────────────────────────── -->
 <header class="site-header">
   <a href="/" class="logo-wrap"><span class="logo-recom">Recom</span><span class="logo-linked">linked</span></a>
-  <div class="site-subbrand">Salary Negotiation Coach</div>
 </header>
 
 <div class="main">
@@ -505,20 +585,15 @@ button { font-family: var(--sans); cursor: pointer; }
 
   <!-- Hero ─────────────────────────────────────────────── -->
   <section class="hero">
-    <div class="hero-pill">A sales coach for non-sleazy people</div>
-    <h1>What are your real chances of <span class="accent">getting paid what you're worth?</span></h1>
-    <p class="hero-sub">
-      Most raise advice is generic. This isn't.
-      Answer 4 quick questions, get your personalised probability, then let an AI coach help you move it higher — with the exact scripts and amount to ask for.
-    </p>
+    <h1>How to negotiate your salary<br><span class="accent" style="display:block;margin-top:12px;font-size:0.78em;font-weight:700;line-height:1.3;">Your job. Your manager. Your plan.</span><span style="display:block;margin-top:8px;font-size:0.5em;font-weight:500;font-style:italic;color:var(--text2);letter-spacing:0.01em;">Not general tips.</span></h1>
 
     <div class="cta-stack">
-      <a href="/raise/?start=1#assessment-top" target="_blank" rel="noopener" class="cta-btn" id="cta-raise">
-        <span>Prepare me for a raise at my current job<span class="cta-badge">LIVE</span></span>
+      <a href="/raise/?start=1#assessment-top" class="cta-btn" id="cta-raise">
+        <span>Get my raise negotiation plan</span>
         <span class="cta-arrow">→</span>
       </a>
-      <a href="/raise/waitlist/" target="_blank" rel="noopener" class="cta-btn secondary" id="cta-offer">
-        <span>Prepare me for negotiating a new job offer<span class="cta-badge">SOON</span></span>
+      <a href="/raise/waitlist/" class="cta-btn secondary" id="cta-offer">
+        <span>Get my offer negotiation plan</span>
         <span class="cta-arrow">→</span>
       </a>
     </div>
@@ -528,132 +603,152 @@ button { font-family: var(--sans); cursor: pointer; }
     </div>
   </section>
 
-  <!-- Animated sample (range narrowing) ────────────────── -->
-  <div class="sample-section" id="sample-anim">
-    <div class="sample-label">WATCH YOUR RANGE NARROW IN REAL TIME</div>
-    <div class="sample-card">
-      <div class="sample-range" id="sample-range">45–65%</div>
-      <div class="sample-bar"><div class="sample-fill" id="sample-fill"></div></div>
-      <div class="sample-reason" id="sample-reason">
-        <strong>Starting point</strong> — based on company situation and tenure only
+  <!-- Sample report card (FA-style, personas cycle) ──── -->
+  <div class="rep-section" id="rep-section">
+    <a href="/raise/?start=1#assessment-top" class="rep-link">
+    <div class="rep-card">
+      <div class="rep-header">
+        <div class="rep-dot"></div>
+        <span class="rep-hlabel">Your Salary Negotiation Profile</span>
+      </div>
+      <div class="rep-body">
+        <div class="rep-score-row">
+          <div class="rep-ring-wrap">
+            <svg viewBox="0 0 64 64">
+              <circle class="rep-ring-track" cx="32" cy="32" r="27"/>
+              <circle class="rep-ring-fill" id="rep-ring" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6" stroke="#c9a84c"/>
+            </svg>
+            <div class="rep-ring-center">
+              <span class="rep-score-num" id="rep-snum">--</span>
+              <span class="rep-score-lbl">score</span>
+            </div>
+          </div>
+          <div>
+            <div class="rep-role" id="rep-srole"></div>
+            <div class="rep-verdict" id="rep-sverdict" style="color:#c9a84c"></div>
+            <div class="rep-desc" id="rep-sdesc"></div>
+          </div>
+        </div>
+        <div class="rep-dims" id="rep-dims"></div>
+        <div class="rep-divider"></div>
+        <div class="rep-more-label">+ 12 more dimensions in your full plan</div>
+        <div class="rep-tags">
+          <span class="rep-tag">Industry tailwinds</span>
+          <span class="rep-tag">External leverage</span>
+          <span class="rep-tag">Manager dynamic</span>
+          <span class="rep-tag">Country norms</span>
+          <span class="rep-tag">Opening script</span>
+          <span class="rep-tag">Pushback responses</span>
+          <span class="rep-tag">Email template</span>
+          <span class="rep-tag">30-day plan</span>
+          <span class="rep-tag">Role-play mode</span>
+          <span class="rep-tag">Coach chat</span>
+        </div>
+        <div class="rep-cta">
+          <div class="rep-cta-text">Get your plan →</div>
+        </div>
       </div>
     </div>
-    <div class="sample-caption">Each chat exchange tightens the range based on your specific situation.</div>
+    </a>
   </div>
 
-  <!-- How it works ─────────────────────────────────────── -->
-  <section class="section">
-    <h2>How it works</h2>
-    <p class="section-sub">Three steps. No friction. Built for people who hate wasting time.</p>
-    <div class="step-list">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div class="step-content">
-          <h3>Answer 4 quick questions (60 seconds)</h3>
-          <p>Tap to select. No typing. Covers country, company situation, tenure, and role. That's your starting probability range.</p>
-        </div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div class="step-content">
-          <h3>Chat through 4 short exchanges</h3>
-          <p>Your range narrows as we dig into your role, performance, leverage, and manager relationship. The number on the card updates with each exchange, with a one-line reason why it moved.</p>
-        </div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div class="step-content">
-          <h3>Unlock the full plan ($49 one-time)</h3>
-          <p>Specific raise amount with market data, the blockers holding your number back, the exact words to open the conversation, scripts to handle pushback, role-play mode, and 30 days of coaching that remembers every conversation.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Free vs paid ──────────────────────────────────────── -->
-  <section class="section">
-    <h2>What you get</h2>
-    <p class="section-sub">Free is actually useful. Paid is where the negotiation prep happens.</p>
-    <div class="value-grid">
-      <div class="value-card free">
-        <div class="value-head">
-          <span class="value-tier">Free</span>
-          <span class="value-price">$0</span>
-        </div>
-        <ul class="value-list">
-          <li>Your personalised probability range</li>
-          <li>4 coaching exchanges that narrow the range</li>
-          <li>One-line reason the range moves each round</li>
-          <li>No email required to start</li>
-        </ul>
-      </div>
-      <div class="value-card paid">
-        <div class="value-head">
-          <span class="value-tier">Full Plan</span>
-          <span class="value-price">$49</span>
-        </div>
-        <ul class="value-list">
-          <li>Specific raise amount range, with supporting data</li>
-          <li>The 3 blockers holding your number back — and the fix for each</li>
-          <li>Ready-to-send email template</li>
-          <li>Spoken opening script, personalised to your situation</li>
-          <li>Role-play mode — practice the conversation with your coach</li>
-          <li>Responses to the 3 pushbacks you're most likely to hear</li>
-          <li>30-day preparation plan, week by week</li>
-          <li>30 days of coaching — your coach remembers every conversation</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- Why different ────────────────────────────────────── -->
+  <!-- Why different (icon grid) ────────────────────────── -->
   <section class="section">
     <h2>Why this is different</h2>
-    <p class="section-sub">Most raise advice is generic. Yours shouldn't be.</p>
-    <div class="why-grid">
-      <div class="why-row">
-        <div class="why-label">Probability</div>
-        <div>
-          <div class="why-old">"Here are 7 tips to ask for a raise"</div>
-          <div class="why-new">Your specific probability — and what moves it to 75%+</div>
+    <div class="val-grid">
+
+      <div class="val-card">
+        <div class="val-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
         </div>
+        <div class="val-title">Made for you</div>
+        <div class="val-body">A plan written for your role, your manager, and your timing.</div>
       </div>
-      <div class="why-row">
-        <div class="why-label">Context</div>
-        <div>
-          <div class="why-old">Generic scripts from a Forbes article</div>
-          <div class="why-new">Scripts written for your role, industry, and manager dynamic</div>
+
+      <div class="val-card">
+        <div class="val-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
         </div>
+        <div class="val-title">Real scripts</div>
+        <div class="val-body">Words you can actually say out loud, not corporate copy or canned lines.</div>
       </div>
-      <div class="why-row">
-        <div class="why-label">Practice</div>
-        <div>
-          <div class="why-old">Read advice, hope it sticks</div>
-          <div class="why-new">Role-play the conversation before having it</div>
+
+      <div class="val-card">
+        <div class="val-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         </div>
+        <div class="val-title">Role-play mode</div>
+        <div class="val-body">Practise the conversation before you have it, with pushbacks and all.</div>
       </div>
-      <div class="why-row">
-        <div class="why-label">Memory</div>
-        <div>
-          <div class="why-old">One-shot advice, then you're on your own</div>
-          <div class="why-new">30 days of coaching — your coach remembers every session</div>
+
+      <div class="val-card">
+        <div class="val-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
         </div>
+        <div class="val-title">30 days of coaching</div>
+        <div class="val-body">Your AI coach remembers every session, for as long as you're preparing.</div>
       </div>
-      <div class="why-row">
-        <div class="why-label">Price</div>
-        <div>
-          <div class="why-old">$1,250 for a human coach call</div>
-          <div class="why-new">$49 one-time, for a raise that's typically worth thousands</div>
-        </div>
-      </div>
+
     </div>
   </section>
 
-  <!-- Pitch callout ────────────────────────────────────── -->
-  <div class="pitch">
-    <div class="pitch-label">THE PITCH</div>
-    <div class="pitch-text">
-      Most people who deserve a raise don't get one — not because they don't deserve it, but because they never get comfortable asking. <em>This is a coach that prepares you for that conversation in 10 minutes, with scripts you can actually say out loud.</em>
+  <!-- Proof bar (cited stats) ─────────────────────────── -->
+  <div class="proof-bar">
+    <div class="proof-stat">
+      People who negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+    </div>
+    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+  </div>
+
+  <!-- Which one sounds like you? (reasons list) ──────── -->
+  <section class="section">
+    <h2>Which one sounds like you?</h2>
+    <div class="reasons-grid">
+      <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
+        <span>I think I'm underpaid but I'm not sure</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=quiet_wins#assessment-top" class="reason-chip">
+        <span>I can't put my wins into words</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
+        <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=freeze#assessment-top" class="reason-chip">
+        <span>I freeze when it's time to name a number</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=long_gap#assessment-top" class="reason-chip">
+        <span>2+ years at this company with no raise</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=small_raise#assessment-top" class="reason-chip">
+        <span>I got a small annual raise and want more</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=shy#assessment-top" class="reason-chip">
+        <span>I'm scared of sounding greedy or pushy</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=quiet_performer#assessment-top" class="reason-chip">
+        <span>I'm a strong performer but quiet, and it's costing me</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=layoffs#assessment-top" class="reason-chip">
+        <span>The company just did layoffs. Can I still ask?</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=never_asked#assessment-top" class="reason-chip">
+        <span>I've never asked for a raise in my career</span><span class="reason-arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Closing CTA (non-sleazy concept lands here) ──────── -->
+  <div class="closing-pitch">
+    <h3><span class="accent">A sales coach</span> for non-sleazy people</h3>
+    <p>
+      Selling your work is not the same as bragging. We coach you to ask for what you're worth: professionally, with evidence, in words that sound like you.
+    </p>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my raise negotiation plan</span>
+      <span class="cta-arrow">→</span>
+    </a>
+    <div class="mini-trust">
+      <strong>Free</strong> · No email needed · 60 seconds
     </div>
   </div>
 
@@ -663,19 +758,23 @@ button { font-family: var(--sans); cursor: pointer; }
     <div style="margin-top: 16px;">
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
-        <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors (company situation, tenure, performance, industry, external leverage, manager relationship, review timing, country norms, and more), then gives you a personalised plan and remembers every conversation for 30 days as you prepare.</div>
+        <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors, then gives you a personalised plan and remembers every conversation for 30 days as you prepare.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability?<span class="faq-icon">+</span></div>
-        <div class="faq-a">The probability is an estimate based on your specific situation and market conditions, not a guarantee. It's calibrated on the structural factors that actually drive raise outcomes (company financial health, your tenure and performance, external leverage, manager dynamics, and timing). It's designed to be directionally accurate so you know whether you're in a strong position, a weak one, or somewhere in between — and what moves it.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability score?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The score is an estimate based on your specific situation and market conditions, not a guarantee. It's calibrated on the structural factors that actually drive raise outcomes. It's designed to be directionally accurate so you know whether you're in a strong position, a weak one, or somewhere in between, and exactly what moves it.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What if I'm not sure about some of the answers?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Pick the closest option. The coaching chat handles uncertainty — if you're not sure about your market rate, your manager's political position, or when exactly your review is, the coach will help you figure it out. Every answer can be revised.</div>
+        <div class="faq-a">Pick the closest option. The coaching chat handles the nuance: if you're unsure about your market rate, your manager's position, or when exactly your review is, the coach will help you figure it out.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Will my employer find out I'm using this?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No. Nothing you type here leaves this site. We don't share data, and we don't sell anything. You can delete everything with one click from your dashboard after you've bought the plan.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What does the 30-day coaching look like?<span class="faq-icon">+</span></div>
-        <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need — your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice — you're working through a specific plan with a coach who knows your situation.</div>
+        <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need. Your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice. You're working through a specific plan with a coach who knows your situation.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Do you store my company name or sensitive info?<span class="faq-icon">+</span></div>
@@ -683,7 +782,7 @@ button { font-family: var(--sans); cursor: pointer; }
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What about a job offer I'm negotiating?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Different product — different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/" target="_blank" rel="noopener">Join the waitlist</a> and we'll let you know when it's live (usually within a few weeks of enough demand).</div>
+        <div class="faq-a">Different product, different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/">Join the waitlist</a> and we'll let you know when it's live.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Refund policy?<span class="faq-icon">+</span></div>
@@ -694,8 +793,9 @@ button { font-family: var(--sans); cursor: pointer; }
 
   <!-- Secondary CTA at bottom of landing ───────────────── -->
   <div style="text-align:center; margin: 36px 0 10px;">
-    <a href="/raise/?start=1#assessment-top" target="_blank" rel="noopener" class="cta-btn" style="display: inline-flex; max-width: 420px;">
-      <span>Get my raise probability — free</span>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Still here? Good.</div>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my raise negotiation plan</span>
       <span class="cta-arrow">→</span>
     </a>
   </div>
@@ -883,50 +983,102 @@ function toggleFaq(qEl) {
 }
 
 /* ───────────────────────────────────────────────────────── */
-/* ── Animated sample (range narrowing preview)           ── */
+/* ── Sample report card — cycles through personas        ── */
 /* ───────────────────────────────────────────────────────── */
-const sampleFrames = [
-  { range: '45–65%', widthPct: 55, color: '#c9a84c', reasonHtml: '<strong>Starting point</strong> — based on company situation and tenure only' },
-  { range: '48–62%', widthPct: 55, color: '#c9a84c', reasonHtml: '<strong>Role & industry</strong> — a hot hiring market tightens and shifts the range' },
-  { range: '52–60%', widthPct: 56, color: '#c9a84c', reasonHtml: '<strong>Performance</strong> — a strong specific win lifts the floor' },
-  { range: '54–58%', widthPct: 56, color: '#00c4a0', reasonHtml: '<strong>Final range</strong> — this is where real coaching starts' },
+const GOLD = '#c9a84c';
+const TEAL = '#00c4a0';
+const RED  = '#e05555';
+const CIRC = 169.6; // 2 * PI * r (r=27)
+
+const repPersonas = [
+  {
+    score: 64, verdictColor: GOLD, ringColor: GOLD,
+    role: 'Mid-level Marketing · SaaS',
+    verdict: 'Moderate chance',
+    desc: 'Quiet contributor with clear wins you haven\'t surfaced.',
+    dims: [
+      { name: 'Company situation', pct: 68, color: GOLD },
+      { name: 'Performance case',  pct: 82, color: TEAL },
+      { name: 'Review timing',     pct: 55, color: GOLD },
+    ],
+  },
+  {
+    score: 78, verdictColor: TEAL, ringColor: TEAL,
+    role: 'Senior Engineer · Fintech',
+    verdict: 'High chance',
+    desc: 'Strong case. Timing and framing will set the ceiling.',
+    dims: [
+      { name: 'Company situation',  pct: 88, color: TEAL },
+      { name: 'Performance case',   pct: 91, color: TEAL },
+      { name: 'External leverage',  pct: 76, color: TEAL },
+    ],
+  },
+  {
+    score: 42, verdictColor: GOLD, ringColor: GOLD,
+    role: 'Junior Analyst · Retail',
+    verdict: 'Low chance',
+    desc: 'Tenure limits upside. One specific win reframes the ask.',
+    dims: [
+      { name: 'Company situation',  pct: 58, color: GOLD },
+      { name: 'Performance case',   pct: 70, color: GOLD },
+      { name: 'Manager advocacy',   pct: 48, color: GOLD },
+    ],
+  },
 ];
 
-function playSample() {
-  const rangeEl  = document.getElementById('sample-range');
-  const fillEl   = document.getElementById('sample-fill');
-  const reasonEl = document.getElementById('sample-reason');
-  if (!rangeEl || !fillEl || !reasonEl) return;
+function renderPersona(p) {
+  const ring    = document.getElementById('rep-ring');
+  const snum    = document.getElementById('rep-snum');
+  const srole   = document.getElementById('rep-srole');
+  const sverd   = document.getElementById('rep-sverdict');
+  const sdesc   = document.getElementById('rep-sdesc');
+  const dimsEl  = document.getElementById('rep-dims');
+  if (!ring || !snum || !dimsEl) return;
 
-  let i = 0;
-  function tick() {
-    const f = sampleFrames[i];
-    reasonEl.style.opacity = 0;
-    setTimeout(() => {
-      rangeEl.textContent   = f.range;
-      fillEl.style.width    = f.widthPct + '%';
-      fillEl.style.background = f.color;
-      reasonEl.innerHTML    = f.reasonHtml;
-      reasonEl.style.opacity = 1;
-    }, 300);
+  // Ring
+  const offset = CIRC - (CIRC * (p.score / 100));
+  ring.setAttribute('stroke', p.ringColor);
+  ring.setAttribute('stroke-dashoffset', offset);
 
-    i = (i + 1) % sampleFrames.length;
-    setTimeout(tick, 2800);
-  }
-  tick();
+  // Score + text
+  snum.textContent = p.score + '%';
+  snum.style.color = p.ringColor;
+  srole.textContent = p.role;
+  sverd.textContent = p.verdict;
+  sverd.style.color = p.verdictColor;
+  sdesc.textContent = p.desc;
+
+  // Dimensions
+  dimsEl.innerHTML = p.dims.map(d => `
+    <div class="rep-dim-row">
+      <div class="rep-dim-name">${d.name}</div>
+      <div class="rep-track"><div class="rep-fill" style="width:${d.pct}%;background:${d.color};"></div></div>
+      <div class="rep-pct" style="color:${d.color}">${d.pct}%</div>
+    </div>
+  `).join('');
 }
 
-// Start sample animation after slight delay (so LCP isn't impacted)
-if (document.getElementById('sample-anim')) {
+function playPersonas() {
+  if (!document.getElementById('rep-section')) return;
+  let i = 0;
+  renderPersona(repPersonas[0]);
+  setInterval(() => {
+    i = (i + 1) % repPersonas.length;
+    renderPersona(repPersonas[i]);
+  }, 4200);
+}
+
+// Start when the card is in view
+if (document.getElementById('rep-section')) {
   const obs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
-        setTimeout(playSample, 400);
+        setTimeout(playPersonas, 300);
         obs.disconnect();
       }
     });
-  }, { threshold: 0.3 });
-  obs.observe(document.getElementById('sample-anim'));
+  }, { threshold: 0.25 });
+  obs.observe(document.getElementById('rep-section'));
 }
 
 /* ───────────────────────────────────────────────────────── */
