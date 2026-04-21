@@ -171,27 +171,32 @@ Respond ONLY with valid JSON, no preamble:
   "reason_line": "..."
 }`;
 
-const EXCHANGE_4_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship AND review cycle timing. This is the FINAL exchange before the paywall.
+const EXCHANGE_4_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship, any prior raise asks, AND review cycle timing. This is the FINAL exchange before the paywall.
 
 Fields to extract:
 - manager_relationship: one of [strong, professional, complicated, never_asked]
 - review_timing: one of [imminent, soon, distant, none, just_happened]
-- context_detail: string (e.g., "manager was just replaced", "I'm on a PIP")
+- prior_ask: one of [not_mentioned, never_asked, asked_got_yes, asked_got_no, asked_got_partial]
+  (A prior "no" is a strong coaching signal — the plan has to handle re-opening the conversation.
+   "asked_got_partial" = asked and got something smaller than requested.
+   Default to "not_mentioned" if the user didn't touch the topic.)
+- context_detail: string (e.g., "manager was just replaced", "I'm on a PIP", "asked last year and was told budget was frozen")
 
 Signal classification uses the combinatorial matrix:
 - strong_positive: strong + imminent/soon
 - positive: strong + distant OR never_asked + soon
 - neutral: professional + any OR strong + no_cycle
-- negative: complicated + any OR any + just_happened
-- strong_negative: complicated + just_happened
+- negative: complicated + any OR any + just_happened OR asked_got_no + any
+- strong_negative: complicated + just_happened OR asked_got_no + just_happened
 
 Reason line (max 22 words):
 - Must reference BOTH relationship AND timing
+- If prior_ask is asked_got_no, acknowledge the past rejection directly but frame as addressable
 - This is the final reason before paywall — should feel conclusive
 
 Respond ONLY with valid JSON, no preamble:
 {
-  "extracted": { "manager_relationship": "...", "review_timing": "...", "context_detail": "..." },
+  "extracted": { "manager_relationship": "...", "review_timing": "...", "prior_ask": "...", "context_detail": "..." },
   "signal": "...",
   "reason_line": "..."
 }`;
@@ -218,7 +223,7 @@ const NEXT_QUESTIONS = {
     allows_free_text: true,
   },
   3: {
-    question: "Last one. How's your relationship with whoever decides your salary, and when's your next review or raise cycle?",
+    question: "Last one. How's your relationship with whoever decides your salary, whether you've asked for a raise before (and how it went), and when's your next review or raise cycle?",
     chips_row_1: [
       { value: 'strong',       label: 'Strong — they advocate for me' },
       { value: 'professional', label: 'Professional but not close' },
