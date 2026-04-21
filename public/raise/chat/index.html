@@ -39,12 +39,17 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 /* ── Chat area ─────────────────────────────────────────── */
 .chat-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 20px;display:flex;flex-direction:column;gap:32px;
+  padding:16px 16px 20px;display:flex;flex-direction:column;gap:44px;
 }
 .chat-wrap::-webkit-scrollbar{display:none;}
 
 /* ── Coach message ─────────────────────────────────────── */
 .coach-msg{display:flex;flex-direction:column;gap:4px;animation:msgIn 0.45s cubic-bezier(0.22,1,0.36,1);}
+/* Safety: iOS Safari has had intermittent flex-gap rendering issues.
+   An explicit margin-top that only kicks in for non-first children
+   guarantees vertical separation even if flex gap under-computes. */
+.coach-msg + .coach-msg, .user-msg + .coach-msg, .score-card-msg + .coach-msg { margin-top: 4px; }
+.user-msg + .user-msg, .coach-msg + .user-msg { margin-top: 4px; }
 @keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
 .bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
@@ -101,8 +106,8 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 }
 .prob-reason strong{color:#fff;}
 
-/* Score card message — extra breathing room around the visually heavy card */
-.score-card-msg{margin-top:10px;margin-bottom:10px;}
+/* Score card — small extra margin keeps its rhythm consistent with the larger chat gap */
+.score-card-msg{margin-top:4px;margin-bottom:4px;}
 
 /* ── User message ──────────────────────────────────────── */
 .user-msg{display:flex;justify-content:flex-end;padding-left:42px;animation:msgIn 0.28s ease;}
