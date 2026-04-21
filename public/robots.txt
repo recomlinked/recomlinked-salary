@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /raise/chat/
+Disallow: /raise/paid/
+Disallow: /raise/enter/
+Disallow: /api/
+
+Sitemap: https://salary.recomlinked.com/sitemap.xml
