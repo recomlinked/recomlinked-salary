@@ -21,17 +21,13 @@
     gtag('config', 'G-C5GQLC5FHP');
   })();
 
-  // ── 3. Microsoft Clarity (add your ID and uncomment) ──
-  /*
-  (function() {
-    if (document.querySelector('script[src*="clarity.ms"]')) return;
-    var s = document.createElement('script');
-    s.async = true;
-    s.src = 'https://www.clarity.ms/tag/YOUR_CLARITY_ID';
-    document.head.appendChild(s);
-    window.clarity = window.clarity || function() { (window.clarity.q = window.clarity.q || []).push(arguments); };
-  })();
-  */
+  // ── 3. Microsoft Clarity ─────────────────────────────
+  (function(c, l, a, r, i, t, y) {
+    if (l.querySelector('script[src*="clarity.ms"]')) return;
+    c[a] = c[a] || function() { (c[a].q = c[a].q || []).push(arguments); };
+    t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+    y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+  })(window, document, 'clarity', 'script', 'wfantc4i14');
 
   // ── 4. Remove any existing footer (idempotency) ──────
   var old = document.querySelector('footer.recomlinked-footer');
