@@ -47,6 +47,7 @@ html, body {
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
+  scroll-behavior: smooth;
 }
 a { color: var(--gold); text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -165,17 +166,33 @@ button { font-family: var(--sans); cursor: pointer; }
 .rep-header {
   background: var(--bg3);
   border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
-  display: flex; align-items: center; gap: 8px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 10px;
 }
 .rep-dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--gold); flex-shrink: 0;
 }
 .rep-hlabel {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  flex: 1;
+}
+.rep-example-tag {
+  font-size: 9.5px; font-weight: 700;
   color: var(--text3);
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+@media (max-width: 420px) {
+  .rep-hlabel { font-size: 13px; }
+  .rep-example-tag { font-size: 9px; padding: 2px 6px; }
 }
 .rep-body { padding: 20px 20px 16px; }
 .rep-score-row {
@@ -597,9 +614,9 @@ button { font-family: var(--sans); cursor: pointer; }
         <span>Get my raise negotiation plan</span>
         <span class="cta-arrow">→</span>
       </a>
-      <a href="/raise/waitlist/" class="cta-btn secondary" id="cta-offer">
-        <span>Get my offer negotiation plan</span>
-        <span class="cta-arrow">→</span>
+      <a href="#rep-section" class="cta-btn secondary" id="cta-how">
+        <span>How it works</span>
+        <span class="cta-arrow">↓</span>
       </a>
     </div>
 
@@ -614,7 +631,8 @@ button { font-family: var(--sans); cursor: pointer; }
     <div class="rep-card">
       <div class="rep-header">
         <div class="rep-dot"></div>
-        <span class="rep-hlabel">Your Salary Negotiation Profile</span>
+        <span class="rep-hlabel">Find out how strong your raise case really is.</span>
+        <span class="rep-example-tag">Example</span>
       </div>
       <div class="rep-body">
         <div class="rep-score-row">
