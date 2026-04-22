@@ -1,17 +1,29 @@
 // api/raise-coach.js
-// Salary Negotiation Coach — Paid coaching chat
-// 30-day coaching window. Context-rich: every call includes the user's profile,
-// their coach's notes (a Claude-maintained compact summary of history), and the last
-// 10 messages of raw transcript. This keeps cost bounded even if the user chats daily.
+// Salary Negotiation Coach — Paid coaching chat + free-mode post-paywall chat
 //
-// History storage (per spec § memory):
+// ── TWO MODES ────────────────────────────────────────────
+// MODE 1 — PAID (token required): 30-day coaching window. Full history,
+// Redis-backed notes, role-play support. Unchanged from prior behaviour.
+//
+// MODE 2 — FREE (no token, profile provided inline): User is on the chat
+// page, past the paywall, still asking questions. We reply usefully but
+// every reply ends with a dynamic CTA referencing their obstacle + range.
+// History NOT stored (no user record). Calls bounded to ~3 per session via
+// frontend — no server-side rate limit here beyond basic abuse guards.
+//
+// ── Round 2 updates ──────────────────────────────────────
+// • Free-mode branch (no token) — accepts { profile, obstacle, final_range,
+//   accumulated_exchanges, message }. No Redis reads. System prompt injects
+//   the same obstacle + range context the paywall used so replies feel
+//   continuous with the paywall moment.
+// • Paid-mode system prompt now references obstacle + prior_ask + seniority_from_text
+//   where available.
+//
+// History storage (paid mode, unchanged):
 //   raise:user:{email}        — profile (stays stable)
 //   raise:user:{email}:plan   — enriched plan from webhook
-//   raise:user:{email}:chat   — full chat history (capped to MAX_HISTORY_RAW messages)
-//   raise:user:{email}:notes  — compact Claude-generated summary (updated via raise-notes-update)
-//
-// Auth: access token (from query string of /raise/paid/?token=...)
-// Session cap: MAX_MESSAGES per 30-day window (generous — 200). Hidden from UI.
+//   raise:user:{email}:chat   — full chat history (capped to MAX_HISTORY_RAW)
+//   raise:user:{email}:notes  — compact Claude-generated summary
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { Redis }  = require('@upstash/redis');
@@ -23,26 +35,40 @@ const redis  = new Redis({
 });
 
 const TTL_30_DAYS     = 60 * 60 * 24 * 30;
-const MAX_HISTORY_RAW = 50;   // keep last 50 messages in Redis (rolls over)
-const MAX_CONTEXT     = 10;   // pass last 10 messages to Claude as raw transcript
-const MAX_MESSAGES    = 200;  // hidden cap — generous enough nobody hits it
+const MAX_HISTORY_RAW = 50;
+const MAX_CONTEXT     = 10;
+const MAX_MESSAGES    = 200;
+
+// Free mode — light bounds to prevent abuse
+const FREE_MAX_CHARS = 800;   // max chars in the user's message
+const FREE_MAX_TOKENS_OUT = 450; // Claude's reply cap in free mode
 
 const TEST_TOKEN = 'RAISE-TEST-2026';
 
-// ── System prompt for the coach ────────────────────────────
-function buildSystemPrompt({ profile, plan, notes }) {
+// ── Price — single source of truth for CTA copy ─────────
+// Must match the chat page's PRICE_USD. Changing here changes free-mode CTA text.
+const PRICE_USD = 39;
+
+// ── System prompt — PAID mode ───────────────────────────
+function buildPaidSystemPrompt({ profile, plan, notes }) {
   const a   = profile.assessment || {};
   const fr  = profile.final_range || {};
+  const obs = profile.obstacle     || {};
   const p   = plan || {};
+  const seniorityFromText = profile.seniority_signal_from_text || a.seniority || 'unknown';
+  const priorAsk          = profile.prior_ask                  || 'not_mentioned';
+
   return `You are the user's personal Salary Negotiation Coach. You have 30 days to prepare them for a successful raise conversation at their current job. You remember every conversation in this window.
 
 USER SNAPSHOT:
 - Name: ${profile.first_name || '(not known)'}
 - Country: ${a.country || 'unknown'}
-- Seniority: ${a.seniority || 'unknown'}
+- Seniority signal: ${seniorityFromText}
 - Company size: ${a.company_size || 'unknown'}
 - Company situation: ${a.company_situation || 'unknown'}
 - Last raise: ${a.last_raise || 'unknown'}
+- Prior ask: ${priorAsk}${priorAsk === 'asked_got_no' ? ' (they were told no before — reopen-the-conversation coaching is central)' : priorAsk === 'asked_got_partial' ? ' (they got less than asked for before — leverage this precedent)' : ''}
+- Stated obstacle: ${obs.code || 'unknown'}${obs.label ? ` — "${obs.label}"` : ''}${obs.free_text ? ` (their words: "${obs.free_text}")` : ''}
 - Final probability range: ${fr.floor || '?'}–${fr.ceiling || '?'}%
 
 COACHING PLAN (your own earlier output — reference it, don't re-generate):
@@ -73,7 +99,7 @@ OUT OF SCOPE (redirect politely):
 
 TONE:
 - Direct, warm, specific. Talks like a coach who's been at this 15 years.
-- Reference their actual profile, never generic.
+- Reference their actual profile — never generic.
 - Every answer ends with something they can DO next.
 - 3-6 sentences unless they explicitly ask for detail.
 - Uses their name sparingly — once per session, not every message.
@@ -82,6 +108,54 @@ ROLE-PLAY MODE:
 If they ask to practise, ask who you should play (the manager, HR, themselves), set the scene in one sentence, then stay in character until they say "out" or "end role play". After role-play ends, give 2-3 short notes on what worked and what to adjust.
 
 Never be generic. Every response should feel like it could only be written for this specific person.`;
+}
+
+// ── System prompt — FREE mode (post-paywall on the chat page) ────────
+// The user has seen the paywall, didn't click, and kept chatting. We give
+// them a genuinely useful reply (not a paywall repeat) then append a short
+// dynamic CTA tail that references their obstacle. The "answer first, earn
+// the CTA" pattern — FA is weak at this, we do better.
+function buildFreeSystemPrompt({ profile, obstacle, final_range, accumulated_exchanges }) {
+  const a   = profile || {};
+  const ex1 = accumulated_exchanges?.ex1?.extracted || {};
+  const ex2 = accumulated_exchanges?.ex2?.extracted || {};
+  const ex3 = accumulated_exchanges?.ex3?.extracted || {};
+  const obs = obstacle || {};
+  const fr  = final_range || {};
+
+  const roleLabel = ex1.job_title_normalised || '(role unknown)';
+  const priorAsk  = ex3.prior_ask || 'not_mentioned';
+
+  return `You are a salary negotiation coach chatting with someone who has just completed a 3-exchange assessment but has NOT YET paid for the full coaching plan. They're on the free chat page, saw the paywall ($${PRICE_USD} coaching plan), and are asking you another question instead of clicking.
+
+YOUR JOB — in this exact order:
+1. Answer their question usefully and specifically. Reference what they told you in the exchanges (role, evidence, manager, obstacle). This is NOT a sales pitch — give them a genuinely helpful answer a coach would give. 3-5 sentences max.
+2. End with a short transition (1-2 sentences) that references their stated obstacle and points out that the FULL version of what you just gave them (exact words, specific numbers, personalised to them) is in the paid plan.
+3. DO NOT repeat any part of the main paywall copy. This is a continuation, not a restart.
+
+USER SNAPSHOT:
+- Role: ${roleLabel}
+- Company situation: ${a.company_situation || 'unknown'}
+- Last raise: ${a.last_raise || 'unknown'}
+- Performance signal: ${ex2.performance_rating || ex2.external_leverage || 'unclear'}
+- Manager relationship: ${ex3.manager_relationship || 'unknown'}
+- Prior ask history: ${priorAsk}
+- Their stated biggest worry: ${obs.code || 'unknown'}${obs.label ? ` — "${obs.label}"` : ''}${obs.free_text ? ` (their words: "${obs.free_text}")` : ''}
+- Their final range: ${fr.floor || '?'}–${fr.ceiling || '?'}%
+
+TONE:
+- Warm and direct, like a coach answering a follow-up in a session.
+- No "upgrade" language. No "unlock". No hype.
+- The transition at the end should feel like you're being honest about the limits of a chat reply, not salesy.
+
+SCOPE:
+- Only raise-negotiation-adjacent topics. If they ask something off-topic (their career generally, personal life, a different job), briefly redirect to the raise context they're already in.
+- If they ask to role-play — answer that role-play is part of the full plan where you can remember what happens across sessions; here in the chat, you can only do a quick single-scene preview.
+
+FORMAT:
+- Plain prose only. No headers, no markdown lists, no bold.
+- 5-7 sentences total (including the closing transition).
+- Don't include a button or CTA text — the frontend wraps your reply with the actual button. Just end with the transition line.`;
 }
 
 async function logCoachMessage(email, firstMessage) {
@@ -102,6 +176,24 @@ async function logCoachMessage(email, firstMessage) {
   } catch (e) { /* non-fatal */ }
 }
 
+async function logFreeCoachMessage(payload) {
+  try {
+    const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
+    if (!webhookUrl) return;
+    await fetch(webhookUrl, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        timestamp: new Date().toISOString(),
+        event:     'COACH_FREE_MESSAGE',
+        product:   'raise',
+        source:    'salary.recomlinked.com',
+        ...payload,
+      }),
+    });
+  } catch (e) { /* non-fatal */ }
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -109,7 +201,80 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  const { token, message } = req.body || {};
+  const body = req.body || {};
+
+  // ── Mode discrimination ─────────────────────────────────
+  // FREE mode: no token, profile + obstacle + final_range passed inline.
+  // PAID mode: token required (old behaviour).
+  const isFreeMode = !body.token && !!body.profile;
+
+  if (isFreeMode) {
+    return handleFreeMode(body, res);
+  }
+  return handlePaidMode(body, res);
+};
+
+// ════════════════════════════════════════════════════════════
+// ══ FREE MODE — post-paywall chat on /raise/chat/         ══
+// ════════════════════════════════════════════════════════════
+async function handleFreeMode(body, res) {
+  const {
+    profile,                  // assessment-level profile
+    obstacle,                 // { code, label, free_text? }
+    final_range,              // { floor, ceiling }
+    accumulated_exchanges,    // { ex1: {...}, ex2: {...}, ex3: {...} }
+    message,                  // user's message
+  } = body;
+
+  if (!profile || !message) {
+    return res.status(400).json({ error: 'Profile and message required' });
+  }
+  if (typeof message !== 'string' || message.length === 0) {
+    return res.status(400).json({ error: 'Message must be a non-empty string' });
+  }
+  if (message.length > FREE_MAX_CHARS) {
+    return res.status(400).json({ error: 'Message too long' });
+  }
+
+  const systemPrompt = buildFreeSystemPrompt({
+    profile, obstacle, final_range, accumulated_exchanges,
+  });
+
+  try {
+    const response = await client.messages.create({
+      model:      'claude-sonnet-4-6',
+      max_tokens: FREE_MAX_TOKENS_OUT,
+      system:     systemPrompt,
+      messages:   [{ role: 'user', content: message }],
+    });
+    const reply = response.content[0]?.text || "I couldn't respond just now. Please try again.";
+
+    logFreeCoachMessage({
+      obstacle_code: obstacle?.code || 'unknown',
+      msg_len:       message.length,
+      reply_len:     reply.length,
+    });
+
+    return res.status(200).json({
+      reply,
+      mode: 'free',
+      // Frontend uses this to render the dynamic CTA button below the reply
+      cta:  {
+        label: `Get my coaching plan · $${PRICE_USD}`,
+        price_usd: PRICE_USD,
+      },
+    });
+  } catch (err) {
+    console.error('[raise-coach] free-mode claude error:', err);
+    return res.status(500).json({ error: 'Coach unavailable. Please try again.' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ PAID MODE — 30-day coaching window                    ══
+// ════════════════════════════════════════════════════════════
+async function handlePaidMode(body, res) {
+  const { token, message } = body;
   if (!token || !message) {
     return res.status(400).json({ error: 'Token and message required' });
   }
@@ -123,8 +288,14 @@ module.exports = async function handler(req, res) {
     email   = 'test@example.com';
     profile = {
       first_name: 'Alex',
-      assessment:  { country: 'ca', seniority: 'mid', company_size: '250_1000', company_situation: 'stable', last_raise: '1_2_years' },
+      assessment: {
+        country: 'ca', seniority: 'mid', company_size: '250_1000',
+        company_situation: 'stable', last_raise: '1_2_years',
+      },
       final_range: { floor: 56, ceiling: 61 },
+      obstacle: { code: 'budget', label: "My manager will say there's no budget" },
+      prior_ask: 'never_asked',
+      seniority_signal_from_text: 'mid',
     };
     plan  = { headline_summary: 'Solid mid-range position.', amount_range: { low_pct: 8, high_pct: 14 } };
     notes = '';
@@ -176,7 +347,7 @@ module.exports = async function handler(req, res) {
     const response = await client.messages.create({
       model:      'claude-sonnet-4-6',
       max_tokens: 800,
-      system:     buildSystemPrompt({ profile, plan, notes }),
+      system:     buildPaidSystemPrompt({ profile, plan, notes }),
       messages,
     });
     const reply = response.content[0]?.text || "I couldn't generate a response. Please try again.";
@@ -192,15 +363,13 @@ module.exports = async function handler(req, res) {
         await redis.set(`raise:user:${email}:chat`, JSON.stringify(updated), { ex: TTL_30_DAYS });
       } catch (e) { /* non-fatal */ }
 
-      // Log first message of a session
       if (history.length === 0) {
         logCoachMessage(email, true);
       } else if (history.length % 10 === 0) {
         logCoachMessage(email, false);
       }
 
-      // ── Trigger notes update every 6 exchanges (12 messages) ──
-      // Fire-and-forget — runs in the background.
+      // Trigger notes update every 6 exchanges (12 messages) — fire-and-forget
       if (updated.length % 12 === 0) {
         try {
           const base = process.env.RAISE_BASE_URL || 'https://salary.recomlinked.com';
@@ -213,9 +382,9 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ reply, capped: false });
+    return res.status(200).json({ reply, mode: 'paid', capped: false });
   } catch (err) {
     console.error('[raise-coach] claude error:', err);
     return res.status(500).json({ error: 'Coach unavailable. Please try again.' });
   }
-};
+}
