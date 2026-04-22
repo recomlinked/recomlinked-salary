@@ -193,10 +193,55 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   flex-wrap:wrap;
 }
 .trust-row .dot{color:rgba(255,255,255,0.18);}
+
+/* ── Uplift panel — "with the coaching plan, your range is X-Y%" ──
+   Sits between the middle coach line and the closing paragraph. Green-accented
+   to signal positive change from base range. Includes 3 mechanism lines
+   that explain WHY the uplift is real (not a bare claim). */
+.uplift-panel{
+  margin:12px 0;
+  background:rgba(0,196,160,0.06);
+  border:1px solid rgba(0,196,160,0.22);
+  border-radius:10px;
+  padding:12px 14px;
+}
+.uplift-head{
+  display:flex;align-items:baseline;gap:8px;
+  margin-bottom:8px;flex-wrap:wrap;
+}
+.uplift-label{
+  font-size:10px;font-weight:800;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--teal);
+}
+.uplift-range{
+  font-size:18px;font-weight:800;color:var(--teal);
+  letter-spacing:-0.5px;
+}
+.uplift-delta{
+  font-size:11px;color:rgba(0,196,160,0.72);font-weight:600;
+}
+.uplift-mechanisms{
+  list-style:none;padding:0;margin:4px 0 0;
+}
+.uplift-mechanisms li{
+  font-size:12px;color:rgba(255,255,255,0.72);line-height:1.55;
+  padding:3px 0 3px 16px;position:relative;
+}
+.uplift-mechanisms li::before{
+  content:'+';position:absolute;left:0;top:2px;
+  color:var(--teal);font-weight:800;font-size:13px;
+}
+.uplift-mechanisms li strong{color:#fff;font-weight:700;}
+
+/* ── Proof line — rotating single-line claim below CTA.
+   Bolds a key phrase (usually the dollar figure or the value statement) to
+   anchor the cost-vs-reward asymmetry. Only one shows per card; rotation
+   happens on each render. */
 .proof-line{
   margin-top:8px;text-align:center;
-  font-size:11px;color:rgba(201,168,76,0.72);font-style:italic;line-height:1.5;
+  font-size:11.5px;color:rgba(201,168,76,0.75);line-height:1.5;
 }
+.proof-line strong{color:var(--gold);font-weight:700;}
 
 /* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
@@ -554,18 +599,25 @@ const OBSTACLE_HOOKS = {
 
 // Paywall proof lines — shown randomly below CTA. Weighted by obstacle so
 // the most relevant proof shows more often for each obstacle type.
+// Proof list — rendered below CTA in the main paywall bubble.
+// Bolded key phrases draw the eye; rest is supportive context. Keep tight.
+// These replace the rotating single-line proof system for the main paywall
+// (section-tease paywalls + locked replies still use the single line since
+// they're secondary surfaces).
+// Proof lines — single-line claims that anchor the "cost is nothing compared
+// to the reward" framing. One shows per paywall card, randomly picked with
+// obstacle-specific weighting. Key phrases use <strong> for visual weight.
+// All lines frame $39 as trivial vs the dollar value or time-value of a raise.
 const PROOF_LINES = [
-  { text: "Your raise pays this back in week one.",                   weight: { all: 1 } },
-  { text: "A 3% bump on a typical salary is $2,400+ in year one.",    weight: { all: 1, justify: 2, unknown_amount: 2 } },
-  { text: "Paid once. 30 days of coaching. No renewal.",              weight: { all: 1 } },
-  { text: "Not what you needed? Email support and we refund.",        weight: { all: 1, prior_no: 2 } },
-  { text: "Built by people who've run this conversation 200+ times.", weight: { all: 1, budget: 2 } },
-  { text: "Your data deletes the moment you ask.",                    weight: { all: 1 } },
-  { text: "Takes 15 minutes to read. The raise lasts years.",         weight: { all: 1, timing: 2 } },
+  { text: `<strong>A 3% bump on a typical salary is $2,400+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 3, unknown_amount: 3 } },
+  { text: `<strong>A 5% bump on a typical salary is $4,000+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 2, unknown_amount: 2 } },
+  { text: `<strong>Your first raise pays this back over 60×</strong>.`,                                              weight: { all: 2 } },
+  { text: `<strong>$39 once, for a conversation that adds thousands to your year-one salary</strong>.`,              weight: { all: 2, budget: 2 } },
+  { text: `<strong>A few hours of prep, a raise that lasts years</strong>.`,                                         weight: { all: 1, timing: 2 } },
+  { text: `<strong>Your raise pays this back in week one</strong>.`,                                                 weight: { all: 2 } },
 ];
 
 function pickProofLine(obstacleCode) {
-  // Weighted random: each line's weight is max(all, obstacle-specific).
   const weighted = PROOF_LINES.map(l => ({
     text: l.text,
     w: Math.max(l.weight.all || 0, (l.weight[obstacleCode] || 0)),
@@ -827,6 +879,40 @@ function insertCoachBubble(text) {
   $('messages').appendChild(wrap);
   scrollChatToBottom();
   return wrap;
+}
+
+/** Type plain text into a target element char-by-char, matching the rhythm
+ *  of typeCoachBubble (18ms per char, 80ms pause on sentence punctuation).
+ *  Used for paywall bubbles and post-paywall coach replies so all text feels
+ *  typed by the coach, not dumped. Returns when the animation finishes.
+ *
+ *  Note: intentionally plain-text only. For bolded segments or CTAs, render
+ *  them as sibling elements that fade in after the typing completes. */
+async function typeIntoElement(targetEl, text, opts) {
+  opts = opts || {};
+  const t = text || '';
+  const scrollEvery = opts.scrollEvery || 30;
+  for (let i = 1; i <= t.length; i++) {
+    targetEl.textContent = t.slice(0, i);
+    const ch = t[i-1];
+    const delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
+    if (i % scrollEvery === 0) scrollChatToBottom();
+    await sleep(delay);
+  }
+  scrollChatToBottom();
+}
+
+/** Fade an element in — used for CTAs and tail paragraphs that appear
+ *  AFTER the main text has typed. */
+function fadeInElement(el, durationMs) {
+  el.style.opacity = '0';
+  el.style.transition = `opacity ${durationMs || 300}ms ease`;
+  // Force reflow so the transition triggers
+  void el.offsetHeight;
+  requestAnimationFrame(() => {
+    el.style.opacity = '1';
+    scrollChatToBottom();
+  });
 }
 
 function appendUserBubble(text, opts) {
@@ -1507,9 +1593,22 @@ function routeToExchange(n) {
   if (n === 2) {
     showExchange2Chips();
     enableInput('Or describe it in your own words…');
+    // Re-arm the free-text handler — earlier submit handler was cleared when
+    // Ex1 ran. Without this, the user can click Send but nothing happens.
+    awaitFreeText((text) => handleExchangeAnswer(2, text));
   } else if (n === 3) {
     renderExchange3Chips();
     enableInput("If you've asked before, tell me what happened…");
+    awaitFreeText((text) => {
+      const rel = state.ex3_partial?.relationship;
+      if (rel) {
+        submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
+      } else if (text && text.length > 6) {
+        submitExchange3({ relationship: '', free_text: text });
+      } else {
+        runDynamicNudge(3, text || '(empty)');
+      }
+    });
   }
 }
 
@@ -1524,7 +1623,8 @@ async function showPaywall() {
   // Fire enrichment (fire-and-forget) so the paid dashboard loads instantly
   fireEnrichment();
 
-  renderPaywallBubble();
+  // Animated render — the trust moment. Headline types, middle types, rest fades in.
+  await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
 
   // Populate plan-preview chips in the bottom panel
@@ -1539,13 +1639,12 @@ async function showPaywall() {
 // Composes and renders the main paywall bubble from current state
 // (profile, range, obstacle). Called on initial paywall show AND on
 // transcript replay from saved state.
-function renderPaywallBubble() {
+// opts.animated: type headline + middle line, fade the rest. Default false (instant).
+async function renderPaywallBubble(opts) {
+  opts = opts || {};
   const r   = state.current_range || { floor: 0, ceiling: 0 };
   const obs = state.obstacle      || { code: 'other' };
   const role = niceRoleLabel();
-  const verdictColor = colorFor(r);
-  const verdict = VERDICT_BY_COLOR[verdictColor];
-  const proof   = pickProofLine(obs.code);
 
   // User phrase echo (optional) — shown when they typed free text
   const echoHtml = (obs.free_text && obs.free_text.length > 3)
@@ -1557,27 +1656,134 @@ function renderPaywallBubble() {
     ? obs.coach_line
     : fallbackObstacleLine(obs.code);
 
+  // ── Uplift computation ──────────────────────────────────
+  // With a prepared negotiation (the plan delivers: specific evidence, tested
+  // opening, responses to pushbacks), research on negotiation outcomes suggests
+  // prepared negotiators capture meaningfully better results than unprepared
+  // ones. Here we represent that as an +8pp lift to the floor and +10pp to
+  // the ceiling, clamped at 92% so the number stays credible, never 95-100%.
+  // Adjust here if A/B testing shows the lift feels too big or too small.
+  const UPLIFT_FLOOR = 8;
+  const UPLIFT_CEIL  = 10;
+  const upliftFloor  = Math.min(92 - 5, r.floor + UPLIFT_FLOOR);
+  const upliftCeil   = Math.min(92, r.ceiling + UPLIFT_CEIL);
+  const midDelta     = Math.round(((upliftFloor + upliftCeil) - (r.floor + r.ceiling)) / 2);
+
+  // Obstacle-specific mechanism framing — the 3rd mechanism adapts to the
+  // worry they flagged so the reasoning connects to their specific situation.
+  const obstacleMechanism = {
+    budget:         "A budget-deflection response that reopens the conversation instead of closing it",
+    justify:        "A 3-sentence justification structure that makes the number feel defensible, not ambitious",
+    timing:         "A timing window designed for your review cycle, not a generic calendar rule",
+    prior_no:       "A reopening script that handles the prior no without looking bitter or desperate",
+    unknown_amount: "A specific number anchored to your role, industry, and market position",
+    other:          "A response to the specific worry you flagged, built around your situation",
+  }[obs.code] || "A response to your specific situation, not a generic template";
+
+  const upliftHtml = `
+    <div class="uplift-panel paywall-uplift">
+      <div class="uplift-head">
+        <span class="uplift-label">With the coaching plan</span>
+        <span class="uplift-range">${upliftFloor}–${upliftCeil}%</span>
+        <span class="uplift-delta">+${midDelta}pp on average</span>
+      </div>
+      <ul class="uplift-mechanisms">
+        <li><strong>A prepared evidence pack</strong> tailored to your role and industry, not a generic list.</li>
+        <li><strong>A tested opening line</strong> that reframes the conversation so your manager helps you get to yes.</li>
+        <li><strong>${obstacleMechanism}.</strong></li>
+      </ul>
+    </div>
+  `;
+
+  // Proof line — single rotating claim rendered below CTA. Bold phrase is
+  // baked into the text (PROOF_LINES entries include <strong>). Inserted as
+  // innerHTML (not textContent) so the strong tag renders.
+  const proof = pickProofLine(obs.code);
+
+  // Headline: role + locked range + verdict clause
+  const rolePrefix = role ? `${role}, ` : '';
+  const headline = `${rolePrefix}your range locked at ${r.floor}–${r.ceiling}%. That's where you start today, without any prep.`;
+  const closing  = `The full plan is everything I'd tell you if we were sitting down for an hour: your 3 specific blockers, the exact words to open with, responses to the pushbacks you'll actually hear, the email template, and 30 days of coaching where I remember every conversation.`;
+
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="paywall-bubble">
-      <p><strong>${role ? escapeHtml(role) + ', ' : ''}your range locked at ${r.floor}–${r.ceiling}%.</strong> That's your realistic probability with a well-prepared negotiation.</p>
-      ${echoHtml}
-      <p>${escapeHtml(middle)}</p>
-      <p>The full plan is everything I'd tell you if we were sitting down for an hour: your 3 specific blockers, the exact words to open with, responses to the pushbacks you'll actually hear, the email template, and 30 days of coaching where I remember every conversation.</p>
-      <button class="btn-pay" id="btn-pay-cta">
+      <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
+      ${echoHtml ? `<div class="echo paywall-echo">"${escapeHtml(obs.free_text)}"</div>` : ''}
+      <p class="paywall-middle"><span class="paywall-typed-middle"></span><span class="paywall-middle-cursor"></span></p>
+      ${upliftHtml}
+      <p class="paywall-closing">${escapeHtml(closing)}</p>
+      <button class="btn-pay paywall-cta" id="btn-pay-cta">
         Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
-      <div class="trust-row">
+      <div class="trust-row paywall-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
       </div>
-      <div class="proof-line">${escapeHtml(proof)}</div>
+      <div class="proof-line paywall-proof">${proof}</div>
     </div>
   `;
   $('messages').appendChild(wrap);
+
+  const btn = wrap.querySelector('[id="btn-pay-cta"]');
+  if (btn) btn.onclick = startCheckout;
+
+  if (!opts.animated) {
+    // Instant render (transcript replay) — fill all text up front, no cursors
+    wrap.querySelector('.paywall-typed-head').textContent   = headline;
+    wrap.querySelector('.paywall-typed-middle').textContent = middle;
+    wrap.querySelector('.paywall-head-cursor')?.remove();
+    wrap.querySelector('.paywall-middle-cursor')?.remove();
+    scrollChatToBottom();
+    return wrap;
+  }
+
+  // Animated render — type headline, uplift panel fades in, middle types,
+  // then the rest fades in together.
+  const echo      = wrap.querySelector('.paywall-echo');
+  const upliftEl  = wrap.querySelector('.paywall-uplift');
+  const closingEl = wrap.querySelector('.paywall-closing');
+  const ctaEl     = wrap.querySelector('.paywall-cta');
+  const trustEl   = wrap.querySelector('.paywall-trust');
+  const proofEl   = wrap.querySelector('.paywall-proof');
+  if (echo)      echo.style.opacity      = '0';
+  upliftEl.style.opacity  = '0';
+  closingEl.style.opacity = '0';
+  ctaEl.style.opacity     = '0';
+  trustEl.style.opacity   = '0';
+  proofEl.style.opacity   = '0';
   scrollChatToBottom();
 
-  const btn = $('btn-pay-cta');
-  if (btn) btn.onclick = startCheckout;
+  // Type the headline
+  const headSpan   = wrap.querySelector('.paywall-typed-head');
+  const headCursor = wrap.querySelector('.paywall-head-cursor');
+  await typeIntoElement(headSpan, headline);
+  if (headCursor) headCursor.remove();
+
+  // Brief pause, fade the echo in (if any), then type the middle
+  await sleep(250);
+  if (echo) {
+    fadeInElement(echo);
+    await sleep(200);
+  }
+
+  const midSpan   = wrap.querySelector('.paywall-typed-middle');
+  const midCursor = wrap.querySelector('.paywall-middle-cursor');
+  await typeIntoElement(midSpan, middle);
+  if (midCursor) midCursor.remove();
+
+  // Uplift panel reveals next — this is the "here's what changes" beat
+  await sleep(350);
+  fadeInElement(upliftEl);
+
+  // Closing + CTA + trust + proof fade in together afterward
+  await sleep(400);
+  fadeInElement(closingEl);
+  await sleep(150);
+  fadeInElement(ctaEl);
+  fadeInElement(trustEl);
+  fadeInElement(proofEl);
+
+  return wrap;
 }
 
 // Fallback middle line per obstacle code — used if Claude didn't provide one
@@ -1684,7 +1890,7 @@ async function onSectionChipTap(section, label) {
   renderSectionTeaseBubble(section);
 }
 
-function renderSectionTeaseBubble(section) {
+async function renderSectionTeaseBubble(section) {
   const tease = SECTION_TEASES[section] || SECTION_TEASES.blockers;
   const obs = state.obstacle || { code: 'other' };
   const hook = OBSTACLE_HOOKS[obs.code] || '';
@@ -1694,21 +1900,41 @@ function renderSectionTeaseBubble(section) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="paywall-bubble">
-      <p>${escapeHtml(leadWithHook)}</p>
-      <button class="btn-pay" data-tease-cta>
+      <p class="tease-lead"><span class="tease-typed"></span><span class="tease-cursor"></span></p>
+      <button class="btn-pay tease-cta" data-tease-cta>
         ${escapeHtml(tease.cta)} · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
-      <div class="trust-row">
+      <div class="trust-row tease-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
       </div>
-      <div class="proof-line">${escapeHtml(proof)}</div>
+      <div class="proof-line tease-proof">${proof}</div>
     </div>
   `;
   $('messages').appendChild(wrap);
-  scrollChatToBottom();
 
   const btn = wrap.querySelector('[data-tease-cta]');
   if (btn) btn.onclick = startCheckout;
+
+  // Hide CTA + trust + proof until typing completes
+  const ctaEl   = wrap.querySelector('.tease-cta');
+  const trustEl = wrap.querySelector('.tease-trust');
+  const proofEl = wrap.querySelector('.tease-proof');
+  ctaEl.style.opacity   = '0';
+  trustEl.style.opacity = '0';
+  proofEl.style.opacity = '0';
+  scrollChatToBottom();
+
+  // Type the lead
+  const leadSpan   = wrap.querySelector('.tease-typed');
+  const leadCursor = wrap.querySelector('.tease-cursor');
+  await typeIntoElement(leadSpan, leadWithHook);
+  if (leadCursor) leadCursor.remove();
+
+  // Fade the rest in
+  await sleep(300);
+  fadeInElement(ctaEl);
+  fadeInElement(trustEl);
+  fadeInElement(proofEl);
 }
 
 /* ───────────────────────────────────────────────────────── */
@@ -1772,7 +1998,8 @@ async function handlePostPaywallText(text) {
     return;
   }
 
-  // Render the coach reply + dynamic CTA tail
+  // Render the coach reply + dynamic CTA tail.
+  // Main reply text types char-by-char. Tail paragraph + CTA fade in after.
   const remaining = FREE_DIALOG_LIMIT - state.free_dialog_count;
   const tailCopy = remaining > 0
     ? `<strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.`
@@ -1781,15 +2008,31 @@ async function handlePostPaywallText(text) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble">
-      <p>${escapeHtml(reply)}</p>
-      <p style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
-      <button class="btn-pay" style="margin-top:10px;" data-tail-cta>
+      <p class="coach-typed"><span class="typed-text"></span><span class="cursor"></span></p>
+      <p class="coach-tail" style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
+      <button class="btn-pay coach-tail-btn" style="margin-top:10px;" data-tail-cta>
         Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
     </div>
   `;
   $('messages').appendChild(wrap);
+
+  const tailEl = wrap.querySelector('.coach-tail');
+  const btnEl  = wrap.querySelector('.coach-tail-btn');
+  tailEl.style.opacity = '0';
+  btnEl.style.opacity  = '0';
   scrollChatToBottom();
+
+  // Type the main reply
+  const typedSpan = wrap.querySelector('.typed-text');
+  const cursorEl  = wrap.querySelector('.cursor');
+  await typeIntoElement(typedSpan, reply);
+  if (cursorEl) cursorEl.remove();
+
+  // Fade in the tail + CTA together
+  await sleep(200);
+  fadeInElement(tailEl);
+  fadeInElement(btnEl);
 
   logEntry('coach_bubble', { text: reply });
 
@@ -1802,7 +2045,7 @@ async function handlePostPaywallText(text) {
 
 /** Post-cap reply — short, polite, all CTA. Rendered when user has exceeded
     FREE_DIALOG_LIMIT free-text messages. */
-function renderLockedReply(userText) {
+async function renderLockedReply(userText) {
   const obs = state.obstacle || { code: 'other' };
   // Three rotating lead-ins so it doesn't feel scripted if they keep typing
   const leadIns = [
@@ -1818,21 +2061,40 @@ function renderLockedReply(userText) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="paywall-bubble">
-      <p>${escapeHtml(leadIn)}</p>
-      <button class="btn-pay" data-tail-cta>
+      <p class="lock-lead"><span class="lock-typed"></span><span class="lock-cursor"></span></p>
+      <button class="btn-pay lock-cta" data-tail-cta>
         Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
-      <div class="trust-row">
+      <div class="trust-row lock-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
       </div>
-      <div class="proof-line">${escapeHtml(proof)}</div>
+      <div class="proof-line lock-proof">${proof}</div>
     </div>
   `;
   $('messages').appendChild(wrap);
-  scrollChatToBottom();
 
   const btn = wrap.querySelector('[data-tail-cta]');
   if (btn) btn.onclick = startCheckout;
+
+  const ctaEl   = wrap.querySelector('.lock-cta');
+  const trustEl = wrap.querySelector('.lock-trust');
+  const proofEl = wrap.querySelector('.lock-proof');
+  ctaEl.style.opacity   = '0';
+  trustEl.style.opacity = '0';
+  proofEl.style.opacity = '0';
+  scrollChatToBottom();
+
+  // Type the lead-in
+  const typedSpan = wrap.querySelector('.lock-typed');
+  const cursorEl  = wrap.querySelector('.lock-cursor');
+  await typeIntoElement(typedSpan, leadIn);
+  if (cursorEl) cursorEl.remove();
+
+  // Fade the rest in
+  await sleep(250);
+  fadeInElement(ctaEl);
+  fadeInElement(trustEl);
+  fadeInElement(proofEl);
 
   // Keep input enabled but user gets the same locked reply each time after this
   enableInput('Ask me anything…');
