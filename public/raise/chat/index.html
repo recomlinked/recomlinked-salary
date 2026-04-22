@@ -1125,7 +1125,10 @@ async function init() {
     const apiCall = fetch(API_ANALYZE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profile),
+      body: JSON.stringify({
+        ...profile,
+        profile_hash: profileHash(),
+      }),
     }).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)));
     const [apiResult] = await Promise.all([apiCall, minDelay]);
     result = apiResult;
@@ -1473,7 +1476,12 @@ async function runObstacleCall(answer) {
 /* ── Common exchange handling (ex1-3) ──────────────────── */
 async function handleExchangeAnswer(exchangeNum, value, displayLabel) {
   appendUserBubble(displayLabel || value);
-  clearChips();
+  // Don't clearChips() here — the API may return is_insufficient, in which
+  // case we want chips to remain visible so the user can try a different
+  // option. fadeOutChips is called explicitly on successful chip-tap paths
+  // before this function runs, so they're already gone for chip submissions.
+  // For free-text submissions, chips stay; runExchangeCall clears them
+  // on success only.
   disableInput('Thinking…');
 
   await runExchangeCall(exchangeNum, value);
@@ -1493,6 +1501,7 @@ async function runExchangeCall(exchangeNum, answer) {
         exchange:              exchangeNum,
         answer,
         profile:               state.profile,
+        profile_hash:          profileHash(),
         current_range:         state.current_range,
         initial_floor:         state.initial_floor,
         accumulated_exchanges: state.accumulated,
@@ -1555,6 +1564,9 @@ async function runExchangeCall(exchangeNum, answer) {
     state.current_exchange = exchangeNum + 1;
   }
   saveState();
+
+  // Successful exchange → clear any lingering chips now
+  clearChips();
 
   // Post a fresh score card for this exchange (stages 1, 2, 3).
   // Stage-3 card is gold-bordered and labelled "Your range" — the final.
@@ -1994,7 +2006,8 @@ async function handlePostPaywallText(text) {
     return;
   }
 
-  // Call the real coach API in free mode
+  // Call the real coach API in free mode. Include session_id and
+  // free_dialog_count so the backend can log them into the Raise Leads sheet.
   let reply = null;
   try {
     const res = await fetch('/api/raise-coach', {
@@ -2006,6 +2019,8 @@ async function handlePostPaywallText(text) {
         final_range:           state.current_range,
         accumulated_exchanges: state.accumulated,
         message:               text,
+        session_id:            profileHash(),
+        free_dialog_count:     state.free_dialog_count,
       }),
     });
     if (res.ok) {
