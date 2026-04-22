@@ -391,6 +391,20 @@ button { font-family: var(--sans); cursor: pointer; }
   opacity: 1; transform: translateX(2px);
 }
 
+/* CTA variant — same layout as regular chips, gold accent color */
+.reason-chip-cta {
+  border-color: rgba(201,168,76,0.45);
+  color: var(--gold);
+}
+.reason-chip-cta:hover {
+  border-color: var(--gold);
+  background: var(--bg3);
+  color: var(--gold);
+}
+.reason-chip-cta .reason-arrow {
+  color: var(--gold); opacity: 1;
+}
+
 /* ── Closing CTA (positioning block) ───────────────────── */
 .closing-pitch {
   background: var(--bg2);
@@ -673,6 +687,14 @@ button { font-family: var(--sans); cursor: pointer; }
     </a>
   </div>
 
+  <!-- Proof bar (cited stats) — context-setter before the value grid -->
+  <div class="proof-bar">
+    <div class="proof-stat">
+      People who negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+    </div>
+    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+  </div>
+
   <!-- Why different (icon grid) ────────────────────────── -->
   <section class="section">
     <h2>Why this is different</h2>
@@ -705,17 +727,9 @@ button { font-family: var(--sans); cursor: pointer; }
     </div>
   </section>
 
-  <!-- Proof bar (cited stats) ─────────────────────────── -->
-  <div class="proof-bar">
-    <div class="proof-stat">
-      People who negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
-    </div>
-    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
-  </div>
-
   <!-- Which one sounds like you? (reasons list) ──────── -->
   <section class="section">
-    <h2>Which one sounds like you?</h2>
+    <h2>What's blocking your raise?</h2>
     <div class="reasons-grid">
       <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
         <span>I think I'm underpaid but I'm not sure</span><span class="reason-arrow">→</span>
@@ -729,8 +743,11 @@ button { font-family: var(--sans); cursor: pointer; }
       <a href="/raise/?start=1&amp;reason=freeze#assessment-top" class="reason-chip">
         <span>I freeze when it's time to name a number</span><span class="reason-arrow">→</span>
       </a>
-      <a href="/raise/?start=1&amp;reason=long_gap#assessment-top" class="reason-chip">
-        <span>2+ years at this company with no raise</span><span class="reason-arrow">→</span>
+      <a href="/raise/?start=1&amp;reason=unknown_number#assessment-top" class="reason-chip">
+        <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=unknown_timing#assessment-top" class="reason-chip">
+        <span>I don't know if now is the right time</span><span class="reason-arrow">→</span>
       </a>
       <a href="/raise/?start=1&amp;reason=small_raise#assessment-top" class="reason-chip">
         <span>I got a small annual raise and want more</span><span class="reason-arrow">→</span>
@@ -746,6 +763,9 @@ button { font-family: var(--sans); cursor: pointer; }
       </a>
       <a href="/raise/?start=1&amp;reason=never_asked#assessment-top" class="reason-chip">
         <span>I've never asked for a raise in my career</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=other#assessment-top" class="reason-chip reason-chip-cta">
+        <span>Most blockers are fixable. Let's find yours</span><span class="reason-arrow">→</span>
       </a>
     </div>
   </section>
