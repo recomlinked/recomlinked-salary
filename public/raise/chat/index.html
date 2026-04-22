@@ -1425,6 +1425,36 @@ async function runExchangeCall(exchangeNum, answer) {
 
   hideCoachTyping();
 
+  // ── Insufficient signal guard ───────────────────────────
+  // Backend classified the answer as lacking signal (e.g. off-topic, too vague).
+  // Don't render a card, don't update range, don't advance. Render the nudge
+  // as a coach bubble and leave chips/input exactly where they were so the
+  // user can try again.
+  if (result.is_insufficient) {
+    // Increment nudge attempts so the next insufficient response escalates in tone
+    nudgeAttempts[exchangeNum] = (nudgeAttempts[exchangeNum] || 0) + 1;
+    await typeCoachBubble(result.nudge_line || "I need a bit more to work with. Can you give me more specifics?");
+    // Re-enable input with exchange-appropriate placeholder. Chips stay visible.
+    enableInput(placeholderForExchange(exchangeNum));
+    $('chat-input').focus();
+    // Re-arm the free-text handler for this exchange
+    if (exchangeNum === 3) {
+      awaitFreeText((text) => {
+        const rel = state.ex3_partial?.relationship;
+        if (rel) {
+          submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
+        } else if (text && text.length > 6) {
+          submitExchange3({ relationship: '', free_text: text });
+        } else {
+          runDynamicNudge(3, text || '(empty)');
+        }
+      });
+    } else {
+      awaitFreeText((text) => handleExchangeAnswer(exchangeNum, text));
+    }
+    return;
+  }
+
   // Save state
   state.current_range = { floor: result.floor, ceiling: result.ceiling };
   state.accumulated['ex' + exchangeNum] = {
@@ -1461,6 +1491,9 @@ async function runExchangeCall(exchangeNum, answer) {
 
   // Otherwise, type the next coach question and route
   if (result.next_question && result.next_question.question) {
+    // Persist the question text so nudge mode can reference it if the user's
+    // next answer is too short or off-topic.
+    currentQuestion[exchangeNum + 1] = result.next_question.question;
     await sleep(200);
     await typeCoachBubble(result.next_question.question);
     await sleep(150);
