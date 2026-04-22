@@ -157,7 +157,16 @@ Classify the signal as "insufficient" ONLY when the answer fails to provide both
   - Single field only: "CTO" alone (no industry), "fintech" alone (no role)
   - Off-topic: "I don't trust my boss", "fuck you"
 
-If the user provided role + industry across MULTIPLE messages in a short conversation (e.g. first message "CTO", later "fintech"), and their current message completes the picture, that is sufficient. Don't re-ask for what's already been provided. Don't invent requirements like company_size or company_name — those aren't asked for.
+TYPO TOLERANCE: Users frequently misspell. Recognise common typos:
+  - "spesialist" = specialist, "comapny" / "compny" = company, "enginner" = engineer, "managment" = management
+  - If a word is clearly a misspelled role or industry term, treat it as valid. Don't demand perfect spelling.
+
+MULTI-MESSAGE ANSWERS ARE COMMON. The answer text you receive may be a concatenation of the user's messages across this exchange (separated by ". "). Examples of valid combined answers:
+  - "CTO. fintech" → sufficient (role=CTO, industry=fintech)
+  - "marketing spesialist. manufacturing comapny" → sufficient (role=marketing specialist, industry=manufacturing)
+  - "I work in tech. I am a product manager" → sufficient (role=PM, industry=tech)
+
+If the combined answer contains BOTH role AND industry anywhere in the text, classify as sufficient. Don't re-ask for what's already been provided. Don't invent requirements like company_size or company_name — those aren't asked for.
 
 Fields to extract (only if signal is NOT insufficient):
 - job_title_normalised: short clean title
