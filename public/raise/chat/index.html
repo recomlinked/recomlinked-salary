@@ -261,30 +261,6 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .user-chips{
   display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
 }
-/* Horizontal-scroll variant — used for obstacle chips (FA pattern).
-   Keeps all chips in one row, right-anchored, with a subtle fade on the left
-   edge hinting scrollability. */
-.user-chips.scroll-row{
-  flex-wrap:nowrap;overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:4px 2px 8px;margin:0 -4px;
-  max-width:100%;
-  justify-content:flex-start;
-  scrollbar-width:none;
-}
-.user-chips.scroll-row::-webkit-scrollbar{display:none;}
-.user-chips.scroll-row .chip{flex-shrink:0;}
-.chips-msg.scroll-msg{
-  width:100%;padding-left:0;
-}
-.chips-scroll-wrap{
-  position:relative;width:100%;overflow:hidden;
-}
-.chips-scroll-wrap::after{
-  content:'';position:absolute;right:0;top:0;bottom:0;width:32px;
-  background:linear-gradient(to right, rgba(244,245,248,0), rgba(244,245,248,1));
-  pointer-events:none;
-}
 .chips-group{width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 .chips-group + .chips-group{margin-top:6px;}
 .chips-sublabel{
@@ -1309,33 +1285,22 @@ async function beginObstacle() {
 }
 
 function renderObstacleChips() {
-  // Horizontal-scroll row (FA pattern). Keeps all 6 chips in one line with
-  // a right-edge fade hint for scroll affordance. Full-width, not right-anchored.
-  const wrap = el('div', 'user-msg chips-msg scroll-msg', '');
-  const scrollWrap = el('div', 'chips-scroll-wrap', '');
-  const inner = el('div', 'user-chips scroll-row', '');
-
-  OBSTACLE_CHIPS.forEach(c => {
-    const btn = el('button', 'chip' + (c.isFreeText ? ' chip-freetext' : ''), c.label);
-    btn.type = 'button';
-    btn.dataset.val = c.code || '';
-    btn.onclick = () => {
-      if (c.isFreeText) {
-        $('chat-input').focus();
-        return;
-      }
-      btn.classList.add('selected');
-      fadeOutChips();
-      handleObstacleChip(c.code, c.label);
-    };
-    inner.appendChild(btn);
+  // Normal wrap layout, right-anchored — same pattern as Ex2/Ex3 chips.
+  // (Horizontal scroll is reserved for the plan-preview chip strip above
+  // the input bar — those are predefined PROMPT chips. These are answer
+  // chips, and should wrap like all other answer chip sets.)
+  renderUserChips(OBSTACLE_CHIPS.map(c => ({
+    code: c.code, label: c.label, isFreeText: !!c.isFreeText,
+  })), (c, btn) => {
+    if (c.isFreeText) {
+      // "Type yours…" — enable input focus. Don't submit yet.
+      $('chat-input').focus();
+      return;
+    }
+    btn.classList.add('selected');
+    fadeOutChips();
+    handleObstacleChip(c.code, c.label);
   });
-
-  scrollWrap.appendChild(inner);
-  wrap.appendChild(scrollWrap);
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  currentChipsWrap = wrap;
 }
 
 async function handleObstacleChip(code, label) {
@@ -1853,8 +1818,8 @@ function awaitFreeText(onSubmit) {
 const MIN_TEXT_CHARS = 8;
 const MIN_TEXT_WORDS = 2;
 
-// Static fallback nudges — only used if /api/raise-nudge fails.
-// First line per exchange; the dynamic endpoint owns the real experience.
+// Static fallback nudges — only used if /api/raise-coach (nudge mode) fails.
+// First line per exchange; the dynamic call owns the real experience.
 const TEXT_NUDGE_FALLBACKS = {
   1: "I need a bit more to work with. Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
   2: "Tap a chip above or give me one sentence on your strongest evidence — a win, an offer, or a sense you're underpaid.",
@@ -1863,22 +1828,24 @@ const TEXT_NUDGE_FALLBACKS = {
 };
 
 // Tracks how many nudges have fired per exchange in the current session.
-// Drives the progressive-tone logic in /api/raise-nudge.
+// Drives the progressive-tone logic in /api/raise-coach (nudge mode).
 const nudgeAttempts = { 1: 0, 2: 0, 3: 0, 4: 0 };
 
 // Currently-displayed coach question per exchange — passed to the nudge
 // endpoint so it can reference what was actually asked.
 const currentQuestion = { 1: '', 2: '', 3: '', 4: '' };
 
-// Fetch a dynamic nudge from the server. Falls back to a static line if
-// the call fails so the UX never stalls.
+// Fetch a dynamic nudge from the server. Calls raise-coach in nudge mode
+// (same endpoint as free/paid — consolidated to stay under Vercel Hobby's
+// 12-function limit). Falls back to a static line if the call fails.
 async function fetchNudge(exchange, userAnswer) {
   const attempts = nudgeAttempts[exchange] || 0;
   try {
-    const res = await fetch('/api/raise-nudge', {
+    const res = await fetch('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        mode:           'nudge',
         exchange,
         question:       currentQuestion[exchange] || '',
         user_answer:    userAnswer,
