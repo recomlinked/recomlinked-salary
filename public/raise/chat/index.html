@@ -37,14 +37,16 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .header-right{display:flex;align-items:center;gap:10px;}
 
 /* ── Chat area ─────────────────────────────────────────── */
+/* No flex gap — each message wrapper owns its own top/bottom padding,
+   which gives consistent breathing room regardless of what's adjacent. */
 .chat-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 24px;display:flex;flex-direction:column;gap:22px;
+  padding:8px 16px 16px;display:flex;flex-direction:column;
 }
 .chat-wrap::-webkit-scrollbar{display:none;}
 
 /* ── Coach message ─────────────────────────────────────── */
-.coach-msg{display:flex;flex-direction:column;gap:4px;animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);}
+.coach-msg{display:flex;flex-direction:column;gap:4px;padding:14px 0;animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);}
 @keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
 .bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
@@ -102,7 +104,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .prob-reason strong{color:#fff;}
 
 /* ── User message ──────────────────────────────────────── */
-.user-msg{display:flex;justify-content:flex-end;padding-left:42px;animation:msgIn 0.28s ease;}
+.user-msg{display:flex;justify-content:flex-end;padding:14px 0 14px 42px;animation:msgIn 0.3s ease;}
 .user-bubble{
   background:var(--navy);color:#fff;
   border-radius:14px 4px 14px 14px;
@@ -166,7 +168,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 
 /* ── Inline user-side chips (answer chips below each coach question) ── */
 .chips-msg{
-  flex-direction:column;align-items:flex-end;gap:6px;padding-left:42px;
+  flex-direction:column;align-items:flex-end;gap:6px;
 }
 .user-chips{
   display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
