@@ -278,7 +278,9 @@ async function handleNudgeMode(body, res) {
   const {
     exchange,        // 1 | 2 | 3
     question,        // the coach question that was asked
-    user_answer,     // what the user typed
+    user_answer,     // what the user typed THIS turn
+    prior_messages,  // array of prior free-text answers in this exchange
+    combined_text,   // all prior_messages joined (convenience)
     prior_attempts,  // how many prior nudges in this exchange
     session_id,      // profileHash for rate limiting
   } = body;
@@ -312,10 +314,30 @@ async function handleNudgeMode(body, res) {
     } catch (e) { /* non-fatal, proceed without rate limit */ }
   }
 
+  // Build a history-aware prompt so Haiku sees what the user already said
+  // across prior messages. Without this, each nudge call is stateless and
+  // Haiku re-asks for information the user already provided.
+  const priorArr = Array.isArray(prior_messages) ? prior_messages : [];
+  const priorBlock = priorArr.length
+    ? priorArr.map((m, i) => `  ${i + 1}. "${String(m).slice(0, 200)}"`).join('\n')
+    : '  (none — this is their first message in this exchange)';
+  const combinedLine = (combined_text && typeof combined_text === 'string')
+    ? combined_text.slice(0, 800)
+    : priorArr.join('. ');
+
   const userMessage = `Exchange: ${exchange}
-Coach question asked: ${question || '(not provided)'}
-User's reply (too short or generic): ${JSON.stringify(user_answer)}
-Prior nudges this exchange: ${attempts}
+Coach question that was asked: ${question || '(not provided)'}
+
+User's messages in this exchange so far:
+${priorBlock}
+
+User's most recent message (this turn): ${JSON.stringify(user_answer)}
+
+Combined text of everything they've said in this exchange: ${JSON.stringify(combinedLine)}
+
+Prior nudges already sent this exchange: ${attempts}
+
+IMPORTANT: Only ask for what is still missing from the COMBINED text above. If they've already given role + industry across messages (even in separate turns), that is sufficient and you should NOT ask for either again — the system will accept their combined answer. Your nudge only matters when something the coach question actually asked for is genuinely missing from the combined text.
 
 Write the nudge.`;
 
