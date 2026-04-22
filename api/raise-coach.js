@@ -1,23 +1,23 @@
 // api/raise-coach.js
-// Salary Negotiation Coach — Paid coaching chat + free-mode post-paywall chat
+// Salary Negotiation Coach — Paid coaching + free post-paywall chat + nudges
 //
-// ── TWO MODES ────────────────────────────────────────────
+// ── THREE MODES ──────────────────────────────────────────
 // MODE 1 — PAID (token required): 30-day coaching window. Full history,
 // Redis-backed notes, role-play support. Unchanged from prior behaviour.
 //
-// MODE 2 — FREE (no token, profile provided inline): User is on the chat
-// page, past the paywall, still asking questions. We reply usefully but
-// every reply ends with a dynamic CTA referencing their obstacle + range.
-// History NOT stored (no user record). Calls bounded to ~3 per session via
-// frontend — no server-side rate limit here beyond basic abuse guards.
+// MODE 2 — FREE (profile + message, no token): User is on the chat page,
+// past the paywall, still asking questions. Reply is useful + ends with CTA.
+// Called by the frontend after paywall appears.
 //
-// ── Round 2 updates ──────────────────────────────────────
-// • Free-mode branch (no token) — accepts { profile, obstacle, final_range,
-//   accumulated_exchanges, message }. No Redis reads. System prompt injects
-//   the same obstacle + range context the paywall used so replies feel
-//   continuous with the paywall moment.
-// • Paid-mode system prompt now references obstacle + prior_ask + seniority_from_text
-//   where available.
+// MODE 3 — NUDGE (mode:'nudge' flag): Lightweight clarification when user's
+// free-text answer during Ex1/Ex2/Ex3 is too short/generic. Haiku, not Sonnet.
+// Rate-limited per session. Merged into this file to stay under Vercel
+// Hobby's 12 Serverless Functions limit — was originally a separate file.
+//
+// Mode discrimination (in order):
+//   body.mode === 'nudge'                  → nudge mode (Haiku)
+//   body.token  present                    → paid mode (Sonnet, history)
+//   body.profile present, no token         → free mode (Sonnet, inline ctx)
 //
 // History storage (paid mode, unchanged):
 //   raise:user:{email}        — profile (stays stable)
@@ -48,6 +48,54 @@ const TEST_TOKEN = 'RAISE-TEST-2026';
 // ── Price — single source of truth for CTA copy ─────────
 // Must match the chat page's PRICE_USD. Changing here changes free-mode CTA text.
 const PRICE_USD = 39;
+
+// ── Nudge mode constants ────────────────────────────────
+const NUDGE_RATE_LIMIT_MAX = 20;                // max nudge calls per session
+const NUDGE_RATE_LIMIT_TTL = 15 * 60;            // 15 minutes
+const NUDGE_MODEL_ID       = 'claude-haiku-4-5-20251001';
+const NUDGE_MAX_TOKENS_OUT = 80;                 // one short sentence, that's it
+
+// Fallback nudges if the Haiku call fails or rate limit is hit. Indexed by
+// exchange + attempt number (0 = first time they've been nudged).
+const NUDGE_FALLBACKS = {
+  1: [
+    "I need a bit more to work with. Your job title and the kind of company you're at, even a short phrase like 'Senior PM at a SaaS startup' works.",
+    "Still too thin for me to tell the field. What's your actual role, and what does your company do?",
+    "I genuinely can't help without this one. One sentence on your role and your company is enough.",
+  ],
+  2: [
+    "Give me a sentence on your strongest card. A specific win, a market offer, a sense you're underpaid. Whatever's most true.",
+    "I can work with rough, but I need something concrete. What's the best piece of evidence in your corner?",
+    "This is the one that sets your ceiling. One real answer, any of the chips above, or a sentence of your own.",
+  ],
+  3: [
+    "Pick one above, or tell me in a sentence. Does your manager go to bat for you, or is it more distant?",
+    "The relationship piece changes the whole playbook. A chip or a sentence, either works.",
+    "This last one matters a lot. Tap a chip or type one line about your manager.",
+  ],
+};
+
+function pickNudgeFallback(exchange, priorAttempts) {
+  const arr = NUDGE_FALLBACKS[exchange] || NUDGE_FALLBACKS[1];
+  const idx = Math.min(priorAttempts || 0, arr.length - 1);
+  return arr[idx];
+}
+
+// System prompt — trains Claude to write ONE short coach-voice nudge.
+const NUDGE_SYSTEM = `You are a salary negotiation coach chatting with a user who just gave you an answer that's too short, too vague, or off-topic. Write ONE nudge sentence asking them to clarify.
+
+RULES:
+- ONE sentence. Max 28 words.
+- Coach's voice, direct, warm, human. Never scripted.
+- Reference what they actually typed if it gives you something to work with. If they typed "hi" or similar filler, acknowledge it lightly and redirect.
+- Progressive tone based on attempt number:
+  * attempt 1: warm, light clarification, assume they just didn't see what you needed
+  * attempt 2: slightly more specific, make the requested shape concrete
+  * attempt 3+: direct, honest. "I genuinely can't help without this one. One sentence is enough."
+- Don't quote their message back. Don't say "I see" or "I understand".
+- Don't use em-dashes. Use commas or full stops.
+- No question mark at the end unless it's a real question you need them to answer.
+- Output ONLY the nudge line. No JSON, no quotes around it, no labels.`;
 
 // ── System prompt — PAID mode ───────────────────────────
 function buildPaidSystemPrompt({ profile, plan, notes }) {
@@ -204,15 +252,87 @@ module.exports = async function handler(req, res) {
   const body = req.body || {};
 
   // ── Mode discrimination ─────────────────────────────────
-  // FREE mode: no token, profile + obstacle + final_range passed inline.
-  // PAID mode: token required (old behaviour).
+  // NUDGE mode: explicit { mode: 'nudge', exchange, user_answer, ... }
+  // PAID mode:  { token, message }
+  // FREE mode:  { profile, message } (no token)
+  if (body.mode === 'nudge') {
+    return handleNudgeMode(body, res);
+  }
   const isFreeMode = !body.token && !!body.profile;
-
   if (isFreeMode) {
     return handleFreeMode(body, res);
   }
   return handlePaidMode(body, res);
 };
+
+// ════════════════════════════════════════════════════════════
+// ══ NUDGE MODE — dynamic clarification during Ex1/Ex2/Ex3 ══
+// ════════════════════════════════════════════════════════════
+async function handleNudgeMode(body, res) {
+  const {
+    exchange,        // 1 | 2 | 3
+    question,        // the coach question that was asked
+    user_answer,     // what the user typed
+    prior_attempts,  // how many prior nudges in this exchange
+    session_id,      // profileHash for rate limiting
+  } = body;
+
+  if (!exchange || exchange < 1 || exchange > 3) {
+    return res.status(400).json({ error: 'Invalid exchange' });
+  }
+  if (!user_answer || typeof user_answer !== 'string') {
+    return res.status(400).json({ error: 'user_answer required' });
+  }
+  if (user_answer.length > 500) {
+    return res.status(400).json({ error: 'user_answer too long' });
+  }
+
+  const attempts = Math.max(0, parseInt(prior_attempts || 0, 10));
+
+  // Rate limit — Redis counter keyed by session, 15min window
+  if (session_id && typeof session_id === 'string' && session_id.length <= 64) {
+    try {
+      const key = `raise:nudge:rate:${session_id}`;
+      const count = await redis.incr(key);
+      if (count === 1) {
+        await redis.expire(key, NUDGE_RATE_LIMIT_TTL);
+      }
+      if (count > NUDGE_RATE_LIMIT_MAX) {
+        return res.status(200).json({
+          nudge:        pickNudgeFallback(exchange, attempts),
+          rate_limited: true,
+        });
+      }
+    } catch (e) { /* non-fatal, proceed without rate limit */ }
+  }
+
+  const userMessage = `Exchange: ${exchange}
+Coach question asked: ${question || '(not provided)'}
+User's reply (too short or generic): ${JSON.stringify(user_answer)}
+Prior nudges this exchange: ${attempts}
+
+Write the nudge.`;
+
+  try {
+    const response = await client.messages.create({
+      model:      NUDGE_MODEL_ID,
+      max_tokens: NUDGE_MAX_TOKENS_OUT,
+      system:     NUDGE_SYSTEM,
+      messages:   [{ role: 'user', content: userMessage }],
+    });
+    const raw = (response.content[0]?.text || '').trim();
+    // Strip surrounding quotes if the model added them despite instructions
+    const cleaned = raw.replace(/^["']+|["']+$/g, '').trim();
+    const nudge = cleaned || pickNudgeFallback(exchange, attempts);
+    return res.status(200).json({ nudge });
+  } catch (err) {
+    console.error('[raise-coach] nudge claude error:', err.message);
+    return res.status(200).json({
+      nudge:    pickNudgeFallback(exchange, attempts),
+      fallback: true,
+    });
+  }
+}
 
 // ════════════════════════════════════════════════════════════
 // ══ FREE MODE — post-paywall chat on /raise/chat/         ══
