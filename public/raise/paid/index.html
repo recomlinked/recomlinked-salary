@@ -150,9 +150,7 @@ button,input,textarea{font-family:var(--sans);}
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   margin-bottom:16px;flex-wrap:wrap;
 }
-.summary-block{
-  flex:1;min-width:120px;
-}
+.summary-block{flex:1;min-width:120px;}
 .summary-block-label{
   font-size:9px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;
   color:rgba(255,255,255,0.35);margin-bottom:3px;
@@ -171,6 +169,12 @@ button,input,textarea{font-family:var(--sans);}
   padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);
 }
 .summary-line strong{color:#fff;}
+.summary-obstacle{
+  margin-top:10px;padding-top:10px;
+  border-top:1px dashed rgba(255,255,255,0.14);
+  font-size:12px;color:rgba(255,255,255,0.62);line-height:1.6;font-style:italic;
+}
+.summary-obstacle strong{color:rgba(255,255,255,0.9);font-style:normal;font-weight:700;}
 
 /* Plan section header (expandable) */
 .section-head{
@@ -180,14 +184,18 @@ button,input,textarea{font-family:var(--sans);}
   border-bottom:1px solid var(--divider);
 }
 .section-head.collapsed{border-bottom:none;}
-.section-head-left{display:flex;align-items:center;gap:10px;min-width:0;}
+.section-head-left{display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1;}
 .section-idx{
   font-size:9px;font-weight:800;letter-spacing:0.09em;
-  color:var(--t3);flex-shrink:0;
+  color:var(--t3);flex-shrink:0;padding-top:2px;
 }
+.section-head-text{min-width:0;flex:1;}
 .section-title{
   font-size:14px;font-weight:800;color:var(--t1);line-height:1.3;
   letter-spacing:-0.2px;
+}
+.section-subtitle{
+  font-size:12px;font-weight:500;color:var(--t3);line-height:1.4;margin-top:3px;
 }
 .section-caret{
   font-size:14px;color:var(--t3);transition:transform 0.2s;flex-shrink:0;
@@ -196,6 +204,21 @@ button,input,textarea{font-family:var(--sans);}
 
 .section-body{padding:4px 18px 18px;}
 .section-body[hidden]{display:none;}
+
+/* Obstacle hook banner — shown at top of section body when plan data has it */
+.obstacle-hook{
+  background:rgba(201,168,76,0.07);
+  border-left:3px solid var(--gold);
+  border-radius:0 6px 6px 0;
+  padding:10px 12px;
+  font-size:12.5px;color:var(--t2);line-height:1.6;
+  margin:2px 0 14px;
+}
+.obstacle-hook::before{
+  content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--gold);margin-right:8px;vertical-align:middle;transform:translateY(-1px);
+}
+.obstacle-hook strong{color:var(--t1);font-weight:700;}
 
 /* Blockers */
 .blocker-card{
@@ -241,6 +264,11 @@ button,input,textarea{font-family:var(--sans);}
   border-left:2.5px solid var(--gold);padding-left:12px;
   font-style:italic;
 }
+.script-why{
+  font-size:12px;color:var(--t2);line-height:1.55;
+  margin-top:8px;padding-top:8px;border-top:1px dashed var(--divider);
+}
+.script-why strong{color:var(--t1);}
 .roleplay-btn{
   width:100%;background:var(--navy);color:#fff;
   border:none;border-radius:8px;padding:11px;
@@ -276,7 +304,17 @@ button,input,textarea{font-family:var(--sans);}
   border:1px solid rgba(201,168,76,0.25);
   border-radius:8px;padding:14px 16px;
   font-size:13px;color:var(--t1);line-height:1.6;
+  margin-bottom:10px;
 }
+.timing-windows{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
+.timing-window{
+  background:var(--page);border-radius:6px;padding:10px 12px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.timing-window-name{
+  font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;min-width:140px;
+}
+.timing-window-why{font-size:12px;color:var(--t2);line-height:1.5;flex:1;}
 
 /* Email */
 .email-subject-row{
@@ -302,9 +340,14 @@ button,input,textarea{font-family:var(--sans);}
 .week-card:last-child{margin-bottom:0;}
 .week-head{
   font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:6px;
+  color:var(--gold);margin-bottom:4px;
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
 }
-.week-actions{list-style:none;padding:0;margin:0;}
+.week-theme{
+  font-size:11px;font-weight:600;color:var(--t2);
+  text-transform:none;letter-spacing:0;
+}
+.week-actions{list-style:none;padding:0;margin:6px 0 0;}
 .week-actions li{
   font-size:12.5px;color:var(--t1);line-height:1.55;
   padding:4px 0 4px 20px;position:relative;
@@ -314,10 +357,43 @@ button,input,textarea{font-family:var(--sans);}
   color:var(--navy);font-weight:700;font-size:12px;
 }
 
+/* Role-play card (new section 07 variant) */
+.roleplay-card{
+  background:var(--page);border-radius:8px;padding:14px 16px;
+  margin-bottom:10px;
+}
+.roleplay-scene{
+  font-size:13px;color:var(--t1);line-height:1.6;font-style:italic;
+  padding-left:12px;border-left:2.5px solid var(--gold);
+}
+.roleplay-instructions{
+  font-size:12px;color:var(--t2);line-height:1.55;
+  margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);
+}
+
 /* Coach section */
 .coach-intro{
-  padding:14px 18px 8px;font-size:12.5px;color:var(--t2);line-height:1.55;
+  padding:14px 18px 6px;font-size:12.5px;color:var(--t2);line-height:1.55;
 }
+.coach-intro strong{color:var(--t1);}
+.coach-starter-chips{
+  padding:4px 18px 12px;display:flex;flex-wrap:wrap;gap:6px;
+}
+.coach-starter-chip{
+  background:var(--card);color:var(--t2);
+  border:1.5px solid var(--divider);border-radius:20px;
+  padding:7px 12px;font-size:12px;font-weight:500;
+  cursor:pointer;font-family:var(--sans);
+  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s;
+  line-height:1.3;
+}
+.coach-starter-chip:hover{border-color:var(--navy);color:var(--navy);}
+.coach-starter-chip:active{transform:scale(0.97);}
+.coach-starter-chip.hot{
+  border-color:var(--gold);color:#8a6e1f;background:rgba(201,168,76,0.07);
+}
+.coach-starter-chip.hot:hover{background:rgba(201,168,76,0.16);}
+
 .coach-messages{
   padding:0 18px 12px;display:flex;flex-direction:column;gap:12px;
   max-height:none;
@@ -329,6 +405,11 @@ button,input,textarea{font-family:var(--sans);}
   padding:11px 13px;font-size:13px;color:var(--t1);line-height:1.6;
   white-space:pre-wrap;word-break:break-word;
 }
+.coach-bubble.welcome{
+  background:var(--bg);color:#fff;
+  border-radius:var(--radius);padding:14px 16px;
+}
+.coach-bubble.welcome strong{color:#fff;}
 .user-msg{display:flex;justify-content:flex-end;}
 .user-bubble{
   background:var(--navy);color:#fff;
@@ -357,7 +438,8 @@ button,input,textarea{font-family:var(--sans);}
 .input-row:focus-within{border-color:var(--navy);}
 .input-row input{
   flex:1;border:none;background:transparent;
-  font-size:14px;color:var(--t1);font-family:var(--sans);outline:none;
+  /* 16px minimum to prevent iOS Safari auto-zoom on focus */
+  font-size:16px;color:var(--t1);font-family:var(--sans);outline:none;
 }
 .input-row input::placeholder{color:var(--t4);}
 .send-btn{
@@ -483,93 +565,119 @@ button,input,textarea{font-family:var(--sans);}
         </div>
       </div>
       <div class="summary-line" id="summary-line">—</div>
+      <div class="summary-obstacle" id="summary-obstacle" hidden></div>
     </div>
 
-    <!-- Blockers -->
+    <!-- 01 Blockers -->
     <div class="plan-section" id="sec-blockers">
       <div class="section-head" onclick="toggleSection('sec-blockers')">
         <div class="section-head-left">
           <div class="section-idx">01</div>
-          <div class="section-title">The 3 blockers holding your number back</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-blockers">What's actually holding my number back?</div>
+            <div class="section-subtitle" id="sub-blockers">Three specific things, and the fix for each</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="blockers-body"></div>
     </div>
 
-    <!-- Opening script -->
+    <!-- 02 Opening script -->
     <div class="plan-section" id="sec-script">
       <div class="section-head" onclick="toggleSection('sec-script')">
         <div class="section-head-left">
           <div class="section-idx">02</div>
-          <div class="section-title">Your opening script</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-script">How should I open the conversation?</div>
+            <div class="section-subtitle" id="sub-script">The first sentence, the full opener, and why it works</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="script-body"></div>
     </div>
 
-    <!-- Pushback -->
+    <!-- 03 Pushback -->
     <div class="plan-section" id="sec-pushback">
       <div class="section-head" onclick="toggleSection('sec-pushback')">
         <div class="section-head-left">
           <div class="section-idx">03</div>
-          <div class="section-title">Handling the 3 likely pushbacks</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-pushback">What if my manager pushes back?</div>
+            <div class="section-subtitle" id="sub-pushback">The three responses you'll actually hear, and what to say</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="pushback-body"></div>
     </div>
 
-    <!-- Timing -->
+    <!-- 04 Timing -->
     <div class="plan-section" id="sec-timing">
       <div class="section-head" onclick="toggleSection('sec-timing')">
         <div class="section-head-left">
           <div class="section-idx">04</div>
-          <div class="section-title">When to ask</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-timing">When's my best moment to ask?</div>
+            <div class="section-subtitle" id="sub-timing">The specific window for your situation</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="timing-body"></div>
     </div>
 
-    <!-- Email template -->
+    <!-- 05 Email template -->
     <div class="plan-section" id="sec-email">
       <div class="section-head" onclick="toggleSection('sec-email')">
         <div class="section-head-left">
           <div class="section-idx">05</div>
-          <div class="section-title">Ready-to-send email</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-email">Can you draft the email for me?</div>
+            <div class="section-subtitle" id="sub-email">Subject line, body, and the single change that gets the meeting booked</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="email-body"></div>
     </div>
 
-    <!-- 30-day plan -->
+    <!-- 06 30-day plan -->
     <div class="plan-section" id="sec-prep">
       <div class="section-head" onclick="toggleSection('sec-prep')">
         <div class="section-head-left">
           <div class="section-idx">06</div>
-          <div class="section-title">Your 30-day prep plan</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-prep">What should I do in the next 30 days?</div>
+            <div class="section-subtitle" id="sub-prep">Week by week — audit, position, set up, ask</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="prep-body"></div>
     </div>
 
-    <!-- Coach chat -->
+    <!-- 07 Role-play + Coach chat -->
     <div class="plan-section" id="sec-coach">
       <div class="section-head" onclick="toggleSection('sec-coach')">
         <div class="section-head-left">
           <div class="section-idx">07</div>
-          <div class="section-title">Your coach · live chat</div>
+          <div class="section-head-text">
+            <div class="section-title" id="title-coach">Let's role-play the conversation</div>
+            <div class="section-subtitle" id="sub-coach">Practise until it feels normal, not rehearsed</div>
+          </div>
         </div>
         <div class="section-caret">▾</div>
       </div>
       <div class="section-body" id="coach-body">
-        <div class="coach-intro">
-          Ask me anything. I remember every conversation in your coaching window. Try: <em>"Let's role-play the conversation"</em> or <em>"What if my manager says there's no budget?"</em>
+        <!-- Role-play scene card (if the plan has it) -->
+        <div id="roleplay-scene-wrap"></div>
+        <!-- Coach intro + starter chips -->
+        <div class="coach-intro" id="coach-intro">
+          <strong>Ask me anything.</strong> I remember every conversation in your 30-day window. The fastest way in is to pick one of these:
         </div>
+        <div class="coach-starter-chips" id="coach-starter-chips"></div>
         <div class="coach-messages" id="coach-messages"></div>
       </div>
     </div>
@@ -602,23 +710,47 @@ button,input,textarea{font-family:var(--sans);}
 
 <script>
 /* ═══════════════════════════════════════════════════════════ */
-/* ══  PAID DASHBOARD — controller                          ══ */
+/* ══  PAID DASHBOARD — controller (Pass 3)                  ══ */
+/* ══  Consumes new `sections` object from enrich.js         ══ */
+/* ══  Falls back to flat fields for pre-round-2 plans       ══ */
 /* ═══════════════════════════════════════════════════════════ */
 
-const LS_TOKEN  = 'rl_raise_access_token';
-const LS_SALARY = 'rl_raise_salary';
-const API_VERIFY   = '/api/raise-verify';
-const API_COACH    = '/api/raise-coach';
-const API_EXPORT   = '/api/raise-export';
-const API_DELETE   = '/api/raise-delete';
+const LS_TOKEN       = 'rl_raise_access_token';
+const LS_SALARY      = 'rl_raise_salary';
+const LS_WELCOMED    = 'rl_raise_welcomed';   // session-scoped: don't re-welcome on every reload
+const API_VERIFY     = '/api/raise-verify';
+const API_COACH      = '/api/raise-coach';
+const API_EXPORT     = '/api/raise-export';
+const API_DELETE     = '/api/raise-delete';
 
 const dash = {
   token: null,
   profile: null,
   plan: null,
   days_left: 0,
-  chat_history: [],  // local render only — server keeps canonical
+  chat_history: [],
+  obstacle: null,   // extracted from plan.meta.obstacle_code / userRecord.obstacle
 };
+
+// Labels for obstacle codes — used in the summary card + welcome bubble
+const OBSTACLE_LABELS = {
+  budget:         'your manager saying there\'s no budget',
+  justify:        'how to justify your number',
+  timing:         'timing — no review scheduled',
+  prior_no:       'having asked before and got a no or delay',
+  unknown_amount: 'not knowing what number to ask for',
+  other:          'the thing you flagged',
+};
+
+// Starter chips for the coach section. First is role-play — the flagship.
+// Others are obstacle-shaped but always present (user can always ask them).
+const COACH_STARTER_CHIPS = [
+  { label: "Let's role-play the conversation",  hot: true,  send: "Let's role-play the actual negotiation. You play my manager. Set the scene and start." },
+  { label: "What if they say there's no budget?",           send: "What's the best response if my manager says there's no budget this cycle?" },
+  { label: "How do I reopen after a prior no?",             send: "How do I reopen the conversation with my manager after they said no last time, without looking bitter or desperate?" },
+  { label: "Talk me through my opening again",              send: "Walk me through my opening script again and why it works for my specific situation." },
+  { label: "What should I do in week 1?",                   send: "What's the most important thing for me to focus on in week 1?" },
+];
 
 /* ── Utilities ─────────────────────────────────────────── */
 function $(id) { return document.getElementById(id); }
@@ -650,16 +782,68 @@ function formatMoney(amount, currency) {
   }
 }
 
+/* ── Data access helpers — read new shape, fall back to old ── */
+// Enrich.js now returns plan.sections.{blockers,script,pushback,timing,email,prep,roleplay}
+// Old pre-round-2 plans only have flat fields. These helpers coalesce.
+
+function sect(key) {
+  return dash.plan?.sections?.[key] || null;
+}
+
+function getBlockers() {
+  return sect('blockers')?.top_3_blockers || dash.plan?.top_3_blockers || [];
+}
+function getScript() {
+  const s = sect('script');
+  if (s) return {
+    one_liner:    s.one_liner    || '',
+    full_opener:  s.full_opener  || '',
+    why_it_works: s.why_it_works || '',
+  };
+  const old = dash.plan?.opening_script || {};
+  return { one_liner: old.one_liner || '', full_opener: old.full_opener || '', why_it_works: '' };
+}
+function getPushbacks() {
+  return sect('pushback')?.pushback_responses || dash.plan?.pushback_responses || [];
+}
+function getTiming() {
+  const s = sect('timing');
+  if (s) return {
+    recommendation: s.timing_recommendation || '',
+    windows:        s.window_options         || [],
+  };
+  return { recommendation: dash.plan?.timing_recommendation || '', windows: [] };
+}
+function getEmail() {
+  return sect('email')?.email_template || dash.plan?.email_template || { subject: '', body: '' };
+}
+function getPrepWeeks() {
+  return sect('prep')?.['30_day_prep_plan']
+    || dash.plan?.['30_day_prep_plan']
+    || dash.plan?.prep_plan_30_day
+    || [];
+}
+function getRolePlay() {
+  const s = sect('roleplay');
+  if (!s) return null;
+  return {
+    opening_scene:       s.opening_scene       || '',
+    coach_instructions:  s.coach_instructions  || '',
+  };
+}
+
+function obstacleHook(key) {
+  return sect(key)?.obstacle_hook || '';
+}
+
 /* ── Init ──────────────────────────────────────────────── */
 async function init() {
   const params = new URLSearchParams(location.search);
   const urlToken   = params.get('token');
   const urlSession = params.get('session_id');
 
-  // Priority: URL token > URL session > localStorage token
   let token = urlToken || localStorage.getItem(LS_TOKEN) || null;
 
-  // Build verify URL
   let verifyUrl;
   if (urlToken) {
     verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(urlToken)}`;
@@ -668,12 +852,10 @@ async function init() {
   } else if (token) {
     verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(token)}`;
   } else {
-    // No identifier at all → send to re-entry
     window.location.replace('/raise/enter/');
     return;
   }
 
-  // Fetch verification
   let data;
   try {
     const res = await fetch(verifyUrl);
@@ -701,16 +883,22 @@ async function init() {
   dash.days_left = data.days_left || 0;
   dash.token     = data.profile?.access_token || token;
 
-  // Persist token for same-device return visits
+  // Extract obstacle — look in multiple places for robustness
+  const planMetaObs = dash.plan?.meta?.obstacle_code;
+  const profileObs  = dash.profile?.obstacle?.code;
+  dash.obstacle = {
+    code:  planMetaObs || profileObs || 'other',
+    label: dash.profile?.obstacle?.label     || '',
+    free_text: dash.profile?.obstacle?.free_text || '',
+  };
+
   if (dash.token) {
     try { localStorage.setItem(LS_TOKEN, dash.token); } catch (e) {}
-    // Clean URL (remove ?session_id or ?token from visible URL)
     if (urlSession || urlToken) {
       history.replaceState({}, '', '/raise/paid/');
     }
   }
 
-  // If plan is still pending (webhook race), poll for up to 30s
   if (dash.plan && dash.plan.pending) {
     showScreen('pending-screen');
     dash.plan = await pollForPlan();
@@ -719,6 +907,10 @@ async function init() {
       $('loading-body').textContent  = 'Email support@recomlinked.com if this persists.';
       showScreen('loading-screen');
       return;
+    }
+    // Re-resolve obstacle code after plan lands
+    if (dash.plan?.meta?.obstacle_code) {
+      dash.obstacle.code = dash.plan.meta.obstacle_code;
     }
   }
 
@@ -744,25 +936,43 @@ async function pollForPlan() {
 function renderDashboard() {
   showScreen('dashboard');
 
-  // Days pill
   const pill = $('days-pill');
   pill.textContent = `${dash.days_left} day${dash.days_left === 1 ? '' : 's'} left`;
   pill.hidden = false;
 
-  // Check salary — show prompt if first visit and no salary stored
   const salary = getSalary();
   if (!salary) {
     $('salary-prompt').hidden = false;
   }
 
   renderSummary();
+  renderSectionTitles();
   renderBlockers();
   renderScript();
   renderPushback();
   renderTiming();
   renderEmail();
   renderPrep();
-  // Coach chat is pre-rendered empty; user drives it via input bar
+  renderRolePlayScene();
+  renderCoachStarterChips();
+  maybeShowWelcomeBubble();
+}
+
+/** If the plan came back with overridden titles (Claude returned its own
+    per-section title), respect them. Otherwise keep the HTML defaults. */
+function renderSectionTitles() {
+  const map = ['blockers','script','pushback','timing','email','prep','roleplay'];
+  // Note: section 07 is 'roleplay' in the data shape but 'coach' as the
+  // plan-section DOM id since it hosts the live chat too.
+  const domKeyMap = { blockers:'blockers', script:'script', pushback:'pushback', timing:'timing', email:'email', prep:'prep', roleplay:'coach' };
+
+  for (const key of map) {
+    const domKey = domKeyMap[key];
+    const t = sect(key)?.title;
+    const s = sect(key)?.subtitle;
+    if (t && $('title-' + domKey)) $('title-' + domKey).textContent = t;
+    if (s && $('sub-'   + domKey)) $('sub-'   + domKey).textContent = s;
+  }
 }
 
 function renderSummary() {
@@ -772,7 +982,6 @@ function renderSummary() {
   $('summary-range').textContent = (fr.floor && fr.ceiling) ? `${fr.floor}–${fr.ceiling}%` : '—';
   $('summary-days').textContent  = String(dash.days_left);
 
-  // Amount in money (uses saved salary if present)
   const salary = getSalary();
   const ar = plan.amount_range;
   if (salary && ar?.low_pct != null && ar?.high_pct != null) {
@@ -787,17 +996,33 @@ function renderSummary() {
     $('summary-amount').textContent = '—';
   }
 
-  // Headline summary
   const line = plan.headline_summary || 'Your coaching plan is ready.';
   $('summary-line').innerHTML = escapeHtml(line);
+
+  // Obstacle context — subtle coach-voice line below the main summary
+  const obs = dash.obstacle;
+  if (obs && obs.code && obs.code !== 'other' || (obs && obs.label)) {
+    const phrase = OBSTACLE_LABELS[obs.code] || (obs.label ? `"${obs.label}"` : '');
+    if (phrase) {
+      $('summary-obstacle').innerHTML = `<strong>You flagged:</strong> ${escapeHtml(phrase)}. The plan below addresses it directly.`;
+      $('summary-obstacle').hidden = false;
+    }
+  }
+}
+
+/** Helper to inject an obstacle-hook banner at the top of a section body. */
+function hookBanner(key) {
+  const text = obstacleHook(key);
+  if (!text) return '';
+  return `<div class="obstacle-hook">${escapeHtml(text)}</div>`;
 }
 
 function renderBlockers() {
   const body = $('blockers-body');
-  body.innerHTML = '';
-  const list = dash.plan?.top_3_blockers || [];
+  body.innerHTML = hookBanner('blockers');
+  const list = getBlockers();
   if (list.length === 0) {
-    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">No blockers loaded yet.</div>';
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Blockers not loaded yet.</div>';
     return;
   }
   list.forEach(b => {
@@ -815,10 +1040,10 @@ function renderBlockers() {
 
 function renderScript() {
   const body = $('script-body');
-  body.innerHTML = '';
-  const s = dash.plan?.opening_script;
-  if (!s) {
-    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Script not loaded.</div>';
+  body.innerHTML = hookBanner('script');
+  const s = getScript();
+  if (!s.one_liner && !s.full_opener) {
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Script not loaded.</div>';
     return;
   }
 
@@ -838,6 +1063,7 @@ function renderScript() {
         <button class="copy-btn" data-copy="${escapeHtml(s.full_opener)}">Copy</button>
       </div>
       <div class="script-text">${escapeHtml(s.full_opener)}</div>
+      ${s.why_it_works ? `<div class="script-why"><strong>Why this works:</strong> ${escapeHtml(s.why_it_works)}</div>` : ''}
     `);
     body.appendChild(card);
   }
@@ -851,10 +1077,10 @@ function renderScript() {
 
 function renderPushback() {
   const body = $('pushback-body');
-  body.innerHTML = '';
-  const list = dash.plan?.pushback_responses || [];
+  body.innerHTML = hookBanner('pushback');
+  const list = getPushbacks();
   if (list.length === 0) {
-    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Pushback responses not loaded.</div>';
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Pushback responses not loaded.</div>';
     return;
   }
   list.forEach(p => {
@@ -871,16 +1097,35 @@ function renderPushback() {
 
 function renderTiming() {
   const body = $('timing-body');
-  const t = dash.plan?.timing_recommendation || 'Timing not loaded.';
-  body.innerHTML = `<div class="timing-box">${escapeHtml(t)}</div>`;
+  body.innerHTML = hookBanner('timing');
+  const t = getTiming();
+  if (!t.recommendation && (!t.windows || t.windows.length === 0)) {
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Timing not loaded.</div>';
+    return;
+  }
+  if (t.recommendation) {
+    const box = el('div', 'timing-box', escapeHtml(t.recommendation));
+    body.appendChild(box);
+  }
+  if (t.windows && t.windows.length > 0) {
+    const wrap = el('div', 'timing-windows', '');
+    t.windows.forEach(w => {
+      const row = el('div', 'timing-window', `
+        <div class="timing-window-name">${escapeHtml(w.window || '')}</div>
+        <div class="timing-window-why">${escapeHtml(w.why || '')}</div>
+      `);
+      wrap.appendChild(row);
+    });
+    body.appendChild(wrap);
+  }
 }
 
 function renderEmail() {
   const body = $('email-body');
-  body.innerHTML = '';
-  const em = dash.plan?.email_template;
-  if (!em) {
-    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Email template not loaded.</div>';
+  body.innerHTML = hookBanner('email');
+  const em = getEmail();
+  if (!em || (!em.subject && !em.body)) {
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Email template not loaded.</div>';
     return;
   }
 
@@ -906,20 +1151,95 @@ function renderEmail() {
 
 function renderPrep() {
   const body = $('prep-body');
-  body.innerHTML = '';
-  const plan = dash.plan?.['30_day_prep_plan'] || dash.plan?.prep_plan_30_day || [];
+  body.innerHTML = hookBanner('prep');
+  const plan = getPrepWeeks();
   if (plan.length === 0) {
-    body.innerHTML = '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Prep plan not loaded.</div>';
+    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Prep plan not loaded.</div>';
     return;
   }
   plan.forEach(wk => {
     const actions = (wk.actions || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
+    const themeHtml = wk.theme ? `<span class="week-theme">${escapeHtml(wk.theme)}</span>` : '';
     const card = el('div', 'week-card', `
-      <div class="week-head">Week ${wk.week}</div>
+      <div class="week-head">
+        <span>Week ${wk.week || ''}</span>
+        ${themeHtml}
+      </div>
       <ul class="week-actions">${actions}</ul>
     `);
     body.appendChild(card);
   });
+}
+
+function renderRolePlayScene() {
+  const wrap = $('roleplay-scene-wrap');
+  if (!wrap) return;
+  const hook = obstacleHook('roleplay');
+  const rp = getRolePlay();
+  if (!rp || !rp.opening_scene) {
+    // Don't render anything — the coach chat alone carries the section
+    wrap.innerHTML = hook ? `<div style="padding:0 18px;">${hookBanner('roleplay')}</div>` : '';
+    return;
+  }
+  wrap.innerHTML = `
+    <div style="padding:0 18px;">
+      ${hookBanner('roleplay')}
+      <div class="roleplay-card">
+        <div class="roleplay-scene">${escapeHtml(rp.opening_scene)}</div>
+        ${rp.coach_instructions ? `<div class="roleplay-instructions">${escapeHtml(rp.coach_instructions)}</div>` : ''}
+      </div>
+      <button class="roleplay-btn" onclick="startRolePlay()">Start the role-play now →</button>
+    </div>
+  `;
+}
+
+function renderCoachStarterChips() {
+  const wrap = $('coach-starter-chips');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  COACH_STARTER_CHIPS.forEach(c => {
+    const chip = el('button', 'coach-starter-chip' + (c.hot ? ' hot' : ''), escapeHtml(c.label));
+    chip.type = 'button';
+    chip.onclick = () => {
+      // Remove all chips after pick so the area doesn't feel like a static menu
+      wrap.innerHTML = '';
+      sendToCoach(c.send);
+    };
+    wrap.appendChild(chip);
+  });
+}
+
+/* ── Welcome-back bubble ───────────────────────────────── */
+/* Shown once per session (not on every reload). Opens the coaching window
+   warmly — references the user's obstacle + range + days left. Feels like
+   the coach saying hi when you walk into the office. */
+function maybeShowWelcomeBubble() {
+  // Session-scoped flag — clears on tab close. Cap to daily too, so
+  // re-opens within the same day don't re-welcome.
+  const already = sessionStorage.getItem(LS_WELCOMED);
+  if (already) return;
+
+  try { sessionStorage.setItem(LS_WELCOMED, '1'); } catch (e) {}
+
+  const fr = dash.profile?.final_range || {};
+  const obsLabel = OBSTACLE_LABELS[dash.obstacle?.code] || '';
+  const rangeStr = (fr.floor && fr.ceiling) ? `${fr.floor}–${fr.ceiling}%` : 'your range';
+  const dayStr   = dash.days_left === 30
+    ? 'We just started — 30 days of coaching ahead.'
+    : `${dash.days_left} day${dash.days_left === 1 ? '' : 's'} left in your coaching window.`;
+
+  const obsSentence = obsLabel
+    ? ` You flagged ${obsLabel} as your biggest concern — that's what we'll zero in on first.`
+    : '';
+
+  const welcome = `Welcome back. Your range locked at <strong>${rangeStr}</strong>.${obsSentence} ${dayStr} Tap a chip below or ask me anything.`;
+
+  // Insert into coach-messages BEFORE any existing content
+  const msgs = $('coach-messages');
+  if (!msgs) return;
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `<div class="coach-bubble welcome">${welcome}</div>`;
+  msgs.insertBefore(wrap, msgs.firstChild);
 }
 
 /* ── Copy buttons ──────────────────────────────────────── */
@@ -931,7 +1251,6 @@ function wireCopyButtons(root) {
       try {
         await navigator.clipboard.writeText(text);
       } catch (err) {
-        // Fallback — select a hidden textarea
         const ta = document.createElement('textarea');
         ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
         document.body.appendChild(ta); ta.select();
@@ -1015,7 +1334,6 @@ function removeTypingIndicator() {
 function scrollToCoach(smooth) {
   const sec = $('sec-coach');
   if (!sec) return;
-  // ensure coach section is expanded
   const head = sec.querySelector('.section-head');
   const body = sec.querySelector('.section-body');
   if (head && head.classList.contains('collapsed')) {
@@ -1127,6 +1445,7 @@ $('confirm-delete').onclick = async () => {
     localStorage.removeItem(LS_SALARY);
     localStorage.removeItem('rl_raise_profile');
     localStorage.removeItem('rl_raise_state');
+    sessionStorage.removeItem(LS_WELCOMED);
   } catch (e) {}
   window.location.replace('/raise/');
 };
