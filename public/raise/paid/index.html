@@ -77,6 +77,11 @@ button,input,textarea{font-family:var(--sans);}
   padding:16px 16px 12px;display:flex;flex-direction:column;gap:12px;
 }
 .main::-webkit-scrollbar{display:none;}
+/* Critical: the [hidden] attribute must override display:flex on .main /
+   .state-screen, otherwise all four states render simultaneously. Plain
+   `hidden` has very low specificity vs an explicit display rule. */
+.main[hidden],
+.state-screen[hidden]{display:none;}
 
 /* ── States: loading / expired / salary ────────────────── */
 .state-screen{
