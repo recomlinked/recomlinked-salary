@@ -113,7 +113,10 @@ const EXCHANGE_1_SYSTEM = `You are a salary negotiation coach. The user has just
 
 Your job: extract structured fields and classify how their field/industry shapes their raise probability RIGHT NOW in the market (spring 2026).
 
-Fields to extract:
+FIRST — CHECK IF THE ANSWER HAS SIGNAL:
+If the user's answer does NOT actually contain a job title or industry information (e.g. they typed "hi", "hello", "I don't know", "test", "asdf", an off-topic sentence like "I don't trust my boss", or anything without a role/field), you must classify the signal as "insufficient" and write a short nudge_line asking specifically for their title and company type. DO NOT invent or infer fields they didn't provide. DO NOT classify a signal direction. DO NOT write a reason_line in this case.
+
+Fields to extract (only if signal is NOT insufficient):
 - job_title_normalised: short clean title
 - function: one of [finance, product, engineering, sales, marketing, ops, hr, design, cs, legal, data, other]
 - industry: one of [saas, fintech, healthcare, retail, manufacturing, media, consulting, government, nonprofit, energy, education, other]
@@ -122,22 +125,29 @@ Fields to extract:
   (Infer from the title and any years/context mentioned. Examples: "Junior Analyst" → junior; "Senior PM, 8 years" → senior; "Director of Eng" → lead; "VP" or "Head of" → exec. Default to "unclear" if no signal.)
 
 Signal classification (how their field affects raise probability):
+- insufficient: answer had no role/industry content (see above)
 - strong_positive: hot market, tight talent supply, high retention pressure
 - positive: above-average conditions
 - neutral: stable market
 - negative: below-average conditions, cost pressure in the sector
 - strong_negative: major layoffs or budget freezes common in this field
 
-Reason line (max 20 words):
+Reason line (max 20 words) — ONLY if signal is NOT insufficient:
 - Must reference their specific field/industry
 - Must reflect their signal direction
 - Must sound like a working coach, not a static article
 
+Nudge line (max 25 words) — ONLY if signal IS insufficient:
+- Warm, direct, coach-voice
+- Ask for the specific missing piece (role + company type)
+- Give an example phrasing like "Senior PM at a SaaS startup"
+
 Respond ONLY with valid JSON, no preamble:
 {
   "extracted": { "job_title_normalised": "...", "function": "...", "industry": "...", "company_type": "...", "seniority_signal_from_text": "..." },
-  "signal": "strong_positive|positive|neutral|negative|strong_negative",
-  "reason_line": "..."
+  "signal": "insufficient|strong_positive|positive|neutral|negative|strong_negative",
+  "reason_line": "...",
+  "nudge_line": "..."
 }`;
 
 // ── Exchange 2: MERGED performance + leverage ────────────
@@ -145,25 +155,34 @@ Respond ONLY with valid JSON, no preamble:
 // Claude classifies the strongest signal they actually gave.
 const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user has just told you about their case for a raise — either their recent performance, their market leverage, or both. This is the single "what's your ammunition?" question in the 3-exchange flow.
 
-Fields to extract (any that apply — use "not_mentioned" if the user didn't touch that axis):
+FIRST — CHECK IF THE ANSWER HAS SIGNAL:
+If the user's answer does NOT actually contain performance, leverage, or market information (e.g. they typed "hi", "I don't know", "test", "asdf", or an off-topic sentence like "I don't trust my boss"), classify the signal as "insufficient" and write a short nudge_line. DO NOT infer fields. DO NOT classify a signal direction. DO NOT write a reason_line in this case.
+
+IMPORTANT: "I don't have strong evidence right now" IS valid signal (neutral-to-slightly-negative) — the user is honestly saying they don't have leverage. Accept that as a real answer. "Insufficient" is ONLY for answers that fail to engage with the question at all.
+
+Fields to extract (any that apply — use "not_mentioned" if not addressed):
 - performance_rating: one of [exceeded, specific_win, met, mixed, not_mentioned]
 - external_leverage:  one of [competing_offer, actively_recruited, underpaid_evidence, none, not_mentioned]
 - market_position:    one of [underpaid, at_market, overpaid, unsure, not_mentioned]
-- specific_achievements: array of 0-3 short strings (only if they mentioned concrete wins)
-- leverage_detail: string (if they typed specifics about offers or recruiter interest)
+- specific_achievements: array of 0-3 short strings
+- leverage_detail: string
 
-Signal classification — pick the STRONGEST axis they actually mentioned:
+Signal classification:
+- insufficient: answer didn't engage with the question (see above)
 - strong_positive: competing_offer OR exceeded expectations
 - positive: actively_recruited OR credible underpaid evidence OR specific performance win
-- neutral: met expectations / at-market / unsure / nothing strongly stated
+- neutral: met expectations / at-market / unsure / "I don't have strong evidence" (honest)
 - negative: mixed performance year AND no external leverage
 - strong_negative: poor performance AND explicitly negative leverage signals
 
-If the user only addressed one axis (e.g. only performance), classify from that axis and set the other fields to "not_mentioned". Don't penalise them for not mentioning leverage — many people genuinely have no external leverage and that's fine.
-
-Reason line (max 22 words):
+Reason line (max 22 words) — ONLY if signal is NOT insufficient:
 - Reference whichever axis the user actually led with
-- Reflect the "tightens but doesn't tank" rule — weak evidence reframes as "upside limited" or "paid plan shows how to build leverage", never "probability tanked"
+- Reflect the "tightens but doesn't tank" rule — weak evidence reframes as "upside limited", never "tanked"
+
+Nudge line (max 25 words) — ONLY if signal IS insufficient:
+- Warm, direct, coach-voice
+- Ask for specifics the user didn't provide
+- Don't repeat the original question; paraphrase the ask
 
 Respond ONLY with valid JSON, no preamble:
 {
@@ -174,8 +193,9 @@ Respond ONLY with valid JSON, no preamble:
     "specific_achievements": [...],
     "leverage_detail": "..."
   },
-  "signal": "...",
-  "reason_line": "..."
+  "signal": "insufficient|strong_positive|positive|neutral|negative|strong_negative",
+  "reason_line": "...",
+  "nudge_line": "..."
 }`;
 
 // ── Exchange 3: MANAGER relationship + prior_ask (timing removed) ────
@@ -183,31 +203,31 @@ Respond ONLY with valid JSON, no preamble:
 // on the relational axis which is a distinct signal from evidence.
 const EXCHANGE_3_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship and whether they've asked for a raise before. This is the FINAL exchange before the obstacle capture.
 
-Fields to extract:
+FIRST — CHECK IF THE ANSWER HAS SIGNAL:
+If they selected a chip (relationship = strong|professional|complicated|never_asked), that IS valid signal even if free_text is empty. Only return "insufficient" if BOTH relationship is empty AND the free_text doesn't describe a manager relationship or prior ask. Off-topic free text ("I don't trust my process", "hi", "asdf") with no chip selected is insufficient.
+
+Fields to extract (only if signal is NOT insufficient):
 - manager_relationship: one of [strong, professional, complicated, never_asked]
 - prior_ask: one of [not_mentioned, never_asked, asked_got_yes, asked_got_no, asked_got_partial]
-  (A prior "no" is a strong coaching signal — the plan has to handle re-opening the conversation.
-   "asked_got_partial" = asked and got something smaller than requested.
-   Default to "not_mentioned" if the user didn't touch the topic.)
-- context_detail: string (e.g., "manager was just replaced", "I'm on a PIP", "asked last year and was told budget was frozen")
+- context_detail: string
 
 Signal classification — relationship × prior_ask matrix:
+- insufficient: no chip and no relationship content in free text
 - strong_positive: strong + (asked_got_yes OR never_asked/not_mentioned)
-- positive:        professional + (asked_got_yes OR never_asked) OR strong + asked_got_partial
-- neutral:         professional + (never_asked OR not_mentioned) OR strong + asked_got_no
-- negative:        complicated + any OR professional + asked_got_no OR any + asked_got_partial
+- positive: professional + (asked_got_yes OR never_asked) OR strong + asked_got_partial
+- neutral: professional + (never_asked OR not_mentioned) OR strong + asked_got_no
+- negative: complicated + any OR professional + asked_got_no OR any + asked_got_partial
 - strong_negative: complicated + asked_got_no
 
-Reason line (max 22 words):
-- Must reference the manager relationship specifically
-- If prior_ask is asked_got_no, acknowledge the past rejection directly but frame as addressable with the right approach
-- This is the last reason line before the obstacle question — should feel like we're zeroing in
+Reason line (max 22 words) — ONLY if NOT insufficient.
+Nudge line (max 25 words) — ONLY if insufficient. Ask for the missing relationship piece; don't repeat the original question.
 
 Respond ONLY with valid JSON, no preamble:
 {
   "extracted": { "manager_relationship": "...", "prior_ask": "...", "context_detail": "..." },
-  "signal": "...",
-  "reason_line": "..."
+  "signal": "insufficient|strong_positive|positive|neutral|negative|strong_negative",
+  "reason_line": "...",
+  "nudge_line": "..."
 }`;
 
 // ── Exchange 4: OBSTACLE capture (no range math) ─────────
@@ -425,6 +445,28 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
       // Range unchanged — frontend already has it from Ex3
       floor:   current_range ? current_range.floor   : null,
       ceiling: current_range ? current_range.ceiling : null,
+    });
+  }
+
+  // ── Insufficient signal guard (Ex1-3) ────────────────────
+  // If Claude classified the user's answer as "insufficient", the answer had
+  // no real signal. Don't run range math. Don't advance the exchange.
+  // Return a nudge_line the frontend will render as a coach bubble.
+  if (claudeResult.signal === 'insufficient') {
+    logToSheet({
+      exchange,
+      signal:    'insufficient',
+      new_floor: current_range.floor,
+      new_ceil:  current_range.ceiling,
+      extracted: '',
+    });
+    return res.status(200).json({
+      is_insufficient: true,
+      nudge_line:      claudeResult.nudge_line || "I need a bit more to work with. Can you give me specifics?",
+      // Return current range unchanged so frontend doesn't lose state
+      floor:   current_range.floor,
+      ceiling: current_range.ceiling,
+      signal:  'insufficient',
     });
   }
 
