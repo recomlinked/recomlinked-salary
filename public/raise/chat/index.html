@@ -51,6 +51,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
 .bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
 .bubble p{font-size:13.5px;color:var(--t1);line-height:1.6;}
+.bubble p + p{margin-top:8px;}
 .bubble.card-bubble{padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
 .coach-msg .cursor{display:inline-block;width:1.5px;height:14px;background:var(--t2);margin-left:1px;vertical-align:middle;animation:blink 0.9s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
@@ -116,20 +117,20 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .typing-bubble{padding:8px 12px;}
 .typing-indicator{display:inline-flex;align-items:center;padding:2px 0;}
 
-/* ── Paywall bubble ────────────────────────────────────── */
+/* ── Paywall bubble (coach-voice, natural) ─────────────── */
+/* Rendered as a coach bubble, not a product surface. Dark background
+   to signal "this is the moment" but the shape + border-radius matches
+   the regular coach bubble. CTA is the only inline UI element. */
 .paywall-bubble{
   background:var(--bg);border-radius:4px 14px 14px 14px;
   padding:16px 16px 14px;color:#fff;
 }
-.paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.72);line-height:1.65;margin-bottom:10px;}
+.paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:10px;}
+.paywall-bubble p:last-of-type{margin-bottom:12px;}
 .paywall-bubble p strong{color:#fff;}
-.paywall-bubble ul{list-style:none;margin:12px 0;padding:0;}
-.paywall-bubble ul li{
-  font-size:12.5px;color:rgba(255,255,255,0.72);line-height:1.5;
-  padding:4px 0 4px 20px;position:relative;
-}
-.paywall-bubble ul li::before{
-  content:'✓';position:absolute;left:0;top:4px;color:var(--gold);font-weight:700;
+.paywall-bubble .echo{
+  font-size:12px;color:rgba(255,255,255,0.55);font-style:italic;
+  border-left:2px solid rgba(201,168,76,0.4);padding-left:10px;margin-bottom:10px;
 }
 .btn-pay{
   width:100%;background:var(--gold);color:var(--bg);
@@ -144,20 +145,25 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .btn-pay-arrow{display:inline-block;animation:ap 1.8s ease-in-out infinite;}
 @keyframes ap{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
 .trust-row{
-  display:flex;justify-content:center;gap:12px;margin-top:10px;
-  font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:0.04em;
+  display:flex;justify-content:center;gap:8px;margin-top:10px;
+  font-size:10px;color:rgba(255,255,255,0.32);letter-spacing:0.03em;
+  flex-wrap:wrap;
 }
-.trust-row span{display:inline-block;}
+.trust-row .dot{color:rgba(255,255,255,0.18);}
+.proof-line{
+  margin-top:8px;text-align:center;
+  font-size:11px;color:rgba(201,168,76,0.72);font-style:italic;line-height:1.5;
+}
 
-/* ── Bottom panel (kept for future dashboard section chips) ── */
+/* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
   flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
   transition:opacity 0.3s;
 }
 .bottom-panel.dimmed{opacity:0.35;pointer-events:none;}
 
-/* Bottom chips-area stays in DOM but collapses when empty (no answer chips
-   render here anymore — reserved for the paid dashboard's section selector). */
+/* Bottom chips-area — populated after final range with plan-preview chips.
+   Each chip opens a section-tease paywall. */
 .chips-area{
   padding:10px 14px 4px;
   display:flex;flex-wrap:wrap;gap:6px;
@@ -165,6 +171,20 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 }
 .chips-area:empty{padding:0;height:0;overflow:hidden;}
 .chips-area::-webkit-scrollbar{display:none;}
+
+.plan-chip{
+  background:var(--card);color:var(--t2);
+  border:1.5px solid var(--divider);
+  border-radius:20px;
+  padding:8px 14px;font-size:12.5px;font-weight:500;
+  cursor:pointer;font-family:var(--sans);
+  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s;
+  line-height:1.3;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.plan-chip:hover{border-color:var(--gold);color:var(--t1);}
+.plan-chip:active{transform:scale(0.97);}
+.plan-chip .lock{font-size:10px;color:var(--gold);}
 
 /* ── Inline user-side chips (answer chips below each coach question) ── */
 .chips-msg{
@@ -193,6 +213,12 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .chip:active{transform:scale(0.97);}
 .chip.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;}
 .chip.fadeout{opacity:0;pointer-events:none;}
+/* Free-text escape chip visually distinct from canonical chips */
+.chip.chip-freetext{
+  border-style:dashed;border-color:var(--t4);
+  color:var(--t3);background:transparent;
+}
+.chip.chip-freetext:hover{border-color:var(--navy);color:var(--navy);border-style:solid;}
 
 /* Input bar */
 .input-bar{
@@ -208,9 +234,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .input-row:focus-within{border-color:var(--navy);}
 .input-row input{
   flex:1;border:none;background:transparent;
-  /* 16px minimum to prevent iOS Safari auto-zoom on focus.
-     Anything below 16px causes iOS to zoom the viewport, which
-     in turn forces horizontal scrolling while typing. */
+  /* 16px minimum to prevent iOS Safari auto-zoom on focus. */
   font-size:16px;color:var(--t1);font-family:var(--sans);outline:none;
 }
 .input-row input::placeholder{color:var(--t4);}
@@ -243,7 +267,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   animation:blink 0.9s infinite;
 }
 
-/* ── Reason change flash (under coach bubble after card update) ─ */
+/* ── Reason change flash ───────────────────────────────── */
 .reason-flash{
   font-size:11px;color:var(--t3);font-style:italic;
   padding:2px 14px 0;
@@ -264,7 +288,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);
 }
 
-/* Exchange label pill (small indicator above each new question) */
+/* Exchange label pill */
 .exchange-pill{
   display:inline-block;font-size:10px;font-weight:700;
   letter-spacing:0.08em;text-transform:uppercase;
@@ -303,6 +327,9 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 
   <!-- Bottom panel ──────────────────────────────────── -->
   <div class="bottom-panel dimmed" id="bottom-panel">
+    <!-- Plan-preview chips area. Empty during ranging flow; populated with
+         7 plan-section chips after the obstacle answer (final range card +
+         main paywall render). Tapping a chip opens a section-tease paywall. -->
     <div class="chips-area" id="chips-area"></div>
     <div class="input-bar">
       <div class="input-row">
@@ -319,6 +346,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 <script>
 /* ═══════════════════════════════════════════════════════════ */
 /* ══  SALARY NEGOTIATION COACH — CHAT PAGE STATE MACHINE   ══ */
+/* ══  3-exchange flow + obstacle capture + dynamic paywall ══ */
 /* ═══════════════════════════════════════════════════════════ */
 
 // Hide any footer injected by shared.js — chat page uses full-height layout
@@ -338,27 +366,35 @@ const API_EXCHANGE = '/api/raise-exchange';
 const API_ENRICH   = '/api/raise-enrich';
 const API_CHECKOUT = '/api/raise-checkout';
 
+// Freshness — if saved state is older than this, start from scratch.
+// (Per TODO: staleness check. User typically finishes in 3-5 min,
+//  so 24h is conservative — covers overnight but not multi-day abandoned sessions.)
+const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
+
+// Price — single source of truth. Change here to retest.
+const PRICE_USD = 39;
+
+// Canonical state shape. Persists in localStorage between reloads.
 const state = {
   profile: null,
   initial_floor: null,
   current_range: null,
-  current_exchange: 0,          // 0 before analyze, 1..4 during, 5 = paywall
-  accumulated: {},              // { ex1: {...}, ex2: {...}, ex3: {...}, ex4: {...} }
-  chat_log: [],                 // for rehydration
-  ex4_partial: null,            // { relationship?, timing?, free_text? }
+  current_exchange: 0,          // 0 before analyze, 1..3 during, 4 = obstacle, 5 = paywall
+  accumulated: {},              // { ex1: {...}, ex2: {...}, ex3: {...} }
+  chat_log: [],                 // array of log entries — drives transcript replay on refresh
+  ex3_partial: null,            // { relationship?, free_text? } — Ex3 is manager-only
+  obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
+  saved_at: null,               // ms timestamp — used for 24h staleness check
 };
 
 const THINKING_ITEMS = [
   "Mapping your company situation",
-  "Factoring in your tenure and timing",
-  "Reading your regional market norms",
-  "Calibrating seniority and leverage",
+  "Factoring in your tenure",
   "Weighing company-size effects",
-  "Checking industry hiring trends in your field",
-  "Setting your realistic probability floor",
-  "Setting your realistic probability ceiling",
-  "Identifying your structural tailwinds",
-  "Identifying your structural headwinds",
+  "Setting your probability floor",
+  "Setting your probability ceiling",
+  "Identifying structural tailwinds",
+  "Identifying structural headwinds",
   "Preparing your coaching questions",
   "Building your personalised range",
 ];
@@ -368,6 +404,104 @@ const VERDICT_BY_COLOR = {
   amber: 'Moderate chance',
   green: 'High chance',
 };
+
+// Obstacle question — chip options + their canonical codes.
+// Last chip is the "type yours" free-text escape (visually distinct).
+const OBSTACLE_CHIPS = [
+  { code: 'budget',         label: "My manager will say there's no budget" },
+  { code: 'justify',        label: "I'm not sure how to justify my number" },
+  { code: 'timing',         label: "Timing feels off — no review scheduled" },
+  { code: 'prior_no',       label: "I've asked before and got no / delay" },
+  { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
+  { code: 'other',          label: 'Type yours…', isFreeText: true },
+];
+
+// Plan-preview chips — rendered in bottom panel after obstacle + paywall.
+// Each maps to a plan page section. Tapping opens a section-tease paywall.
+// Section IDs match the plan page (01-07) for future consistency.
+const PLAN_PREVIEW_CHIPS = [
+  { section: 'blockers', label: 'Show me the 3 blockers on my number' },
+  { section: 'script',   label: 'Give me the exact words to open with' },
+  { section: 'pushback', label: "Handle the pushbacks I'll hear" },
+  { section: 'timing',   label: "When's my best moment to ask?" },
+  { section: 'email',    label: 'Draft the email for me' },
+  { section: 'prep',     label: 'Give me the 30-day prep plan' },
+  { section: 'roleplay', label: "Let's role-play the conversation" },
+];
+
+// Section-tease content — each chip triggers a coach-voice paywall bubble
+// that teases what's inside that section. Copy speaks like the coach answering.
+// Obstacle context can be interpolated via {obstacle_hook} — a short line
+// picked from OBSTACLE_HOOKS below based on user's obstacle.
+const SECTION_TEASES = {
+  blockers: {
+    lead: "Three things are keeping your number lower than it could be. {obstacle_hook} I can name each one and give you the fix, but they're specific to your situation — your role, your evidence, your manager's constraints. That's what the plan lays out.",
+    cta:  'Show me my 3 blockers',
+  },
+  script: {
+    lead: "The opening is 80% of the outcome. There's one sentence that reframes the conversation so your manager is no longer deciding whether to give you a raise, they're deciding how to help you get one. I'll give you that sentence plus the full 3-minute opener tailored to your range.",
+    cta:  'Get my opening script',
+  },
+  pushback: {
+    lead: "\"There's no budget.\" \"Let's revisit next cycle.\" \"I need to talk to my boss.\" Every one of these has a specific response that doesn't close the door. {obstacle_hook} The plan maps the three you're most likely to hear and the exact words for each.",
+    cta:  'Get my pushback responses',
+  },
+  timing: {
+    lead: "Timing isn't 'review day or nothing'. There are five windows in a normal year where the ask lands well, and most people only see one of them. I'll tell you which one is nearest for your situation and exactly how to set it up.",
+    cta:  'Show me my best timing',
+  },
+  email: {
+    lead: "The email that gets the meeting booked isn't the one explaining what you want. It's the one that makes it impossible to say no to a 15-minute conversation. I'll draft it for you, subject line and all, specific to your manager and your situation.",
+    cta:  'Get my ready-to-send email',
+  },
+  prep: {
+    lead: "You've got four weeks. Week 1 is intel — what they think about you, what the constraints actually are. Week 2 is positioning. Week 3 is the conversation setup. Week 4 is the ask itself. Each step is concrete, takes under an hour, and stacks.",
+    cta:  'Give me my 30-day plan',
+  },
+  roleplay: {
+    lead: "The only way to not feel rehearsed in the conversation is to actually rehearse it. I'll play your manager — real responses, real pushbacks, real silences. We practise until it feels natural. You walk in with your nervous system already familiar with the room.",
+    cta:  "Let's role-play it",
+  },
+};
+
+// Short obstacle-specific hooks inserted into section teases where {obstacle_hook}
+// appears. Keeps teases feeling personalised without generating custom copy for
+// every section × obstacle pair.
+const OBSTACLE_HOOKS = {
+  budget:         "The 'no budget' problem is usually blocker number one.",
+  justify:        "If you're unsure how to justify it, blocker number one is almost always framing, not the number itself.",
+  timing:         "Timing worries usually tie directly to one of the three blockers.",
+  prior_no:       "A prior no makes blocker identification doubly important — some blockers lifted since then, some didn't.",
+  unknown_amount: "The amount uncertainty itself is one of the three blockers for most people.",
+  other:          '',
+};
+
+// Paywall proof lines — shown randomly below CTA. Weighted by obstacle so
+// the most relevant proof shows more often for each obstacle type.
+const PROOF_LINES = [
+  { text: "Your raise pays this back in week one.",                   weight: { all: 1 } },
+  { text: "A 3% bump on a typical salary is $2,400+ in year one.",    weight: { all: 1, justify: 2, unknown_amount: 2 } },
+  { text: "Paid once. 30 days of coaching. No renewal.",              weight: { all: 1 } },
+  { text: "Not what you needed? Email support and we refund.",        weight: { all: 1, prior_no: 2 } },
+  { text: "Built by people who've run this conversation 200+ times.", weight: { all: 1, budget: 2 } },
+  { text: "Your data deletes the moment you ask.",                    weight: { all: 1 } },
+  { text: "Takes 15 minutes to read. The raise lasts years.",         weight: { all: 1, timing: 2 } },
+];
+
+function pickProofLine(obstacleCode) {
+  // Weighted random: each line's weight is max(all, obstacle-specific).
+  const weighted = PROOF_LINES.map(l => ({
+    text: l.text,
+    w: Math.max(l.weight.all || 0, (l.weight[obstacleCode] || 0)),
+  }));
+  const total = weighted.reduce((s, l) => s + l.w, 0);
+  let r = Math.random() * total;
+  for (const l of weighted) {
+    r -= l.w;
+    if (r <= 0) return l.text;
+  }
+  return weighted[0].text;
+}
 
 /* ── Utilities ──────────────────────────────────────────── */
 function $(id) { return document.getElementById(id); }
@@ -392,8 +526,10 @@ function colorFor(range) {
 }
 
 function saveState() {
-  try { localStorage.setItem(LS_STATE, JSON.stringify(state)); }
-  catch (e) { /* storage may be full / disabled */ }
+  try {
+    state.saved_at = Date.now();
+    localStorage.setItem(LS_STATE, JSON.stringify(state));
+  } catch (e) { /* storage may be full / disabled */ }
 }
 function loadState() {
   try {
@@ -422,12 +558,26 @@ function profileHash() {
   const ex = state.accumulated || {};
   const s = `${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`
           + `|${ex.ex1?.signal || ''}|${ex.ex2?.signal || ''}`
-          + `|${ex.ex3?.signal || ''}|${ex.ex4?.signal || ''}`;
+          + `|${ex.ex3?.signal || ''}|${state.obstacle?.code || ''}`;
   try {
     return btoa(unescape(encodeURIComponent(s))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
   } catch (e) {
     return s.replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
   }
+}
+
+/* ── Chat log — append-only record of what rendered ─────── */
+// Each entry is { type, payload } so resumeFromState can replay the
+// visible transcript without re-running animations. Types used:
+//   'coach_bubble'    { text }
+//   'user_bubble'     { text }
+//   'score_card'      { range, reason_line, stage }
+//   'paywall'         — rendered from state.obstacle + current_range
+//   'obstacle_q'      — triggers obstacle-question render
+function logEntry(type, payload) {
+  if (!state.chat_log) state.chat_log = [];
+  state.chat_log.push({ type, payload: payload || {}, ts: Date.now() });
+  saveState();
 }
 
 /* ── Thinking screen ────────────────────────────────────── */
@@ -476,7 +626,7 @@ async function runThinkingAnimation() {
   }
   arcStep();
 
-  // ── Typing phrases (type in → pause → type out → next) ──
+  // Typing phrases (type in → pause → type out → next)
   let i = 0;
   while (thinkingRunning) {
     const item = THINKING_ITEMS[i % THINKING_ITEMS.length];
@@ -502,26 +652,25 @@ function stopThinkingAnimation() {
   if (s) s.style.display = 'none';
 }
 
-/* ── Render probability card (first bubble, persists) ──── */
-/* ── Score card (one per exchange) ──────────────────────── */
-// exchangeDone: 0 = initial, 1-4 = card posted after that exchange
+/* ── Score card ──────────────────────────────────────────── */
+// stage: 0 = initial, 1-3 = card posted after that exchange, 4 = final (after obstacle)
 const CARD_STAGE_LABEL = {
-  0: 'Starting Range',
-  1: 'After: Role & Industry',
-  2: 'After: Performance',
-  3: 'After: Market & Leverage',
-  4: 'Final Range',
+  0: 'Starting range',
+  1: 'After: your role and field',
+  2: 'After: your evidence and leverage',
+  3: 'After: your manager and history',
+  4: 'Your range',
 };
 
-function renderScoreCard(range, reasonLine, exchangeDone) {
+function renderScoreCard(range, reasonLine, stage) {
   const color = colorFor(range);
   const ceiling = range.ceiling;
   const floor   = range.floor;
-  const stageLabel = CARD_STAGE_LABEL[exchangeDone || 0];
-  const isFinal = exchangeDone === 4;
+  const stageLabel = CARD_STAGE_LABEL[stage || 0];
+  const isFinal = stage === 4;
 
   const cardWrap = el('div', 'coach-msg score-card-msg', '');
-  cardWrap.dataset.exchangeDone = String(exchangeDone || 0);
+  cardWrap.dataset.stage = String(stage || 0);
 
   cardWrap.innerHTML = `
     <div class="bubble card-bubble ${isFinal ? 'final-card' : ''}">
@@ -532,7 +681,7 @@ function renderScoreCard(range, reasonLine, exchangeDone) {
           <span class="prob-verdict ${color}">${VERDICT_BY_COLOR[color]}</span>
         </div>
         <div class="prob-track"><div class="prob-fill ${color}" style="width:0%;"></div></div>
-        <div class="prob-reason">${reasonLine || ''}</div>
+        <div class="prob-reason">${escapeHtml(reasonLine || '')}</div>
       </div>
     </div>
   `;
@@ -554,7 +703,8 @@ function renderInitialCard(range, contextLine) {
 }
 
 /* ── Coach bubble with typing effect ────────────────────── */
-async function typeCoachBubble(text) {
+async function typeCoachBubble(text, opts) {
+  opts = opts || {};
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>
@@ -574,14 +724,28 @@ async function typeCoachBubble(text) {
   }
   if (cursorEl) cursorEl.remove();
   scrollChatToBottom();
+
+  if (!opts.skipLog) logEntry('coach_bubble', { text });
   return wrap;
 }
 
-function appendUserBubble(text) {
+// Non-animated coach bubble — used by rehydrate so refresh is instant.
+function insertCoachBubble(text) {
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(text)}</p></div>`;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  return wrap;
+}
+
+function appendUserBubble(text, opts) {
+  opts = opts || {};
   const wrap = el('div', 'user-msg', '');
   wrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
+  if (!opts.skipLog) logEntry('user_bubble', { text });
+  return wrap;
 }
 
 function escapeHtml(s) {
@@ -670,18 +834,13 @@ function startTypingArcAnimation(row) {
 }
 
 /* ── Chips UI (inline user-side chips) ──────────────────── */
-// Current active user-chips wrap (so we can remove it when answered)
 let currentChipsWrap = null;
 
 function clearChips() {
-  // Removes whatever inline user-chips wrap is currently active
   if (currentChipsWrap) {
     currentChipsWrap.remove();
     currentChipsWrap = null;
   }
-  // Also clear the bottom-panel chips-area (future dashboard chips)
-  const a = $('chips-area');
-  if (a) a.innerHTML = '';
 }
 
 function fadeOutChips() {
@@ -696,15 +855,14 @@ function fadeOutChips() {
  * Renders chips inline on the user side (right-aligned, below the question).
  * Tapping a chip runs onSelect(chip, button). Caller is responsible for
  * clearing / fading via the helpers above.
- * Returns the wrap element.
  */
 function renderUserChips(chips, onSelect) {
   const wrap = el('div', 'user-msg chips-msg', '');
   const inner = el('div', 'user-chips', '');
   chips.forEach(c => {
-    const btn = el('button', 'chip', c.label);
+    const btn = el('button', 'chip' + (c.isFreeText ? ' chip-freetext' : ''), c.label);
     btn.type = 'button';
-    btn.dataset.val = c.value;
+    btn.dataset.val = c.value || c.code || '';
     btn.onclick = () => onSelect(c, btn);
     inner.appendChild(btn);
   });
@@ -715,8 +873,7 @@ function renderUserChips(chips, onSelect) {
   return wrap;
 }
 
-// Legacy alias — old code paths still call renderChips().
-// Redirect to user-side rendering.
+// Legacy alias
 function renderChips(chips, onSelect) {
   return renderUserChips(chips, onSelect);
 }
@@ -762,28 +919,29 @@ function showErrorBubble(message, onRetry) {
 /* ───────────────────────────────────────────────────────── */
 
 async function init() {
-  // Rehydration: if state exists and has made progress, resume from there
   const saved = loadState();
   const profile = loadProfile();
 
-  if (saved && saved.profile && saved.current_exchange > 0) {
+  // Staleness check — if state is older than STALE_AFTER_MS, discard and start fresh
+  if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
+    try { localStorage.removeItem(LS_STATE); } catch (e) {}
+  } else if (saved && saved.profile && saved.current_exchange > 0) {
     Object.assign(state, saved);
     await resumeFromState();
     return;
   }
 
   if (!profile) {
-    // No profile and no state — they shouldn't be here. Send back to landing.
     window.location.replace('/raise/');
     return;
   }
 
   state.profile = profile;
+  state.chat_log = [];
   saveState();
 
-  // Start fresh — thinking animation + analyze call
   const thinkingPromise = runThinkingAnimation();
-  const minDelay = sleep(2800); // ensure thinking plays for a satisfying minimum
+  const minDelay = sleep(2800);
 
   let result;
   try {
@@ -805,65 +963,94 @@ async function init() {
 
   stopThinkingAnimation();
 
-  // Save initial state
   state.initial_floor    = result.floor;
   state.current_range    = { floor: result.floor, ceiling: result.ceiling };
   state.current_exchange = 1;
-  state.chat_log.push({ type: 'card', ...state.current_range, context: result.context_line });
+  logEntry('score_card', { range: { ...state.current_range }, reason_line: result.context_line, stage: 0 });
   saveState();
 
   // Render first card + first coach message
   renderInitialCard(state.current_range, result.context_line);
   await sleep(400);
-  await typeCoachBubble(result.first_coach_message);
+  // First coach message — intentionally rewritten (backend sends an old
+  // 4-question version). We override locally for 3-exchange framing.
+  const firstMsg = firstCoachMessageFor(state.current_range);
+  await typeCoachBubble(firstMsg);
   await sleep(200);
 
-  // Start exchange 1
   beginExchange1();
 }
 
-/* ── Resume from saved state (reload, come-back visit) ──── */
+/** Constructs the first coach message — references 3 questions (was 4). */
+function firstCoachMessageFor(range) {
+  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. Three quick questions will narrow it and show where your real leverage is.`;
+}
+
+/* ── Resume from saved state — replay full transcript ────── */
 async function resumeFromState() {
   stopThinkingAnimation();
 
-  // Re-render card using last known range
   if (!state.current_range) {
-    // corrupted state — reset and redirect
     clearAll();
     window.location.replace('/raise/');
     return;
   }
-  renderInitialCard(state.current_range, '');
 
-  // Walk chat log to restore bubbles
-  // (We persist minimal — just re-ask the current exchange's question.
-  //  A full transcript restore is out of scope for V1.)
-  await sleep(200);
+  // Replay the transcript from chat_log instantly (no animation) so refresh
+  // preserves everything the user saw. Then resume from the current_exchange
+  // cursor for whatever prompt/chip UI needs to reappear.
+  const log = Array.isArray(state.chat_log) ? state.chat_log : [];
+  for (const entry of log) {
+    if (entry.type === 'coach_bubble') {
+      insertCoachBubble(entry.payload.text || '');
+    } else if (entry.type === 'user_bubble') {
+      const wrap = el('div', 'user-msg', '');
+      wrap.innerHTML = `<div class="user-bubble">${escapeHtml(entry.payload.text || '')}</div>`;
+      $('messages').appendChild(wrap);
+    } else if (entry.type === 'score_card') {
+      renderScoreCard(entry.payload.range, entry.payload.reason_line, entry.payload.stage);
+    } else if (entry.type === 'paywall') {
+      // Paywall rendered from state.obstacle + state.current_range
+      renderPaywallBubble();
+    }
+  }
+
+  scrollChatToBottom();
+
+  // Resume interaction based on cursor
   const where = state.current_exchange;
   if (where === 1)      beginExchange1();
   else if (where === 2) beginExchange2();
   else if (where === 3) beginExchange3();
-  else if (where === 4) beginExchange4();
-  else if (where === 5) showPaywall();
-  else                  beginExchange1();
+  else if (where === 4) beginObstacle();
+  else if (where === 5) {
+    // Paywall state — ensure chips + post-paywall input wiring is live
+    renderPlanPreviewChips();
+    enableInput('Ask me anything…');
+    awaitFreeText(handlePostPaywallText);
+  } else {
+    beginExchange1();
+  }
 }
 
 /* ── Exchange 1: Role & industry (free text only) ──────── */
 async function beginExchange1() {
   clearChips();
   disableInput('Thinking…');
-  await typeCoachBubble("What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.");
+  const q = "What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.";
+  await typeCoachBubble(q);
   await sleep(200);
   enableInput('Describe your role…');
   $('chat-input').focus();
   awaitFreeText((text) => handleExchangeAnswer(1, text));
 }
 
-/* ── Exchange 2: Performance (chips + free text) ───────── */
+/* ── Exchange 2: merged performance + leverage ─────────── */
 async function beginExchange2() {
   clearChips();
   disableInput('Thinking…');
-  await typeCoachBubble("How would you describe your performance over the last 12 months?");
+  const q = "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.";
+  await typeCoachBubble(q);
   await sleep(150);
   showExchange2Chips();
   enableInput('Or describe it in your own words…');
@@ -871,10 +1058,12 @@ async function beginExchange2() {
 }
 function showExchange2Chips() {
   const chips = [
-    { value: 'exceeded',     label: 'Exceeded expectations' },
-    { value: 'specific_win', label: 'Had a strong specific win' },
-    { value: 'met',          label: 'Met expectations' },
-    { value: 'mixed',        label: "It's been a mixed year" },
+    { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
+    { value: 'competing_offer',    label: 'I have a competing offer' },
+    { value: 'actively_recruited', label: "I'm being actively recruited" },
+    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
+    { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
+    { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
   ];
   renderChips(chips, (c, btn) => {
     btn.classList.add('selected');
@@ -883,159 +1072,216 @@ function showExchange2Chips() {
   });
 }
 
-/* ── Exchange 3: Market position & leverage ────────────── */
+/* ── Exchange 3: manager relationship + prior_ask ──────── */
 async function beginExchange3() {
   clearChips();
   disableInput('Thinking…');
-  await typeCoachBubble("Do you have a sense of how your salary compares to market rate — and has anyone approached you about other opportunities recently?");
-  await sleep(150);
-  showExchange3Chips();
-  enableInput('Or describe your situation…');
-  awaitFreeText((text) => handleExchangeAnswer(3, text));
-}
-function showExchange3Chips() {
-  const chips = [
-    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
-    { value: 'competing_offer',    label: 'I have a competing offer' },
-    { value: 'actively_recruited', label: "I'm being actively recruited" },
-    { value: 'none',               label: 'No external leverage right now' },
-  ];
-  renderChips(chips, (c, btn) => {
-    btn.classList.add('selected');
-    fadeOutChips();
-    handleExchangeAnswer(3, c.value, c.label);
-  });
-}
-
-/* ── Exchange 4: Manager + timing (DUAL CHIPS) ─────────── */
-async function beginExchange4() {
-  clearChips();
-  disableInput('Thinking…');
-  state.ex4_partial = {};
+  state.ex3_partial = {};
   saveState();
-  await typeCoachBubble("Last one. How's your relationship with whoever decides your salary, and when's your next review or raise cycle?");
+  const q = "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?";
+  await typeCoachBubble(q);
   await sleep(150);
-  renderExchange4Chips();
-  enableInput('Or add any context…');
+  renderExchange3Chips();
+  enableInput("If you've asked before, tell me what happened…");
   awaitFreeText((text) => {
-    // If user types free text, submit both chips + text (chips may be partial)
-    if (state.ex4_partial?.relationship && state.ex4_partial?.timing) {
-      submitExchange4({ ...state.ex4_partial, free_text: text });
+    // Ex3: if a chip was picked, combine with free text. Otherwise free-text-only path.
+    const rel = state.ex3_partial?.relationship;
+    if (rel) {
+      submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
     } else if (text && text.length > 6) {
-      // Free-text only path — let Claude figure it out
-      submitExchange4({ relationship: state.ex4_partial?.relationship || '', timing: state.ex4_partial?.timing || '', free_text: text });
+      // Free-text only — no chip picked
+      submitExchange3({ relationship: '', free_text: text });
     } else {
       // Nudge
       const wrap = el('div', 'coach-msg', '');
-      wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Pick one from each row, or write a sentence or two.</p></div>`;
+      wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Pick a chip above, or write a sentence or two.</p></div>`;
       $('messages').appendChild(wrap);
       scrollChatToBottom();
     }
   });
 }
 
-function renderExchange4Chips() {
-  const wrap = el('div', 'user-msg chips-msg ex4-chips', '');
+function renderExchange3Chips() {
+  const wrap = el('div', 'user-msg chips-msg ex3-chips', '');
 
-  const row1 = el('div', 'chips-group', '');
-  row1.innerHTML = '<div class="chips-sublabel">Relationship</div>';
-  const row1Chips = [
-    { value: 'strong',       label: 'Strong — they advocate' },
+  const rowChips = [
+    { value: 'strong',       label: 'Strong — they advocate for me' },
     { value: 'professional', label: 'Professional but not close' },
     { value: 'complicated',  label: "It's complicated" },
-    { value: 'never_asked',  label: "Haven't asked before" },
+    { value: 'never_asked',  label: "I haven't asked before" },
   ];
-  const row1Inner = el('div', 'user-chips', '');
-  row1Chips.forEach(c => {
+  const inner = el('div', 'user-chips', '');
+  rowChips.forEach(c => {
     const btn = el('button', 'chip', c.label);
     btn.type = 'button';
     btn.dataset.val = c.value;
-    btn.dataset.row = 'relationship';
-    btn.onclick = () => pickEx4Row('relationship', c.value, c.label, btn);
-    row1Inner.appendChild(btn);
+    btn.onclick = () => pickEx3Relationship(c.value, c.label, btn);
+    inner.appendChild(btn);
   });
-  row1.appendChild(row1Inner);
-  wrap.appendChild(row1);
-
-  const row2 = el('div', 'chips-group', '');
-  row2.innerHTML = '<div class="chips-sublabel">Timing of next review</div>';
-  const row2Chips = [
-    { value: 'imminent',     label: 'Within 1 month' },
-    { value: 'soon',         label: '1–3 months' },
-    { value: 'distant',      label: '3–6 months' },
-    { value: 'none',         label: 'No set cycle' },
-    { value: 'just_happened',label: 'Review just happened' },
-  ];
-  const row2Inner = el('div', 'user-chips', '');
-  row2Chips.forEach(c => {
-    const btn = el('button', 'chip', c.label);
-    btn.type = 'button';
-    btn.dataset.val = c.value;
-    btn.dataset.row = 'timing';
-    btn.onclick = () => pickEx4Row('timing', c.value, c.label, btn);
-    row2Inner.appendChild(btn);
-  });
-  row2.appendChild(row2Inner);
-  wrap.appendChild(row2);
+  wrap.appendChild(inner);
 
   $('messages').appendChild(wrap);
   scrollChatToBottom();
   currentChipsWrap = wrap;
 }
 
-function pickEx4Row(row, value, label, btn) {
-  state.ex4_partial = state.ex4_partial || {};
-  state.ex4_partial[row] = value;
-  state.ex4_partial[row + '_label'] = label;
+function pickEx3Relationship(value, label, btn) {
+  state.ex3_partial = state.ex3_partial || {};
+  state.ex3_partial.relationship = value;
+  state.ex3_partial.relationship_label = label;
   saveState();
 
-  // Deselect siblings within this row only (using data-row attribute)
+  // Deselect siblings
   if (currentChipsWrap) {
-    currentChipsWrap.querySelectorAll('.chip[data-row="' + row + '"]').forEach(c => {
+    currentChipsWrap.querySelectorAll('.chip').forEach(c => {
       c.classList.toggle('selected', c === btn);
     });
   }
 
-  // If both rows picked, submit
-  if (state.ex4_partial.relationship && state.ex4_partial.timing) {
-    setTimeout(() => {
-      fadeOutChips();
-      submitExchange4({
-        relationship: state.ex4_partial.relationship,
-        timing:       state.ex4_partial.timing,
-        free_text:    '',
-        displayLabels: {
-          relationship: state.ex4_partial.relationship_label,
-          timing:       state.ex4_partial.timing_label,
-        },
-      });
-    }, 240);
-  }
+  // Submit immediately if no prior_ask follow-up expected — let Claude
+  // infer prior_ask from the chip alone (it defaults to not_mentioned if
+  // not clear). Users who want to elaborate can still type after picking.
+  setTimeout(() => {
+    fadeOutChips();
+    submitExchange3({
+      relationship: value,
+      free_text:    '',
+      displayLabels: { relationship: label },
+    });
+  }, 240);
 }
 
-async function submitExchange4(answer) {
-  // Display the user choice as a bubble
+async function submitExchange3(answer) {
   let displayText = '';
-  if (answer.displayLabels) {
-    displayText = `${answer.displayLabels.relationship || ''} · ${answer.displayLabels.timing || ''}`;
+  if (answer.displayLabels && answer.displayLabels.relationship) {
+    displayText = answer.displayLabels.relationship;
     if (answer.free_text) displayText += ` · ${answer.free_text}`;
   } else if (answer.free_text) {
     displayText = answer.free_text;
   } else {
-    displayText = `${answer.relationship} · ${answer.timing}`;
+    displayText = answer.relationship;
   }
   appendUserBubble(displayText);
 
-  await runExchangeCall(4, {
+  await runExchangeCall(3, {
     relationship: answer.relationship,
-    timing:       answer.timing,
     free_text:    answer.free_text || '',
   });
 }
 
+/* ── Obstacle capture (after Ex3) ───────────────────────── */
+async function beginObstacle() {
+  clearChips();
+  disableInput('Thinking…');
+  state.current_exchange = 4;
+  saveState();
+
+  const q = "Before I map out your plan, what's the one thing you're most worried about?";
+  await typeCoachBubble(q);
+  await sleep(150);
+  renderObstacleChips();
+  enableInput('Or type your own…');
+  awaitFreeText((text) => handleObstacleFreeText(text));
+}
+
+function renderObstacleChips() {
+  renderUserChips(OBSTACLE_CHIPS.map(c => ({
+    code: c.code, label: c.label, isFreeText: !!c.isFreeText,
+  })), (c, btn) => {
+    if (c.isFreeText) {
+      // "Type yours…" — enable input focus. Don't submit yet.
+      $('chat-input').focus();
+      return;
+    }
+    btn.classList.add('selected');
+    fadeOutChips();
+    handleObstacleChip(c.code, c.label);
+  });
+}
+
+async function handleObstacleChip(code, label) {
+  appendUserBubble(label);
+  disableInput('Thinking…');
+  state.obstacle = { code, label };
+  saveState();
+  await runObstacleCall({ obstacle_code: code, label });
+}
+
+async function handleObstacleFreeText(text) {
+  if (!text || text.length < 6) {
+    const wrap = el('div', 'coach-msg', '');
+    wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Tap a chip above, or give me a sentence or two.</p></div>`;
+    $('messages').appendChild(wrap);
+    scrollChatToBottom();
+    return;
+  }
+  appendUserBubble(text);
+  clearChips();
+  disableInput('Thinking…');
+  state.obstacle = { code: null, label: text, free_text: text };
+  saveState();
+  await runObstacleCall({ free_text: text });
+}
+
+async function runObstacleCall(answer) {
+  await sleep(300);
+  showCoachTyping();
+
+  let result;
+  try {
+    const res = await fetch(API_EXCHANGE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exchange:              4,
+        answer,
+        profile:               state.profile,
+        current_range:         state.current_range,
+        initial_floor:         state.initial_floor,
+        accumulated_exchanges: state.accumulated,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    result = await res.json();
+  } catch (err) {
+    hideCoachTyping();
+    showErrorBubble(
+      "Something failed. Let's try that once more.",
+      () => runObstacleCall(answer)
+    );
+    return;
+  }
+
+  hideCoachTyping();
+
+  // Save obstacle with Claude's classification + coach line
+  state.obstacle = {
+    code:       result.obstacle_code      || state.obstacle?.code || 'other',
+    label:      state.obstacle?.label     || '',
+    free_text:  state.obstacle?.free_text || '',
+    user_phrase_echo: result.user_phrase_echo || '',
+    coach_line: result.coach_line || '',
+  };
+  state.current_exchange = 5;
+  saveState();
+
+  // Post the final range card (stage 4) — range unchanged from Ex3
+  renderScoreCard(state.current_range, '', 4);
+  logEntry('score_card', { range: { ...state.current_range }, reason_line: '', stage: 4 });
+  await sleep(500);
+
+  // Coach bridge line from Claude
+  if (result.coach_line) {
+    await typeCoachBubble(result.coach_line);
+    await sleep(400);
+  }
+
+  // Main paywall
+  await showPaywall();
+}
+
 /* ── Common exchange handling (ex1-3) ──────────────────── */
 async function handleExchangeAnswer(exchangeNum, value, displayLabel) {
-  // Display user's choice
   appendUserBubble(displayLabel || value);
   clearChips();
   disableInput('Thinking…');
@@ -1082,25 +1328,27 @@ async function runExchangeCall(exchangeNum, answer) {
     signal:    result.signal,
     extracted: result.extracted,
   };
-  if (exchangeNum === 4) {
-    state.current_exchange = 5;
+  if (exchangeNum === 3) {
+    // After Ex3 → obstacle question
+    state.current_exchange = 4;
   } else {
     state.current_exchange = exchangeNum + 1;
   }
   saveState();
 
-  // Post a fresh score card for this exchange (stacks in the chat history)
+  // Post a fresh score card for this exchange (stages 1, 2, 3)
   renderScoreCard(state.current_range, result.reason_line, exchangeNum);
+  logEntry('score_card', { range: { ...state.current_range }, reason_line: result.reason_line, stage: exchangeNum });
   await sleep(800);
 
-  // Exchange 4 complete → paywall
+  // Exchange 3 complete → obstacle question (no next_question from backend)
   if (result.is_final) {
     await sleep(400);
-    await showPaywall();
+    beginObstacle();
     return;
   }
 
-  // Otherwise, type the next coach question
+  // Otherwise, type the next coach question and route
   if (result.next_question && result.next_question.question) {
     await sleep(200);
     await typeCoachBubble(result.next_question.question);
@@ -1116,58 +1364,103 @@ function routeToExchange(n) {
     showExchange2Chips();
     enableInput('Or describe it in your own words…');
   } else if (n === 3) {
-    showExchange3Chips();
-    enableInput('Or describe your situation…');
-  } else if (n === 4) {
-    renderExchange4Chips();
-    enableInput('Or add any context…');
+    renderExchange3Chips();
+    enableInput("If you've asked before, tell me what happened…");
   }
 }
 
-/* ── Paywall ───────────────────────────────────────────── */
+/* ───────────────────────────────────────────────────────── */
+/* ── PAYWALL (main) — dynamic, coach-voice                ── */
+/* ───────────────────────────────────────────────────────── */
+
 async function showPaywall() {
   clearChips();
-  disableInput('Coaching plan unlocks with $49…');
+  disableInput('Or ask me anything…');
 
-  // Fire enrichment (fire-and-forget)
+  // Fire enrichment (fire-and-forget) so the paid dashboard loads instantly
   fireEnrichment();
 
-  const r = state.current_range;
-  const verdict = VERDICT_BY_COLOR[colorFor(r)];
+  renderPaywallBubble();
+  logEntry('paywall', {});
+
+  // Populate plan-preview chips in the bottom panel
+  renderPlanPreviewChips();
+
+  // Re-enable input so user can keep asking questions after paywall.
+  // Any post-paywall text routes to handlePostPaywallText.
+  enableInput('Ask me anything…');
+  awaitFreeText(handlePostPaywallText);
+}
+
+// Composes and renders the main paywall bubble from current state
+// (profile, range, obstacle). Called on initial paywall show AND on
+// transcript replay from saved state.
+function renderPaywallBubble() {
+  const r   = state.current_range || { floor: 0, ceiling: 0 };
+  const obs = state.obstacle      || { code: 'other' };
+  const role = niceRoleLabel();
+  const verdictColor = colorFor(r);
+  const verdict = VERDICT_BY_COLOR[verdictColor];
+  const proof   = pickProofLine(obs.code);
+
+  // User phrase echo (optional) — shown when they typed free text
+  const echoHtml = (obs.free_text && obs.free_text.length > 3)
+    ? `<div class="echo">"${escapeHtml(obs.free_text)}"</div>` : '';
+
+  // Obstacle-keyed middle paragraph. Uses Claude's coach_line if it was
+  // generated, otherwise falls back to a canonical line per obstacle code.
+  const middle = (obs.coach_line && obs.coach_line.length > 10)
+    ? obs.coach_line
+    : fallbackObstacleLine(obs.code);
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="paywall-bubble">
-      <p><strong>Your range lands at ${r.floor}–${r.ceiling}%.</strong> That's your realistic probability with a well-prepared negotiation.</p>
-      <p>The difference between that and 75%+ almost always comes down to 2–3 specific moves made <em>before</em> the conversation — the exact number to ask for, the opening words, how to handle the pushbacks you're most likely to hear.</p>
-      <p>For <strong>$49 one-time</strong>, you unlock:</p>
-      <ul>
-        <li>Your specific raise amount range with supporting data</li>
-        <li>The 3 blockers holding your number back — and the fix for each</li>
-        <li>Ready-to-send email template + spoken opening script</li>
-        <li>Role-play mode — practise the conversation with me</li>
-        <li>Responses to the 3 pushbacks most likely for your situation</li>
-        <li>30 days of coaching — I remember every conversation</li>
-      </ul>
+      <p><strong>${role ? escapeHtml(role) + ', ' : ''}your range locked at ${r.floor}–${r.ceiling}%.</strong> That's your realistic probability with a well-prepared negotiation.</p>
+      ${echoHtml}
+      <p>${escapeHtml(middle)}</p>
+      <p>The full plan is everything I'd tell you if we were sitting down for an hour: your 3 specific blockers, the exact words to open with, responses to the pushbacks you'll actually hear, the email template, and 30 days of coaching where I remember every conversation.</p>
       <button class="btn-pay" id="btn-pay-cta">
-        Get My Coaching Plan · $49 <span class="btn-pay-arrow">→</span>
+        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row">
-        <span>Stripe</span><span>·</span><span>Secure</span><span>·</span><span>One-time</span><span>·</span><span>No subscription</span>
+        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
       </div>
+      <div class="proof-line">${escapeHtml(proof)}</div>
     </div>
   `;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
 
-  $('btn-pay-cta').onclick = startCheckout;
+  const btn = $('btn-pay-cta');
+  if (btn) btn.onclick = startCheckout;
+}
+
+// Fallback middle line per obstacle code — used if Claude didn't provide one
+function fallbackObstacleLine(code) {
+  const map = {
+    budget:         "The 'no budget' line is the single most common deflection, and it almost always means 'I need ammunition to take upstairs', not 'no'. We can fix that.",
+    justify:        "Justifying the number is the easiest part once you see the framing. Most people over-complicate it. There are three moves that do the work for you.",
+    timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled.",
+    prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable.",
+    unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation that gets you to a defensible ask.",
+    other:          "That's a real concern, and the plan has a specific answer for it.",
+  };
+  return map[code] || map.other;
+}
+
+// Extracts a short role label like "Senior FP&A Manager" if available
+function niceRoleLabel() {
+  const ex1 = state.accumulated?.ex1?.extracted || {};
+  const title = (ex1.job_title_normalised || '').trim();
+  return title || '';
 }
 
 function fireEnrichment() {
-  // Non-blocking — backend runs Claude generation, stores under profile_hash
   const body = {
     profile:      state.profile,
     exchanges:    state.accumulated,
+    obstacle:     state.obstacle,
     final_range:  state.current_range,
     profile_hash: profileHash(),
   };
@@ -1195,6 +1488,7 @@ async function startCheckout() {
         profile_hash: profileHash(),
         profile:      state.profile,
         final_range:  state.current_range,
+        obstacle:     state.obstacle,
         refSource,
       }),
     });
@@ -1205,13 +1499,137 @@ async function startCheckout() {
   } catch (err) {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = 'Get My Coaching Plan · $49 <span class="btn-pay-arrow">→</span>';
+      btn.innerHTML = `Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>`;
     }
     showErrorBubble(
       "Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.",
       null
     );
   }
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Plan-preview chips (bottom panel, after paywall)     ── */
+/* ───────────────────────────────────────────────────────── */
+
+function renderPlanPreviewChips() {
+  const area = $('chips-area');
+  if (!area) return;
+  area.innerHTML = '';
+  PLAN_PREVIEW_CHIPS.forEach(c => {
+    const chip = el('button', 'plan-chip', '');
+    chip.type = 'button';
+    chip.innerHTML = `${escapeHtml(c.label)} <span class="lock">🔒</span>`;
+    chip.onclick = () => onSectionChipTap(c.section, c.label);
+    area.appendChild(chip);
+  });
+}
+
+async function onSectionChipTap(section, label) {
+  // Echo the chip label as a user bubble
+  appendUserBubble(label);
+
+  // Brief coach typing, then the section-tease paywall bubble
+  await sleep(250);
+  showCoachTyping();
+  await sleep(900);
+  hideCoachTyping();
+
+  renderSectionTeaseBubble(section);
+}
+
+function renderSectionTeaseBubble(section) {
+  const tease = SECTION_TEASES[section] || SECTION_TEASES.blockers;
+  const obs = state.obstacle || { code: 'other' };
+  const hook = OBSTACLE_HOOKS[obs.code] || '';
+  const leadWithHook = tease.lead.replace('{obstacle_hook}', hook).replace(/\s{2,}/g, ' ').trim();
+  const proof = pickProofLine(obs.code);
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="paywall-bubble">
+      <p>${escapeHtml(leadWithHook)}</p>
+      <button class="btn-pay" data-tease-cta>
+        ${escapeHtml(tease.cta)} · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      <div class="trust-row">
+        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
+      </div>
+      <div class="proof-line">${escapeHtml(proof)}</div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  const btn = wrap.querySelector('[data-tease-cta]');
+  if (btn) btn.onclick = startCheckout;
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Post-paywall text: useful answer + dynamic CTA tail  ── */
+/* ───────────────────────────────────────────────────────── */
+
+// After paywall appears, user free-text still engages the coach. We call a
+// pre-paid coach endpoint (uses raise-coach.js's free-mode branch — added in
+// Round 2). For now, we render a coach-voice reply that acknowledges the
+// question and ends with a dynamic CTA tail referencing their obstacle.
+// This keeps the feel right even before Round 2 wires the backend fully.
+async function handlePostPaywallText(text) {
+  appendUserBubble(text);
+  disableInput('Thinking…');
+
+  await sleep(300);
+  showCoachTyping();
+  await sleep(1400);
+  hideCoachTyping();
+
+  // Simple local response template — Round 2 replaces this with a real
+  // API call to /api/raise-coach with a free-mode flag. For now, give a
+  // useful-feeling reply that ends with an obstacle-aware CTA.
+  const obs = state.obstacle || { code: 'other' };
+  const reply = composeLocalPostPaywallReply(text, obs);
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble">
+      <p>${escapeHtml(reply.answer)}</p>
+      <p style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);"><strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.</p>
+      <button class="btn-pay" style="margin-top:10px;" data-tail-cta>
+        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  logEntry('coach_bubble', { text: reply.answer });
+
+  const btn = wrap.querySelector('[data-tail-cta]');
+  if (btn) btn.onclick = startCheckout;
+
+  enableInput('Ask me anything…');
+  awaitFreeText(handlePostPaywallText);
+}
+
+// Local composer — a stopgap until Round 2 wires raise-coach.js for free mode.
+// Deliberately generic-but-on-topic so it doesn't feel templated.
+function composeLocalPostPaywallReply(userText, obs) {
+  const lower = (userText || '').toLowerCase();
+  let answer;
+  if (/budget|money|afford|can.?t pay/.test(lower)) {
+    answer = "Budget pushback is almost always a script their manager handed them, not the real answer. The move is to separate 'can we' from 'will we', because those usually have different people behind them.";
+  } else if (/manager|boss|relation/.test(lower)) {
+    answer = "Manager dynamics matter most in the setup, not the conversation itself. How you ask for the meeting tells you 80% of what the outcome will be.";
+  } else if (/time|timing|when|review/.test(lower)) {
+    answer = "Timing isn't as fixed as it feels. There are at least five windows in a normal year where this conversation lands well, and review cycle is just one of them.";
+  } else if (/number|amount|how much|percent|percentage/.test(lower)) {
+    answer = "The number is the easiest part once you have the framing. There's a specific formula that works for your situation — market data, your last raise, and the structural factors we just talked about.";
+  } else if (/nervous|scared|afraid|anxious|worried/.test(lower)) {
+    answer = "Nerves are normal and don't actually hurt you if you prep. The thing that hurts is walking in without having rehearsed the first 30 seconds. That part is teachable.";
+  } else {
+    answer = "Good question. The real answer depends on the specifics of your situation — your role, your manager, and the obstacle you flagged.";
+  }
+  return { answer };
 }
 
 /* ── Free-text input wiring ────────────────────────────── */
@@ -1221,16 +1639,16 @@ function awaitFreeText(onSubmit) {
   pendingSubmitHandler = onSubmit;
 }
 
-// Minimum substance thresholds for free-text answers.
+// Minimum substance thresholds for free-text answers during exchanges.
 // Chip selections always bypass this (they're pre-validated options).
 const MIN_TEXT_CHARS = 8;
 const MIN_TEXT_WORDS = 2;
 
 const TEXT_NUDGES = {
   1: "I need a bit more to work with — your job title and the kind of company you're at. Even a short phrase works, like 'Senior PM at a SaaS startup'.",
-  2: "Tap one of the chips above, or tell me a sentence or two about your recent performance.",
-  3: "Tap one of the chips above, or share a bit about how your pay compares to market, or any external offers or recruiter interest.",
-  4: "Pick one from each row above, or write a sentence or two about your relationship with whoever decides your salary and when your next review is.",
+  2: "Tap one of the chips above, or tell me a sentence or two about your strongest evidence — a win, an offer, or a sense you're underpaid.",
+  3: "Pick one above, or tell me a sentence about your relationship with whoever decides your salary and any prior raise ask.",
+  4: "Tap a chip above, or write one sentence about what's worrying you most.",
 };
 
 function handleSend() {
@@ -1239,19 +1657,17 @@ function handleSend() {
   if (!val) return;
   if (!pendingSubmitHandler) return;
 
-  // Ex4 with both chips already selected: any free-text is fine (optional context).
-  // Otherwise, require enough substance to be worth a coach cycle.
-  const ex4BothChipsPicked = (state.current_exchange === 4) &&
-    !!(state.ex4_partial?.relationship && state.ex4_partial?.timing);
+  // Post-paywall and obstacle free-text paths handle their own validation.
+  // Ex1-3 use the substance nudge.
+  const exNum = state.current_exchange;
+  const needsNudge = (exNum >= 1 && exNum <= 3);
 
-  if (!ex4BothChipsPicked) {
+  if (needsNudge) {
     const words = val.split(/\s+/).filter(Boolean).length;
     if (val.length < MIN_TEXT_CHARS || words < MIN_TEXT_WORDS) {
-      // Echo what they tried, show a specific nudge, keep input cleared.
-      // pendingSubmitHandler stays set so the next valid submit routes correctly.
       appendUserBubble(val);
       input.value = '';
-      const msg = TEXT_NUDGES[state.current_exchange] || "Can you give me a bit more detail?";
+      const msg = TEXT_NUDGES[exNum] || "Can you give me a bit more detail?";
       typeCoachBubble(msg);
       return;
     }
