@@ -105,31 +105,47 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .prob-reason strong{color:#fff;}
 .prob-card.no-reason .prob-reason{display:none;}
 
-/* ── Reason callout (rendered as a separate bubble between card and
-   next coach message). Color-coded by signal direction. */
-.reason-callout{
-  animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);
-  padding:14px 0 10px 0;
+/* ── In-card reason — divider + color-accented left border, inside the dark
+   probability card. Colors reflect the signal direction for that exchange. */
+.prob-reason-block{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px dashed rgba(255,255,255,0.14);
 }
-.reason-callout .callout-body{
-  background:var(--card);
-  border-left:3px solid var(--t3);
-  border-radius:0 10px 10px 10px;
-  padding:12px 14px;
-  font-size:13px;line-height:1.6;color:var(--t1);
-  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+.prob-reason-inner{
   display:flex;gap:10px;align-items:flex-start;
+  padding:10px 12px;
+  border-radius:8px;
+  border-left:3px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.03);
 }
-.reason-callout .callout-dot{
-  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;
-  background:var(--t3);
+.prob-reason-dot{
+  width:7px;height:7px;border-radius:50%;
+  margin-top:6px;flex-shrink:0;
+  background:rgba(255,255,255,0.45);
 }
-.reason-callout.pos  .callout-body{ border-left-color:var(--teal); }
-.reason-callout.pos  .callout-dot { background:var(--teal); }
-.reason-callout.neg  .callout-body{ border-left-color:var(--red); }
-.reason-callout.neg  .callout-dot { background:var(--red); }
-.reason-callout.neu  .callout-body{ border-left-color:var(--gold); }
-.reason-callout.neu  .callout-dot { background:var(--gold); }
+.prob-reason-text{
+  font-size:13px;line-height:1.55;
+  color:rgba(255,255,255,0.85);
+}
+/* Positive signal — teal accent */
+.prob-reason-inner.pos{
+  border-left-color:var(--teal);
+  background:rgba(0,196,160,0.07);
+}
+.prob-reason-inner.pos .prob-reason-dot{background:var(--teal);}
+/* Negative signal — red accent */
+.prob-reason-inner.neg{
+  border-left-color:var(--red);
+  background:rgba(224,85,85,0.07);
+}
+.prob-reason-inner.neg .prob-reason-dot{background:var(--red);}
+/* Neutral — gold accent */
+.prob-reason-inner.neu{
+  border-left-color:var(--gold);
+  background:rgba(201,168,76,0.06);
+}
+.prob-reason-inner.neu .prob-reason-dot{background:var(--gold);}
 
 /* ── User message ──────────────────────────────────────── */
 .user-msg{display:flex;justify-content:flex-end;padding:14px 0 14px 42px;animation:msgIn 0.3s ease;}
@@ -190,28 +206,53 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .bottom-panel.dimmed{opacity:0.35;pointer-events:none;}
 
 /* Bottom chips-area — populated after final range with plan-preview chips.
-   Each chip opens a section-tease paywall. */
+   Each chip opens a section-tease paywall. Matches FA chat pattern:
+   single row, horizontal scroll, right-edge fade as scroll affordance. */
 .chips-area{
-  padding:10px 14px 4px;
-  display:flex;flex-wrap:wrap;gap:6px;
-  max-height:160px;overflow-y:auto;
+  position:relative;
+  overflow:hidden;
+  padding:10px 0 4px;
 }
-.chips-area:empty{padding:0;height:0;overflow:hidden;}
-.chips-area::-webkit-scrollbar{display:none;}
+.chips-area:empty{padding:0;height:0;}
+/* Right-edge fade gradient — signals scrollability */
+.chips-area::after{
+  content:'';
+  position:absolute;top:0;right:0;
+  width:44px;height:100%;
+  background:linear-gradient(to right, rgba(244,245,248,0), rgba(244,245,248,1));
+  pointer-events:none;
+}
+.chips-area-scroll{
+  display:flex;
+  gap:7px;
+  overflow-x:auto;
+  padding:0 14px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.chips-area-scroll::-webkit-scrollbar{display:none;}
 
 .plan-chip{
-  background:var(--card);color:var(--t2);
-  border:1.5px solid var(--divider);
+  background:rgba(30,61,114,0.06);
+  border:1.5px solid rgba(30,61,114,0.18);
+  color:var(--navy);
   border-radius:20px;
-  padding:8px 14px;font-size:12.5px;font-weight:500;
+  padding:7px 14px;font-size:12px;font-weight:600;
   cursor:pointer;font-family:var(--sans);
-  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s;
+  white-space:nowrap;
+  flex-shrink:0;
   line-height:1.3;
   display:inline-flex;align-items:center;gap:6px;
+  transition:opacity 0.15s;
 }
-.plan-chip:hover{border-color:var(--gold);color:var(--t1);}
-.plan-chip:active{transform:scale(0.97);}
+.plan-chip:active{opacity:0.7;}
 .plan-chip .lock{font-size:10px;color:var(--gold);}
+/* Flagship variant — the role-play chip gets the gold treatment */
+.plan-chip.plan-chip-gold{
+  background:rgba(201,168,76,0.06);
+  border-color:rgba(201,168,76,0.35);
+  color:#a07c2a;
+}
 
 /* ── Inline user-side chips (answer chips below each coach question) ── */
 .chips-msg{
@@ -381,7 +422,9 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
     <!-- Plan-preview chips area. Empty during ranging flow; populated with
          7 plan-section chips after the obstacle answer (final range card +
          main paywall render). Tapping a chip opens a section-tease paywall. -->
-    <div class="chips-area" id="chips-area"></div>
+    <div class="chips-area" id="chips-area">
+      <div class="chips-area-scroll" id="chips-area-scroll"></div>
+    </div>
     <div class="input-bar">
       <div class="input-row">
         <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
@@ -475,15 +518,15 @@ const OBSTACLE_CHIPS = [
 
 // Plan-preview chips — rendered in bottom panel after obstacle + paywall.
 // Each maps to a plan page section. Tapping opens a section-tease paywall.
-// Section IDs match the plan page (01-07) for future consistency.
+// Role-play leads as the flagship (gold), matching FA's gold-chip treatment.
 const PLAN_PREVIEW_CHIPS = [
+  { section: 'roleplay', label: "Let's role-play the conversation", gold: true },
   { section: 'blockers', label: 'Show me the 3 blockers on my number' },
   { section: 'script',   label: 'Give me the exact words to open with' },
   { section: 'pushback', label: "Handle the pushbacks I'll hear" },
   { section: 'timing',   label: "When's my best moment to ask?" },
   { section: 'email',    label: 'Draft the email for me' },
   { section: 'prep',     label: 'Give me the 30-day prep plan' },
-  { section: 'roleplay', label: "Let's role-play the conversation" },
 ];
 
 // Section-tease content — each chip triggers a coach-voice paywall bubble
@@ -720,7 +763,7 @@ const CARD_STAGE_LABEL = {
   3: 'Your range',
 };
 
-function renderScoreCard(range, reasonLine, stage) {
+function renderScoreCard(range, reasonLine, stage, signal) {
   const color = colorFor(range);
   const ceiling = range.ceiling;
   const floor   = range.floor;
@@ -730,17 +773,30 @@ function renderScoreCard(range, reasonLine, stage) {
   const cardWrap = el('div', 'coach-msg score-card-msg', '');
   cardWrap.dataset.stage = String(stage || 0);
 
-  // Reason line now rendered as a separate callout below the card, not inline.
-  // We keep the DOM slot for backward-compat but suppress it via .no-reason.
+  // Signal → color class for the in-card reason block
+  let reasonCls = 'neu';
+  if (signal === 'strong_positive' || signal === 'positive') reasonCls = 'pos';
+  else if (signal === 'negative' || signal === 'strong_negative') reasonCls = 'neg';
+
+  const reasonBlock = reasonLine ? `
+    <div class="prob-reason-block">
+      <div class="prob-reason-inner ${reasonCls}">
+        <div class="prob-reason-dot"></div>
+        <div class="prob-reason-text">${escapeHtml(reasonLine)}</div>
+      </div>
+    </div>
+  ` : '';
+
   cardWrap.innerHTML = `
     <div class="bubble card-bubble ${isFinal ? 'final-card' : ''}">
-      <div class="prob-card no-reason">
+      <div class="prob-card">
         <div class="prob-stage">${stageLabel}</div>
         <div class="prob-range-row">
           <span class="prob-range ${color}">${floor}–${ceiling}%</span>
           <span class="prob-verdict ${color}">${VERDICT_BY_COLOR[color]}</span>
         </div>
         <div class="prob-track"><div class="prob-fill ${color}" style="width:0%;"></div></div>
+        ${reasonBlock}
       </div>
     </div>
   `;
@@ -754,29 +810,6 @@ function renderScoreCard(range, reasonLine, stage) {
 
   scrollChatToBottom();
   return cardWrap;
-}
-
-/** Reason callout — rendered as a separate bubble after a score card.
-    Color-coded by signal direction. Makes the "why your range moved" story
-    visible and rewarding. */
-function renderReasonCallout(reasonLine, signal) {
-  if (!reasonLine) return null;
-  // Map signal → callout color class
-  let cls = 'neu';
-  if (signal === 'strong_positive' || signal === 'positive') cls = 'pos';
-  else if (signal === 'negative' || signal === 'strong_negative') cls = 'neg';
-  // neutral / unknown → gold
-
-  const wrap = el('div', 'reason-callout ' + cls, '');
-  wrap.innerHTML = `
-    <div class="callout-body">
-      <div class="callout-dot"></div>
-      <div class="callout-text">${escapeHtml(reasonLine)}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  return wrap;
 }
 
 // Legacy alias — code that still calls renderInitialCard will work.
@@ -1090,9 +1123,15 @@ async function resumeFromState() {
       wrap.innerHTML = `<div class="user-bubble">${escapeHtml(entry.payload.text || '')}</div>`;
       $('messages').appendChild(wrap);
     } else if (entry.type === 'score_card') {
-      renderScoreCard(entry.payload.range, entry.payload.reason_line, entry.payload.stage);
+      renderScoreCard(
+        entry.payload.range,
+        entry.payload.reason_line,
+        entry.payload.stage,
+        entry.payload.signal
+      );
     } else if (entry.type === 'reason_callout') {
-      renderReasonCallout(entry.payload.text, entry.payload.signal);
+      // Legacy entry type (pre-v3) — reason is now inside the score card.
+      // Ignore silently during replay; the card above will already show it.
     } else if (entry.type === 'paywall') {
       // Paywall rendered from state.obstacle + state.current_range
       renderPaywallBubble();
@@ -1122,6 +1161,7 @@ async function beginExchange1() {
   clearChips();
   disableInput('Thinking…');
   const q = "What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.";
+  currentQuestion[1] = q;
   await typeCoachBubble(q);
   await sleep(200);
   enableInput('Describe your role…');
@@ -1134,6 +1174,7 @@ async function beginExchange2() {
   clearChips();
   disableInput('Thinking…');
   const q = "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.";
+  currentQuestion[2] = q;
   await typeCoachBubble(q);
   await sleep(150);
   showExchange2Chips();
@@ -1163,6 +1204,7 @@ async function beginExchange3() {
   state.ex3_partial = {};
   saveState();
   const q = "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?";
+  currentQuestion[3] = q;
   await typeCoachBubble(q);
   await sleep(150);
   renderExchange3Chips();
@@ -1176,11 +1218,8 @@ async function beginExchange3() {
       // Free-text only — no chip picked
       submitExchange3({ relationship: '', free_text: text });
     } else {
-      // Nudge
-      const wrap = el('div', 'coach-msg', '');
-      wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Pick a chip above, or write a sentence or two.</p></div>`;
-      $('messages').appendChild(wrap);
-      scrollChatToBottom();
+      // Under-substantive free text without a chip — use dynamic nudge
+      runDynamicNudge(3, text || '(empty)');
     }
   });
 }
@@ -1261,6 +1300,7 @@ async function beginObstacle() {
   saveState();
 
   const q = "Before I map out your plan, what's the one thing you're most worried about?";
+  currentQuestion[4] = q;
   await typeCoachBubble(q);
   await sleep(150);
   renderObstacleChips();
@@ -1437,17 +1477,15 @@ async function runExchangeCall(exchangeNum, answer) {
 
   // Post a fresh score card for this exchange (stages 1, 2, 3).
   // Stage-3 card is gold-bordered and labelled "Your range" — the final.
-  renderScoreCard(state.current_range, result.reason_line, exchangeNum);
-  logEntry('score_card', { range: { ...state.current_range }, reason_line: result.reason_line, stage: exchangeNum });
-  await sleep(400);
-
-  // Render the reason callout as a separate, color-coded bubble — more
-  // visible than the old inline muted text. Signal drives the color.
-  if (result.reason_line) {
-    renderReasonCallout(result.reason_line, result.signal);
-    logEntry('reason_callout', { text: result.reason_line, signal: result.signal || 'neutral' });
-    await sleep(500);
-  }
+  // Reason block renders inside the card, color-coded by signal.
+  renderScoreCard(state.current_range, result.reason_line, exchangeNum, result.signal);
+  logEntry('score_card', {
+    range: { ...state.current_range },
+    reason_line: result.reason_line,
+    stage: exchangeNum,
+    signal: result.signal,
+  });
+  await sleep(800);
 
   // Exchange 3 complete → obstacle question (no next_question from backend)
   if (result.is_final) {
@@ -1621,16 +1659,18 @@ async function startCheckout() {
 /* ───────────────────────────────────────────────────────── */
 
 function renderPlanPreviewChips() {
-  const area = $('chips-area');
-  if (!area) return;
-  area.innerHTML = '';
+  const scroll = $('chips-area-scroll');
+  if (!scroll) return;
+  scroll.innerHTML = '';
   PLAN_PREVIEW_CHIPS.forEach(c => {
-    const chip = el('button', 'plan-chip', '');
+    const chip = el('button', 'plan-chip' + (c.gold ? ' plan-chip-gold' : ''), '');
     chip.type = 'button';
     chip.innerHTML = `${escapeHtml(c.label)} <span class="lock">🔒</span>`;
     chip.onclick = () => onSectionChipTap(c.section, c.label);
-    area.appendChild(chip);
+    scroll.appendChild(chip);
   });
+  // Reset scroll position to the start so gold flagship chip is visible first
+  scroll.scrollLeft = 0;
 }
 
 async function onSectionChipTap(section, label) {
@@ -1813,12 +1853,46 @@ function awaitFreeText(onSubmit) {
 const MIN_TEXT_CHARS = 8;
 const MIN_TEXT_WORDS = 2;
 
-const TEXT_NUDGES = {
-  1: "I need a bit more to work with — your job title and the kind of company you're at. Even a short phrase works, like 'Senior PM at a SaaS startup'.",
-  2: "Tap one of the chips above, or tell me a sentence or two about your strongest evidence — a win, an offer, or a sense you're underpaid.",
-  3: "Pick one above, or tell me a sentence about your relationship with whoever decides your salary and any prior raise ask.",
-  4: "Tap a chip above, or write one sentence about what's worrying you most.",
+// Static fallback nudges — only used if /api/raise-nudge fails.
+// First line per exchange; the dynamic endpoint owns the real experience.
+const TEXT_NUDGE_FALLBACKS = {
+  1: "I need a bit more to work with. Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
+  2: "Tap a chip above or give me one sentence on your strongest evidence — a win, an offer, or a sense you're underpaid.",
+  3: "Pick a chip or write one line about your manager relationship and any prior raise ask.",
+  4: "Tap a chip above, or type one line about what's worrying you most.",
 };
+
+// Tracks how many nudges have fired per exchange in the current session.
+// Drives the progressive-tone logic in /api/raise-nudge.
+const nudgeAttempts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+
+// Currently-displayed coach question per exchange — passed to the nudge
+// endpoint so it can reference what was actually asked.
+const currentQuestion = { 1: '', 2: '', 3: '', 4: '' };
+
+// Fetch a dynamic nudge from the server. Falls back to a static line if
+// the call fails so the UX never stalls.
+async function fetchNudge(exchange, userAnswer) {
+  const attempts = nudgeAttempts[exchange] || 0;
+  try {
+    const res = await fetch('/api/raise-nudge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exchange,
+        question:       currentQuestion[exchange] || '',
+        user_answer:    userAnswer,
+        prior_attempts: attempts,
+        session_id:     profileHash(),
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.nudge) return data.nudge;
+    }
+  } catch (e) { /* fall through */ }
+  return TEXT_NUDGE_FALLBACKS[exchange] || "Can you give me a bit more to work with?";
+}
 
 function handleSend() {
   const input = $('chat-input');
@@ -1827,7 +1901,8 @@ function handleSend() {
   if (!pendingSubmitHandler) return;
 
   // Post-paywall and obstacle free-text paths handle their own validation.
-  // Ex1-3 use the substance nudge.
+  // Ex1-3 use the substance nudge. Ex4 (obstacle) has its own check in
+  // handleObstacleFreeText.
   const exNum = state.current_exchange;
   const needsNudge = (exNum >= 1 && exNum <= 3);
 
@@ -1836,8 +1911,8 @@ function handleSend() {
     if (val.length < MIN_TEXT_CHARS || words < MIN_TEXT_WORDS) {
       appendUserBubble(val);
       input.value = '';
-      const msg = TEXT_NUDGES[exNum] || "Can you give me a bit more detail?";
-      typeCoachBubble(msg);
+      // Trigger dynamic nudge — show typing state, fetch, then type it in.
+      runDynamicNudge(exNum, val);
       return;
     }
   }
@@ -1846,6 +1921,24 @@ function handleSend() {
   const h = pendingSubmitHandler;
   pendingSubmitHandler = null;
   h(val);
+}
+
+async function runDynamicNudge(exchange, userAnswer) {
+  disableInput('Thinking…');
+  showCoachTyping();
+  const text = await fetchNudge(exchange, userAnswer);
+  hideCoachTyping();
+  nudgeAttempts[exchange] = (nudgeAttempts[exchange] || 0) + 1;
+  await typeCoachBubble(text);
+  enableInput(placeholderForExchange(exchange));
+  $('chat-input').focus();
+}
+
+function placeholderForExchange(n) {
+  if (n === 1) return 'Describe your role…';
+  if (n === 2) return 'Or describe it in your own words…';
+  if (n === 3) return "If you've asked before, tell me what happened…";
+  return 'Type your answer…';
 }
 
 $('send-btn').addEventListener('click', handleSend);
