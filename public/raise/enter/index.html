@@ -56,8 +56,10 @@ h1{
 .sub{font-size:13.5px;color:var(--t2);line-height:1.6;margin-bottom:20px;}
 
 .input-label{
+  display:block;
   font-size:11px;font-weight:700;letter-spacing:0.06em;
   color:var(--t3);text-transform:uppercase;margin-bottom:6px;
+  cursor:text;
 }
 .input-field{
   width:100%;border:1.5px solid var(--divider);border-radius:8px;
@@ -66,6 +68,7 @@ h1{
   transition:border-color 0.15s;margin-bottom:6px;
 }
 .input-field:focus{border-color:var(--navy);}
+.input-field.is-error{border-color:var(--red);}
 
 .btn-submit{
   width:100%;background:var(--gold);color:#07090f;
@@ -133,12 +136,19 @@ h1{
     <p class="sub">Enter your email and we'll send you a fresh sign-in link. If your 30-day coaching window is still active, you'll be back in your session in under a minute.</p>
 
     <form id="email-form" autocomplete="on" novalidate>
-      <div class="input-label">EMAIL</div>
+      <label class="input-label" for="email-input">EMAIL</label>
       <input
         class="input-field" id="email-input"
         type="email" inputmode="email" autocomplete="email"
-        placeholder="you@example.com" required/>
-      <div class="err" id="err-email">Please enter a valid email address.</div>
+        placeholder="you@example.com" required
+        aria-describedby="err-email"/>
+      <!-- Honeypot — hidden from sighted users, filled only by bots.
+           If this field has a value on submit, we silently drop the request. -->
+      <input
+        type="text" id="website-field" name="website" tabindex="-1"
+        autocomplete="off" aria-hidden="true"
+        style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;"/>
+      <div class="err" id="err-email" role="alert" aria-live="polite">Please enter a valid email address.</div>
       <button class="btn-submit" type="submit" id="btn-submit">Send me a sign-in link</button>
     </form>
 
@@ -175,32 +185,125 @@ h1{
 
 <script>
 const API_MAGIC = '/api/raise-magic-link';
+const COOLDOWN_SECONDS = 60;    // resend lockout — client-side only; server
+                                // should also enforce something similar.
 
 const $ = id => document.getElementById(id);
 
+// Common email typos that usually mean the user misspelled the domain.
+// Catching these up-front prevents magic links going to nonexistent mailboxes.
+const EMAIL_TYPOS = [
+  'gamil.com','gmial.com','gmaill.com','gmai.com','gmil.com','gnail.com',
+  'yahooo.com','yahoo.co','yaho.com',
+  'hotmial.com','hotmil.com','hotmai.com','hotnail.com',
+  'outlok.com','outloo.com',
+  '.con','.cmo','.ocm','.vom','.comm','.cm',
+];
+
+// Disposable email domains — users can't retrieve their 30-day access
+// from these. Blocking keeps paying users from locking themselves out.
+const DISPOSABLE_DOMAINS = [
+  'mailinator.com','guerrillamail.com','10minutemail.com','tempmail.com',
+  'throwam.com','yopmail.com','trashmail.com','sharklasers.com',
+  'getnada.com','maildrop.cc','temp-mail.org','fakeinbox.com',
+];
+
+// Stricter than includes('@') check. Catches typos like "foo@bar" (no TLD),
+// "foo@.com" (empty domain), "foo@bar.c" (single-char TLD), whitespace-
+// embedded emails. Not RFC-strict (impossible in regex) but covers ~99%
+// of real typos users make.
 function looksLikeEmail(v) {
   v = (v || '').trim().toLowerCase();
-  if (v.length < 5) return false;
-  const at = v.indexOf('@');
-  if (at < 1) return false;
-  const domain = v.slice(at + 1);
-  if (!domain.includes('.')) return false;
-  if (domain.endsWith('.')) return false;
-  return true;
+  if (v.length < 5 || v.length > 254) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
 }
 
-$('email-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const input = $('email-input');
-  const email = (input.value || '').trim();
-  if (!looksLikeEmail(email)) {
-    $('err-email').classList.add('show');
-    input.focus();
+// Returns null if OK, or an error message string if the email has a
+// known typo / disposable domain. Keeps the messaging specific so users
+// can fix their own mistakes without hitting "invalid email" generically.
+function extraEmailChecks(email) {
+  const lower = email.toLowerCase();
+  for (const typo of EMAIL_TYPOS) {
+    if (lower.includes(typo)) {
+      return "Check your email spelling — looks like a typo in the domain.";
+    }
+  }
+  const domain = lower.split('@')[1] || '';
+  if (DISPOSABLE_DOMAINS.indexOf(domain) > -1) {
+    return "Please use a real email address so we can send your 30-day access link.";
+  }
+  return null;
+}
+
+// ── Cooldown state ───────────────────────────────────────
+// After a submit, lock the button for COOLDOWN_SECONDS. Prevents accidental
+// double-submits and raises the bar for client-side spam. The server should
+// still rate-limit independently — this is UX, not security.
+let cooldownTimer = null;
+let cooldownRemaining = 0;
+const btn = $('btn-submit');
+const btnOriginalText = 'Send me a sign-in link';
+
+function startCooldown() {
+  cooldownRemaining = COOLDOWN_SECONDS;
+  btn.disabled = true;
+  tickCooldown();
+  cooldownTimer = setInterval(tickCooldown, 1000);
+}
+
+function tickCooldown() {
+  if (cooldownRemaining <= 0) {
+    clearInterval(cooldownTimer);
+    cooldownTimer = null;
+    btn.disabled = false;
+    btn.textContent = btnOriginalText;
     return;
   }
-  $('err-email').classList.remove('show');
+  btn.textContent = `Please wait ${cooldownRemaining}s before requesting again`;
+  cooldownRemaining -= 1;
+}
 
-  const btn = $('btn-submit');
+// Show a specific error message on the error element
+function showError(msg) {
+  const errEl = $('err-email');
+  errEl.textContent = msg;
+  errEl.classList.add('show');
+  $('email-input').classList.add('is-error');
+  $('email-input').focus();
+}
+
+// ── Form submit ──────────────────────────────────────────
+$('email-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  // Honeypot check — if the hidden field was filled, a bot did it.
+  // Silently show success (don't reveal we caught them, don't hit API).
+  if ($('website-field').value) {
+    $('form-card').hidden = true;
+    $('success-card').hidden = false;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    return;
+  }
+
+  const input = $('email-input');
+  const email = (input.value || '').trim();
+
+  // Step 1: format check
+  if (!looksLikeEmail(email)) {
+    showError("Please enter a valid email address.");
+    return;
+  }
+
+  // Step 2: typo + disposable check
+  const extra = extraEmailChecks(email);
+  if (extra) {
+    showError(extra);
+    return;
+  }
+
+  $('err-email').classList.remove('show');
+  input.classList.remove('is-error');
+
   btn.disabled = true;
   btn.innerHTML = '<span class="mini-spin"></span>&nbsp; Sending…';
 
@@ -211,30 +314,37 @@ $('email-form').addEventListener('submit', async (e) => {
       body: JSON.stringify({ email }),
     });
   } catch (err) {
-    // Network error — but we still show success (security: never reveal registration status)
+    // Network error — intentionally proceed to success state. We don't
+    // leak whether the email exists, and offline users will retry anyway.
   }
 
-  // Always show success — API pattern is to return 200 regardless
+  // Always show success — API pattern is to return 200 regardless.
+  // We don't distinguish "found/expired/not found" like FA does because
+  // that leaks registration status (email enumeration attack). Users with
+  // no account see success too; they just never get an email.
   $('form-card').hidden = true;
   $('success-card').hidden = false;
   window.scrollTo({ top: 0, behavior: 'instant' });
+
+  // Arm cooldown so if the user comes back via "Try again", they can't
+  // immediately re-submit the same email.
+  startCooldown();
 });
 
+// "Try again" from success state — swap cards; cooldown still active
 $('try-again').addEventListener('click', (e) => {
   e.preventDefault();
   $('success-card').hidden = true;
   $('form-card').hidden = false;
-  const btn = $('btn-submit');
-  btn.disabled = false;
-  btn.textContent = 'Send me a sign-in link';
-  const input = $('email-input');
-  input.value = '';
-  input.focus();
+  $('email-input').value = '';
+  $('email-input').focus();
+  // Do NOT clear cooldown — respect the lockout
 });
 
 // Clear error on typing
 $('email-input').addEventListener('input', () => {
   $('err-email').classList.remove('show');
+  $('email-input').classList.remove('is-error');
 });
 
 // Focus email field on load
