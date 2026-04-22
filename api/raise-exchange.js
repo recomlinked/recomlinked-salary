@@ -114,19 +114,68 @@ const EXCHANGE_1_SYSTEM = `You are a salary negotiation coach. The user has just
 Your job: extract structured fields and classify how their field/industry shapes their raise probability RIGHT NOW in the market (spring 2026).
 
 FIRST — CHECK IF THE ANSWER HAS SIGNAL:
-If the user's answer does NOT actually contain a job title or industry information (e.g. they typed "hi", "hello", "I don't know", "test", "asdf", an off-topic sentence like "I don't trust my boss", or anything without a role/field), you must classify the signal as "insufficient" and write a short nudge_line asking specifically for their title and company type. DO NOT invent or infer fields they didn't provide. DO NOT classify a signal direction. DO NOT write a reason_line in this case.
+An answer is SUFFICIENT if it contains BOTH:
+  (a) any recognisable job title, role, or function, including:
+      - C-suite abbreviations: CEO, CFO, CTO, CHRO, CMO, COO, CIO, CRO, CPO, CISO, CDO, CCO, or any C-level
+      - VP / SVP / EVP / Head of [anything]
+      - Director / Manager / Lead / Principal / Staff
+      - Common role abbreviations (accept the most natural reading, don't demand clarification):
+        * PM (Product / Project / Program / Portfolio Manager)
+        * FA (Financial Analyst)
+        * BA (Business Analyst)
+        * DA (Data Analyst)
+        * SE / SWE / SDE (Software Engineer)
+        * SRE (Site Reliability Engineer)
+        * QA (Quality Assurance)
+        * UX / UI (designer)
+        * EM (Engineering Manager)
+        * TPM (Technical Program Manager)
+        * DevOps, MLE (ML Engineer), PMM (Product Marketing Manager)
+        * CS (Customer Success), SDR / BDR / AE (sales roles)
+      - Individual contributor titles: Engineer, Analyst, Accountant, Designer, Writer, Developer, Consultant, etc.
+      - Any recognisable English-language job title
+  (b) any recognisable industry or field:
+      - Tech variants: SaaS, fintech, healthtech, edtech, biotech, e-commerce, proptech, insurtech
+      - Traditional: retail, manufacturing, healthcare, finance, banking, insurance, legal, consulting, media, government, nonprofit, energy, real estate, logistics, hospitality, airline, telecom, automotive, pharma, agriculture, construction, education
+      - General descriptors: "tech", "a startup", "a bank", "a hospital", "a law firm", "an agency"
+
+Very short answers are fine if both pieces are present. Examples of SUFFICIENT answers:
+  - "CTO in fintech", "CHRO at a retail chain", "CMO in SaaS", "CIO in banking"
+  - "VP of engineering, healthtech", "Head of Ops, manufacturing"
+  - "PM, SaaS" → sufficient (Product/Project Manager, SaaS industry)
+  - "FA in banking" → sufficient (Financial Analyst, banking)
+  - "BA, consulting firm" → sufficient
+  - "SWE at a startup" → sufficient
+  - "TPM, fintech" → sufficient
+  - "UX designer at an agency" → sufficient
+  - "accountant at a retail chain" → sufficient
+
+When a role abbreviation is ambiguous (e.g. PM could be Product/Project/Program Manager), DO NOT ask the user to clarify — pick the most common reading for their industry (e.g. SaaS PM → Product Manager) and proceed. The range math is the same regardless.
+
+Classify the signal as "insufficient" ONLY when the answer fails to provide both role AND industry. Examples of INSUFFICIENT:
+  - "hi", "hello", "test", "asdf", "no", "nothing"
+  - Single field only: "CTO" alone (no industry), "fintech" alone (no role)
+  - Off-topic: "I don't trust my boss", "fuck you"
+
+If the user provided role + industry across MULTIPLE messages in a short conversation (e.g. first message "CTO", later "fintech"), and their current message completes the picture, that is sufficient. Don't re-ask for what's already been provided. Don't invent requirements like company_size or company_name — those aren't asked for.
 
 Fields to extract (only if signal is NOT insufficient):
 - job_title_normalised: short clean title
 - function: one of [finance, product, engineering, sales, marketing, ops, hr, design, cs, legal, data, other]
 - industry: one of [saas, fintech, healthcare, retail, manufacturing, media, consulting, government, nonprofit, energy, education, other]
-- company_type: one of [startup, scaleup, public, private_mid, government, nonprofit, unknown]
+- company_type: one of [startup, scaleup, public, private_mid, government, nonprofit, unknown] — default "unknown" if not clearly stated, DO NOT mark insufficient just because this is unknown
 - seniority_signal_from_text: one of [junior, mid, senior, lead, exec, unclear]
-  (Infer from the title and any years/context mentioned. Examples: "Junior Analyst" → junior; "Senior PM, 8 years" → senior; "Director of Eng" → lead; "VP" or "Head of" → exec. Default to "unclear" if no signal.)
+  (Infer from the title:
+   - "junior" → junior
+   - "Senior [X]" → senior
+   - "Director / Head of / Principal / Staff" → lead
+   - Any C-suite (CEO, CFO, CTO, CHRO, CMO, COO, CIO, CRO, CPO, CISO, CDO, CCO, or any other C-level) → exec
+   - "VP / SVP / EVP / Chief [anything]" → exec
+   - Default "unclear" if title isn't clear)
 
 Signal classification (how their field affects raise probability):
-- insufficient: answer had no role/industry content (see above)
-- strong_positive: hot market, tight talent supply, high retention pressure
+- insufficient: missing role OR industry (see above)
+- strong_positive: hot market, tight talent supply, high retention pressure (e.g. fintech CTO, AI/ML roles)
 - positive: above-average conditions
 - neutral: stable market
 - negative: below-average conditions, cost pressure in the sector
@@ -135,12 +184,13 @@ Signal classification (how their field affects raise probability):
 Reason line (max 20 words) — ONLY if signal is NOT insufficient:
 - Must reference their specific field/industry
 - Must reflect their signal direction
-- Must sound like a working coach, not a static article
+- Must sound like a working coach
 
 Nudge line (max 25 words) — ONLY if signal IS insufficient:
 - Warm, direct, coach-voice
-- Ask for the specific missing piece (role + company type)
+- Ask ONLY for the specific missing piece (role or industry)
 - Give an example phrasing like "Senior PM at a SaaS startup"
+- NEVER ask for company size, company name, or anything beyond role + industry
 
 Respond ONLY with valid JSON, no preamble:
 {
@@ -156,28 +206,35 @@ Respond ONLY with valid JSON, no preamble:
 const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user has just told you about their case for a raise — either their recent performance, their market leverage, or both. This is the single "what's your ammunition?" question in the 3-exchange flow.
 
 FIRST — CHECK IF THE ANSWER HAS SIGNAL:
-If the user's answer does NOT actually contain performance, leverage, or market information (e.g. they typed "hi", "I don't know", "test", "asdf", or an off-topic sentence like "I don't trust my boss"), classify the signal as "insufficient" and write a short nudge_line. DO NOT infer fields. DO NOT classify a signal direction. DO NOT write a reason_line in this case.
+An answer is SUFFICIENT if it engages with the question in any way. Examples of SUFFICIENT answers:
+  - Positive: "I exceeded my targets", "I have a competing offer", "I'm underpaid based on Glassdoor"
+  - Neutral: "I met expectations", "things went okay", "I don't have strong evidence right now"
+  - Negative / honest admission: "nothing", "no", "I have nothing", "I don't have anything", "I had nothing" — THESE ARE ALL VALID. User is honestly saying they have no leverage. Classify as negative or strong_negative, not insufficient.
 
-IMPORTANT: "I don't have strong evidence right now" IS valid signal (neutral-to-slightly-negative) — the user is honestly saying they don't have leverage. Accept that as a real answer. "Insufficient" is ONLY for answers that fail to engage with the question at all.
+Classify "insufficient" ONLY when the answer is completely off-topic or filler:
+  - "hi", "test", "asdf"
+  - Off-topic: "I don't trust my boss", "fuck you", "what was the options"
+
+If user has provided context across multiple messages in short conversation (e.g. first "no", then "in real world I had nothing"), that IS an answer. Accept it and classify accordingly — don't keep asking for "more" when they've clearly said they have nothing. Pushing further is bad coaching.
 
 Fields to extract (any that apply — use "not_mentioned" if not addressed):
-- performance_rating: one of [exceeded, specific_win, met, mixed, not_mentioned]
+- performance_rating: one of [exceeded, specific_win, met, mixed, poor, not_mentioned]
 - external_leverage:  one of [competing_offer, actively_recruited, underpaid_evidence, none, not_mentioned]
 - market_position:    one of [underpaid, at_market, overpaid, unsure, not_mentioned]
 - specific_achievements: array of 0-3 short strings
 - leverage_detail: string
 
 Signal classification:
-- insufficient: answer didn't engage with the question (see above)
+- insufficient: answer was filler or off-topic (see above — rare!)
 - strong_positive: competing_offer OR exceeded expectations
 - positive: actively_recruited OR credible underpaid evidence OR specific performance win
-- neutral: met expectations / at-market / unsure / "I don't have strong evidence" (honest)
-- negative: mixed performance year AND no external leverage
-- strong_negative: poor performance AND explicitly negative leverage signals
+- neutral: met expectations / at-market / unsure
+- negative: "I don't have strong evidence" / "nothing" / honest admission of no leverage
+- strong_negative: explicitly poor performance AND zero leverage
 
 Reason line (max 22 words) — ONLY if signal is NOT insufficient:
-- Reference whichever axis the user actually led with
-- Reflect the "tightens but doesn't tank" rule — weak evidence reframes as "upside limited", never "tanked"
+- Reference what they actually said
+- For "negative" signal (honest no-leverage): reframe as "upside limited, focus shifts to making the case strategically" — never "tanked"
 
 Nudge line (max 25 words) — ONLY if signal IS insufficient:
 - Warm, direct, coach-voice
@@ -325,7 +382,11 @@ function fallbackResult(exchange, answer) {
   };
 }
 
-async function logToSheet(payload) {
+// Fire-and-forget log to the Google Apps Script webhook. `event` must match
+// an event name the Apps Script's appendRaiseLead recognises (so it routes to
+// the Raise Leads tab and color-codes the row). `fields` is merged into the
+// payload — the Apps Script reads role/industry/range_floor/etc. by name.
+async function logToSheet(event, fields) {
   try {
     const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
     if (!webhookUrl) return;
@@ -334,9 +395,9 @@ async function logToSheet(payload) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
         timestamp: new Date().toISOString(),
-        event:     'RAISE_EXCHANGE',
+        event,
         product:   'raise',
-        ...payload,
+        ...(fields || {}),
       }),
     });
   } catch (e) { /* non-fatal */ }
@@ -430,10 +491,11 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
 
   // ── Ex4 obstacle branch: no range math, return obstacle payload ───
   if (exchange === 4) {
-    logToSheet({
-      exchange: 4,
-      obstacle: claudeResult.obstacle_code || 'other',
-      user_phrase: (claudeResult.user_phrase_echo || '').slice(0, 200),
+    logToSheet('RAISE_OBSTACLE', {
+      session_id:    req.body?.profile_hash || '',
+      obstacle:      claudeResult.obstacle_code || 'other',
+      range_floor:   current_range ? current_range.floor   : '',
+      range_ceiling: current_range ? current_range.ceiling : '',
     });
 
     return res.status(200).json({
@@ -453,12 +515,11 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
   // no real signal. Don't run range math. Don't advance the exchange.
   // Return a nudge_line the frontend will render as a coach bubble.
   if (claudeResult.signal === 'insufficient') {
-    logToSheet({
-      exchange,
-      signal:    'insufficient',
-      new_floor: current_range.floor,
-      new_ceil:  current_range.ceiling,
-      extracted: '',
+    logToSheet('RAISE_EXCHANGE_' + exchange, {
+      session_id:    req.body?.profile_hash || '',
+      signal:        'insufficient',
+      range_floor:   current_range.floor,
+      range_ceiling: current_range.ceiling,
     });
     return res.status(200).json({
       is_insufficient: true,
@@ -484,12 +545,18 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
   const next = NEXT_QUESTIONS[exchange] || null;
 
   // ── Fire-and-forget logging ────────────────────────────
-  logToSheet({
-    exchange,
-    signal:     claudeResult.signal,
-    new_floor:  newRange.floor,
-    new_ceil:   newRange.ceiling,
-    extracted:  JSON.stringify(claudeResult.extracted || {}).slice(0, 400),
+  // Pull user-visible fields out of Claude's extracted structure so analytics
+  // queries can segment by role/industry without parsing JSON blobs.
+  const ext = claudeResult.extracted || {};
+  logToSheet('RAISE_EXCHANGE_' + exchange, {
+    session_id:    req.body?.profile_hash || '',
+    role:          ext.job_title_normalised || '',
+    industry:      ext.industry             || '',
+    company_type:  ext.company_type         || '',
+    seniority:     ext.seniority_signal_from_text || '',
+    range_floor:   newRange.floor,
+    range_ceiling: newRange.ceiling,
+    signal:        claudeResult.signal,
   });
 
   return res.status(200).json({
