@@ -18,6 +18,10 @@
 //
 // Cache key: raise:analyze|{situation}|{lastRaise}|{size}
 // TTL: 7 days (same-profile users get the cached context line).
+//
+// ── Round 2 update ───────────────────────────────────────
+// firstCoachMessage now references 3 exchanges, not 4 (matches the 3-exchange
+// chat flow). The chat page also overrides this locally for redundancy.
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { Redis }  = require('@upstash/redis');
@@ -32,30 +36,21 @@ const CACHE_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 // ── Deterministic initial range ───────────────────────────
 // Values from salary-negotiation-coach-spec.md § 2
-// Note: country and seniority modifiers removed in the 3-question redesign.
-// - Country: all users now start from the US baseline; regional nuance is
-//   handled at the coach-prompt layer in raise-exchange.js if/when relevant.
-// - Seniority: initial range uses the mid-level baseline; raise-exchange.js
-//   Ex1 extracts seniority_signal_from_text and can adjust on the first turn.
 function calculateInitialRange(p) {
   let floor   = 40;
   let ceiling = 70;
 
-  // Annual-raise baseline overrides default baseline
   if (p.last_raise === 'annual_raise_want_more') {
     floor   = 35;
     ceiling = 55;
   }
 
-  // Tier 1 ceiling caps (most restrictive wins)
   if (p.company_situation === 'cutting')  ceiling = Math.min(ceiling, 42);
   if (p.last_raise === 'under_1_year')    ceiling = Math.min(ceiling, 32);
 
-  // Tier 1 floor lifts
   if (p.company_situation === 'growing')  floor = Math.max(floor, 45);
   if (p.last_raise === '2_plus_years')    floor = Math.min(floor + 10, ceiling - 5);
 
-  // Clamp, ensure min 5pp width
   floor   = Math.max(10, Math.round(floor));
   ceiling = Math.min(90, Math.round(ceiling));
   if (ceiling - floor < 5) ceiling = floor + 5;
@@ -119,8 +114,9 @@ Respond ONLY with valid JSON, no preamble:
 }`;
 
 // ── First coach message template ──────────────────────────
+// Round 2: reference THREE questions, not four (matches new 3-exchange flow).
 function firstCoachMessage(floor, ceiling) {
-  return `That's your starting range, ${floor}–${ceiling}%, based on the structural factors alone. Four quick questions will narrow it and show where your real leverage is.`;
+  return `That's your starting range, ${floor}–${ceiling}%, based on the structural factors alone. Three quick questions will narrow it and show where your real leverage is.`;
 }
 
 // ── Main handler ──────────────────────────────────────────
@@ -131,8 +127,6 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  // Only 3 fields are required after the assessment reduction.
-  // Extra fields (country, seniority) if sent by the frontend are ignored here.
   const {
     company_situation,
     last_raise,
@@ -147,12 +141,11 @@ module.exports = async function handler(req, res) {
 
   const profile = { company_situation, last_raise, company_size };
 
-  // ── Deterministic math runs unconditionally ────────────
   const { floor, ceiling } = calculateInitialRange(profile);
   const color              = colorFromMidpoint(floor, ceiling);
   const dominant           = dominantFactorCode(profile);
 
-  // ── Cache check for the Claude-generated context line ──
+  // Cache check for the Claude-generated context line
   const cacheKey = makeCacheKey(profile);
   let contextLine = null;
   try {
@@ -163,7 +156,6 @@ module.exports = async function handler(req, res) {
     }
   } catch (e) { /* continue without cache */ }
 
-  // ── If no cache, call Claude for the context line ─────
   if (!contextLine) {
     const userMessage = `User profile:
 - Company situation: ${company_situation}
@@ -186,19 +178,16 @@ Write the context line.`;
       const parsed  = JSON.parse(cleaned);
       contextLine   = (parsed.context_line || '').trim();
 
-      // Cache the context line
       if (contextLine) {
         await redis.set(cacheKey, JSON.stringify({ context_line: contextLine }), { ex: CACHE_TTL_SECONDS })
           .catch(() => { /* non-fatal */ });
       }
     } catch (err) {
       console.error('[raise-analyze] claude error:', err.message);
-      // Fallback: static line per dominant factor
       contextLine = fallbackContext(dominant);
     }
   }
 
-  // ── Log (fire-and-forget) ──────────────────────────────
   logToSheet({
     company_situation, last_raise, company_size,
     floor, ceiling, color, dominant,
@@ -209,10 +198,10 @@ Write the context line.`;
   return res.status(200).json({
     floor,
     ceiling,
-    color,                        // 'red' | 'amber' | 'green'
+    color,
     context_line: contextLine,
     first_coach_message: firstCoachMessage(floor, ceiling),
-    exchange_next: 1,             // Exchange 1 is role/industry
+    exchange_next: 1,
   });
 };
 
