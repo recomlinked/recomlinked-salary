@@ -1198,6 +1198,11 @@ function submitAssessment() {
   };
   try {
     localStorage.setItem('rl_raise_profile', JSON.stringify(profile));
+    // New assessment submission → always clear old chat state so the chat
+    // page starts a fresh analysis. Without this, re-taking the assessment
+    // (especially with the same answers) rehydrates the previous flow and
+    // shows the old paywall/final card instead of a new run.
+    localStorage.removeItem('rl_raise_state');
   } catch (e) {
     // localStorage disabled — fall back to URL params
     const q = new URLSearchParams(profile).toString();
