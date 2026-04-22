@@ -103,6 +103,33 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   font-size:12px;color:rgba(255,255,255,0.6);line-height:1.55;
 }
 .prob-reason strong{color:#fff;}
+.prob-card.no-reason .prob-reason{display:none;}
+
+/* ── Reason callout (rendered as a separate bubble between card and
+   next coach message). Color-coded by signal direction. */
+.reason-callout{
+  animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);
+  padding:14px 0 10px 0;
+}
+.reason-callout .callout-body{
+  background:var(--card);
+  border-left:3px solid var(--t3);
+  border-radius:0 10px 10px 10px;
+  padding:12px 14px;
+  font-size:13px;line-height:1.6;color:var(--t1);
+  box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  display:flex;gap:10px;align-items:flex-start;
+}
+.reason-callout .callout-dot{
+  width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px;
+  background:var(--t3);
+}
+.reason-callout.pos  .callout-body{ border-left-color:var(--teal); }
+.reason-callout.pos  .callout-dot { background:var(--teal); }
+.reason-callout.neg  .callout-body{ border-left-color:var(--red); }
+.reason-callout.neg  .callout-dot { background:var(--red); }
+.reason-callout.neu  .callout-body{ border-left-color:var(--gold); }
+.reason-callout.neu  .callout-dot { background:var(--gold); }
 
 /* ── User message ──────────────────────────────────────── */
 .user-msg{display:flex;justify-content:flex-end;padding:14px 0 14px 42px;animation:msgIn 0.3s ease;}
@@ -192,6 +219,30 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 }
 .user-chips{
   display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
+}
+/* Horizontal-scroll variant — used for obstacle chips (FA pattern).
+   Keeps all chips in one row, right-anchored, with a subtle fade on the left
+   edge hinting scrollability. */
+.user-chips.scroll-row{
+  flex-wrap:nowrap;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:4px 2px 8px;margin:0 -4px;
+  max-width:100%;
+  justify-content:flex-start;
+  scrollbar-width:none;
+}
+.user-chips.scroll-row::-webkit-scrollbar{display:none;}
+.user-chips.scroll-row .chip{flex-shrink:0;}
+.chips-msg.scroll-msg{
+  width:100%;padding-left:0;
+}
+.chips-scroll-wrap{
+  position:relative;width:100%;overflow:hidden;
+}
+.chips-scroll-wrap::after{
+  content:'';position:absolute;right:0;top:0;bottom:0;width:32px;
+  background:linear-gradient(to right, rgba(244,245,248,0), rgba(244,245,248,1));
+  pointer-events:none;
 }
 .chips-group{width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
 .chips-group + .chips-group{margin-top:6px;}
@@ -385,7 +436,13 @@ const state = {
   ex3_partial: null,            // { relationship?, free_text? } — Ex3 is manager-only
   obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
   saved_at: null,               // ms timestamp — used for 24h staleness check
+  free_dialog_count: 0,         // count of post-paywall free-text messages (caps at FREE_DIALOG_LIMIT)
 };
+
+// Free-text dialog cap before paywall-lock mode engages. User can ask up to
+// this many questions after the paywall; each gets a real coach answer + CTA.
+// After this, replies become terse "upgrade to continue" variants.
+const FREE_DIALOG_LIMIT = 3;
 
 const THINKING_ITEMS = [
   "Mapping your company situation",
@@ -653,13 +710,14 @@ function stopThinkingAnimation() {
 }
 
 /* ── Score card ──────────────────────────────────────────── */
-// stage: 0 = initial, 1-3 = card posted after that exchange, 4 = final (after obstacle)
+// stage: 0 = initial, 1-3 = card posted after each exchange.
+// There is no stage-4 card — the obstacle question doesn't change the range,
+// so the stage-3 card (gold-bordered, "Your range") is the final.
 const CARD_STAGE_LABEL = {
   0: 'Starting range',
   1: 'After: your role and field',
   2: 'After: your evidence and leverage',
-  3: 'After: your manager and history',
-  4: 'Your range',
+  3: 'Your range',
 };
 
 function renderScoreCard(range, reasonLine, stage) {
@@ -667,21 +725,22 @@ function renderScoreCard(range, reasonLine, stage) {
   const ceiling = range.ceiling;
   const floor   = range.floor;
   const stageLabel = CARD_STAGE_LABEL[stage || 0];
-  const isFinal = stage === 4;
+  const isFinal = stage === 3;
 
   const cardWrap = el('div', 'coach-msg score-card-msg', '');
   cardWrap.dataset.stage = String(stage || 0);
 
+  // Reason line now rendered as a separate callout below the card, not inline.
+  // We keep the DOM slot for backward-compat but suppress it via .no-reason.
   cardWrap.innerHTML = `
     <div class="bubble card-bubble ${isFinal ? 'final-card' : ''}">
-      <div class="prob-card">
+      <div class="prob-card no-reason">
         <div class="prob-stage">${stageLabel}</div>
         <div class="prob-range-row">
           <span class="prob-range ${color}">${floor}–${ceiling}%</span>
           <span class="prob-verdict ${color}">${VERDICT_BY_COLOR[color]}</span>
         </div>
         <div class="prob-track"><div class="prob-fill ${color}" style="width:0%;"></div></div>
-        <div class="prob-reason">${escapeHtml(reasonLine || '')}</div>
       </div>
     </div>
   `;
@@ -695,6 +754,29 @@ function renderScoreCard(range, reasonLine, stage) {
 
   scrollChatToBottom();
   return cardWrap;
+}
+
+/** Reason callout — rendered as a separate bubble after a score card.
+    Color-coded by signal direction. Makes the "why your range moved" story
+    visible and rewarding. */
+function renderReasonCallout(reasonLine, signal) {
+  if (!reasonLine) return null;
+  // Map signal → callout color class
+  let cls = 'neu';
+  if (signal === 'strong_positive' || signal === 'positive') cls = 'pos';
+  else if (signal === 'negative' || signal === 'strong_negative') cls = 'neg';
+  // neutral / unknown → gold
+
+  const wrap = el('div', 'reason-callout ' + cls, '');
+  wrap.innerHTML = `
+    <div class="callout-body">
+      <div class="callout-dot"></div>
+      <div class="callout-text">${escapeHtml(reasonLine)}</div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  return wrap;
 }
 
 // Legacy alias — code that still calls renderInitialCard will work.
@@ -1009,6 +1091,8 @@ async function resumeFromState() {
       $('messages').appendChild(wrap);
     } else if (entry.type === 'score_card') {
       renderScoreCard(entry.payload.range, entry.payload.reason_line, entry.payload.stage);
+    } else if (entry.type === 'reason_callout') {
+      renderReasonCallout(entry.payload.text, entry.payload.signal);
     } else if (entry.type === 'paywall') {
       // Paywall rendered from state.obstacle + state.current_range
       renderPaywallBubble();
@@ -1185,18 +1269,33 @@ async function beginObstacle() {
 }
 
 function renderObstacleChips() {
-  renderUserChips(OBSTACLE_CHIPS.map(c => ({
-    code: c.code, label: c.label, isFreeText: !!c.isFreeText,
-  })), (c, btn) => {
-    if (c.isFreeText) {
-      // "Type yours…" — enable input focus. Don't submit yet.
-      $('chat-input').focus();
-      return;
-    }
-    btn.classList.add('selected');
-    fadeOutChips();
-    handleObstacleChip(c.code, c.label);
+  // Horizontal-scroll row (FA pattern). Keeps all 6 chips in one line with
+  // a right-edge fade hint for scroll affordance. Full-width, not right-anchored.
+  const wrap = el('div', 'user-msg chips-msg scroll-msg', '');
+  const scrollWrap = el('div', 'chips-scroll-wrap', '');
+  const inner = el('div', 'user-chips scroll-row', '');
+
+  OBSTACLE_CHIPS.forEach(c => {
+    const btn = el('button', 'chip' + (c.isFreeText ? ' chip-freetext' : ''), c.label);
+    btn.type = 'button';
+    btn.dataset.val = c.code || '';
+    btn.onclick = () => {
+      if (c.isFreeText) {
+        $('chat-input').focus();
+        return;
+      }
+      btn.classList.add('selected');
+      fadeOutChips();
+      handleObstacleChip(c.code, c.label);
+    };
+    inner.appendChild(btn);
   });
+
+  scrollWrap.appendChild(inner);
+  wrap.appendChild(scrollWrap);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  currentChipsWrap = wrap;
 }
 
 async function handleObstacleChip(code, label) {
@@ -1265,13 +1364,13 @@ async function runObstacleCall(answer) {
   state.current_exchange = 5;
   saveState();
 
-  // Post the final range card (stage 4) — range unchanged from Ex3
-  renderScoreCard(state.current_range, '', 4);
-  logEntry('score_card', { range: { ...state.current_range }, reason_line: '', stage: 4 });
-  await sleep(500);
+  // NOTE: no range card rendered here. The obstacle doesn't change range
+  // math — the stage-3 card (gold-bordered "Your range") is already the
+  // final. Rendering another card here would be a confusing duplicate.
 
-  // Coach bridge line from Claude
+  // Coach bridge line from Claude — acknowledges the obstacle, leads into paywall
   if (result.coach_line) {
+    await sleep(200);
     await typeCoachBubble(result.coach_line);
     await sleep(400);
   }
@@ -1336,10 +1435,19 @@ async function runExchangeCall(exchangeNum, answer) {
   }
   saveState();
 
-  // Post a fresh score card for this exchange (stages 1, 2, 3)
+  // Post a fresh score card for this exchange (stages 1, 2, 3).
+  // Stage-3 card is gold-bordered and labelled "Your range" — the final.
   renderScoreCard(state.current_range, result.reason_line, exchangeNum);
   logEntry('score_card', { range: { ...state.current_range }, reason_line: result.reason_line, stage: exchangeNum });
-  await sleep(800);
+  await sleep(400);
+
+  // Render the reason callout as a separate, color-coded bubble — more
+  // visible than the old inline muted text. Signal drives the color.
+  if (result.reason_line) {
+    renderReasonCallout(result.reason_line, result.signal);
+    logEntry('reason_callout', { text: result.reason_line, signal: result.signal || 'neutral' });
+    await sleep(500);
+  }
 
   // Exchange 3 complete → obstacle question (no next_question from backend)
   if (result.is_final) {
@@ -1569,31 +1677,74 @@ function renderSectionTeaseBubble(section) {
 /* ── Post-paywall text: useful answer + dynamic CTA tail  ── */
 /* ───────────────────────────────────────────────────────── */
 
-// After paywall appears, user free-text still engages the coach. We call a
-// pre-paid coach endpoint (uses raise-coach.js's free-mode branch — added in
-// Round 2). For now, we render a coach-voice reply that acknowledges the
-// question and ends with a dynamic CTA tail referencing their obstacle.
-// This keeps the feel right even before Round 2 wires the backend fully.
+// After paywall appears, user free-text still engages the coach via
+// /api/raise-coach free-mode. Each reply includes a dynamic CTA tail.
+// After FREE_DIALOG_LIMIT messages, we switch to paywall-lock mode where
+// the replies are terse and the CTA is the full message — prevents the
+// free chat from becoming the product.
 async function handlePostPaywallText(text) {
   appendUserBubble(text);
   disableInput('Thinking…');
 
+  state.free_dialog_count = (state.free_dialog_count || 0) + 1;
+  saveState();
+
   await sleep(300);
   showCoachTyping();
-  await sleep(1400);
+
+  // Check dialog cap BEFORE calling the API — saves a Claude call when locked
+  if (state.free_dialog_count > FREE_DIALOG_LIMIT) {
+    await sleep(800);
+    hideCoachTyping();
+    renderLockedReply(text);
+    return;
+  }
+
+  // Call the real coach API in free mode
+  let reply = null;
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile:               state.profile,
+        obstacle:              state.obstacle,
+        final_range:           state.current_range,
+        accumulated_exchanges: state.accumulated,
+        message:               text,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      reply = data.reply || null;
+    }
+  } catch (e) { /* fall through to fallback */ }
+
   hideCoachTyping();
 
-  // Simple local response template — Round 2 replaces this with a real
-  // API call to /api/raise-coach with a free-mode flag. For now, give a
-  // useful-feeling reply that ends with an obstacle-aware CTA.
-  const obs = state.obstacle || { code: 'other' };
-  const reply = composeLocalPostPaywallReply(text, obs);
+  if (!reply) {
+    // API unavailable — render a short apologetic bubble without a CTA.
+    // Don't count this against the user's free_dialog_count (already incremented).
+    const wrap = el('div', 'coach-msg', '');
+    wrap.innerHTML = `<div class="bubble"><p>I couldn't respond just now. Try again, or jump into the plan — it has the answers to most questions you'd ask here.</p></div>`;
+    $('messages').appendChild(wrap);
+    scrollChatToBottom();
+    enableInput('Ask me anything…');
+    awaitFreeText(handlePostPaywallText);
+    return;
+  }
+
+  // Render the coach reply + dynamic CTA tail
+  const remaining = FREE_DIALOG_LIMIT - state.free_dialog_count;
+  const tailCopy = remaining > 0
+    ? `<strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.`
+    : `<strong style="color:var(--t1);">Last free answer.</strong> The specifics — your exact words, your numbers, your handoff — live in the full plan. $${PRICE_USD} once.`;
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble">
-      <p>${escapeHtml(reply.answer)}</p>
-      <p style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);"><strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.</p>
+      <p>${escapeHtml(reply)}</p>
+      <p style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
       <button class="btn-pay" style="margin-top:10px;" data-tail-cta>
         Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
@@ -1602,7 +1753,7 @@ async function handlePostPaywallText(text) {
   $('messages').appendChild(wrap);
   scrollChatToBottom();
 
-  logEntry('coach_bubble', { text: reply.answer });
+  logEntry('coach_bubble', { text: reply });
 
   const btn = wrap.querySelector('[data-tail-cta]');
   if (btn) btn.onclick = startCheckout;
@@ -1611,25 +1762,43 @@ async function handlePostPaywallText(text) {
   awaitFreeText(handlePostPaywallText);
 }
 
-// Local composer — a stopgap until Round 2 wires raise-coach.js for free mode.
-// Deliberately generic-but-on-topic so it doesn't feel templated.
-function composeLocalPostPaywallReply(userText, obs) {
-  const lower = (userText || '').toLowerCase();
-  let answer;
-  if (/budget|money|afford|can.?t pay/.test(lower)) {
-    answer = "Budget pushback is almost always a script their manager handed them, not the real answer. The move is to separate 'can we' from 'will we', because those usually have different people behind them.";
-  } else if (/manager|boss|relation/.test(lower)) {
-    answer = "Manager dynamics matter most in the setup, not the conversation itself. How you ask for the meeting tells you 80% of what the outcome will be.";
-  } else if (/time|timing|when|review/.test(lower)) {
-    answer = "Timing isn't as fixed as it feels. There are at least five windows in a normal year where this conversation lands well, and review cycle is just one of them.";
-  } else if (/number|amount|how much|percent|percentage/.test(lower)) {
-    answer = "The number is the easiest part once you have the framing. There's a specific formula that works for your situation — market data, your last raise, and the structural factors we just talked about.";
-  } else if (/nervous|scared|afraid|anxious|worried/.test(lower)) {
-    answer = "Nerves are normal and don't actually hurt you if you prep. The thing that hurts is walking in without having rehearsed the first 30 seconds. That part is teachable.";
-  } else {
-    answer = "Good question. The real answer depends on the specifics of your situation — your role, your manager, and the obstacle you flagged.";
-  }
-  return { answer };
+/** Post-cap reply — short, polite, all CTA. Rendered when user has exceeded
+    FREE_DIALOG_LIMIT free-text messages. */
+function renderLockedReply(userText) {
+  const obs = state.obstacle || { code: 'other' };
+  // Three rotating lead-ins so it doesn't feel scripted if they keep typing
+  const leadIns = [
+    "I can't go further without you on the plan — but I want to. Everything you're asking is in there, answered specifically for you.",
+    "The plan is the product. Every answer I'd give you here lives in there, sharper and built around your exact situation.",
+    "I've given you what I can for free. The rest is the plan — role-play, exact scripts, 30 days of follow-up.",
+  ];
+  const lockIdx = Math.min(state.free_dialog_count - FREE_DIALOG_LIMIT - 1, leadIns.length - 1);
+  const leadIn = leadIns[Math.max(0, lockIdx)];
+
+  const proof = pickProofLine(obs.code);
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="paywall-bubble">
+      <p>${escapeHtml(leadIn)}</p>
+      <button class="btn-pay" data-tail-cta>
+        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      <div class="trust-row">
+        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
+      </div>
+      <div class="proof-line">${escapeHtml(proof)}</div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  const btn = wrap.querySelector('[data-tail-cta]');
+  if (btn) btn.onclick = startCheckout;
+
+  // Keep input enabled but user gets the same locked reply each time after this
+  enableInput('Ask me anything…');
+  awaitFreeText(handlePostPaywallText);
 }
 
 /* ── Free-text input wiring ────────────────────────────── */
