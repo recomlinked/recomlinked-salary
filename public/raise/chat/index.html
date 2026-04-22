@@ -1825,8 +1825,28 @@ function fireEnrichment() {
 }
 
 async function startCheckout() {
-  const btn = $('btn-pay-cta');
-  if (btn) { btn.disabled = true; btn.textContent = 'Opening Stripe…'; }
+  // Inject keyframes once, globally. Matches FA's pattern so the spinner
+  // starts spinning the moment the user clicks, even on a slow network.
+  if (!document.getElementById('rl-spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'rl-spin-style';
+    s.textContent = '@keyframes rl-spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+
+  // Small spinning circle, inline SVG — appended inside every .btn-pay on
+  // screen (main paywall, section-tease paywalls, post-paywall replies). All
+  // share the same checkout destination, all should feel clicked simultaneously.
+  const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
+
+  const allCtas = document.querySelectorAll('.btn-pay');
+  allCtas.forEach(el => {
+    // Save original HTML so we can restore if the request fails
+    if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
+    el.insertAdjacentHTML('beforeend', spinner);
+    el.style.pointerEvents = 'none';
+    el.setAttribute('disabled', 'true');
+  });
 
   try {
     const params = new URLSearchParams(location.search);
@@ -1845,12 +1865,22 @@ async function startCheckout() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (!data.url) throw new Error('No checkout URL');
+    // Redirect — spinners stay visible until Stripe's page loads, which
+    // matches user expectation ("it's loading, not broken").
     window.location.href = data.url;
   } catch (err) {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>`;
-    }
+    // Restore all CTAs to clickable state and show an error bubble
+    document.querySelectorAll('.btn-pay').forEach(el => {
+      if (el.dataset.origHtml) {
+        el.innerHTML = el.dataset.origHtml;
+        delete el.dataset.origHtml;
+      } else {
+        // Fallback: strip any spinner SVGs we added
+        el.querySelectorAll('.rl-cta-spinner').forEach(s => s.remove());
+      }
+      el.style.pointerEvents = '';
+      el.removeAttribute('disabled');
+    });
     showErrorBubble(
       "Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.",
       null
