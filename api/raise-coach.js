@@ -82,24 +82,26 @@ function pickNudgeFallback(exchange, priorAttempts) {
 }
 
 // System prompt — trains Claude to write ONE short coach-voice nudge.
-const NUDGE_SYSTEM = `You are a salary negotiation coach chatting with a user who just gave you an answer that's too short, too vague, or off-topic. Write ONE nudge sentence asking them to clarify.
+const NUDGE_SYSTEM = `You are a salary negotiation coach nudging a user whose answer was too short, too vague, or off-topic. Write ONE nudge sentence.
 
 HARD RULES:
-- NEVER repeat the coach's original question verbatim or near-verbatim. You are the coach; you already asked it. Now paraphrase the REQUEST in a shorter, different way that makes the missing piece obvious.
+- Only ask for information the original coach question explicitly requested. Do NOT invent new requirements (e.g. if the question asked for role + industry, do NOT ask for company size, company name, or what the company does — those weren't asked).
+- If the user has provided PART of the answer already in prior messages, acknowledge that and ask only for the missing piece. Example: if they said "CTO" then "fintech", that's role + industry — that is a complete answer, classify as sufficient, don't ask for more.
+- NEVER repeat the coach's original question verbatim. Paraphrase the specific missing piece.
 - ONE sentence. Max 28 words.
-- Coach's voice, direct, warm, human. Never scripted.
-- If the user typed "hi" or similar filler, acknowledge it lightly ("Happy to chat, but") and redirect.
-- If the user went off-topic (e.g. talking about trust when asked about evidence), name it briefly ("That's a real concern, but for this question I need...") then redirect.
+- Coach's voice: direct, warm, human.
+- If the user typed filler like "hi", acknowledge lightly ("Happy to chat, but") and redirect.
+- If off-topic, name it briefly ("That's a real concern, but for this question I need...") then redirect.
+- If the user is frustrated ("you asked me that", "fuck you", etc.), apologize briefly and restate what you actually need in simplest form. Don't repeat a rejected request.
 - Progressive tone based on attempt number:
-  * attempt 1: warm, light clarification, assume they just didn't see what you needed
-  * attempt 2: slightly more specific, give the requested shape concretely
-  * attempt 3+: direct, honest — "I genuinely can't help without this one. One sentence is enough."
-- Don't quote their message back in full. Don't say "I see" or "I understand".
-- Don't use em-dashes. Use commas or full stops.
-- No question mark at the end unless it's a real question you need them to answer.
-- Output ONLY the nudge line. No JSON, no quotes around it, no labels.
+  * attempt 1: warm, light clarification
+  * attempt 2: acknowledge what they've already given, ask for the specific missing piece
+  * attempt 3+: direct, honest — accept what they have if it's minimally sufficient
+- Don't say "I see" or "I understand". Don't use em-dashes.
+- No question mark at the end unless it's a real question.
+- Output ONLY the nudge line. No JSON, no quotes, no labels.
 
-REMEMBER: your job is to ASK FOR WHAT'S MISSING in fresh words, not to re-announce the original question.`;
+REMEMBER: your job is to help the user complete the specific question that was asked. Don't expand scope. Don't ask for fields the original question didn't request.`;
 
 // ── System prompt — PAID mode ───────────────────────────
 function buildPaidSystemPrompt({ profile, plan, notes }) {
@@ -219,7 +221,7 @@ async function logCoachMessage(email, firstMessage) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
         timestamp: new Date().toISOString(),
-        event:     firstMessage ? 'COACH_FIRST_MESSAGE' : 'COACH_MESSAGE',
+        event:     'RAISE_COACH_MSG',
         product:   'raise',
         email,
         source:    'salary.recomlinked.com',
@@ -237,7 +239,7 @@ async function logFreeCoachMessage(payload) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify({
         timestamp: new Date().toISOString(),
-        event:     'COACH_FREE_MESSAGE',
+        event:     'RAISE_POST_PAYWALL_MSG',
         product:   'raise',
         source:    'salary.recomlinked.com',
         ...payload,
@@ -348,6 +350,8 @@ async function handleFreeMode(body, res) {
     final_range,              // { floor, ceiling }
     accumulated_exchanges,    // { ex1: {...}, ex2: {...}, ex3: {...} }
     message,                  // user's message
+    session_id,               // profile_hash — anonymous user identifier
+    free_dialog_count,        // how many free-mode msgs this user has sent
   } = body;
 
   if (!profile || !message) {
@@ -373,10 +377,13 @@ async function handleFreeMode(body, res) {
     });
     const reply = response.content[0]?.text || "I couldn't respond just now. Please try again.";
 
+    // Log to Raise Leads tab with the schema fields the Apps Script expects
     logFreeCoachMessage({
-      obstacle_code: obstacle?.code || 'unknown',
-      msg_len:       message.length,
-      reply_len:     reply.length,
+      session_id:         session_id || '',
+      obstacle:           obstacle?.code || 'unknown',
+      range_floor:        final_range?.floor   ?? '',
+      range_ceiling:      final_range?.ceiling ?? '',
+      free_dialog_count:  free_dialog_count ?? '',
     });
 
     return res.status(200).json({
