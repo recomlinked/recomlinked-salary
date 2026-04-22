@@ -63,8 +63,10 @@ function updateRange(current, targetWidth, signal, initialFloor) {
   // ── Canonical rule: floor NEVER drops below initial Tier 1 floor ──
   if (typeof initialFloor === 'number') newFloor = Math.max(newFloor, initialFloor);
 
-  // Force exact target width (to ensure clean 5pp final range)
-  if (newCeiling - newFloor !== targetWidth) {
+  // Force exact target width, but only when the range is WIDER than target.
+  // Never expand a range that's already narrower than the target width —
+  // that would grow uncertainty when we should only reduce it.
+  if (newCeiling - newFloor > targetWidth) {
     // Center adjustment around current midpoint
     const midTarget = Math.round((newFloor + newCeiling) / 2);
     newFloor   = midTarget - Math.floor(targetWidth / 2);
