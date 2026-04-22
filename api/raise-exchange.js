@@ -1,8 +1,10 @@
 // api/raise-exchange.js
 // Salary Negotiation Coach — Per-exchange range update
-// Called after each of the 4 coaching exchanges during free chat.
-// Receives: current state + user's new answer.
-// Returns: new range, movement reason line, extracted fields, next question (or null if ex4).
+// Called after each of the 3 coaching exchanges + the final obstacle capture
+// during free chat. Receives: current state + user's new answer.
+// Returns: new range, movement reason line, extracted fields, next question
+// (or is_final=true when exchange=3 so the frontend can show the obstacle
+// question; obstacle submission uses exchange=4 and returns is_paywall=true).
 //
 // INPUT (re. the 3-question assessment reduction): `profile` from the chat page
 // contains 3 real user-selected fields (company_situation, last_raise, company_size)
@@ -16,6 +18,15 @@
 // classify the overall signal (strong_positive | positive | neutral | negative),
 // and write the reason line. The range math itself runs DETERMINISTICALLY in code
 // (see spec § 9 canonical rules).
+//
+// 3-exchange redesign notes:
+//   Ex1 = role & industry (free text)              — unchanged
+//   Ex2 = your case: performance + leverage merged  — NEW merged question
+//         (was Ex2 perf + Ex3 market in the old 4-exchange version)
+//   Ex3 = manager + prior_ask only (timing dropped, moved to obstacle chip)
+//   Ex4 = OBSTACLE capture only — no range math, just classify the obstacle
+//         for paywall copy composition. Coach line is the final line before
+//         the paywall bubble renders.
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { Redis }  = require('@upstash/redis');
@@ -26,8 +37,11 @@ const redis  = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 });
 
-// Target widths per exchange (tightens steadily toward 5pp at ex4)
-const TARGET_WIDTH = { 1: 25, 2: 19, 3: 13, 4: 5 };
+// Target widths per exchange — 3-step tightening (was 4-step 25/19/13/5)
+// Ex1: 25pp width (widest tightening)
+// Ex2: 15pp width (merged perf + leverage, bigger signal, bigger shrink)
+// Ex3: 5pp  width (final locked range)
+const TARGET_WIDTH = { 1: 25, 2: 15, 3: 5 };
 
 // ── Range math — spec § 9 "tightens but doesn't tank" ─────
 // Signal: 'strong_positive' | 'positive' | 'neutral' | 'negative' | 'strong_negative'
@@ -50,8 +64,8 @@ function updateRange(current, targetWidth, signal, initialFloor) {
     strong_negative: [0.15, 0.85],
   }[signal] || [0.50, 0.50];
 
-  let floorLift  = Math.round(shrinkBy * ratios[0]);
-  let ceilingDrop= Math.round(shrinkBy * ratios[1]);
+  let floorLift   = Math.round(shrinkBy * ratios[0]);
+  let ceilingDrop = Math.round(shrinkBy * ratios[1]);
 
   // Also apply a small midpoint nudge for strong signals
   if (signal === 'strong_positive') { floorLift += 2; ceilingDrop -= 2; }
@@ -126,120 +140,143 @@ Respond ONLY with valid JSON, no preamble:
   "reason_line": "..."
 }`;
 
-const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user has just told you about their last 12 months of performance.
+// ── Exchange 2: MERGED performance + leverage ────────────
+// The user's single answer tells us whichever axis matters most to them.
+// Claude classifies the strongest signal they actually gave.
+const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user has just told you about their case for a raise — either their recent performance, their market leverage, or both. This is the single "what's your ammunition?" question in the 3-exchange flow.
 
-Fields to extract:
-- performance_rating: one of [exceeded, specific_win, met, mixed]
+Fields to extract (any that apply — use "not_mentioned" if the user didn't touch that axis):
+- performance_rating: one of [exceeded, specific_win, met, mixed, not_mentioned]
+- external_leverage:  one of [competing_offer, actively_recruited, underpaid_evidence, none, not_mentioned]
+- market_position:    one of [underpaid, at_market, overpaid, unsure, not_mentioned]
 - specific_achievements: array of 0-3 short strings (only if they mentioned concrete wins)
+- leverage_detail: string (if they typed specifics about offers or recruiter interest)
 
-Signal classification:
-- strong_positive: exceeded expectations
-- positive: strong specific win
-- neutral: met expectations
-- negative: mixed year
+Signal classification — pick the STRONGEST axis they actually mentioned:
+- strong_positive: competing_offer OR exceeded expectations
+- positive: actively_recruited OR credible underpaid evidence OR specific performance win
+- neutral: met expectations / at-market / unsure / nothing strongly stated
+- negative: mixed performance year AND no external leverage
+- strong_negative: poor performance AND explicitly negative leverage signals
 
-Reason line (max 20 words):
-- Reference their rating specifically
-- Reflect the "tightens but doesn't tank" rule — weak performance reframes as "upside limited", never "probability tanked"
+If the user only addressed one axis (e.g. only performance), classify from that axis and set the other fields to "not_mentioned". Don't penalise them for not mentioning leverage — many people genuinely have no external leverage and that's fine.
+
+Reason line (max 22 words):
+- Reference whichever axis the user actually led with
+- Reflect the "tightens but doesn't tank" rule — weak evidence reframes as "upside limited" or "paid plan shows how to build leverage", never "probability tanked"
 
 Respond ONLY with valid JSON, no preamble:
 {
-  "extracted": { "performance_rating": "...", "specific_achievements": [...] },
+  "extracted": {
+    "performance_rating": "...",
+    "external_leverage": "...",
+    "market_position": "...",
+    "specific_achievements": [...],
+    "leverage_detail": "..."
+  },
   "signal": "...",
   "reason_line": "..."
 }`;
 
-const EXCHANGE_3_SYSTEM = `You are a salary negotiation coach. The user has just told you about their market position and external leverage.
-
-Fields to extract:
-- market_position: one of [underpaid, at_market, overpaid, unsure]
-- external_leverage: one of [competing_offer, actively_recruited, underpaid_evidence, none]
-- leverage_detail: string (if they typed specifics)
-
-Signal classification:
-- strong_positive: competing_offer
-- positive: actively_recruited OR credible underpaid evidence
-- neutral: at-market, unsure
-- negative: none / no external leverage
-
-Reason line (max 20 words):
-- Must reference leverage specifically
-- If no external leverage: frame as "paid plan shows how to build it fast" — never tank the number
-
-Respond ONLY with valid JSON, no preamble:
-{
-  "extracted": { "market_position": "...", "external_leverage": "...", "leverage_detail": "..." },
-  "signal": "...",
-  "reason_line": "..."
-}`;
-
-const EXCHANGE_4_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship, any prior raise asks, AND review cycle timing. This is the FINAL exchange before the paywall.
+// ── Exchange 3: MANAGER relationship + prior_ask (timing removed) ────
+// Timing moved to obstacle-question chip in the frontend. Ex3 stays focused
+// on the relational axis which is a distinct signal from evidence.
+const EXCHANGE_3_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship and whether they've asked for a raise before. This is the FINAL exchange before the obstacle capture.
 
 Fields to extract:
 - manager_relationship: one of [strong, professional, complicated, never_asked]
-- review_timing: one of [imminent, soon, distant, none, just_happened]
 - prior_ask: one of [not_mentioned, never_asked, asked_got_yes, asked_got_no, asked_got_partial]
   (A prior "no" is a strong coaching signal — the plan has to handle re-opening the conversation.
    "asked_got_partial" = asked and got something smaller than requested.
    Default to "not_mentioned" if the user didn't touch the topic.)
 - context_detail: string (e.g., "manager was just replaced", "I'm on a PIP", "asked last year and was told budget was frozen")
 
-Signal classification uses the combinatorial matrix:
-- strong_positive: strong + imminent/soon
-- positive: strong + distant OR never_asked + soon
-- neutral: professional + any OR strong + no_cycle
-- negative: complicated + any OR any + just_happened OR asked_got_no + any
-- strong_negative: complicated + just_happened OR asked_got_no + just_happened
+Signal classification — relationship × prior_ask matrix:
+- strong_positive: strong + (asked_got_yes OR never_asked/not_mentioned)
+- positive:        professional + (asked_got_yes OR never_asked) OR strong + asked_got_partial
+- neutral:         professional + (never_asked OR not_mentioned) OR strong + asked_got_no
+- negative:        complicated + any OR professional + asked_got_no OR any + asked_got_partial
+- strong_negative: complicated + asked_got_no
 
 Reason line (max 22 words):
-- Must reference BOTH relationship AND timing
-- If prior_ask is asked_got_no, acknowledge the past rejection directly but frame as addressable
-- This is the final reason before paywall — should feel conclusive
+- Must reference the manager relationship specifically
+- If prior_ask is asked_got_no, acknowledge the past rejection directly but frame as addressable with the right approach
+- This is the last reason line before the obstacle question — should feel like we're zeroing in
 
 Respond ONLY with valid JSON, no preamble:
 {
-  "extracted": { "manager_relationship": "...", "review_timing": "...", "prior_ask": "...", "context_detail": "..." },
+  "extracted": { "manager_relationship": "...", "prior_ask": "...", "context_detail": "..." },
   "signal": "...",
   "reason_line": "..."
 }`;
 
+// ── Exchange 4: OBSTACLE capture (no range math) ─────────
+// The user has already seen their final range card. They've just told us
+// the one thing they're most worried about. We classify it into a canonical
+// obstacle code for paywall copy keying, and write the final coach line
+// that bridges directly into the paywall bubble.
+const EXCHANGE_4_SYSTEM = `You are a salary negotiation coach. The user has seen their final probability range and you've just asked: "Before I map out your plan, what's the one thing you're most worried about?"
+
+They may have tapped a canonical chip OR typed free text. Your job is to classify their worry into one of six canonical obstacle codes AND write a short, empathetic coach line that acknowledges their specific worry and bridges into the paywall that follows.
+
+Canonical obstacle codes:
+- budget         : manager will cite budget constraints / no money / "bad year"
+- justify        : unsure how to justify the number / feels underqualified / imposter vibes
+- timing         : no review scheduled / just happened / feels like the wrong moment
+- prior_no       : asked before and got a no or a delay
+- unknown_amount : doesn't know what specific number to ask for
+- other          : something meaningfully different from the five above
+
+If the user TYPED free text, classify to the CLOSEST canonical code (don't default to "other" unless genuinely none of the five fit). Preserve their exact phrasing in user_phrase_echo for the paywall to reference.
+
+Coach line (max 30 words):
+- Must acknowledge their SPECIFIC worry (reference the obstacle)
+- Must hint that the paid plan addresses exactly this thing
+- Must NOT say "upgrade" or "pay" or "unlock" — the paywall bubble handles that
+- Must feel like a natural next sentence from a coach, not a sales line
+- Ends with something that leads smoothly into the paywall
+
+Example coach lines:
+- budget:         "That 'no budget' line is the single most common deflection, and it almost always means 'I need ammunition to take upstairs', not 'no'. We can fix that."
+- justify:        "Justifying the number is the easiest part once you see the framing. Most people over-complicate it. There are three moves that do the work for you."
+- timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled."
+- prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable."
+- unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation that gets you to a defensible ask."
+- other:          (improvise, same structure, same tone)
+
+Respond ONLY with valid JSON, no preamble:
+{
+  "obstacle_code": "budget|justify|timing|prior_no|unknown_amount|other",
+  "user_phrase_echo": "<their exact words if free text, else empty string>",
+  "coach_line": "<1-2 sentences, max 30 words>"
+}`;
+
+// ── Next-question payloads ──────────────────────────────
+// Ex1 → Ex2, Ex2 → Ex3. After Ex3, frontend renders obstacle question locally.
+// After Ex4 (obstacle), frontend renders paywall.
 const NEXT_QUESTIONS = {
   1: {
-    question: "How would you describe your performance over the last 12 months?",
+    question: "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.",
     chips: [
-      { value: 'exceeded',     label: 'Exceeded expectations' },
-      { value: 'specific_win', label: 'Had a strong specific win' },
-      { value: 'met',          label: 'Met expectations' },
-      { value: 'mixed',        label: "It's been a mixed year" },
+      { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
+      { value: 'competing_offer',    label: 'I have a competing offer' },
+      { value: 'actively_recruited', label: "I'm being actively recruited" },
+      { value: 'underpaid',          label: "I know I'm underpaid for my role" },
+      { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
+      { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
     ],
     allows_free_text: true,
   },
   2: {
-    question: "Do you have a sense of how your salary compares to market rate — and has anyone approached you about other opportunities recently?",
-    chips: [
-      { value: 'underpaid',          label: "I know I'm underpaid for my role" },
-      { value: 'competing_offer',    label: 'I have a competing offer' },
-      { value: 'actively_recruited', label: "I'm being actively recruited" },
-      { value: 'none',               label: 'No external leverage right now' },
-    ],
-    allows_free_text: true,
-  },
-  3: {
-    question: "Last one. How's your relationship with whoever decides your salary, whether you've asked for a raise before (and how it went), and when's your next review or raise cycle?",
+    question: "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?",
     chips_row_1: [
       { value: 'strong',       label: 'Strong — they advocate for me' },
       { value: 'professional', label: 'Professional but not close' },
       { value: 'complicated',  label: "It's complicated" },
       { value: 'never_asked',  label: "I haven't asked before" },
     ],
-    chips_row_2: [
-      { value: 'imminent',     label: 'Review in the next month' },
-      { value: 'soon',         label: 'Review in 1–3 months' },
-      { value: 'distant',      label: 'Review in 3–6 months' },
-      { value: 'none',         label: 'No set review cycle' },
-      { value: 'just_happened',label: 'Review just happened' },
-    ],
     allows_free_text: true,
+    free_text_hint: 'If you asked before, tell me what happened — that changes the playbook.',
   },
 };
 
@@ -252,7 +289,15 @@ function systemForExchange(n) {
 }
 
 function fallbackResult(exchange, answer) {
-  // Used if Claude call fails — keeps the UX alive
+  if (exchange === 4) {
+    // Obstacle fallback — generic acknowledgement that won't break the paywall
+    return {
+      obstacle_code: 'other',
+      user_phrase_echo: typeof answer === 'string' ? String(answer).slice(0, 200) : '',
+      coach_line: "That's a real concern, and the coaching plan has a specific answer for it.",
+    };
+  }
+  // Used if Claude call fails for Ex1-3 — keeps the UX alive
   return {
     extracted: {},
     signal: 'neutral',
@@ -286,9 +331,9 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
   const {
-    exchange,              // 1 | 2 | 3 | 4
-    answer,                // free-text answer OR a single chip value OR {row1, row2} for ex4
-    profile,               // chat-page profile: 3 real fields (company_situation, last_raise, company_size) + 2 legacy defaults (country, seniority) — only the real 3 are sent to Claude
+    exchange,              // 1 | 2 | 3 (range tightening) | 4 (obstacle capture)
+    answer,                // free-text answer OR chip value OR {relationship, free_text} for ex3 OR {obstacle_code, label, free_text} for ex4
+    profile,               // chat-page profile: 3 real fields + 2 legacy defaults
     current_range,         // { floor, ceiling }
     initial_floor,         // from analyze response — used to enforce canonical floor rule
     accumulated_exchanges, // previous exchanges' extracted data (for context only)
@@ -298,8 +343,13 @@ module.exports = async function handler(req, res) {
   if (!exchange || exchange < 1 || exchange > 4) {
     return res.status(400).json({ error: 'Invalid exchange number' });
   }
-  if (!profile || !current_range) {
-    return res.status(400).json({ error: 'Missing profile or current_range' });
+  if (!profile) {
+    return res.status(400).json({ error: 'Missing profile' });
+  }
+  // Ex4 (obstacle) doesn't need current_range for math, but we still want it
+  // for context. Ex1-3 require it.
+  if (exchange <= 3 && !current_range) {
+    return res.status(400).json({ error: 'Missing current_range' });
   }
   if (answer == null || answer === '') {
     return res.status(400).json({ error: 'Answer required' });
@@ -307,8 +357,7 @@ module.exports = async function handler(req, res) {
 
   // Strip legacy default fields (country, seniority) before exposing the
   // profile to Claude — those are defaults carried in localStorage for the
-  // chat page's profileHash, not real user answers, and we don't want the
-  // coach to treat them as user-stated preferences.
+  // chat page's profileHash, not real user answers.
   const cleanProfile = {
     company_situation: profile.company_situation,
     last_raise:        profile.last_raise,
@@ -317,15 +366,25 @@ module.exports = async function handler(req, res) {
 
   // ── Build user message for Claude ──────────────────────
   let userMessage;
-  if (exchange === 4) {
-    // Answer is either a structured object or string
-    const a1 = typeof answer === 'object' ? answer.relationship : '';
-    const a2 = typeof answer === 'object' ? answer.timing       : '';
+  if (exchange === 3) {
+    // Ex3: manager-only, optional free text
+    const rel  = typeof answer === 'object' ? (answer.relationship || '') : '';
     const free = typeof answer === 'object' ? (answer.free_text || '') : (typeof answer === 'string' ? answer : '');
-    userMessage = `User's relationship chip: ${a1 || '(not selected)'}
-User's timing chip: ${a2 || '(not selected)'}
+    userMessage = `User's relationship chip: ${rel || '(not selected)'}
 User's free text: ${free || '(none)'}
-Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}`;
+Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
+Assessment: ${JSON.stringify(cleanProfile)}`;
+  } else if (exchange === 4) {
+    // Ex4: obstacle capture. Answer is { obstacle_code, label, free_text? }
+    // for chip selection, OR { free_text } for typed input.
+    const chipCode  = typeof answer === 'object' ? (answer.obstacle_code || '') : '';
+    const chipLabel = typeof answer === 'object' ? (answer.label || '') : '';
+    const free      = typeof answer === 'object' ? (answer.free_text || '') : (typeof answer === 'string' ? answer : '');
+    userMessage = `User's obstacle chip (if any): ${chipCode || '(free text only)'}
+Chip label (if any): ${chipLabel || '(none)'}
+User's free text (if any): ${free || '(none)'}
+Final range: ${current_range ? `${current_range.floor}-${current_range.ceiling}%` : 'unknown'}
+Accumulated exchanges so far: ${JSON.stringify(accumulated_exchanges || {})}`;
   } else {
     userMessage = `User answer: ${typeof answer === 'string' ? answer : JSON.stringify(answer)}
 Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
@@ -349,7 +408,27 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
     claudeResult = fallbackResult(exchange, answer);
   }
 
-  // ── Apply deterministic range update ───────────────────
+  // ── Ex4 obstacle branch: no range math, return obstacle payload ───
+  if (exchange === 4) {
+    logToSheet({
+      exchange: 4,
+      obstacle: claudeResult.obstacle_code || 'other',
+      user_phrase: (claudeResult.user_phrase_echo || '').slice(0, 200),
+    });
+
+    return res.status(200).json({
+      is_obstacle:       true,
+      is_paywall:        true,
+      obstacle_code:     claudeResult.obstacle_code    || 'other',
+      user_phrase_echo:  claudeResult.user_phrase_echo || '',
+      coach_line:        claudeResult.coach_line       || "Let's get you a plan.",
+      // Range unchanged — frontend already has it from Ex3
+      floor:   current_range ? current_range.floor   : null,
+      ceiling: current_range ? current_range.ceiling : null,
+    });
+  }
+
+  // ── Ex1-3: apply deterministic range update ────────────
   const targetWidth = TARGET_WIDTH[exchange];
   const newRange    = updateRange(
     current_range,
@@ -359,7 +438,7 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
   );
   const color       = colorFromMidpoint(newRange.floor, newRange.ceiling);
 
-  // ── Next question (null if this was ex4) ───────────────
+  // Next question (null if this was ex3 — frontend shows obstacle question)
   const next = NEXT_QUESTIONS[exchange] || null;
 
   // ── Fire-and-forget logging ────────────────────────────
@@ -372,13 +451,15 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
   });
 
   return res.status(200).json({
-    floor:       newRange.floor,
-    ceiling:     newRange.ceiling,
+    floor:         newRange.floor,
+    ceiling:       newRange.ceiling,
     color,
-    reason_line: claudeResult.reason_line || 'Your range is tightening as we learn more.',
-    extracted:   claudeResult.extracted   || {},
-    signal:      claudeResult.signal      || 'neutral',
-    next_question: next,                // null if ex4 → client shows paywall
-    is_final:    exchange === 4,
+    reason_line:   claudeResult.reason_line || 'Your range is tightening as we learn more.',
+    extracted:     claudeResult.extracted   || {},
+    signal:        claudeResult.signal      || 'neutral',
+    next_question: next,                // null if exchange===3 → client shows obstacle question
+    is_final:      exchange === 3,      // true after ex3 → render final range card + obstacle question
+    is_obstacle:   false,
+    is_paywall:    false,
   });
 };
