@@ -15,7 +15,7 @@
 <meta property="og:image" content="https://salary.recomlinked.com/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
-<meta property="og:image:alt" content="Salary Negotiation Coach — Know your chance. Negotiate with a plan."/>
+<meta property="og:image:alt" content="Salary Negotiation Coach. Know your chance. Negotiate with a plan."/>
 
 <!-- Twitter/X card -->
 <meta name="twitter:card" content="summary_large_image"/>
@@ -94,22 +94,35 @@ button { font-family: var(--sans); cursor: pointer; }
   padding: 20px 0 28px;
 }
 .hero h1 {
-  font-size: clamp(26px, 5vw, 42px);
+  font-size: clamp(26px, 5.2vw, 40px);
   line-height: 1.25;
   font-weight: 800;
   letter-spacing: -0.8px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   color: var(--text);
 }
-.hero h1 .accent { color: var(--gold); }
+.hero h1 .accent {
+  color: var(--gold);
+  font-size: 1.35em;
+  line-height: 1;
+  vertical-align: baseline;
+}
+.hero-sub {
+  font-size: clamp(15px, 2.6vw, 18px);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text);
+  max-width: 520px;
+  margin: 0 auto 8px;
+}
 .hero-trust {
-  font-size: 11px; color: var(--text3); letter-spacing: 0.04em;
+  font-size: 11px; color: var(--text2); letter-spacing: 0.04em;
   margin-top: 24px; text-transform: uppercase;
 }
 .hero-trust span { margin: 0 6px; }
 
 @media (max-width: 480px) {
-  .hero h1 { letter-spacing: -0.5px; }
+  .hero h1 { letter-spacing: -0.6px; }
 }
 
 /* ── CTAs ──────────────────────────────────────────────── */
@@ -135,17 +148,17 @@ button { font-family: var(--sans); cursor: pointer; }
 .cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
 .cta-btn.secondary {
   background: transparent;
-  color: var(--text3);
-  border: 1.5px solid var(--border2);
-  opacity: 0.85;
+  color: var(--text2);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  opacity: 1;
 }
-.cta-btn.secondary:hover { background: var(--bg3); opacity: 1; }
+.cta-btn.secondary:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.35); }
 @media (max-width: 420px) {
   .cta-btn { padding: 15px 26px; font-size: 14.5px; white-space: normal; }
   .cta-stack { gap: 10px; margin-top: 24px; }
 }
 
-/* ── Sample report card (FA-style, personas cycle) ────── */
+/* ── Sample report card — probability + factors + checklist ─── */
 .rep-section {
   margin: 32px 0 32px;
 }
@@ -156,146 +169,204 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .rep-link:hover { text-decoration: none; }
 .rep-card {
-  background: var(--bg2);
+  background: var(--bg3);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  border-radius: 10px;
+  padding: 14px 14px 16px;
+  transition: opacity 300ms ease, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
 }
+.rep-card.fading { opacity: 0; }
 .rep-link:hover .rep-card {
   border-color: rgba(201,168,76,0.45);
   box-shadow: 0 0 0 1px rgba(201,168,76,0.15);
 }
 .rep-link:hover .rep-cta-text { text-decoration: underline; }
 .rep-link:active .rep-card { transform: translateY(1px); }
+
 .rep-header {
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-  padding: 14px 16px;
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 14px;
 }
 .rep-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--gold); flex-shrink: 0;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); flex-shrink: 0;
 }
 .rep-hlabel {
-  font-size: 14px; font-weight: 700;
+  font-size: 12px; font-weight: 600;
   color: var(--text);
   line-height: 1.35;
   flex: 1;
 }
 .rep-example-tag {
-  font-size: 9.5px; font-weight: 700;
+  font-size: 9px; font-weight: 700;
   color: var(--text3);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  letter-spacing: 0.04em; text-transform: uppercase;
   background: rgba(255,255,255,0.04);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 3px;
   padding: 3px 7px;
   flex-shrink: 0;
   white-space: nowrap;
 }
-@media (max-width: 420px) {
-  .rep-hlabel { font-size: 13px; }
-  .rep-example-tag { font-size: 9px; padding: 2px 6px; }
+
+/* Probability card (inside rep-card) */
+.rep-prob {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 16px 14px;
 }
-.rep-body { padding: 20px 20px 16px; }
-.rep-score-row {
-  display: flex; align-items: center; gap: 16px;
-  margin-bottom: 18px;
+.rep-prob-stage {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.09em; text-transform: uppercase;
+  margin-bottom: 8px;
 }
-.rep-ring-wrap {
-  position: relative; width: 64px; height: 64px;
-  flex-shrink: 0;
+.rep-prob-row {
+  display: flex; align-items: flex-end; gap: 10px;
+  margin-bottom: 12px;
 }
-.rep-ring-wrap svg { width: 64px; height: 64px; }
-.rep-ring-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+.rep-range {
+  font-size: 38px; font-weight: 800;
+  letter-spacing: -2px; line-height: 1;
+  opacity: 0; transition: opacity 400ms ease;
 }
-.rep-score-num {
-  font-size: 16px; font-weight: 800;
-  color: var(--text); line-height: 1;
+.rep-range.show { opacity: 1; }
+.rep-verdict-lbl {
+  font-size: 10px; font-weight: 700;
+  padding-bottom: 4px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  opacity: 0; transition: opacity 400ms ease 100ms;
 }
-.rep-score-lbl {
-  font-size: 8px; color: var(--text3);
-  text-transform: uppercase; letter-spacing: 0.08em;
-  margin-top: 2px;
-}
-.rep-ring-track { fill: none; stroke: var(--bg4); stroke-width: 5; }
-.rep-ring-fill {
-  fill: none; stroke-width: 5; stroke-linecap: round;
-  transform: rotate(-90deg); transform-origin: 32px 32px;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.22,1,0.36,1), stroke 0.6s;
-}
-.rep-role {
-  font-size: 10px; font-weight: 600;
-  letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--text3); margin-bottom: 3px;
-}
-.rep-verdict {
-  font-size: 15px; font-weight: 800;
-  margin-bottom: 3px; line-height: 1.25;
-}
-.rep-desc {
-  font-size: 11.5px; color: var(--text2); line-height: 1.5;
-}
-.rep-dims {
-  display: flex; flex-direction: column; gap: 7px;
-  margin-bottom: 14px;
-}
-.rep-dim-row {
-  display: flex; align-items: center; gap: 8px;
-}
-.rep-dim-name {
-  font-size: 11px; color: var(--text2);
-  width: 148px; flex-shrink: 0;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
+.rep-verdict-lbl.show { opacity: 1; }
+.rep-range.red, .rep-verdict-lbl.red { color: var(--red); }
+.rep-range.amber, .rep-verdict-lbl.amber { color: var(--gold); }
+.rep-range.green, .rep-verdict-lbl.green { color: var(--teal); }
 .rep-track {
-  flex: 1; height: 5px;
-  background: var(--bg4); border-radius: 3px;
-  overflow: hidden;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px; height: 6px; overflow: hidden;
 }
 .rep-fill {
-  height: 100%; border-radius: 3px; width: 0;
-  transition: width 0.8s cubic-bezier(0.22,1,0.36,1), background 0.6s;
+  height: 100%; border-radius: 3px; width: 0%;
+  transition: width 900ms cubic-bezier(0.22,1,0.36,1) 200ms;
 }
-.rep-pct {
-  font-size: 11px; width: 32px; text-align: right;
+.rep-fill.red   { background: var(--red); }
+.rep-fill.amber { background: var(--gold); }
+.rep-fill.green { background: var(--teal); }
+.rep-persona-label {
+  margin-top: 14px;
+  font-size: 12px; color: var(--text2); line-height: 1.45;
+  opacity: 0; transition: opacity 400ms ease 300ms;
+}
+.rep-persona-label.show { opacity: 1; }
+.rep-persona-label .rep-prole {
+  color: #b8bcce; font-weight: 600;
+}
+
+/* Section headers (factors / plan) */
+.rep-section-head {
+  margin-top: 18px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.09em; text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rep-section-count {
+  font-size: 10px; color: var(--text2);
+  font-weight: 500; letter-spacing: 0; text-transform: none;
+}
+
+/* Factors list */
+.rep-factors { display: flex; flex-direction: column; gap: 7px; }
+.rep-factor {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; line-height: 1.3;
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+.rep-factor.show { opacity: 1; transform: translateX(0); }
+.rep-factor-bar {
+  width: 28px; height: 4px; border-radius: 2px;
+  flex-shrink: 0;
+}
+.rep-factor-bar.pos { background: var(--teal); }
+.rep-factor-bar.neu { background: var(--gold); }
+.rep-factor-bar.neg { background: var(--red); }
+.rep-factor-label { flex: 1; color: #b8bcce; }
+.rep-factor-value {
+  font-size: 12px; color: var(--text2); font-weight: 500;
+}
+
+.rep-show-more {
+  margin-top: 10px;
+  font-size: 11px; color: var(--text2);
+  opacity: 0; transition: opacity 400ms ease;
+}
+.rep-show-more.show { opacity: 1; }
+.rep-show-more .plus {
+  color: var(--gold); font-weight: 700; margin-right: 4px;
+}
+
+/* Checklist */
+.rep-checklist { display: flex; flex-direction: column; gap: 7px; }
+.rep-clitem {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; line-height: 1.3;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.rep-clitem.show { opacity: 1; }
+.rep-clmark {
+  width: 16px; height: 16px; border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  transform: scale(0.6);
+  transition: transform 260ms cubic-bezier(0.34,1.56,0.64,1);
+}
+.rep-clitem.show .rep-clmark { transform: scale(1); }
+.rep-clmark.done { background: var(--teal); color: var(--bg); }
+.rep-clmark.pending {
+  background: transparent; color: var(--text3);
+  border: 1.3px solid rgba(255,255,255,0.18);
+}
+.rep-cltext { flex: 1; }
+.rep-clitem.done .rep-cltext { color: #b8bcce; }
+.rep-clitem.pending .rep-cltext { color: var(--text2); }
+.rep-clpill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.14);
   color: var(--text2);
-}
-.rep-divider {
-  height: 1px; background: var(--border);
-  margin: 4px 0 12px;
-}
-.rep-more-label {
-  font-size: 11px; font-weight: 800;
-  color: var(--text2); margin-bottom: 8px;
-}
-.rep-tags {
-  display: flex; flex-wrap: wrap; gap: 5px;
-  margin-bottom: 14px;
-}
-.rep-tag {
-  font-size: 10px; color: var(--gold);
-  background: rgba(201,168,76,0.08);
-  border: 1px solid rgba(201,168,76,0.25);
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px;
   border-radius: 4px;
-  padding: 3px 8px;
+  flex-shrink: 0;
 }
+
 .rep-cta {
-  text-align: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  text-align: right;
 }
 .rep-cta-text {
-  font-size: 11px; color: var(--gold); font-weight: 700;
-  letter-spacing: 0.03em; cursor: pointer;
+  font-size: 12px; color: var(--gold); font-weight: 700;
+  cursor: pointer;
 }
-.rep-cta-text:hover { text-decoration: underline; }
-@media (max-width: 480px) {
-  .rep-dim-name { width: 110px; font-size: 10.5px; }
+
+/* Persona indicator dots */
+.rep-indicator {
+  display: flex; gap: 6px; justify-content: center;
+  margin-top: 12px;
 }
+.rep-pi-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 300ms ease;
+}
+.rep-pi-dot.active { background: var(--gold); }
 
 /* ── Section ──────────────────────────────────────────── */
 .section {
@@ -311,36 +382,6 @@ button { font-family: var(--sans); cursor: pointer; }
 .section .section-sub {
   font-size: 13px; color: var(--text2); line-height: 1.55;
   margin-bottom: 20px;
-}
-
-/* ── Why different (icon grid) ─────────────────────────── */
-.val-grid {
-  display: grid; grid-template-columns: 1fr; gap: 10px;
-  max-width: 560px; margin: 0 auto;
-}
-.val-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 18px 16px;
-}
-.val-icon {
-  width: 28px; height: 28px;
-  color: var(--gold);
-  margin-bottom: 10px;
-  display: block;
-}
-.val-icon svg {
-  width: 100%; height: 100%;
-  stroke: currentColor; stroke-width: 1.6;
-  fill: none; stroke-linecap: round; stroke-linejoin: round;
-}
-.val-title {
-  font-size: 14px; font-weight: 700;
-  color: var(--text); margin-bottom: 4px;
-}
-.val-body {
-  font-size: 12.5px; color: var(--text2); line-height: 1.55;
 }
 
 /* ── Proof bar ────────────────────────────────────────── */
@@ -597,6 +638,102 @@ button { font-family: var(--sans); cursor: pointer; }
   font-size: 12px; color: var(--text3);
 }
 
+/* ── Proof rotator (typewriter between sample card and how-it-works) ── */
+.proof-rotator {
+  margin: 36px 0 36px;
+  text-align: center;
+  min-height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 12px;
+}
+.proof-rotator-text {
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  max-width: 520px;
+}
+.proof-rotator-text .emph {
+  color: var(--gold);
+  font-weight: 700;
+}
+.proof-rotator-text .cursor {
+  display: inline-block;
+  width: 2px;
+  background: var(--gold);
+  margin-left: 2px;
+  animation: proof-blink 0.9s steps(2, end) infinite;
+  height: 1em;
+  vertical-align: text-bottom;
+}
+@keyframes proof-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@media (max-width: 480px) {
+  .proof-rotator-text { font-size: 15px; }
+}
+
+/* ── How it works (vertical cards) ────────────────────── */
+.hiw-section {
+  margin: 32px 0 32px;
+}
+.hiw-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 16px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.hiw-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
+  font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hiw-body { flex: 1; min-width: 0; }
+.hiw-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.hiw-desc {
+  font-size: 13px;
+  color: #b8bcce;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.hiw-desc .range {
+  color: var(--teal);
+  font-weight: 700;
+}
+.hiw-meta {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.hiw-meta .pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.hiw-meta .pill.free {
+  background: rgba(0,196,160,0.08);
+  border-color: rgba(0,196,160,0.3);
+  color: var(--teal);
+}
+
 /* ── Section dividers (below-fold) ─────────────────────── */
 .divider {
   height: 1px; background: var(--border);
@@ -629,11 +766,13 @@ button { font-family: var(--sans); cursor: pointer; }
 
   <!-- Hero ─────────────────────────────────────────────── -->
   <section class="hero">
-    <h1>How to negotiate your salary<br><span class="accent" style="display:block;margin-top:12px;font-size:0.78em;font-weight:700;line-height:1.35;">Your actual probability, your plan for the ask, and an AI coach for the words and emails</span><span style="display:block;margin-top:10px;font-size:0.62em;font-weight:500;color:var(--text);line-height:1.3;">Not general advice</span></h1>
+    <h1>Get a <span class="accent">7-15%</span> raise<br>with a personalised negotiation plan</h1>
+
+    <p class="hero-sub">No need to be a negotiator. The plan writes the words for you.</p>
 
     <div class="cta-stack">
       <a href="/raise/?start=1#assessment-top" class="cta-btn" id="cta-raise">
-        <span>Get my raise negotiation plan</span>
+        <span>Get my plan</span>
         <span class="cta-arrow">→</span>
       </a>
       <a href="#rep-section" class="cta-btn secondary" id="cta-how">
@@ -647,55 +786,7 @@ button { font-family: var(--sans); cursor: pointer; }
     </div>
   </section>
 
-  <!-- Sample report card (FA-style, personas cycle) ──── -->
-  <div class="rep-section" id="rep-section">
-    <a href="/raise/?start=1#assessment-top" class="rep-link">
-    <div class="rep-card">
-      <div class="rep-header">
-        <div class="rep-dot"></div>
-        <span class="rep-hlabel">Find out how strong your raise case really is</span>
-        <span class="rep-example-tag">Example</span>
-      </div>
-      <div class="rep-body">
-        <div class="rep-score-row">
-          <div class="rep-ring-wrap">
-            <svg viewBox="0 0 64 64">
-              <circle class="rep-ring-track" cx="32" cy="32" r="27"/>
-              <circle class="rep-ring-fill" id="rep-ring" cx="32" cy="32" r="27" stroke-dasharray="169.6" stroke-dashoffset="169.6" stroke="#c9a84c"/>
-            </svg>
-            <div class="rep-ring-center">
-              <span class="rep-score-num" id="rep-snum">--</span>
-              <span class="rep-score-lbl">score</span>
-            </div>
-          </div>
-          <div>
-            <div class="rep-role" id="rep-srole"></div>
-            <div class="rep-verdict" id="rep-sverdict" style="color:#c9a84c"></div>
-            <div class="rep-desc" id="rep-sdesc"></div>
-          </div>
-        </div>
-        <div class="rep-dims" id="rep-dims"></div>
-        <div class="rep-divider"></div>
-        <div class="rep-more-label">+ more dimensions in your full plan</div>
-        <div class="rep-tags">
-          <span class="rep-tag">Industry tailwinds</span>
-          <span class="rep-tag">External leverage</span>
-          <span class="rep-tag">Manager dynamic</span>
-          <span class="rep-tag">Opening script</span>
-          <span class="rep-tag">Pushback responses</span>
-          <span class="rep-tag">Email template</span>
-          <span class="rep-tag">Role-play mode</span>
-          <span class="rep-tag">Coach chat</span>
-        </div>
-        <div class="rep-cta">
-          <div class="rep-cta-text">Get your plan →</div>
-        </div>
-      </div>
-    </div>
-    </a>
-  </div>
-
-  <!-- Proof bar (cited stats) — context-setter before the value grid -->
+  <!-- Proof bar (cited stats) — establishes credibility before product demo -->
   <div class="proof-bar">
     <div class="proof-stat">
       People who negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
@@ -703,37 +794,87 @@ button { font-family: var(--sans); cursor: pointer; }
     <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
   </div>
 
-  <!-- Why different (icon grid) ────────────────────────── -->
-  <section class="section">
-    <h2>Why this is different</h2>
-    <div class="val-grid">
-
-      <div class="val-card">
-        <div class="val-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
-        </div>
-        <div class="val-title">Calibrated to you</div>
-        <div class="val-body">A realistic probability and a plan built for your role, your manager, and your timing.</div>
+  <!-- Sample report card — probability + factors + checklist, rotates through personas ─── -->
+  <div class="rep-section" id="rep-section">
+    <a href="/raise/?start=1#assessment-top" class="rep-link">
+    <div class="rep-card" id="rep-card">
+      <div class="rep-header">
+        <div class="rep-dot"></div>
+        <span class="rep-hlabel">Find out how strong your raise case really is</span>
+        <span class="rep-example-tag">Example</span>
       </div>
 
-      <div class="val-card">
-        <div class="val-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>
+      <div class="rep-prob">
+        <div class="rep-prob-row">
+          <span class="rep-range" id="rep-range">0-0%</span>
+          <span class="rep-verdict-lbl" id="rep-verdict-lbl"></span>
         </div>
-        <div class="val-title">Words you'd actually say</div>
-        <div class="val-body">Scripts and emails in your voice, not canned corporate lines.</div>
+        <div class="rep-track"><div class="rep-fill" id="rep-fill" style="width:0%"></div></div>
+        <div class="rep-persona-label" id="rep-persona-label"></div>
       </div>
 
-      <div class="val-card">
-        <div class="val-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        </div>
-        <div class="val-title">Practise before you ask</div>
-        <div class="val-body">Role-play the conversation with pushbacks and objections, so you walk in ready.</div>
+      <div class="rep-section-head">
+        <span>What's moving your score</span>
       </div>
+      <div class="rep-factors" id="rep-factors"></div>
+      <div class="rep-show-more" id="rep-factors-more"><span class="plus">+</span>more</div>
 
+      <div class="rep-section-head">
+        <span>Your preparation plan</span>
+        <span class="rep-section-count" id="rep-cl-count">0 of 10 done</span>
+      </div>
+      <div class="rep-checklist" id="rep-checklist"></div>
+      <div class="rep-show-more" id="rep-checklist-more"><span class="plus">+</span>more</div>
+
+      <div class="rep-cta">
+        <div class="rep-cta-text">Get your plan →</div>
+      </div>
+    </div>
+    </a>
+    <div class="rep-indicator" id="rep-indicator">
+      <div class="rep-pi-dot active"></div>
+      <div class="rep-pi-dot"></div>
+      <div class="rep-pi-dot"></div>
+      <div class="rep-pi-dot"></div>
+    </div>
+  </div>
+
+  <!-- How it works (3 vertical cards) ──────────────────── -->
+  <section class="section hiw-section">
+    <h2>How it works</h2>
+
+    <div class="hiw-card">
+      <div class="hiw-num">1</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Answer 3 questions</div>
+        <div class="hiw-desc">These are the main factors that impact your raise probability. Tap to answer, no typing.</div>
+        <div class="hiw-meta"><span class="pill">20 seconds</span><span class="pill free">Free</span></div>
+      </div>
+    </div>
+
+    <div class="hiw-card">
+      <div class="hiw-num">2</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Short chat with the coach</div>
+        <div class="hiw-desc">Add context on your performance, company, and timing so we can narrow your raise probability into a real range, something like <span class="range">68-82%</span>.</div>
+        <div class="hiw-meta"><span class="pill">2-3 minutes</span><span class="pill free">Free probability range</span></div>
+      </div>
+    </div>
+
+    <div class="hiw-card">
+      <div class="hiw-num">3</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Get your plan</div>
+        <div class="hiw-desc">Your specific number, opening script, pushback responses, email template, and 30 days of unlimited coach chat.</div>
+        <div class="hiw-meta"><span class="pill">$39 one-time</span><span class="pill">30-day access</span></div>
+      </div>
     </div>
   </section>
+
+  <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
+  <div class="proof-rotator" id="proof-rotator">
+    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
+  </div>
 
   <!-- Which one sounds like you? (reasons list) ──────── -->
   <section class="section">
@@ -742,35 +883,26 @@ button { font-family: var(--sans); cursor: pointer; }
       <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
         <span>I think I'm underpaid but I'm not sure</span><span class="reason-arrow">→</span>
       </a>
-      <a href="/raise/?start=1&amp;reason=quiet_wins#assessment-top" class="reason-chip">
-        <span>I can't put my wins into words</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
-        <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=freeze#assessment-top" class="reason-chip">
-        <span>I freeze when it's time to name a number</span><span class="reason-arrow">→</span>
-      </a>
       <a href="/raise/?start=1&amp;reason=unknown_number#assessment-top" class="reason-chip">
         <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
       </a>
       <a href="/raise/?start=1&amp;reason=unknown_timing#assessment-top" class="reason-chip">
         <span>I don't know if now is the right time</span><span class="reason-arrow">→</span>
       </a>
-      <a href="/raise/?start=1&amp;reason=small_raise#assessment-top" class="reason-chip">
-        <span>I got a small annual raise and want more</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=shy#assessment-top" class="reason-chip">
-        <span>I'm scared of sounding greedy or pushy</span><span class="reason-arrow">→</span>
+      <a href="/raise/?start=1&amp;reason=quiet_wins#assessment-top" class="reason-chip">
+        <span>I can't put my wins into words</span><span class="reason-arrow">→</span>
       </a>
       <a href="/raise/?start=1&amp;reason=quiet_performer#assessment-top" class="reason-chip">
         <span>I'm a strong performer but quiet, and it's costing me</span><span class="reason-arrow">→</span>
       </a>
-      <a href="/raise/?start=1&amp;reason=layoffs#assessment-top" class="reason-chip">
-        <span>The company just did layoffs. Can I still ask?</span><span class="reason-arrow">→</span>
+      <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
+        <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
       </a>
       <a href="/raise/?start=1&amp;reason=never_asked#assessment-top" class="reason-chip">
         <span>I've never asked for a raise in my career</span><span class="reason-arrow">→</span>
+      </a>
+      <a href="/raise/?start=1&amp;reason=layoffs#assessment-top" class="reason-chip">
+        <span>The company just did layoffs. Can I still ask?</span><span class="reason-arrow">→</span>
       </a>
       <a href="/raise/?start=1&amp;reason=other#assessment-top" class="reason-chip reason-chip-cta">
         <span>Most blockers are fixable. Let's find yours</span><span class="reason-arrow">→</span>
@@ -785,7 +917,7 @@ button { font-family: var(--sans); cursor: pointer; }
       Selling your work is not the same as bragging. We coach you to <strong>ask for what you're worth</strong>: professionally, with evidence, in words that sound like you.
     </p>
     <a href="/raise/?start=1#assessment-top" class="cta-btn">
-      <span>Get my raise negotiation plan</span>
+      <span>Get my plan</span>
       <span class="cta-arrow">→</span>
     </a>
     <div class="mini-trust">
@@ -800,6 +932,10 @@ button { font-family: var(--sans); cursor: pointer; }
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
         <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors, then gives you a personalised plan and remembers every conversation for 30 days as you prepare.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How much does it cost?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The assessment and coaching chat are free. If you want the full plan, including your specific number, opening script, pushback responses, email template, and 30 days of coach chat, it's $39 one-time. No subscription, no upsells. Backed by a 14-day refund if it's not useful for your situation.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability score?<span class="faq-icon">+</span></div>
@@ -836,7 +972,7 @@ button { font-family: var(--sans); cursor: pointer; }
   <div style="text-align:center; margin: 36px 0 10px;">
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Still here? Good.</div>
     <a href="/raise/?start=1#assessment-top" class="cta-btn">
-      <span>Get my raise negotiation plan</span>
+      <span>Get my plan</span>
       <span class="cta-arrow">→</span>
     </a>
   </div>
@@ -904,7 +1040,7 @@ button { font-family: var(--sans); cursor: pointer; }
         Got a raise in the past year, want more
       </div>
       <div class="opt" data-val="1_2_years" onclick="selectOpt(this,'raise-opts')">
-        1–2 years since my last raise
+        1-2 years since my last raise
       </div>
       <div class="opt" data-val="2_plus_years" onclick="selectOpt(this,'raise-opts')">
         2+ years since my last raise
@@ -930,9 +1066,9 @@ button { font-family: var(--sans); cursor: pointer; }
     <p class="sub">Larger companies tend to have structured raise bands. Smaller ones usually have more case-by-case flexibility.</p>
     <div class="opts" id="size-opts">
       <div class="opt" data-val="under_50"     onclick="selectOpt(this,'size-opts')">Under 50</div>
-      <div class="opt" data-val="50_250"       onclick="selectOpt(this,'size-opts')">50–250</div>
-      <div class="opt" data-val="250_1000"     onclick="selectOpt(this,'size-opts')">250–1,000</div>
-      <div class="opt" data-val="1000_10000"   onclick="selectOpt(this,'size-opts')">1,000–10,000</div>
+      <div class="opt" data-val="50_250"       onclick="selectOpt(this,'size-opts')">50-250</div>
+      <div class="opt" data-val="250_1000"     onclick="selectOpt(this,'size-opts')">250-1,000</div>
+      <div class="opt" data-val="1000_10000"   onclick="selectOpt(this,'size-opts')">1,000-10,000</div>
       <div class="opt" data-val="10000_plus"   onclick="selectOpt(this,'size-opts')">10,000+</div>
     </div>
     <div class="err" id="err-2">Please select your company size.</div>
@@ -1002,89 +1138,156 @@ function toggleFaq(qEl) {
 }
 
 /* ───────────────────────────────────────────────────────── */
-/* ── Sample report card — cycles through personas        ── */
+/* ── Sample report card — 4 personas, animated build     ── */
 /* ───────────────────────────────────────────────────────── */
-const GOLD = '#c9a84c';
-const TEAL = '#00c4a0';
-const RED  = '#e05555';
-const CIRC = 169.6; // 2 * PI * r (r=27)
-
-const repPersonas = [
-  {
-    score: 55, verdictColor: GOLD, ringColor: GOLD,
-    role: 'Mid-level Marketing · SaaS',
-    verdict: 'Moderate chance',
-    desc: 'Quiet contributor with clear wins you haven\'t surfaced.',
-    dims: [
-      { name: 'Company situation', pct: 55, color: GOLD },
-      { name: 'Performance case',  pct: 72, color: TEAL },
-      { name: 'Review timing',     pct: 48, color: GOLD },
-    ],
-  },
-  {
-    score: 78, verdictColor: TEAL, ringColor: TEAL,
-    role: 'Senior Engineer · Fintech',
-    verdict: 'High chance',
-    desc: 'Strong case. Timing and framing will set the ceiling.',
-    dims: [
-      { name: 'Company situation',  pct: 88, color: TEAL },
-      { name: 'Performance case',   pct: 91, color: TEAL },
-      { name: 'External leverage',  pct: 76, color: TEAL },
-    ],
-  },
-  {
-    score: 38, verdictColor: RED, ringColor: RED,
-    role: 'Junior Analyst · Retail',
-    verdict: 'Low chance',
-    desc: 'Tenure limits upside. One specific win reframes the ask.',
-    dims: [
-      { name: 'Company situation',  pct: 28, color: RED  },
-      { name: 'Performance case',   pct: 52, color: GOLD },
-      { name: 'Manager advocacy',   pct: 32, color: RED  },
-    ],
-  },
+const PLAN_ITEMS = [
+  "Top 3 blockers identified",
+  "Opening script drafted",
+  "Pushback responses",
+  "Timing window set",
+  "Email draft ready"
 ];
 
-function renderPersona(p) {
-  const ring    = document.getElementById('rep-ring');
-  const snum    = document.getElementById('rep-snum');
-  const srole   = document.getElementById('rep-srole');
-  const sverd   = document.getElementById('rep-sverdict');
-  const sdesc   = document.getElementById('rep-sdesc');
-  const dimsEl  = document.getElementById('rep-dims');
-  if (!ring || !snum || !dimsEl) return;
+const PERSONAS = [
+  {
+    role: "Senior Nurse · Hospital System",
+    desc: "Covers extra shifts without a pay bump. Union contract helps.",
+    floor: 54, ceiling: 68, color: "amber", verdict: "Moderate chance",
+    factors: [
+      ["pos", "Performance case", "Strong"],
+      ["pos", "Scope expansion", "Significant"],
+      ["neu", "Manager relationship", "Professional"],
+      ["neg", "Last raise timing", "6 months ago"],
+      ["neg", "Review timing", "6+ weeks out"]
+    ],
+    done: [1,1,0,1,0]
+  },
+  {
+    role: "Account Manager · Consulting",
+    desc: "Strong case, recent competing offer, clear leverage.",
+    floor: 68, ceiling: 82, color: "green", verdict: "High chance",
+    factors: [
+      ["pos", "Company situation", "Stable"],
+      ["pos", "Performance case", "Exceeded"],
+      ["pos", "Market position", "Competing offer"],
+      ["neu", "Last raise timing", "14 months ago"],
+      ["pos", "Review timing", "2 weeks out"]
+    ],
+    done: [1,1,1,0,1]
+  },
+  {
+    role: "Ops Lead · Manufacturing",
+    desc: "Strong performance but the company is cutting costs.",
+    floor: 32, ceiling: 45, color: "red", verdict: "Low chance",
+    factors: [
+      ["pos", "Performance case", "Strong"],
+      ["neu", "Manager relationship", "Professional"],
+      ["neg", "Company situation", "Cost-cutting"],
+      ["neg", "Last raise timing", "3 months ago"],
+      ["neg", "Market position", "Underpaid"]
+    ],
+    done: [1,0,0,0,0]
+  },
+  {
+    role: "Engineering Manager · Fintech",
+    desc: "Took on scope without a title bump. Evidence is piling up.",
+    floor: 61, ceiling: 74, color: "amber", verdict: "Moderate chance",
+    factors: [
+      ["pos", "Scope expansion", "Significant"],
+      ["pos", "Performance case", "Strong"],
+      ["neu", "Company situation", "Stable"],
+      ["neu", "Manager relationship", "Strong"],
+      ["neg", "Last raise timing", "9 months ago"]
+    ],
+    done: [0,1,1,1,0]
+  }
+];
 
-  // Ring
-  const offset = CIRC - (CIRC * (p.score / 100));
-  ring.setAttribute('stroke', p.ringColor);
-  ring.setAttribute('stroke-dashoffset', offset);
+let repIdx = 0;
+let repTimer = null;
 
-  // Score + text
-  snum.textContent = p.score + '%';
-  snum.style.color = p.ringColor;
-  srole.textContent = p.role;
-  sverd.textContent = p.verdict;
-  sverd.style.color = p.verdictColor;
-  sdesc.textContent = p.desc;
+function renderRepPersona(p) {
+  const pRange   = document.getElementById('rep-range');
+  const pVerdict = document.getElementById('rep-verdict-lbl');
+  const pFill    = document.getElementById('rep-fill');
+  const pLabel   = document.getElementById('rep-persona-label');
+  const factors  = document.getElementById('rep-factors');
+  const checklist= document.getElementById('rep-checklist');
+  const clCount  = document.getElementById('rep-cl-count');
+  const fMore    = document.getElementById('rep-factors-more');
+  const cMore    = document.getElementById('rep-checklist-more');
+  if (!pRange || !pFill || !factors || !checklist) return;
 
-  // Dimensions
-  dimsEl.innerHTML = p.dims.map(d => `
-    <div class="rep-dim-row">
-      <div class="rep-dim-name">${d.name}</div>
-      <div class="rep-track"><div class="rep-fill" style="width:${d.pct}%;background:${d.color};"></div></div>
-      <div class="rep-pct" style="color:${d.color}">${d.pct}%</div>
-    </div>
-  `).join('');
+  pRange.className   = 'rep-range ' + p.color;
+  pVerdict.className = 'rep-verdict-lbl ' + p.color;
+  pFill.className    = 'rep-fill ' + p.color;
+
+  pRange.textContent   = p.floor + '-' + p.ceiling + '%';
+  pVerdict.textContent = p.verdict;
+  pLabel.innerHTML     = '<span class="rep-prole">' + p.role + '</span><br>' + p.desc;
+
+  pFill.style.width = '0%';
+  [pRange, pVerdict, pLabel, fMore, cMore].forEach(e => { if (e) e.classList.remove('show'); });
+
+  factors.innerHTML = p.factors.map((f, i) =>
+    '<div class="rep-factor" style="transition-delay:' + (350 + i * 70) + 'ms">' +
+      '<span class="rep-factor-bar ' + f[0] + '"></span>' +
+      '<span class="rep-factor-label">' + f[1] + '</span>' +
+      '<span class="rep-factor-value">' + f[2] + '</span>' +
+    '</div>'
+  ).join('');
+
+  const doneCount = p.done.reduce((a,b) => a + b, 0);
+  clCount.textContent = doneCount + ' of 10 done';
+
+  const factorsEnd = 350 + p.factors.length * 70;
+  checklist.innerHTML = PLAN_ITEMS.map((it, i) => {
+    const d = p.done[i];
+    const delay = factorsEnd + 50 + i * 50;
+    return '<div class="rep-clitem ' + (d ? 'done' : 'pending') +
+      '" style="transition-delay:' + delay + 'ms">' +
+      '<span class="rep-clmark ' + (d ? 'done' : 'pending') + '">' + (d ? '✓' : '○') + '</span>' +
+      '<span class="rep-cltext">' + it + '</span>' +
+      (d ? '' : '<span class="rep-clpill">Draft →</span>') +
+    '</div>';
+  }).join('');
+
+  fMore.style.transitionDelay = (factorsEnd + 100) + 'ms';
+  cMore.style.transitionDelay = (factorsEnd + 50 + PLAN_ITEMS.length * 50 + 100) + 'ms';
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      pRange.classList.add('show');
+      pVerdict.classList.add('show');
+      pLabel.classList.add('show');
+      pFill.style.width = p.ceiling + '%';
+      document.querySelectorAll('#rep-factors .rep-factor').forEach(f => f.classList.add('show'));
+      document.querySelectorAll('#rep-checklist .rep-clitem').forEach(c => c.classList.add('show'));
+      fMore.classList.add('show');
+      cMore.classList.add('show');
+    });
+  });
+
+  const dots = document.querySelectorAll('#rep-indicator .rep-pi-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === repIdx));
+}
+
+function rotateRep() {
+  const card = document.getElementById('rep-card');
+  if (!card) return;
+  card.classList.add('fading');
+  setTimeout(() => {
+    repIdx = (repIdx + 1) % PERSONAS.length;
+    renderRepPersona(PERSONAS[repIdx]);
+    card.classList.remove('fading');
+  }, 350);
 }
 
 function playPersonas() {
   if (!document.getElementById('rep-section')) return;
-  let i = 0;
-  renderPersona(repPersonas[0]);
-  setInterval(() => {
-    i = (i + 1) % repPersonas.length;
-    renderPersona(repPersonas[i]);
-  }, 4200);
+  renderRepPersona(PERSONAS[0]);
+  if (repTimer) clearInterval(repTimer);
+  repTimer = setInterval(rotateRep, 6000);
 }
 
 // Start when the card is in view
@@ -1098,6 +1301,76 @@ if (document.getElementById('rep-section')) {
     });
   }, { threshold: 0.25 });
   obs.observe(document.getElementById('rep-section'));
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Proof rotator — typewriter animation between sample   ── */
+/* ──  card and How it works                                ── */
+/* ───────────────────────────────────────────────────────── */
+const PROOF_LINES = [
+  'A 7% raise on a $70k salary is <span class="emph">$4,900 more in year one</span>, and it compounds forever.',
+  'Your first raise pays this back <span class="emph">over 100 times</span>.',
+  '$39 once, for a conversation that adds <span class="emph">thousands to your year-one salary</span>.',
+  'A few hours of prep, <span class="emph">a raise that lasts years</span>.',
+  'Your raise pays this back <span class="emph">in week one</span>.'
+];
+
+const PROOF_TYPE_SPEED    = 32;   // ms per character while typing
+const PROOF_ERASE_SPEED   = 14;   // ms per character while erasing (faster)
+const PROOF_HOLD_FULL_MS  = 3400; // hold after typed in
+const PROOF_HOLD_EMPTY_MS = 260;  // pause between lines
+let proofRunning = false;
+
+async function runProofRotator() {
+  if (proofRunning) return;
+  const host = document.getElementById('proof-rotator-text');
+  if (!host) return;
+  proofRunning = true;
+  let i = 0;
+
+  // Plain-text version of each line for typing, plus the HTML for final render
+  const lines = PROOF_LINES.map(html => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return { html: html, text: tmp.textContent };
+  });
+
+  function renderCursor() {
+    return '<span class="cursor"></span>';
+  }
+
+  while (proofRunning) {
+    const line = lines[i];
+    // Type plain text char-by-char
+    for (let c = 0; c <= line.text.length; c++) {
+      host.innerHTML = line.text.slice(0, c).replace(/</g, '&lt;') + renderCursor();
+      await new Promise(r => setTimeout(r, PROOF_TYPE_SPEED));
+    }
+    // Swap to full HTML version (adds gold emphasis on key phrases)
+    host.innerHTML = line.html + renderCursor();
+    await new Promise(r => setTimeout(r, PROOF_HOLD_FULL_MS));
+    // Erase back to empty
+    const eraseText = line.text;
+    for (let c = eraseText.length; c >= 0; c--) {
+      host.innerHTML = eraseText.slice(0, c).replace(/</g, '&lt;') + renderCursor();
+      await new Promise(r => setTimeout(r, PROOF_ERASE_SPEED));
+    }
+    await new Promise(r => setTimeout(r, PROOF_HOLD_EMPTY_MS));
+    i = (i + 1) % lines.length;
+  }
+}
+
+// Start proof rotator when it scrolls into view
+if (document.getElementById('proof-rotator')) {
+  const pobs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        runProofRotator();
+        pobs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  pobs.observe(document.getElementById('proof-rotator'));
 }
 
 /* ───────────────────────────────────────────────────────── */
