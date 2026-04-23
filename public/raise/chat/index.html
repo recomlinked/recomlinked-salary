@@ -1163,6 +1163,22 @@ async function init() {
 
   // Render first card + first coach message
   renderInitialCard(state.current_range, result.context_line);
+
+  // GA4 + Clarity — chat_analyzed (initial probability computed + rendered)
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'chat_analyzed', {
+        product:         'raise',
+        initial_floor:   state.current_range.floor,
+        initial_ceiling: state.current_range.ceiling,
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'chat_analyzed');
+      window.clarity('event', 'chat_analyzed');
+    }
+  } catch (e) { /* non-fatal */ }
+
   await sleep(400);
   // First coach message — intentionally rewritten (backend sends an old
   // 4-question version). We override locally for 3-exchange framing.
@@ -1433,6 +1449,22 @@ async function handleObstacleChip(code, label) {
   disableInput('Thinking…');
   state.obstacle = { code, label };
   saveState();
+
+  // GA4 + Clarity — obstacle_answered
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'obstacle_answered', {
+        product:       'raise',
+        obstacle_code: code,
+        source:        'chip',
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'obstacle_answered');
+      window.clarity('event', 'obstacle_answered');
+    }
+  } catch (e) { /* non-fatal */ }
+
   await runObstacleCall({ obstacle_code: code, label });
 }
 
@@ -1449,6 +1481,22 @@ async function handleObstacleFreeText(text) {
   disableInput('Thinking…');
   state.obstacle = { code: null, label: text, free_text: text };
   saveState();
+
+  // GA4 + Clarity — obstacle_answered (free-text path)
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'obstacle_answered', {
+        product:       'raise',
+        obstacle_code: 'free_text',
+        source:        'text',
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'obstacle_answered');
+      window.clarity('event', 'obstacle_answered');
+    }
+  } catch (e) { /* non-fatal */ }
+
   await runObstacleCall({ free_text: text });
 }
 
@@ -1642,6 +1690,25 @@ async function runExchangeCall(exchangeNum, answer) {
     stage: exchangeNum,
     signal: result.signal,
   });
+
+  // GA4 + Clarity — exchange_N_completed (fires after Ex1, Ex2, Ex3)
+  try {
+    const evtName = 'exchange_' + exchangeNum + '_completed';
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', evtName, {
+        product:         'raise',
+        exchange_number: exchangeNum,
+        signal:          result.signal || '',
+        floor:           state.current_range.floor,
+        ceiling:         state.current_range.ceiling,
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', evtName);
+      window.clarity('event', evtName);
+    }
+  } catch (e) { /* non-fatal */ }
+
   await sleep(800);
 
   // Exchange 3 complete → obstacle question (no next_question from backend)
@@ -1702,6 +1769,22 @@ async function showPaywall() {
   // Animated render — the trust moment. Headline types, middle types, rest fades in.
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
+
+  // GA4 + Clarity — paywall_viewed
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'paywall_viewed', {
+        product:       'raise',
+        final_floor:   state.current_range ? state.current_range.floor   : null,
+        final_ceiling: state.current_range ? state.current_range.ceiling : null,
+        obstacle_code: (state.obstacle && state.obstacle.code) || '',
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'paywall_viewed');
+      window.clarity('event', 'paywall_viewed');
+    }
+  } catch (e) { /* non-fatal */ }
 
   // Populate plan-preview chips in the bottom panel
   renderPlanPreviewChips();
@@ -1906,19 +1989,19 @@ async function startCheckout() {
   // Use transport:'beacon' so the event survives the page unload when we redirect.
   try {
     if (typeof window.gtag === 'function') {
-      window.gtag('event', 'RAISE_CHECKOUT_STARTED', {
-        value: 39,
-        currency: 'USD',
+      window.gtag('event', 'checkout_started', {
+        product:        'raise',
+        value:          39,
+        currency:       'USD',
         transport_type: 'beacon',
-        final_range: (state && state.current_range)
-          ? (state.current_range[0] + '-' + state.current_range[1])
-          : '',
-        obstacle: (state && state.obstacle) || '',
+        final_floor:    (state && state.current_range) ? state.current_range.floor   : null,
+        final_ceiling:  (state && state.current_range) ? state.current_range.ceiling : null,
+        obstacle_code:  (state && state.obstacle && state.obstacle.code) || '',
       });
     }
     if (typeof window.clarity === 'function') {
       window.clarity('set', 'funnel_stage', 'checkout_started');
-      window.clarity('event', 'RAISE_CHECKOUT_STARTED');
+      window.clarity('event', 'checkout_started');
     }
   } catch (e) { /* tracking must never break checkout */ }
 
