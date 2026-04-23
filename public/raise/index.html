@@ -806,25 +806,37 @@ button { font-family: var(--sans); cursor: pointer; }
 
       <div class="rep-prob">
         <div class="rep-prob-row">
-          <span class="rep-range" id="rep-range">0-0%</span>
-          <span class="rep-verdict-lbl" id="rep-verdict-lbl"></span>
+          <span class="rep-range amber show" id="rep-range">54–68%</span>
+          <span class="rep-verdict-lbl amber show" id="rep-verdict-lbl">Moderate chance</span>
         </div>
-        <div class="rep-track"><div class="rep-fill" id="rep-fill" style="width:0%"></div></div>
-        <div class="rep-persona-label" id="rep-persona-label"></div>
+        <div class="rep-track"><div class="rep-fill amber" id="rep-fill" style="width:68%"></div></div>
+        <div class="rep-persona-label show" id="rep-persona-label"><span class="rep-prole">Senior Nurse · Hospital System</span><br>Covers extra shifts without a pay bump. Union contract helps.</div>
       </div>
 
       <div class="rep-section-head">
         <span>What's moving your score</span>
       </div>
-      <div class="rep-factors" id="rep-factors"></div>
-      <div class="rep-show-more" id="rep-factors-more"><span class="plus">+</span>more</div>
+      <div class="rep-factors" id="rep-factors">
+        <div class="rep-factor show"><span class="rep-factor-bar pos"></span><span class="rep-factor-label">Performance case</span><span class="rep-factor-value">Strong</span></div>
+        <div class="rep-factor show"><span class="rep-factor-bar pos"></span><span class="rep-factor-label">Scope expansion</span><span class="rep-factor-value">Significant</span></div>
+        <div class="rep-factor show"><span class="rep-factor-bar neu"></span><span class="rep-factor-label">Manager relationship</span><span class="rep-factor-value">Professional</span></div>
+        <div class="rep-factor show"><span class="rep-factor-bar neg"></span><span class="rep-factor-label">Last raise timing</span><span class="rep-factor-value">6 months ago</span></div>
+        <div class="rep-factor show"><span class="rep-factor-bar neg"></span><span class="rep-factor-label">Review timing</span><span class="rep-factor-value">6+ weeks out</span></div>
+      </div>
+      <div class="rep-show-more show" id="rep-factors-more"><span class="plus">+</span>more</div>
 
       <div class="rep-section-head">
         <span>Your preparation plan</span>
-        <span class="rep-section-count" id="rep-cl-count">0 of 10 done</span>
+        <span class="rep-section-count" id="rep-cl-count">3 of 10 done</span>
       </div>
-      <div class="rep-checklist" id="rep-checklist"></div>
-      <div class="rep-show-more" id="rep-checklist-more"><span class="plus">+</span>more</div>
+      <div class="rep-checklist" id="rep-checklist">
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Top 3 blockers identified</span></div>
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Opening script drafted</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Pushback responses</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Timing window set</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Email draft ready</span><span class="rep-clpill">Draft →</span></div>
+      </div>
+      <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>more</div>
 
       <div class="rep-cta">
         <div class="rep-cta-text">Get your plan →</div>
@@ -1285,7 +1297,9 @@ function rotateRep() {
 
 function playPersonas() {
   if (!document.getElementById('rep-section')) return;
-  renderRepPersona(PERSONAS[0]);
+  // HTML is pre-rendered with PERSONAS[0] content for fast LCP paint.
+  // Skip the initial re-render; just start the rotation timer so the first
+  // animated transition happens at the 6-second mark (persona 0 → persona 1).
   if (repTimer) clearInterval(repTimer);
   repTimer = setInterval(rotateRep, 6000);
 }
