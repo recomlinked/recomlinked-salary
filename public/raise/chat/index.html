@@ -1901,6 +1901,27 @@ function fireEnrichment() {
 }
 
 async function startCheckout() {
+  // ── Track checkout intent BEFORE redirect to Stripe ──
+  // Fires to GA4 (G-C5GQLC5FHP) and Clarity (wfantc4i14), both loaded in shared.js.
+  // Use transport:'beacon' so the event survives the page unload when we redirect.
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'RAISE_CHECKOUT_STARTED', {
+        value: 39,
+        currency: 'USD',
+        transport_type: 'beacon',
+        final_range: (state && state.current_range)
+          ? (state.current_range[0] + '-' + state.current_range[1])
+          : '',
+        obstacle: (state && state.obstacle) || '',
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'checkout_started');
+      window.clarity('event', 'RAISE_CHECKOUT_STARTED');
+    }
+  } catch (e) { /* tracking must never break checkout */ }
+
   // Inject keyframes once, globally. Matches FA's pattern so the spinner
   // starts spinning the moment the user clicks, even on a slow network.
   if (!document.getElementById('rl-spin-style')) {
