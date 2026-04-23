@@ -153,6 +153,30 @@ button { font-family: var(--sans); cursor: pointer; }
   opacity: 1;
 }
 .cta-btn.secondary:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.35); }
+.cta-btn.outline-gold {
+  background: transparent;
+  color: var(--gold);
+  border: 1.5px solid rgba(201,168,76,0.4);
+  padding: 13px 26px;
+  font-size: 14.5px;
+}
+.cta-btn.outline-gold:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.7);
+}
+
+/* Inline CTA below How it works */
+.hiw-continue {
+  text-align: center;
+  margin: 20px 0 8px;
+}
+.hiw-continue-hint {
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+  text-transform: uppercase;
+}
 @media (max-width: 420px) {
   .cta-btn { padding: 15px 26px; font-size: 14.5px; white-space: normal; }
   .cta-stack { gap: 10px; margin-top: 24px; }
@@ -794,6 +818,52 @@ button { font-family: var(--sans); cursor: pointer; }
     <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
   </div>
 
+  <!-- How it works (3 vertical cards) ──────────────────── -->
+  <section class="section hiw-section" id="how-it-works">
+    <h2>How it works</h2>
+
+    <div class="hiw-card">
+      <div class="hiw-num">1</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Answer 3 questions</div>
+        <div class="hiw-desc">These are the main factors that impact your raise probability. Tap to answer, no typing.</div>
+        <div class="hiw-meta"><span class="pill">20 seconds</span><span class="pill">No email needed</span></div>
+      </div>
+    </div>
+
+    <div class="hiw-card">
+      <div class="hiw-num">2</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Short chat with the coach</div>
+        <div class="hiw-desc">Add context on your performance, company, and timing so we can narrow your raise probability into a real range, something like <span class="range">68-82%</span>.</div>
+        <div class="hiw-meta"><span class="pill">2-3 minutes</span><span class="pill free">Free</span></div>
+      </div>
+    </div>
+
+    <div class="hiw-card">
+      <div class="hiw-num">3</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Get your plan</div>
+        <div class="hiw-desc">Your specific number, opening script, pushback responses, email template, and 30 days of unlimited coach chat.</div>
+        <div class="hiw-meta"><span class="pill">$39 one-time</span><span class="pill">30-day access</span></div>
+      </div>
+    </div>
+
+    <!-- CTA after steps — continues the journey at step 1 -->
+    <div class="hiw-continue">
+      <a href="/raise/?start=1#assessment-top" class="cta-btn outline-gold">
+        <span>Start step 1</span>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="hiw-continue-hint">Free · No email needed · 20 seconds</div>
+    </div>
+  </section>
+
+  <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
+  <div class="proof-rotator" id="proof-rotator">
+    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
+  </div>
+
   <!-- Sample report card — probability + factors + checklist, rotates through personas ─── -->
   <div class="rep-section" id="rep-section">
     <a href="/raise/?start=1#assessment-top" class="rep-link">
@@ -851,43 +921,6 @@ button { font-family: var(--sans); cursor: pointer; }
     </div>
   </div>
 
-  <!-- How it works (3 vertical cards) ──────────────────── -->
-  <section class="section hiw-section" id="how-it-works">
-    <h2>How it works</h2>
-
-    <div class="hiw-card">
-      <div class="hiw-num">1</div>
-      <div class="hiw-body">
-        <div class="hiw-title">Answer 3 questions</div>
-        <div class="hiw-desc">These are the main factors that impact your raise probability. Tap to answer, no typing.</div>
-        <div class="hiw-meta"><span class="pill">20 seconds</span><span class="pill free">Free</span></div>
-      </div>
-    </div>
-
-    <div class="hiw-card">
-      <div class="hiw-num">2</div>
-      <div class="hiw-body">
-        <div class="hiw-title">Short chat with the coach</div>
-        <div class="hiw-desc">Add context on your performance, company, and timing so we can narrow your raise probability into a real range, something like <span class="range">68-82%</span>.</div>
-        <div class="hiw-meta"><span class="pill">2-3 minutes</span><span class="pill free">Free probability range</span></div>
-      </div>
-    </div>
-
-    <div class="hiw-card">
-      <div class="hiw-num">3</div>
-      <div class="hiw-body">
-        <div class="hiw-title">Get your plan</div>
-        <div class="hiw-desc">Your specific number, opening script, pushback responses, email template, and 30 days of unlimited coach chat.</div>
-        <div class="hiw-meta"><span class="pill">$39 one-time</span><span class="pill">30-day access</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
-  <div class="proof-rotator" id="proof-rotator">
-    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
-  </div>
-
   <!-- Which one sounds like you? (reasons list) ──────── -->
   <section class="section">
     <h2>What's blocking your raise?</h2>
@@ -924,9 +957,9 @@ button { font-family: var(--sans); cursor: pointer; }
 
   <!-- Closing CTA (positioning statement lands here) ──────── -->
   <div class="closing-pitch">
-    <h3><span class="accent">A sales coach</span> for people who aren't salespeople</h3>
+    <h3><span class="accent">A negotiation coach</span> for people who hate asking</h3>
     <p>
-      Selling your work is not the same as bragging. We coach you to <strong>ask for what you're worth</strong>: professionally, with evidence, in words that sound like you.
+      Asking for a raise and selling your work <strong>isn't greedy</strong>. It's how careers move.
     </p>
     <a href="/raise/?start=1#assessment-top" class="cta-btn">
       <span>Get my plan</span>
@@ -1323,10 +1356,8 @@ if (document.getElementById('rep-section')) {
 /* ───────────────────────────────────────────────────────── */
 const PROOF_LINES = [
   'A 7% raise on a $70k salary is <span class="emph">$4,900 more in year one</span>, and it compounds forever.',
-  'Your first raise pays this back <span class="emph">over 100 times</span>.',
-  '$39 once, for a conversation that adds <span class="emph">thousands to your year-one salary</span>.',
-  'A few hours of prep, <span class="emph">a raise that lasts years</span>.',
-  'Your raise pays this back <span class="emph">in week one</span>.'
+  'A conversation that adds <span class="emph">thousands to your year-one salary</span>.',
+  'A few hours of prep, <span class="emph">a raise that lasts years</span>.'
 ];
 
 const PROOF_TYPE_SPEED    = 32;   // ms per character while typing
