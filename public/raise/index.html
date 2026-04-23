@@ -971,6 +971,24 @@ const S = {
     document.getElementById('assessment-content').style.display = 'block';
     // Scroll to top of assessment after paint
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+
+    // GA4 + Clarity — assessment_started (fires for every entry path:
+    // hero CTA, reason chips, closing CTAs — they all land here with ?start=1)
+    try {
+      const reason = params.get('reason') || '';
+      const ref    = params.get('ref')    || '';
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'assessment_started', {
+          product: 'raise',
+          reason:  reason,
+          ref:     ref,
+        });
+      }
+      if (typeof window.clarity === 'function') {
+        window.clarity('set', 'funnel_stage', 'assessment_started');
+        window.clarity('event', 'assessment_started');
+      }
+    } catch (e) { /* non-fatal */ }
   }
 })();
 
