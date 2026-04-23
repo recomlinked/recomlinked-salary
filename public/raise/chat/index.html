@@ -501,6 +501,12 @@ const state = {
   obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
   saved_at: null,               // ms timestamp — used for 24h staleness check
   free_dialog_count: 0,         // count of post-paywall free-text messages (caps at FREE_DIALOG_LIMIT)
+  // Turn-by-turn conversation history for Ex1/Ex2 only. Each value is an
+  // array of {role: 'user'|'assistant', text: string} for the CURRENT exchange.
+  // Sent to /api/raise-exchange so the classifier sees history and decides
+  // sufficient/insufficient based on cumulative content, not single-message length.
+  // Cleared when an exchange completes (advance=true).
+  exchange_messages: { 1: [], 2: [] },
 };
 
 // Free-text dialog cap before paywall-lock mode engages. User can ask up to
@@ -1104,6 +1110,12 @@ async function init() {
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
   } else if (saved && saved.profile && saved.current_exchange > 0) {
     Object.assign(state, saved);
+    // Ensure exchange_messages exists after loading pre-refactor state
+    if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
+      state.exchange_messages = { 1: [], 2: [] };
+    }
+    if (!Array.isArray(state.exchange_messages[1])) state.exchange_messages[1] = [];
+    if (!Array.isArray(state.exchange_messages[2])) state.exchange_messages[2] = [];
     await resumeFromState();
     return;
   }
@@ -1227,6 +1239,9 @@ async function beginExchange1() {
   disableInput('Thinking…');
   const q = "What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.";
   currentQuestion[1] = q;
+  // Reset conversation history for this exchange and seed with the coach question
+  clearExchangeMessages(1);
+  pushExchangeMessage(1, 'assistant', q);
   await typeCoachBubble(q);
   await sleep(200);
   enableInput('Describe your role…');
@@ -1240,6 +1255,9 @@ async function beginExchange2() {
   disableInput('Thinking…');
   const q = "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.";
   currentQuestion[2] = q;
+  // Reset conversation history for this exchange and seed with the coach question
+  clearExchangeMessages(2);
+  pushExchangeMessage(2, 'assistant', q);
   await typeCoachBubble(q);
   await sleep(150);
   showExchange2Chips();
@@ -1283,8 +1301,26 @@ async function beginExchange3() {
       // Free-text only — no chip picked
       submitExchange3({ relationship: '', free_text: text });
     } else {
-      // Under-substantive free text without a chip — use dynamic nudge
-      runDynamicNudge(3, text || '(empty)');
+      // Under-substantive free text without a chip — static nudge + re-arm
+      nudgeEx3NoChip();
+    }
+  });
+}
+
+/* Ex3 helper: user typed something too short and hasn't picked a chip yet.
+ * Show a static nudge coach bubble and re-arm the free-text listener so
+ * another attempt (with or without a chip) still routes correctly. */
+function nudgeEx3NoChip() {
+  typeCoachBubble(TEXT_NUDGE_FALLBACKS[3]);
+  enableInput(placeholderForExchange(3));
+  awaitFreeText((t2) => {
+    const r2 = state.ex3_partial?.relationship;
+    if (r2) {
+      submitExchange3({ relationship: r2, free_text: t2, displayLabels: { relationship: state.ex3_partial.relationship_label } });
+    } else if (t2 && t2.length > 6) {
+      submitExchange3({ relationship: '', free_text: t2 });
+    } else {
+      nudgeEx3NoChip();
     }
   });
 }
@@ -1473,15 +1509,25 @@ async function runObstacleCall(answer) {
   await showPaywall();
 }
 
-/* ── Common exchange handling (ex1-3) ──────────────────── */
+/* ── Common exchange handling (ex1-3) ────────────────────
+ * Every user turn flows through here. For Ex1/Ex2 we push the user message
+ * into state.exchange_messages so the backend sees full conversation history.
+ * Backend decides advance-vs-nudge. No length heuristics on the client.
+ */
 async function handleExchangeAnswer(exchangeNum, value, displayLabel) {
   appendUserBubble(displayLabel || value);
+
+  // For Ex1/Ex2, record the human-readable user turn in conversation history.
+  // displayLabel is used for chip taps (e.g. "I exceeded expectations"); value
+  // is used for free-text (already human-readable).
+  if ((exchangeNum === 1 || exchangeNum === 2) && typeof value === 'string') {
+    const historyText = displayLabel || value;
+    pushExchangeMessage(exchangeNum, 'user', historyText);
+  }
+
   // Don't clearChips() here — the API may return is_insufficient, in which
   // case we want chips to remain visible so the user can try a different
-  // option. fadeOutChips is called explicitly on successful chip-tap paths
-  // before this function runs, so they're already gone for chip submissions.
-  // For free-text submissions, chips stay; runExchangeCall clears them
-  // on success only.
+  // option. Chips clear on successful response only.
   disableInput('Thinking…');
 
   await runExchangeCall(exchangeNum, value);
@@ -1492,6 +1538,12 @@ async function runExchangeCall(exchangeNum, answer) {
   await sleep(300);
   showCoachTyping();
 
+  // For Ex1/Ex2, send the full conversation history; backend classifies
+  // based on the cumulative USER content, not the latest message alone.
+  const messages = (exchangeNum === 1 || exchangeNum === 2)
+    ? getExchangeMessages(exchangeNum)
+    : undefined;
+
   let result;
   try {
     const res = await fetch(API_EXCHANGE, {
@@ -1499,7 +1551,8 @@ async function runExchangeCall(exchangeNum, answer) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         exchange:              exchangeNum,
-        answer,
+        answer,                                    // chip values + Ex3/Ex4 legacy
+        messages,                                  // Ex1/Ex2 conversation history
         profile:               state.profile,
         profile_hash:          profileHash(),
         current_range:         state.current_range,
@@ -1520,16 +1573,20 @@ async function runExchangeCall(exchangeNum, answer) {
 
   hideCoachTyping();
 
-  // ── Insufficient signal guard ───────────────────────────
-  // Backend classified the answer as lacking signal (e.g. off-topic, too vague).
-  // Don't render a card, don't update range, don't advance. Render the nudge
-  // as a coach bubble and leave chips/input exactly where they were so the
-  // user can try again.
+  // ── Insufficient signal → backend nudge ─────────────────
+  // Backend classified the cumulative user answer as lacking signal. Render
+  // the nudge as a coach bubble, add it to conversation history so the
+  // NEXT call sees it, and leave chips/input where they were.
   if (result.is_insufficient) {
-    // Increment nudge attempts so the next insufficient response escalates in tone
     nudgeAttempts[exchangeNum] = (nudgeAttempts[exchangeNum] || 0) + 1;
-    await typeCoachBubble(result.nudge_line || "I need a bit more to work with. Can you give me more specifics?");
-    // Re-enable input with exchange-appropriate placeholder. Chips stay visible.
+    const nudgeText = result.nudge_line || TEXT_NUDGE_FALLBACKS[exchangeNum] || "Can you give me a bit more to work with?";
+
+    // Record the coach's nudge in conversation history (Ex1/Ex2 only)
+    if (exchangeNum === 1 || exchangeNum === 2) {
+      pushExchangeMessage(exchangeNum, 'assistant', nudgeText);
+    }
+
+    await typeCoachBubble(nudgeText);
     enableInput(placeholderForExchange(exchangeNum));
     $('chat-input').focus();
     // Re-arm the free-text handler for this exchange
@@ -1541,13 +1598,20 @@ async function runExchangeCall(exchangeNum, answer) {
         } else if (text && text.length > 6) {
           submitExchange3({ relationship: '', free_text: text });
         } else {
-          runDynamicNudge(3, text || '(empty)');
+          nudgeEx3NoChip();
         }
       });
     } else {
       awaitFreeText((text) => handleExchangeAnswer(exchangeNum, text));
     }
     return;
+  }
+
+  // ── Advance ──────────────────────────────────────────────
+  // Exchange complete. Clear this exchange's conversation history (it was
+  // only needed to decide sufficient/insufficient) and move on.
+  if (exchangeNum === 1 || exchangeNum === 2) {
+    clearExchangeMessages(exchangeNum);
   }
 
   // Save state
@@ -1618,7 +1682,7 @@ function routeToExchange(n) {
       } else if (text && text.length > 6) {
         submitExchange3({ relationship: '', free_text: text });
       } else {
-        runDynamicNudge(3, text || '(empty)');
+        nudgeEx3NoChip();
       }
     });
   }
@@ -2153,67 +2217,45 @@ function awaitFreeText(onSubmit) {
   pendingSubmitHandler = onSubmit;
 }
 
-// Minimum substance thresholds for free-text answers during exchanges.
-// Chip selections always bypass this (they're pre-validated options).
-const MIN_TEXT_CHARS = 8;
-const MIN_TEXT_WORDS = 2;
-
-// Static fallback nudges — only used if /api/raise-coach (nudge mode) fails.
+// Static fallback nudges — used ONLY when the backend classifier call fails
+// (network error or 500). In normal operation, the backend writes the nudge
+// line based on conversation history.
 const TEXT_NUDGE_FALLBACKS = {
-  1: "I need a bit more to work with. Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
+  1: "Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
   2: "Tap a chip above or give me one sentence on your strongest evidence — a win, an offer, or a sense you're underpaid.",
   3: "Pick a chip or write one line about your manager relationship and any prior raise ask.",
   4: "Tap a chip above, or type one line about what's worrying you most.",
 };
 
 // Tracks how many nudges have fired per exchange in the current session.
+// Kept for logging + tone progression but no longer gates any logic path.
 const nudgeAttempts = { 1: 0, 2: 0, 3: 0, 4: 0 };
 
 // Currently-displayed coach question per exchange.
 const currentQuestion = { 1: '', 2: '', 3: '', 4: '' };
 
-// Accumulated user free-text per exchange. When the user gives partial answers
-// across multiple messages (e.g. "marketing specialist" → then "manufacturing
-// company"), we concatenate them so the backend can see the full picture and
-// detect when the user has provided enough across turns.
-const accumulatedText = { 1: [], 2: [], 3: [], 4: [] };
-
-function addAccumulatedText(exchange, text) {
-  if (!accumulatedText[exchange]) accumulatedText[exchange] = [];
-  accumulatedText[exchange].push(text);
+// ── Exchange message helpers ──────────────────────────────
+// Turn-by-turn conversation for Ex1/Ex2. Sent to /api/raise-exchange as
+// `messages` so the classifier sees cumulative context and decides
+// advance/nudge based on meaning, not message length. Ex3 chips + Ex4
+// obstacle still use the legacy answer shape.
+function pushExchangeMessage(exchange, role, text) {
+  if (exchange !== 1 && exchange !== 2) return;
+  state.exchange_messages = state.exchange_messages || { 1: [], 2: [] };
+  state.exchange_messages[exchange] = state.exchange_messages[exchange] || [];
+  state.exchange_messages[exchange].push({ role, text: String(text || '') });
+  saveState();
 }
 
-function combinedAccumulatedText(exchange) {
-  return (accumulatedText[exchange] || []).join('. ').trim();
+function getExchangeMessages(exchange) {
+  if (exchange !== 1 && exchange !== 2) return [];
+  return (state.exchange_messages?.[exchange] || []).slice();
 }
 
-// Fetch a dynamic nudge from the server, including the user's accumulated
-// free-text from prior messages in this exchange. Falls back to a static
-// line if the call fails.
-async function fetchNudge(exchange, userAnswer) {
-  const attempts = nudgeAttempts[exchange] || 0;
-  const combined = combinedAccumulatedText(exchange);
-  try {
-    const res = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode:           'nudge',
-        exchange,
-        question:       currentQuestion[exchange] || '',
-        user_answer:    userAnswer,
-        prior_messages: accumulatedText[exchange] || [],
-        combined_text:  combined,
-        prior_attempts: attempts,
-        session_id:     profileHash(),
-      }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.nudge) return data.nudge;
-    }
-  } catch (e) { /* fall through */ }
-  return TEXT_NUDGE_FALLBACKS[exchange] || "Can you give me a bit more to work with?";
+function clearExchangeMessages(exchange) {
+  if (!state.exchange_messages) state.exchange_messages = { 1: [], 2: [] };
+  state.exchange_messages[exchange] = [];
+  saveState();
 }
 
 function handleSend() {
@@ -2222,45 +2264,10 @@ function handleSend() {
   if (!val) return;
   if (!pendingSubmitHandler) return;
 
-  const exNum = state.current_exchange;
-  const needsNudge = (exNum >= 1 && exNum <= 3);
-
-  if (needsNudge) {
-    const words = val.split(/\s+/).filter(Boolean).length;
-    if (val.length < MIN_TEXT_CHARS || words < MIN_TEXT_WORDS) {
-      appendUserBubble(val);
-      input.value = '';
-      addAccumulatedText(exNum, val);
-      runDynamicNudge(exNum, val);
-      return;
-    }
-    // Long-enough text: accumulate it and send the COMBINED text to the
-    // backend — so if the user has now given role + industry across two
-    // messages, the Ex1 classifier can see all of it and classify as sufficient.
-    addAccumulatedText(exNum, val);
-    const combined = combinedAccumulatedText(exNum);
-    input.value = '';
-    const h = pendingSubmitHandler;
-    pendingSubmitHandler = null;
-    h(combined);
-    return;
-  }
-
   input.value = '';
   const h = pendingSubmitHandler;
   pendingSubmitHandler = null;
   h(val);
-}
-
-async function runDynamicNudge(exchange, userAnswer) {
-  disableInput('Thinking…');
-  showCoachTyping();
-  const text = await fetchNudge(exchange, userAnswer);
-  hideCoachTyping();
-  nudgeAttempts[exchange] = (nudgeAttempts[exchange] || 0) + 1;
-  await typeCoachBubble(text);
-  enableInput(placeholderForExchange(exchange));
-  $('chat-input').focus();
 }
 
 function placeholderForExchange(n) {
