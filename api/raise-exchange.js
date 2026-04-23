@@ -109,12 +109,14 @@ function colorFromMidpoint(floor, ceiling) {
 // Each prompt constrains Claude to: (a) extract specific fields,
 // (b) classify the signal, (c) write the reason line.
 
-const EXCHANGE_1_SYSTEM = `You are a salary negotiation coach. The user has just told you their job title and company/industry in free text.
+const EXCHANGE_1_SYSTEM = `You are a salary negotiation coach. The user is answering: "What's your job title and what kind of company do you work for?"
+
+You will receive the full conversation for this exchange so far — labelled COACH and USER lines. If the user has answered across MULTIPLE turns, treat the UNION of all their USER lines as their complete answer. Do not re-ask for anything they've already provided in ANY prior USER turn.
 
 Your job: extract structured fields and classify how their field/industry shapes their raise probability RIGHT NOW in the market (spring 2026).
 
-FIRST — CHECK IF THE ANSWER HAS SIGNAL:
-An answer is SUFFICIENT if it contains BOTH:
+FIRST — CHECK IF THE CUMULATIVE USER ANSWER HAS SIGNAL:
+Combine ALL user turns in the conversation. An answer is SUFFICIENT if the COMBINED user turns contain BOTH:
   (a) any recognisable job title, role, or function, including:
       - C-suite abbreviations: CEO, CFO, CTO, CHRO, CMO, COO, CIO, CRO, CPO, CISO, CDO, CCO, or any C-level
       - VP / SVP / EVP / Head of [anything]
@@ -194,6 +196,15 @@ Reason line (max 20 words) — ONLY if signal is NOT insufficient:
 - Must reference their specific field/industry
 - Must reflect their signal direction
 - Must sound like a working coach
+- USE THE ASSESSMENT DATA to sharpen the reason. The user's message payload includes an "Assessment" JSON with three fields:
+  * company_situation: one of [growing, stable, cost_cutting, layoffs, uncertain]
+  * last_raise: one of [none, less_than_1_year, 1_2_years, 2_3_years, more_than_3_years]
+  * company_size: one of [under_50, 50_250, 250_1000, 1000_plus, public_company, government]
+  Work these factors into the reason line when they meaningfully change the read. Examples:
+  * last_raise=more_than_3_years + exec role: "Exec demand is strong, and at 3+ years without a raise, timing is firmly on your side."
+  * company_situation=cost_cutting + hot role: "Role demand is strong, but your company's cost-cutting posture will tighten the ask."
+  * company_situation=growing + mid-size: "Fintech demand is hot, and a growing mid-size company has real leverage to retain you."
+  Don't force a reference if none of the three factors change the conclusion — just name the industry effect clearly.
 
 Nudge line (max 25 words) — ONLY if signal IS insufficient:
 - Warm, direct, coach-voice
@@ -212,19 +223,21 @@ Respond ONLY with valid JSON, no preamble:
 // ── Exchange 2: MERGED performance + leverage ────────────
 // The user's single answer tells us whichever axis matters most to them.
 // Claude classifies the strongest signal they actually gave.
-const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user has just told you about their case for a raise — either their recent performance, their market leverage, or both. This is the single "what's your ammunition?" question in the 3-exchange flow.
+const EXCHANGE_2_SYSTEM = `You are a salary negotiation coach. The user is answering: "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true."
 
-FIRST — CHECK IF THE ANSWER HAS SIGNAL:
-An answer is SUFFICIENT if it engages with the question in any way. Examples of SUFFICIENT answers:
+You will receive the full conversation for this exchange so far — labelled COACH and USER lines. If the user has answered across MULTIPLE turns, treat the UNION of all their USER lines as their complete answer. Do not re-ask for anything they've already said.
+
+FIRST — CHECK IF THE CUMULATIVE USER ANSWER HAS SIGNAL:
+Combine ALL user turns. An answer is SUFFICIENT if those combined turns engage with the question in any way. Examples of SUFFICIENT answers:
   - Positive: "I exceeded my targets", "I have a competing offer", "I'm underpaid based on Glassdoor"
   - Neutral: "I met expectations", "things went okay", "I don't have strong evidence right now"
   - Negative / honest admission: "nothing", "no", "I have nothing", "I don't have anything", "I had nothing" — THESE ARE ALL VALID. User is honestly saying they have no leverage. Classify as negative or strong_negative, not insufficient.
 
-Classify "insufficient" ONLY when the answer is completely off-topic or filler:
+Classify "insufficient" ONLY when the combined user turns are completely off-topic or filler:
   - "hi", "test", "asdf"
   - Off-topic: "I don't trust my boss", "fuck you", "what was the options"
 
-If user has provided context across multiple messages in short conversation (e.g. first "no", then "in real world I had nothing"), that IS an answer. Accept it and classify accordingly — don't keep asking for "more" when they've clearly said they have nothing. Pushing further is bad coaching.
+If the user said "no" then elaborated with "in real world I had nothing", that IS an answer — the union is clear. Accept it. Don't keep asking for "more" when they've clearly stated they have nothing.
 
 Fields to extract (any that apply — use "not_mentioned" if not addressed):
 - performance_rating: one of [exceeded, specific_win, met, mixed, poor, not_mentioned]
@@ -244,6 +257,11 @@ Signal classification:
 Reason line (max 22 words) — ONLY if signal is NOT insufficient:
 - Reference what they actually said
 - For "negative" signal (honest no-leverage): reframe as "upside limited, focus shifts to making the case strategically" — never "tanked"
+- USE THE ASSESSMENT DATA to sharpen the read. The user's payload includes "Assessment" with company_situation, last_raise, company_size AND "Prior accumulated profile" with their Ex1 role/industry. Work these in when they change the interpretation. Examples:
+  * competing_offer + company_situation=cost_cutting: "Competing offer is real leverage, especially since your company's cost-cutting posture makes retention risk expensive for them."
+  * "nothing" + last_raise=more_than_3_years: "Evidence is thin, but 3+ years without a raise is its own case — tenure becomes the story."
+  * exceeded + company_situation=growing: "A strong year at a growing company is the textbook case — upside is real."
+  Don't force references if the factors don't change the read — be natural.
 
 Nudge line (max 25 words) — ONLY if signal IS insufficient:
 - Warm, direct, coach-voice
@@ -286,6 +304,12 @@ Signal classification — relationship × prior_ask matrix:
 - strong_negative: complicated + asked_got_no
 
 Reason line (max 22 words) — ONLY if NOT insufficient.
+- USE THE FULL CONTEXT AVAILABLE. The user's payload includes "Assessment" (company_situation, last_raise, company_size) and "Prior accumulated profile" (their Ex1 role/industry and Ex2 performance/leverage signal). This is the FINAL range card before the paywall — the reason line should feel like a confident coach summary, not a bullet point.
+- Weave the strongest 1-2 factors across all three exchanges. Examples:
+  * strong manager + exec role + growing company: "Advocate manager plus exec demand plus growth timing — every factor is working in your favour."
+  * complicated manager + no leverage + cost_cutting: "A complicated manager dynamic and a cost-cutting environment narrow the window; precision matters more than ambition here."
+  * professional manager + competing_offer + 2_3_years raise gap: "Your offer in hand plus a 2+ year gap gives a professional manager an easy yes — the case writes itself."
+
 Nudge line (max 25 words) — ONLY if insufficient. Ask for the missing relationship piece; don't repeat the original question.
 
 Respond ONLY with valid JSON, no preamble:
@@ -422,7 +446,8 @@ module.exports = async function handler(req, res) {
 
   const {
     exchange,              // 1 | 2 | 3 (range tightening) | 4 (obstacle capture)
-    answer,                // free-text answer OR chip value OR {relationship, free_text} for ex3 OR {obstacle_code, label, free_text} for ex4
+    messages,              // NEW (preferred): array of {role, text} for the current exchange's conversation history
+    answer,                // LEGACY: free-text answer OR chip value OR {relationship, free_text} for ex3 OR {obstacle_code, label, free_text} for ex4
     profile,               // chat-page profile: 3 real fields + 2 legacy defaults
     current_range,         // { floor, ceiling }
     initial_floor,         // from analyze response — used to enforce canonical floor rule
@@ -441,7 +466,24 @@ module.exports = async function handler(req, res) {
   if (exchange <= 3 && !current_range) {
     return res.status(400).json({ error: 'Missing current_range' });
   }
-  if (answer == null || answer === '') {
+
+  // Accept either new `messages` array or legacy `answer`. Normalise to
+  // both: `latestUserAnswer` (for logging/Ex4/chip cases) and
+  // `messagesArr` (for Ex1/Ex2 prompts that benefit from history).
+  let messagesArr = [];
+  let latestUserAnswer = answer;
+  if (Array.isArray(messages) && messages.length > 0) {
+    messagesArr = messages.slice(-20); // cap to last 20 to control tokens
+    // Find the most recent user message for the latest answer
+    for (let i = messagesArr.length - 1; i >= 0; i--) {
+      if (messagesArr[i]?.role === 'user') {
+        latestUserAnswer = messagesArr[i].text;
+        break;
+      }
+    }
+  }
+
+  if (latestUserAnswer == null || latestUserAnswer === '') {
     return res.status(400).json({ error: 'Answer required' });
   }
 
@@ -455,11 +497,25 @@ module.exports = async function handler(req, res) {
   };
 
   // ── Build user message for Claude ──────────────────────
+  // Format history as readable turn-by-turn for Haiku. Each turn is
+  // either COACH or USER. If history is empty, falls back to single-answer
+  // legacy format for backward compat.
+  function formatHistory() {
+    if (!messagesArr.length) {
+      return `User answer: ${typeof answer === 'string' ? answer : JSON.stringify(answer)}`;
+    }
+    const lines = messagesArr.map(m => {
+      const who = m.role === 'assistant' ? 'COACH' : 'USER';
+      return `${who}: ${String(m.text || '').slice(0, 400)}`;
+    });
+    return `Conversation so far (this exchange only):\n${lines.join('\n')}`;
+  }
+
   let userMessage;
   if (exchange === 3) {
-    // Ex3: manager-only, optional free text
-    const rel  = typeof answer === 'object' ? (answer.relationship || '') : '';
-    const free = typeof answer === 'object' ? (answer.free_text || '') : (typeof answer === 'string' ? answer : '');
+    // Ex3: manager-only, optional free text. Legacy answer format still supported.
+    const rel  = typeof latestUserAnswer === 'object' ? (latestUserAnswer.relationship || '') : '';
+    const free = typeof latestUserAnswer === 'object' ? (latestUserAnswer.free_text || '') : (typeof latestUserAnswer === 'string' ? latestUserAnswer : '');
     userMessage = `User's relationship chip: ${rel || '(not selected)'}
 User's free text: ${free || '(none)'}
 Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
@@ -467,16 +523,20 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
   } else if (exchange === 4) {
     // Ex4: obstacle capture. Answer is { obstacle_code, label, free_text? }
     // for chip selection, OR { free_text } for typed input.
-    const chipCode  = typeof answer === 'object' ? (answer.obstacle_code || '') : '';
-    const chipLabel = typeof answer === 'object' ? (answer.label || '') : '';
-    const free      = typeof answer === 'object' ? (answer.free_text || '') : (typeof answer === 'string' ? answer : '');
+    const chipCode  = typeof latestUserAnswer === 'object' ? (latestUserAnswer.obstacle_code || '') : '';
+    const chipLabel = typeof latestUserAnswer === 'object' ? (latestUserAnswer.label || '') : '';
+    const free      = typeof latestUserAnswer === 'object' ? (latestUserAnswer.free_text || '') : (typeof latestUserAnswer === 'string' ? latestUserAnswer : '');
     userMessage = `User's obstacle chip (if any): ${chipCode || '(free text only)'}
 Chip label (if any): ${chipLabel || '(none)'}
 User's free text (if any): ${free || '(none)'}
 Final range: ${current_range ? `${current_range.floor}-${current_range.ceiling}%` : 'unknown'}
 Accumulated exchanges so far: ${JSON.stringify(accumulated_exchanges || {})}`;
   } else {
-    userMessage = `User answer: ${typeof answer === 'string' ? answer : JSON.stringify(answer)}
+    // Ex1, Ex2: send full conversation history so the classifier sees
+    // multi-turn answers and can decide sufficient/insufficient based on
+    // the complete context, not just the latest user message.
+    userMessage = `${formatHistory()}
+
 Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
 Assessment: ${JSON.stringify(cleanProfile)}`;
   }
