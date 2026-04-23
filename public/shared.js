@@ -18,7 +18,14 @@
     window.dataLayer = window.dataLayer || [];
     window.gtag = function() { window.dataLayer.push(arguments); };
     gtag('js', new Date());
-    gtag('config', 'G-C5GQLC5FHP');
+
+    // Debug mode — append ?debug_mode=1 to any URL to route that session to
+    // GA4 DebugView (excluded from standard reports). Works on any device,
+    // any network — use this when IP-based internal filtering can't catch
+    // you (mobile data, changing networks, etc). Flag persists for the page
+    // load; restart session by visiting the URL without the param.
+    var isDebug = new URLSearchParams(window.location.search).get('debug_mode') === '1';
+    gtag('config', 'G-C5GQLC5FHP', isDebug ? { debug_mode: true } : {});
   })();
 
   // ── 3. Microsoft Clarity ─────────────────────────────
