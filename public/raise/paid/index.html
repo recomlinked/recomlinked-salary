@@ -897,6 +897,64 @@ async function init() {
     free_text: dash.profile?.obstacle?.free_text || '',
   };
 
+  // ── Track RAISE_PAID — fires ONLY when arriving fresh from Stripe checkout ──
+  // urlSession is only set when Stripe redirects here with ?session_id=cs_...
+  // Magic-link returns (urlToken) are re-access, not new purchases → no fire.
+  // SessionStorage dedup guards against immediate refresh double-counting.
+  if (urlSession) {
+    try {
+      var paidKey = 'raise_paid_tracked_' + urlSession;
+      if (!sessionStorage.getItem(paidKey)) {
+        sessionStorage.setItem(paidKey, '1');
+
+        var firePaidEvents = function() {
+          try {
+            if (typeof window.gtag === 'function') {
+              window.gtag('event', 'RAISE_PAID', {
+                value: 39,
+                currency: 'USD',
+                transaction_id: urlSession,
+              });
+              // Standard GA4 ecommerce event — powers GA4 Monetization reports
+              window.gtag('event', 'purchase', {
+                transaction_id: urlSession,
+                value: 39,
+                currency: 'USD',
+                items: [{
+                  item_id: 'salary_coach_39',
+                  item_name: 'Salary Negotiation Coach',
+                  price: 39,
+                  quantity: 1,
+                }],
+              });
+            }
+            if (typeof window.clarity === 'function') {
+              window.clarity('set', 'funnel_stage', 'paid');
+              window.clarity('event', 'RAISE_PAID');
+              // Prioritises this session in Clarity's limited recording slots
+              window.clarity('upgrade', 'paid_user');
+            }
+          } catch (e) { /* tracking must never break dashboard */ }
+        };
+
+        // shared.js is deferred, so gtag usually loaded by now (after fetch await),
+        // but retry briefly just in case on slow connections.
+        if (typeof window.gtag === 'function') {
+          firePaidEvents();
+        } else {
+          var attempts = 0;
+          var iv = setInterval(function() {
+            attempts++;
+            if (typeof window.gtag === 'function' || attempts > 20) {
+              clearInterval(iv);
+              firePaidEvents();
+            }
+          }, 100);
+        }
+      }
+    } catch (e) { /* sessionStorage disabled (private mode) — skip silently */ }
+  }
+
   if (dash.token) {
     try { localStorage.setItem(LS_TOKEN, dash.token); } catch (e) {}
     if (urlSession || urlToken) {
