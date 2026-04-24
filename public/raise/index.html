@@ -771,6 +771,286 @@ button { font-family: var(--sans); cursor: pointer; }
   margin-top: 32px; letter-spacing: 0.02em;
 }
 .mini-trust strong { color: var(--text2); }
+
+/* ══════════════════════════════════════════════════════════════ */
+/* ── Compound-raise calculator                                ── */
+/* ══════════════════════════════════════════════════════════════ */
+.calc-separator {
+  height: 1px;
+  background: rgba(0,196,160,0.2);
+  margin: 20px -4px 18px;
+}
+.calc-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: -0.2px;
+}
+.calc-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.calc-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.calc-row-double {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.calc-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.calc-field-raise {
+  flex: 0 0 auto;
+}
+.calc-field-raise .calc-input-wrap {
+  width: 78px;
+}
+.calc-row-label {
+  font-size: 12px;
+  color: var(--text2);
+  font-weight: 600;
+  flex-shrink: 0;
+  text-align: left;
+}
+.calc-row > .calc-row-label { width: 54px; }
+.calc-field > .calc-row-label { width: auto; min-width: 44px; }
+.calc-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+.calc-input {
+  width: 100%;
+  background: rgba(20,23,34,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 12px 8px 24px;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+}
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.calc-input:focus {
+  border-color: rgba(201,168,76,0.5);
+  background: rgba(20,23,34,0.95);
+}
+.calc-input-prefix {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  font-size: 14px; font-weight: 700;
+  pointer-events: none;
+}
+.calc-input-suffix {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  font-size: 13px; font-weight: 700;
+  pointer-events: none;
+}
+.calc-years-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1;
+}
+.calc-year-pill {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 0;
+  flex: 1;
+  min-width: 38px;
+  text-align: center;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 150ms ease;
+  outline: none;
+}
+.calc-year-pill:focus,
+.calc-year-pill:focus-visible { outline: none; box-shadow: none; }
+.calc-year-pill:hover {
+  border-color: rgba(255,255,255,0.25);
+  color: var(--text);
+}
+.calc-year-pill.active {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.4);
+  color: var(--text);
+}
+
+/* Interactive calculator — two-bar chart */
+.calc-chart-wrap {
+  position: relative;
+  margin: 0 -4px 8px;
+}
+.bars-chart {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  height: 240px;
+  padding: 30px 20px 0;
+  margin: 0 auto;
+  max-width: 340px;
+}
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  position: relative;
+  padding-top: 30px;
+  padding-bottom: 44px;
+}
+.bar-total {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+.bar-col-nego .bar-total { color: var(--teal); }
+.bar-stack {
+  width: 72px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  position: relative;
+}
+.bar-segment {
+  width: 100%;
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+.bar-gray {
+  background: linear-gradient(180deg, #8a90a8 0%, #5b6075 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 1800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-col-nego .bar-gray {
+  border-radius: 0;
+}
+.bar-gold {
+  background: linear-gradient(180deg, #d8b75a 0%, #c9a84c 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 -4px 14px rgba(201,168,76,0.22);
+  transition: height 1400ms cubic-bezier(0.22, 1, 0.36, 1) 1200ms;
+}
+.bar-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
+.bar-col-nego .bar-caption { color: var(--gold); }
+
+/* First-view reveal animation */
+.calc-chart-wrap:not(.revealed) .bar-segment { transform: scaleY(0); }
+.calc-chart-wrap.revealed .bar-segment {
+  animation: bar-grow 1200ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards;
+}
+.calc-chart-wrap.revealed .bar-gold {
+  animation: bar-grow 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms forwards;
+}
+.calc-chart-wrap.revealed .bar-total {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 1400ms;
+}
+.calc-chart-wrap.revealed .bar-caption {
+  opacity: 1;
+  transition-delay: 1600ms;
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.calc-result {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.calc-result-num {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  transition: color 200ms ease;
+}
+.calc-result-sub {
+  font-size: 11.5px;
+  color: var(--text2);
+  margin-top: 10px;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+.calc-result-disclaimer {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.03em;
+}
+
+/* CTA block below the calculator panel */
+.calc-cta {
+  text-align: center;
+  margin: 24px 0 48px;
+}
+.calc-cta-hook {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+.calc-cta-hook .gold { color: var(--gold); }
+
 </style>
 </head>
 
@@ -813,10 +1093,80 @@ button { font-family: var(--sans); cursor: pointer; }
   <!-- Proof bar (cited stats) — establishes credibility before product demo -->
   <div class="proof-bar">
     <div class="proof-stat">
-      People who negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+      People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
     </div>
     <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+
+    <!-- Interactive compound-raise calculator -->
+    <div class="calc-separator"></div>
+    <div class="calc-title" id="calc-title">8% raise today, compounded over 25 years means:</div>
+
+    <div class="calc-inputs">
+      <div class="calc-row calc-row-double">
+        <div class="calc-field calc-field-raise">
+          <label class="calc-row-label" for="calc-raise">Raise</label>
+          <div class="calc-input-wrap">
+            <input type="text" inputmode="numeric" class="calc-input" id="calc-raise" value="8" style="padding-left:12px; padding-right:26px;" aria-label="Raise percentage" />
+            <span class="calc-input-suffix">%</span>
+          </div>
+        </div>
+        <div class="calc-field">
+          <label class="calc-row-label" for="calc-salary">Salary</label>
+          <div class="calc-input-wrap">
+            <span class="calc-input-prefix">$</span>
+            <input type="text" inputmode="numeric" class="calc-input" id="calc-salary" value="70,000" aria-label="Current salary" />
+          </div>
+        </div>
+      </div>
+      <div class="calc-row">
+        <span class="calc-row-label">Years</span>
+        <div class="calc-years-pills" id="calc-years-pills">
+          <button type="button" class="calc-year-pill" data-years="5">5y</button>
+          <button type="button" class="calc-year-pill" data-years="10">10y</button>
+          <button type="button" class="calc-year-pill" data-years="15">15y</button>
+          <button type="button" class="calc-year-pill" data-years="20">20y</button>
+          <button type="button" class="calc-year-pill active" data-years="25">25y</button>
+          <button type="button" class="calc-year-pill" data-years="30">30y</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-chart-wrap" id="calc-bars">
+      <div class="bars-chart">
+        <div class="bar-col" id="bar-col-base">
+          <div class="bar-total" id="bar-total-base">$2.55M</div>
+          <div class="bar-stack" id="bar-stack-base">
+            <div class="bar-segment bar-gray" id="bar-gray-base"></div>
+          </div>
+          <div class="bar-caption">Don't<br/>negotiate</div>
+        </div>
+        <div class="bar-col bar-col-nego" id="bar-col-nego">
+          <div class="bar-total" id="bar-total-nego">$2.76M</div>
+          <div class="bar-stack" id="bar-stack-nego">
+            <div class="bar-segment bar-gray" id="bar-gray-nego"></div>
+            <div class="bar-segment bar-gold" id="bar-gold-cap"></div>
+          </div>
+          <div class="bar-caption">Negotiate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-result">
+      <div class="calc-result-num" id="calc-result-num">+$204,172</div>
+      <div class="calc-result-sub">extra earnings over <span id="calc-result-years">25</span> years<br/><span class="calc-result-disclaimer">Assumes 3% annual merit raises after your one-time negotiated raise</span></div>
+    </div>
   </div>
+
+  <!-- CTA after the calculator -->
+  <div class="calc-cta">
+    <div class="calc-cta-hook">The best negotiations take <span class="gold">a few hours of prep</span>.</div>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my plan</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
 
   <!-- How it works (3 vertical cards) ──────────────────── -->
   <section class="section hiw-section" id="how-it-works">
@@ -1584,6 +1934,202 @@ function submitAssessment() {
 (function initProgress() {
   const p0 = document.getElementById('p0');
   if (p0) p0.classList.add('done');
+})();
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Compound-raise calculator                            ── */
+/* ───────────────────────────────────────────────────────── */
+(function initCalc() {
+  const salaryEl = document.getElementById('calc-salary');
+  const raiseEl = document.getElementById('calc-raise');
+  const yearsPillsEl = document.getElementById('calc-years-pills');
+  const barsWrapEl = document.getElementById('calc-bars');
+  const barGrayBaseEl = document.getElementById('bar-gray-base');
+  const barStackBaseEl = document.getElementById('bar-stack-base');
+  const barTotalBaseEl = document.getElementById('bar-total-base');
+  const barGrayNegoEl = document.getElementById('bar-gray-nego');
+  const barGoldCapEl = document.getElementById('bar-gold-cap');
+  const barStackNegoEl = document.getElementById('bar-stack-nego');
+  const barTotalNegoEl = document.getElementById('bar-total-nego');
+  const resultNumEl = document.getElementById('calc-result-num');
+  const resultYearsEl = document.getElementById('calc-result-years');
+  const titleEl = document.getElementById('calc-title');
+
+  if (!salaryEl || !raiseEl || !barsWrapEl) return;
+
+  const MAX_BAR_PX = 150;
+  const MERIT_RATE = 0.03;
+
+  function state() {
+    const salary = parseInt(salaryEl.value.replace(/[^\d]/g, ''), 10) || 0;
+    const raise = parseFloat(raiseEl.value.replace(/[^\d.]/g, '')) || 0;
+    const activePill = yearsPillsEl.querySelector('.calc-year-pill.active');
+    const years = activePill ? parseInt(activePill.dataset.years, 10) : 25;
+    return { salary, raise, years };
+  }
+
+  // Cumulative earnings formula.
+  // Baseline (don't negotiate): year i salary = salary × 1.03^i. Cumulative sum over N years.
+  // Negotiated: year 0 salary = salary × (1 + raise). 3% merit raises each year thereafter.
+  // Verified: $70k × 8% × 25y = +$204,172 (matches closed form: salary × raise/100 × (1.03^N - 1)/0.03)
+  function cumulativeSeries(salary, raisePct, years) {
+    let baseTotal = 0;
+    let negoTotal = 0;
+    const negoBase = salary * (1 + raisePct / 100);
+    for (let i = 0; i < years; i++) {
+      baseTotal += salary * Math.pow(1 + MERIT_RATE, i);
+      negoTotal += negoBase * Math.pow(1 + MERIT_RATE, i);
+    }
+    return { baseTotal, negoTotal };
+  }
+
+  function formatMoney(v) {
+    if (v >= 1000000) return '$' + (v / 1000000).toFixed(v < 10000000 ? 2 : 1).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1') + 'M';
+    if (v >= 1000) return '$' + Math.round(v / 1000) + 'K';
+    return '$' + Math.round(v);
+  }
+  function formatBigMoney(v) {
+    return '$' + Math.round(v).toLocaleString('en-US');
+  }
+
+  // Debounce timer — bar animation fires 200ms after user stops typing
+  let animateTimer = null;
+
+  // Update all text immediately (no debounce — feels responsive while typing).
+  // Returns { grayHeight, goldHeight } for the bar animation.
+  function computeAndUpdateText() {
+    const { salary, raise, years } = state();
+    if (salary < 1000 || raise <= 0 || years <= 0) return null;
+    const { baseTotal, negoTotal } = cumulativeSeries(salary, raise, years);
+    const gain = negoTotal - baseTotal;
+
+    const grayHeight = MAX_BAR_PX;
+    const goldHeight = (gain / baseTotal) * MAX_BAR_PX;
+
+    barTotalBaseEl.textContent = formatMoney(baseTotal);
+    barTotalNegoEl.textContent = formatMoney(negoTotal);
+    const raiseDisplay = Number.isInteger(raise) ? raise.toString() : raise.toFixed(1);
+    if (titleEl) titleEl.textContent = `${raiseDisplay}% raise today, compounded over ${years} years means:`;
+    resultNumEl.textContent = '+' + formatBigMoney(gain);
+    if (resultYearsEl) resultYearsEl.textContent = years;
+
+    return { grayHeight, goldHeight };
+  }
+
+  // Animate bars: snap to zero, then grow smoothly to target.
+  function animateBarsTo(grayHeight, goldHeight, opts) {
+    const skipZeroReset = opts && opts.skipZeroReset;
+
+    barStackBaseEl.style.height = grayHeight + 'px';
+    barStackNegoEl.style.height = (grayHeight + goldHeight) + 'px';
+
+    if (skipZeroReset) {
+      barGrayBaseEl.style.height = grayHeight + 'px';
+      barGrayNegoEl.style.height = grayHeight + 'px';
+      barGoldCapEl.style.height = goldHeight + 'px';
+      return;
+    }
+
+    // Snap to zero (transitions temporarily disabled)
+    barGrayBaseEl.style.transition = 'none';
+    barGrayNegoEl.style.transition = 'none';
+    barGoldCapEl.style.transition = 'none';
+    barGrayBaseEl.style.height = '0px';
+    barGrayNegoEl.style.height = '0px';
+    barGoldCapEl.style.height = '0px';
+
+    // Force reflow
+    void barGrayBaseEl.offsetHeight;
+
+    // Re-enable transitions, grow to target
+    requestAnimationFrame(() => {
+      barGrayBaseEl.style.transition = '';
+      barGrayNegoEl.style.transition = '';
+      barGoldCapEl.style.transition = '';
+      barGrayBaseEl.style.height = grayHeight + 'px';
+      barGrayNegoEl.style.height = grayHeight + 'px';
+      barGoldCapEl.style.height = goldHeight + 'px';
+    });
+  }
+
+  function onInputChange() {
+    const result = computeAndUpdateText();
+    if (!result) return;
+
+    // If reveal animation hasn't fired yet, just set heights silently
+    if (!barsWrapEl.classList.contains('revealed')) {
+      animateBarsTo(result.grayHeight, result.goldHeight, { skipZeroReset: true });
+      return;
+    }
+
+    // Debounce the bar animation
+    if (animateTimer) clearTimeout(animateTimer);
+    animateTimer = setTimeout(() => {
+      animateBarsTo(result.grayHeight, result.goldHeight);
+      animateTimer = null;
+    }, 200);
+  }
+
+  // Salary input — format with commas as user types
+  salaryEl.addEventListener('input', () => {
+    const raw = salaryEl.value.replace(/[^\d]/g, '');
+    if (raw === '') {
+      salaryEl.value = '';
+    } else {
+      const capped = Math.min(parseInt(raw, 10), 9999999);
+      salaryEl.value = capped.toLocaleString('en-US');
+    }
+    onInputChange();
+  });
+
+  // Raise input — numeric with up to 1 decimal, capped at 50%
+  raiseEl.addEventListener('input', () => {
+    const raw = raiseEl.value.replace(/[^\d.]/g, '');
+    const parts = raw.split('.');
+    let v = parts[0];
+    if (parts.length > 1) v += '.' + parts[1].slice(0, 1);
+    const n = parseFloat(v);
+    if (!isNaN(n) && n > 50) v = '50';
+    raiseEl.value = v;
+    onInputChange();
+  });
+
+  // Year pills — fire immediately, no debounce
+  yearsPillsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.calc-year-pill');
+    if (!btn) return;
+    yearsPillsEl.querySelectorAll('.calc-year-pill').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const result = computeAndUpdateText();
+    if (!result) return;
+    if (animateTimer) { clearTimeout(animateTimer); animateTimer = null; }
+    if (!barsWrapEl.classList.contains('revealed')) {
+      animateBarsTo(result.grayHeight, result.goldHeight, { skipZeroReset: true });
+    } else {
+      animateBarsTo(result.grayHeight, result.goldHeight);
+    }
+  });
+
+  // Initial render (heights set but CSS reveal animation plays when scrolled into view)
+  const initial = computeAndUpdateText();
+  if (initial) {
+    animateBarsTo(initial.grayHeight, initial.goldHeight, { skipZeroReset: true });
+  }
+
+  // Reveal animation when chart scrolls into view (once per page load)
+  if ('IntersectionObserver' in window) {
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          requestAnimationFrame(() => barsWrapEl.classList.add('revealed'));
+          revealObs.disconnect();
+        }
+      });
+    }, { threshold: 0.35 });
+    revealObs.observe(barsWrapEl);
+  } else {
+    barsWrapEl.classList.add('revealed');
+  }
 })();
 </script>
 
