@@ -2026,7 +2026,10 @@ function submitAssessment() {
     if (ratio < 3.75) return 'Over 3 years of your salary';
     if (ratio < 4.25) return 'Almost 4 years of your salary';
     if (ratio < 4.75) return 'Over 4 years of your salary';
-    return 'More than 5 years of your salary';
+    // For 5+ years: round to nearest whole year — the number speaks for itself.
+    // At extremes (e.g., 50% raise → 48 years), the visceral magnitude is the point.
+    const years = Math.round(ratio);
+    return `About ${years} years of your salary`;
   }
 
   // Debounce timer — bar animation fires 200ms after user stops typing
