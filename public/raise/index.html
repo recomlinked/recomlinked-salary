@@ -2040,8 +2040,12 @@ function submitAssessment() {
     const { baseTotal, negoTotal } = cumulativeSeries(salary, raise, years);
     const gain = negoTotal - baseTotal;
 
-    const grayHeight = MAX_BAR_PX;
-    const goldHeight = (gain / baseTotal) * MAX_BAR_PX;
+    // Bar heights: stack always fits within MAX_BAR_PX while preserving
+    // the gold:gray ratio = gain:baseTotal.
+    // Gray represents baseline cumulative earnings, gold represents gain.
+    // Both scaled so (gray + gold) = MAX_BAR_PX.
+    const grayHeight = (baseTotal / negoTotal) * MAX_BAR_PX;
+    const goldHeight = (gain / negoTotal) * MAX_BAR_PX;
 
     barTotalBaseEl.textContent = formatMoney(baseTotal);
     barTotalNegoEl.textContent = formatMoney(negoTotal);
@@ -2125,14 +2129,16 @@ function submitAssessment() {
     onInputChange();
   });
 
-  // Raise input — numeric with up to 1 decimal, capped at 50%
+  // Raise input — numeric with up to 1 decimal, capped at 100%
+  // (100% covers extreme-but-real scenarios like new-job market correction;
+  // above that is nonsense territory)
   raiseEl.addEventListener('input', () => {
     const raw = raiseEl.value.replace(/[^\d.]/g, '');
     const parts = raw.split('.');
     let v = parts[0];
     if (parts.length > 1) v += '.' + parts[1].slice(0, 1);
     const n = parseFloat(v);
-    if (!isNaN(n) && n > 50) v = '50';
+    if (!isNaN(n) && n > 100) v = '100';
     raiseEl.value = v;
     onInputChange();
   });
