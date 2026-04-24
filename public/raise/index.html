@@ -712,6 +712,20 @@ button { font-family: var(--sans); cursor: pointer; }
   display: flex;
   gap: 14px;
   align-items: flex-start;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.hiw-card:hover,
+.hiw-card:focus-visible {
+  border-color: rgba(201,168,76,0.35);
+  background: rgba(20,23,34,0.9);
+  outline: none;
+}
+.hiw-card:active {
+  transform: scale(0.995);
 }
 .hiw-num {
   width: 28px; height: 28px;
@@ -1172,32 +1186,32 @@ button { font-family: var(--sans); cursor: pointer; }
   <section class="section hiw-section" id="how-it-works">
     <h2>How it works</h2>
 
-    <div class="hiw-card">
+    <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Start: answer 3 questions to begin your assessment">
       <div class="hiw-num">1</div>
       <div class="hiw-body">
         <div class="hiw-title">Answer 3 questions</div>
         <div class="hiw-desc">These are the main factors that impact your raise probability. Tap to answer, no typing.</div>
         <div class="hiw-meta"><span class="pill">20 seconds</span><span class="pill">No email needed</span></div>
       </div>
-    </div>
+    </a>
 
-    <div class="hiw-card">
+    <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Start: chat with your AI negotiation coach">
       <div class="hiw-num">2</div>
       <div class="hiw-body">
         <div class="hiw-title">Short chat with the coach</div>
         <div class="hiw-desc">Add context on your performance, company, and timing so we can narrow your raise probability into a real range, something like <span class="range">68-82%</span>.</div>
         <div class="hiw-meta"><span class="pill">2-3 minutes</span><span class="pill free">Free</span></div>
       </div>
-    </div>
+    </a>
 
-    <div class="hiw-card">
+    <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Start: get your personalized negotiation plan">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
         <div class="hiw-title">Get your plan</div>
         <div class="hiw-desc">Your specific number, opening script, pushback responses, email template, and 30 days of unlimited coach chat.</div>
         <div class="hiw-meta"><span class="pill">30-day access</span></div>
       </div>
-    </div>
+    </a>
 
     <!-- CTA after steps — continues the journey at step 1 -->
     <div class="hiw-continue">
