@@ -353,6 +353,64 @@ button { font-family: var(--sans); cursor: pointer; }
   flex-shrink: 0;
 }
 
+/* Chat-with-AI row — sits between checklist and CTA */
+.rep-chat-row {
+  margin-top: 14px;
+  padding: 11px 13px;
+  background: rgba(0,196,160,0.04);
+  border: 1px solid rgba(0,196,160,0.18);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+.rep-chat-row.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.rep-chat-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,196,160,0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+}
+.rep-chat-text {
+  flex: 1;
+  min-width: 0;
+}
+.rep-chat-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.rep-chat-sub {
+  font-size: 11px;
+  color: var(--teal);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+.rep-chat-pill {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--teal);
+  background: rgba(0,196,160,0.1);
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
 .rep-cta {
   margin-top: 16px;
   padding-top: 12px;
@@ -741,7 +799,7 @@ button { font-family: var(--sans); cursor: pointer; }
   margin-bottom: 10px;
 }
 .hiw-desc .range {
-  color: var(--teal);
+  color: var(--text);
   font-weight: 700;
 }
 .hiw-meta {
@@ -1243,6 +1301,20 @@ button { font-family: var(--sans); cursor: pointer; }
       </div>
       <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>3 more in your plan</div>
 
+      <div class="rep-chat-row" id="rep-chat-row">
+        <div class="rep-chat-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5h10v7H6l-3 2.5V5z"/>
+            <path d="M7 9h11v6h-3l-2 2v-2h-6V9z" fill="rgba(0,196,160,0.06)"/>
+          </svg>
+        </div>
+        <div class="rep-chat-text">
+          <div class="rep-chat-title">Chat with your AI coach</div>
+          <div class="rep-chat-sub">Ongoing coaching</div>
+        </div>
+        <span class="rep-chat-pill">30 days</span>
+      </div>
+
       <div class="rep-cta">
         <div class="rep-cta-text">Get your plan →</div>
       </div>
@@ -1600,6 +1672,7 @@ function renderRepPersona(p) {
   const checklist= document.getElementById('rep-checklist');
   const clCount  = document.getElementById('rep-cl-count');
   const cMore    = document.getElementById('rep-checklist-more');
+  const chatRow  = document.getElementById('rep-chat-row');
   if (!pRange || !pFill || !checklist) return;
 
   pRange.className   = 'rep-range ' + p.color;
@@ -1611,7 +1684,7 @@ function renderRepPersona(p) {
   pLabel.innerHTML     = '<span class="rep-prole">' + p.role + '</span><br>' + p.desc;
 
   pFill.style.width = '0%';
-  [pRange, pVerdict, pLabel, cMore].forEach(e => { if (e) e.classList.remove('show'); });
+  [pRange, pVerdict, pLabel, cMore, chatRow].forEach(e => { if (e) e.classList.remove('show'); });
 
   const doneCount = p.done.reduce((a,b) => a + b, 0);
   // Real product has 10 items; we show 7, hide 3 ("+3 more in your plan")
@@ -1630,7 +1703,10 @@ function renderRepPersona(p) {
     '</div>';
   }).join('');
 
-  cMore.style.transitionDelay = (checklistStart + PLAN_ITEMS.length * 60 + 100) + 'ms';
+  const cMoreDelay = checklistStart + PLAN_ITEMS.length * 60 + 100;
+  cMore.style.transitionDelay = cMoreDelay + 'ms';
+  // Chat row appears just after the "+3 more" line — final beat in the reveal
+  if (chatRow) chatRow.style.transitionDelay = (cMoreDelay + 200) + 'ms';
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -1640,6 +1716,7 @@ function renderRepPersona(p) {
       pFill.style.width = p.ceiling + '%';
       document.querySelectorAll('#rep-checklist .rep-clitem').forEach(c => c.classList.add('show'));
       cMore.classList.add('show');
+      if (chatRow) chatRow.classList.add('show');
     });
   });
 
