@@ -304,26 +304,7 @@ button { font-family: var(--sans); cursor: pointer; }
   font-weight: 500; letter-spacing: 0; text-transform: none;
 }
 
-/* Factors list */
-.rep-factors { display: flex; flex-direction: column; gap: 7px; }
-.rep-factor {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; line-height: 1.3;
-  opacity: 0; transform: translateX(-8px);
-  transition: opacity 350ms ease, transform 350ms ease;
-}
-.rep-factor.show { opacity: 1; transform: translateX(0); }
-.rep-factor-bar {
-  width: 28px; height: 4px; border-radius: 2px;
-  flex-shrink: 0;
-}
-.rep-factor-bar.pos { background: var(--teal); }
-.rep-factor-bar.neu { background: var(--gold); }
-.rep-factor-bar.neg { background: var(--red); }
-.rep-factor-label { flex: 1; color: #b8bcce; }
-.rep-factor-value {
-  font-size: 12px; color: var(--text2); font-weight: 500;
-}
+/* Factors list — REMOVED (we now show only the prep plan checklist) */
 
 .rep-show-more {
   margin-top: 10px;
@@ -1248,29 +1229,19 @@ button { font-family: var(--sans); cursor: pointer; }
       </div>
 
       <div class="rep-section-head">
-        <span>What's moving your score</span>
-      </div>
-      <div class="rep-factors" id="rep-factors">
-        <div class="rep-factor show"><span class="rep-factor-bar pos"></span><span class="rep-factor-label">Performance case</span><span class="rep-factor-value">Strong</span></div>
-        <div class="rep-factor show"><span class="rep-factor-bar pos"></span><span class="rep-factor-label">Scope expansion</span><span class="rep-factor-value">Significant</span></div>
-        <div class="rep-factor show"><span class="rep-factor-bar neu"></span><span class="rep-factor-label">Manager relationship</span><span class="rep-factor-value">Professional</span></div>
-        <div class="rep-factor show"><span class="rep-factor-bar neg"></span><span class="rep-factor-label">Last raise timing</span><span class="rep-factor-value">6 months ago</span></div>
-        <div class="rep-factor show"><span class="rep-factor-bar neg"></span><span class="rep-factor-label">Review timing</span><span class="rep-factor-value">6+ weeks out</span></div>
-      </div>
-      <div class="rep-show-more show" id="rep-factors-more"><span class="plus">+</span>more</div>
-
-      <div class="rep-section-head">
         <span>Your preparation plan</span>
         <span class="rep-section-count" id="rep-cl-count">3 of 10 done</span>
       </div>
       <div class="rep-checklist" id="rep-checklist">
         <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Top 3 blockers identified</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Your specific raise number set</span><span class="rep-clpill">Draft →</span></div>
         <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Opening script drafted</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Pushback responses</span><span class="rep-clpill">Draft →</span></div>
-        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Timing window set</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Email draft ready</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Pushback responses prepared</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Manager objections mapped</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Counteroffer scenarios ready</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Email follow-up drafted</span></div>
       </div>
-      <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>more</div>
+      <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>3 more in your plan</div>
 
       <div class="rep-cta">
         <div class="rep-cta-text">Get your plan →</div>
@@ -1555,10 +1526,12 @@ function toggleFaq(qEl) {
 /* ───────────────────────────────────────────────────────── */
 const PLAN_ITEMS = [
   "Top 3 blockers identified",
+  "Your specific raise number set",
   "Opening script drafted",
-  "Pushback responses",
-  "Timing window set",
-  "Email draft ready"
+  "Pushback responses prepared",
+  "Manager objections mapped",
+  "Counteroffer scenarios ready",
+  "Email follow-up drafted"
 ];
 
 const PERSONAS = [
@@ -1573,7 +1546,7 @@ const PERSONAS = [
       ["neg", "Last raise timing", "6 months ago"],
       ["neg", "Review timing", "6+ weeks out"]
     ],
-    done: [1,1,0,1,0]
+    done: [1,0,1,0,0,0,1]
   },
   {
     role: "Account Manager · Consulting",
@@ -1586,7 +1559,7 @@ const PERSONAS = [
       ["neu", "Last raise timing", "14 months ago"],
       ["pos", "Review timing", "2 weeks out"]
     ],
-    done: [1,1,1,0,1]
+    done: [1,1,1,0,0,0,0]
   },
   {
     role: "Ops Lead · Manufacturing",
@@ -1599,7 +1572,7 @@ const PERSONAS = [
       ["neg", "Last raise timing", "3 months ago"],
       ["neg", "Market position", "Underpaid"]
     ],
-    done: [1,0,0,0,0]
+    done: [1,0,0,0,1,0,1]
   },
   {
     role: "Engineering Manager · Fintech",
@@ -1612,7 +1585,7 @@ const PERSONAS = [
       ["neu", "Manager relationship", "Strong"],
       ["neg", "Last raise timing", "9 months ago"]
     ],
-    done: [0,1,1,1,0]
+    done: [1,0,1,0,0,1,0]
   }
 ];
 
@@ -1624,12 +1597,10 @@ function renderRepPersona(p) {
   const pVerdict = document.getElementById('rep-verdict-lbl');
   const pFill    = document.getElementById('rep-fill');
   const pLabel   = document.getElementById('rep-persona-label');
-  const factors  = document.getElementById('rep-factors');
   const checklist= document.getElementById('rep-checklist');
   const clCount  = document.getElementById('rep-cl-count');
-  const fMore    = document.getElementById('rep-factors-more');
   const cMore    = document.getElementById('rep-checklist-more');
-  if (!pRange || !pFill || !factors || !checklist) return;
+  if (!pRange || !pFill || !checklist) return;
 
   pRange.className   = 'rep-range ' + p.color;
   pVerdict.className = 'rep-verdict-lbl ' + p.color;
@@ -1640,23 +1611,17 @@ function renderRepPersona(p) {
   pLabel.innerHTML     = '<span class="rep-prole">' + p.role + '</span><br>' + p.desc;
 
   pFill.style.width = '0%';
-  [pRange, pVerdict, pLabel, fMore, cMore].forEach(e => { if (e) e.classList.remove('show'); });
-
-  factors.innerHTML = p.factors.map((f, i) =>
-    '<div class="rep-factor" style="transition-delay:' + (350 + i * 70) + 'ms">' +
-      '<span class="rep-factor-bar ' + f[0] + '"></span>' +
-      '<span class="rep-factor-label">' + f[1] + '</span>' +
-      '<span class="rep-factor-value">' + f[2] + '</span>' +
-    '</div>'
-  ).join('');
+  [pRange, pVerdict, pLabel, cMore].forEach(e => { if (e) e.classList.remove('show'); });
 
   const doneCount = p.done.reduce((a,b) => a + b, 0);
+  // Real product has 10 items; we show 7, hide 3 ("+3 more in your plan")
   clCount.textContent = doneCount + ' of 10 done';
 
-  const factorsEnd = 350 + p.factors.length * 70;
+  // Checklist animations start where factors used to: ~350ms after card show
+  const checklistStart = 350;
   checklist.innerHTML = PLAN_ITEMS.map((it, i) => {
     const d = p.done[i];
-    const delay = factorsEnd + 50 + i * 50;
+    const delay = checklistStart + i * 60;
     return '<div class="rep-clitem ' + (d ? 'done' : 'pending') +
       '" style="transition-delay:' + delay + 'ms">' +
       '<span class="rep-clmark ' + (d ? 'done' : 'pending') + '">' + (d ? '✓' : '○') + '</span>' +
@@ -1665,8 +1630,7 @@ function renderRepPersona(p) {
     '</div>';
   }).join('');
 
-  fMore.style.transitionDelay = (factorsEnd + 100) + 'ms';
-  cMore.style.transitionDelay = (factorsEnd + 50 + PLAN_ITEMS.length * 50 + 100) + 'ms';
+  cMore.style.transitionDelay = (checklistStart + PLAN_ITEMS.length * 60 + 100) + 'ms';
 
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -1674,9 +1638,7 @@ function renderRepPersona(p) {
       pVerdict.classList.add('show');
       pLabel.classList.add('show');
       pFill.style.width = p.ceiling + '%';
-      document.querySelectorAll('#rep-factors .rep-factor').forEach(f => f.classList.add('show'));
       document.querySelectorAll('#rep-checklist .rep-clitem').forEach(c => c.classList.add('show'));
-      fMore.classList.add('show');
       cMore.classList.add('show');
     });
   });
