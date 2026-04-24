@@ -843,11 +843,16 @@ button { font-family: var(--sans); cursor: pointer; }
   font-size: 16px; /* iOS Safari auto-zooms inputs < 16px on focus */
   font-weight: 700;
   padding: 9px 12px;
+  line-height: 1.25;
   border-radius: 6px;
   outline: none;
   font-family: inherit;
   -moz-appearance: textfield;
   box-sizing: border-box;
+}
+/* Raise input: extra right padding to clear the % suffix */
+.calc-input-raise {
+  padding-right: 26px;
 }
 /* When an input is preceded by a prefix ($), shift text right to clear the prefix */
 .calc-input-prefix + .calc-input {
@@ -883,6 +888,7 @@ button { font-family: var(--sans); cursor: pointer; }
   font-size: 16px; /* iOS Safari auto-zooms selects < 16px on focus */
   font-weight: 700;
   padding: 9px 28px 9px 12px;
+  line-height: 1.25;
   border-radius: 6px;
   font-family: inherit;
   -webkit-appearance: none;
@@ -1103,7 +1109,7 @@ button { font-family: var(--sans); cursor: pointer; }
       <div class="calc-field">
         <span class="calc-micro-label">Raise</span>
         <div class="calc-input-wrap">
-          <input type="text" inputmode="numeric" class="calc-input" id="calc-raise" value="8" style="padding-left:12px; padding-right:26px;" aria-label="Raise percentage" />
+          <input type="text" inputmode="numeric" class="calc-input calc-input-raise" id="calc-raise" value="8" aria-label="Raise percentage" />
           <span class="calc-input-suffix">%</span>
         </div>
       </div>
