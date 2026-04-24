@@ -1043,6 +1043,14 @@ button { font-family: var(--sans); cursor: pointer; }
   letter-spacing: 0.01em;
   line-height: 1.5;
 }
+#calc-result-sticky {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.1px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
 .calc-result-disclaimer {
   display: inline-block;
   margin-top: 4px;
@@ -1167,7 +1175,7 @@ button { font-family: var(--sans); cursor: pointer; }
 
     <div class="calc-result">
       <div class="calc-result-num" id="calc-result-num">+$204,172</div>
-      <div class="calc-result-sub">extra earnings over <span id="calc-result-years">25</span> years<br/><span class="calc-result-disclaimer">Assumes 3% annual merit raises after your one-time negotiated raise</span></div>
+      <div class="calc-result-sub"><span id="calc-result-sticky">Almost 3 years of your salary.</span><br/><span class="calc-result-disclaimer">Assumes 3% annual merit raises after your one-time negotiated raise</span></div>
     </div>
   </div>
 
@@ -1966,7 +1974,7 @@ function submitAssessment() {
   const barStackNegoEl = document.getElementById('bar-stack-nego');
   const barTotalNegoEl = document.getElementById('bar-total-nego');
   const resultNumEl = document.getElementById('calc-result-num');
-  const resultYearsEl = document.getElementById('calc-result-years');
+  const resultStickyEl = document.getElementById('calc-result-sticky');
   const titleEl = document.getElementById('calc-title');
 
   if (!salaryEl || !raiseEl || !barsWrapEl) return;
@@ -2006,6 +2014,25 @@ function submitAssessment() {
     return '$' + Math.round(v).toLocaleString('en-US');
   }
 
+  // Convert (gain / salary) ratio to a human-friendly phrase.
+  // Returns empty string when too small to meaningfully motivate (< 3 months).
+  function stickyLabel(ratio) {
+    if (ratio < 0.21) return '';
+    if (ratio < 0.38) return 'About 3 months of your salary.';
+    if (ratio < 0.54) return 'About 6 months of your salary.';
+    if (ratio < 0.79) return 'About 9 months of your salary.';
+    if (ratio < 1.08) return 'About a year of your salary.';
+    if (ratio < 1.42) return 'More than a year of your salary.';
+    if (ratio < 1.75) return 'Almost 2 years of your salary.';
+    if (ratio < 2.25) return 'About 2 years of your salary.';
+    if (ratio < 2.75) return 'Over 2 years of your salary.';
+    if (ratio < 3.25) return 'Almost 3 years of your salary.';
+    if (ratio < 3.75) return 'Over 3 years of your salary.';
+    if (ratio < 4.25) return 'Almost 4 years of your salary.';
+    if (ratio < 4.75) return 'Over 4 years of your salary.';
+    return 'More than 5 years of your salary.';
+  }
+
   // Debounce timer — bar animation fires 200ms after user stops typing
   let animateTimer = null;
 
@@ -2025,7 +2052,13 @@ function submitAssessment() {
     const raiseDisplay = Number.isInteger(raise) ? raise.toString() : raise.toFixed(1);
     if (titleEl) titleEl.textContent = `${raiseDisplay}% raise today, compounded over ${years} years means:`;
     resultNumEl.textContent = '+' + formatBigMoney(gain);
-    if (resultYearsEl) resultYearsEl.textContent = years;
+
+    // Sticky-number line: concrete translation for emotional impact
+    if (resultStickyEl) {
+      const label = stickyLabel(gain / salary);
+      resultStickyEl.textContent = label;
+      resultStickyEl.style.display = label ? '' : 'none';
+    }
 
     return { grayHeight, goldHeight };
   }
