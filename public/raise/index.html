@@ -804,6 +804,10 @@ button { font-family: var(--sans); cursor: pointer; }
   line-height: 1.5;
   margin-bottom: 10px;
 }
+.hiw-desc b {
+  color: var(--text);
+  font-weight: 700;
+}
 .hiw-desc .range {
   color: var(--text);
   font-weight: 700;
@@ -825,6 +829,24 @@ button { font-family: var(--sans); cursor: pointer; }
   background: rgba(0,196,160,0.08);
   border-color: rgba(0,196,160,0.3);
   color: var(--teal);
+}
+/* Inline CTA at the end of each card body — visually mimics a link, but
+   is just a styled div (the whole card is already an <a>). */
+.hiw-cta {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}
+.hiw-cta-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  transition: transform 220ms ease;
+}
+.hiw-card:hover .hiw-cta-arrow,
+.hiw-card:focus-visible .hiw-cta-arrow {
+  transform: translateX(3px);
 }
 
 /* ── Section dividers (below-fold) ─────────────────────── */
@@ -1163,7 +1185,7 @@ button { font-family: var(--sans); cursor: pointer; }
       <div class="hiw-body">
         <div class="hiw-title">Build your case</div>
         <div class="hiw-desc">Every raise comes down to a few key factors — your <b>company's situation</b>, your <b>performance</b>, your <b>manager</b>, and your <b>timing</b>. Estimating your chances first lets you build the right strategy based on the <b>strengths</b> and <b>weaknesses</b> of your raise case. We calculate that winning chance in a few quick taps.</div>
-        <div class="hiw-meta"><span class="pill">1 minute</span><span class="pill">No email needed</span></div>
+        <div class="hiw-cta">See your winning chance in 1 minute <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
@@ -1172,7 +1194,7 @@ button { font-family: var(--sans); cursor: pointer; }
       <div class="hiw-body">
         <div class="hiw-title">Set your number</div>
         <div class="hiw-desc">A vague "more money" never works. You need a specific number, backed by <b>market data</b> and your <b>real scope</b>. And remember — <b>even 1%</b> more or less <b>compounds</b> into a huge amount over the years. In the next section we help you calculate exactly what your raise number means for your future.</div>
-        <div class="hiw-meta"><span class="pill">See your number</span></div>
+        <div class="hiw-cta">Calculate what each 1% raise means over your career <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
@@ -1181,7 +1203,7 @@ button { font-family: var(--sans); cursor: pointer; }
       <div class="hiw-body">
         <div class="hiw-title">Build your action plan</div>
         <div class="hiw-desc"><b>Opening script</b>, <b>market research data</b>, <b>pushback responses</b>, <b>email follow-up</b>, and <b>counteroffer scenarios</b> — all written for your role and your manager. Plus a coach in your pocket for the actual conversation.</div>
-        <div class="hiw-meta"><span class="pill">Action plan</span><span class="pill">Role playing</span></div>
+        <div class="hiw-cta">Start crafting your action plan <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
