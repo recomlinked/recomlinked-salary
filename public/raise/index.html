@@ -451,6 +451,11 @@ button { font-family: var(--sans); cursor: pointer; }
   font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
   margin-bottom: 6px; color: var(--text);
 }
+h2.section-title {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
+  color: var(--text);
+  margin-bottom: 20px;
+}
 .section .section-sub {
   font-size: 13px; color: var(--text2); line-height: 1.55;
   margin-bottom: 20px;
@@ -480,6 +485,11 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 
 /* ── Reasons grid (Which one sounds like you?) ─────────── */
+.reasons-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
 .reasons-grid {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 8px;
@@ -1178,7 +1188,7 @@ button { font-family: var(--sans); cursor: pointer; }
 
   <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
   <section class="section hiw-section" id="how-it-works">
-    <h2>In 3 simple steps</h2>
+    <h2 class="section-title">In 3 simple steps</h2>
 
     <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Step 1: build your raise case">
       <div class="hiw-num">1</div>
@@ -1198,23 +1208,49 @@ button { font-family: var(--sans); cursor: pointer; }
       </div>
     </a>
 
-    <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Step 3: build your action plan">
+    <a href="#blockers" class="hiw-card" aria-label="Step 3: know what's blocking your raise">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
-        <div class="hiw-title">Build your action plan</div>
-        <div class="hiw-desc"><b>Opening script</b>, <b>market research data</b>, <b>pushback responses</b>, <b>email follow-up</b>, and <b>counteroffer scenarios</b> — all written for your role and your manager. Plus a coach in your pocket for the actual conversation.</div>
-        <div class="hiw-cta">Start crafting your action plan <span class="hiw-cta-arrow">→</span></div>
+        <div class="hiw-title">Know what's blocking your raise</div>
+        <div class="hiw-desc">Every raise blocker has a specific response. Don't know your number? That's <b>market research</b>. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. Not sure about timing? That's a <b>timing strategy</b>. Each piece of your action plan exists to remove one specific blocker.</div>
+        <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
 
-    <!-- CTA after steps — continues the journey at step 1 -->
-    <div class="hiw-continue">
-      <a href="/raise/?start=1#assessment-top" class="cta-btn outline-gold">
-        <span>Start step 1</span>
-        <span class="cta-arrow">→</span>
-      </a>
-      <div class="hiw-continue-hint">Free · No email needed</div>
+    <!-- Blockers section — each chip is one dimension of the full plan -->
+    <div class="reasons-section" id="blockers">
+      <h2 class="section-title">Most common raise blockers</h2>
+      <div class="reasons-grid">
+        <a href="/raise/?start=1&amp;reason=quiet_performer#assessment-top" class="reason-chip">
+          <span>I'm a strong performer but quiet, and it's costing me</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
+          <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=unknown_number#assessment-top" class="reason-chip">
+          <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=unknown_timing#assessment-top" class="reason-chip">
+          <span>I'm not sure if now is the right time</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=no_script#assessment-top" class="reason-chip">
+          <span>I don't know how to start the conversation</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=fear_no#assessment-top" class="reason-chip">
+          <span>What if they say no?</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
+          <span>I think I'm underpaid but I can't prove it</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=already_asked#assessment-top" class="reason-chip">
+          <span>I already asked and got nothing</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=other#assessment-top" class="reason-chip reason-chip-cta">
+          <span>None of these? Let's find yours</span><span class="reason-arrow">→</span>
+        </a>
+      </div>
     </div>
+
   </section>
 
   <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
@@ -1223,6 +1259,8 @@ button { font-family: var(--sans); cursor: pointer; }
   </div>
 
   <div class="divider"></div>
+
+  <h2 class="section-title" id="calculator-heading">What each 1% raise means for your career</h2>
 
   <!-- Interactive compound-raise calculator -->
   <div class="proof-bar" id="calculator">
@@ -1361,40 +1399,6 @@ button { font-family: var(--sans); cursor: pointer; }
     </div>
     <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
   </div>
-
-  <!-- Which one sounds like you? (reasons list) ──────── -->
-  <section class="section">
-    <h2>What's blocking your raise?</h2>
-    <div class="reasons-grid">
-      <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
-        <span>I think I'm underpaid but I'm not sure</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=unknown_number#assessment-top" class="reason-chip">
-        <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=unknown_timing#assessment-top" class="reason-chip">
-        <span>I don't know if now is the right time</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=quiet_wins#assessment-top" class="reason-chip">
-        <span>I can't put my wins into words</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=quiet_performer#assessment-top" class="reason-chip">
-        <span>I'm a strong performer but quiet, and it's costing me</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
-        <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=never_asked#assessment-top" class="reason-chip">
-        <span>I've never asked for a raise in my career</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=layoffs#assessment-top" class="reason-chip">
-        <span>The company just did layoffs. Can I still ask?</span><span class="reason-arrow">→</span>
-      </a>
-      <a href="/raise/?start=1&amp;reason=other#assessment-top" class="reason-chip reason-chip-cta">
-        <span>Most blockers are fixable. Let's find yours</span><span class="reason-arrow">→</span>
-      </a>
-    </div>
-  </section>
 
   <!-- Closing CTA (positioning statement lands here) ──────── -->
   <div class="closing-pitch">
