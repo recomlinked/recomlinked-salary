@@ -628,7 +628,6 @@ const OBSTACLE_HOOKS = {
 // obstacle-specific weighting. Key phrases use <strong> for visual weight.
 // All lines frame $39 as trivial vs the dollar value or time-value of a raise.
 const PROOF_LINES = [
-  { text: `<strong>A 3% bump on a typical salary is $2,400+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 3, unknown_amount: 3 } },
   { text: `<strong>A 5% bump on a typical salary is $4,000+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 2, unknown_amount: 2 } },
   { text: `<strong>Your first raise pays this back over 60×</strong>.`,                                              weight: { all: 2 } },
   { text: `<strong>$39 once, for a conversation that adds thousands to your year-one salary</strong>.`,              weight: { all: 2, budget: 2 } },
@@ -2042,20 +2041,18 @@ async function renderDeepDiveReoffer(afterStep) {
   } else {
     const last = gaps[gaps.length - 1];
     const rest = gaps.slice(0, -1).join(', ');
-    offerText = `You're going in without ${rest} and ${last}. Your plan has all of them — written for you, instantly available. Improves every time you add context.`;
+    offerText = `You're going in without ${rest} and ${last}. Your plan has all of them — written for you.`;
   }
 
-  await typeCoachBubble(offerText);
-  await sleep(200);
-
-  // Render CTA + optional continue
+  // Render offer text + CTA together in one paywall-style block
   const wrap = el('div', 'coach-msg', '');
   const continueHtml = isFinal ? '' : `
     <button class="btn-deep-dive" onclick="this.closest('.coach-msg').querySelector('.btn-pay').style.display='none';this.style.display='none';runDeepDiveStep(${afterStep + 1});">
       Not yet — keep going
     </button>`;
   wrap.innerHTML = `
-    <div class="bubble" style="text-align:center;padding:16px;">
+    <div class="paywall-bubble">
+      <p style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:14px;">${offerText}</p>
       <button class="btn-pay" onclick="startCheckout();">
         Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
@@ -2077,12 +2074,10 @@ async function renderDeepDiveReoffer(afterStep) {
 
 // Edge case: user answered all 3 questions with no gaps (rare — means they're prepared)
 async function renderFinalDeepDiveOffer() {
-  await typeCoachBubble("You're more prepared than most. The plan adds your personalized scripts, email templates, and ongoing coaching — but you've already got the foundation.");
-  await sleep(200);
-
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="bubble" style="text-align:center;padding:16px;">
+    <div class="paywall-bubble">
+      <p style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:14px;">You're more prepared than most. The plan adds your personalized scripts, email templates, and ongoing coaching — but you've already got the foundation.</p>
       <button class="btn-pay" onclick="startCheckout();">
         Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
