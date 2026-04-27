@@ -1737,26 +1737,91 @@ async function renderPaywallBubble(opts) {
     other:          "A response to your specific situation, not a generic template",
   }[obs.code] || "A response to your specific situation, not a generic template";
 
-  // ── Timing-aware headline ──────────────────────────────
+  // ── Dynamic headline — coach voice, based on what they NEED ──
   const rolePrefix = role ? `${role}, ` : '';
-  const headlineByTiming = {
-    this_week:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Your conversation is soon — here's what I'd prepare for you:`,
-    few_weeks:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Your review is coming up — let's get you fully prepared:`,
-    this_quarter: `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. You have time to build the strongest case possible:`,
-    exploring:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Here's what your plan would include:`,
-  };
-  const headline = headlineByTiming[timing] || headlineByTiming.exploring;
+  const ex2data = state.accumulated?.ex2?.extracted || {};
 
-  // ── Timing-aware closing ──────────────────────────────
-  const closingByTiming = {
-    this_week:    `Your 3 specific blockers, the exact words to open with, and responses to the pushbacks you'll hear — ready in 15 minutes.`,
-    few_weeks:    `Your complete toolkit: blockers, opening script, pushback responses, and email template. Refine it before your review — the plan updates in minutes.`,
-    this_quarter: `The full plan: market research, evidence pack, scripts, pushback responses, email templates. Add context anytime — your plan improves instantly.`,
-    exploring:    `Your 3 specific blockers, the exact words to open with, responses to pushbacks, and the email template. Ready in 15 minutes. Add context anytime — your plan updates instantly.`,
-  };
-  const closing = closingByTiming[timing] || closingByTiming.exploring;
+  // Build a strength + gap headline from their actual signals
+  const strengths = [];
+  const needs = [];
 
-  // Uplift panel — "With your plan" not "With the coaching plan"
+  // Strengths from Ex2
+  if (ex2data.performance_rating === 'exceeded' || ex2data.performance_rating === 'specific_win') strengths.push('strong performance');
+  if (ex2data.external_leverage === 'competing_offer') strengths.push('a competing offer');
+  if (ex2data.external_leverage === 'actively_recruited') strengths.push('recruiter interest');
+  if (ex2data.external_leverage === 'underpaid_evidence') strengths.push('evidence you\'re underpaid');
+
+  // Needs from obstacle
+  const needsByObstacle = {
+    budget:         'a response ready for the budget objection',
+    justify:        'a way to frame your value that feels natural',
+    timing:         'clarity on when and how to open the conversation',
+    prior_no:       'a strategy to reopen after a no',
+    unknown_amount: 'a specific number you can say with confidence',
+    relationship:   'an approach that protects the relationship',
+    pushy:          'a framing that feels professional, not aggressive',
+    putting_off:    'a clear first step to stop overthinking and start acting',
+    other:          'a plan tailored to your specific situation',
+  };
+  const mainNeed = needsByObstacle[obs.code] || needsByObstacle.other;
+
+  let headline;
+  if (strengths.length > 0) {
+    headline = `${rolePrefix}you have ${strengths[0]} — but you still need ${mainNeed}. That's what your plan builds.`;
+  } else {
+    headline = `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. What you need now is ${mainNeed}. That's what your plan builds.`;
+  }
+
+  // ── Uplift bullets — what the plan DOES for them, not generic deliverables ──
+  const upliftBullets = {
+    budget:         [
+      "<strong>The exact words</strong> for when they say 'there's no budget' — turns a no into a next step.",
+      "<strong>Your value framed</strong> so your manager can sell it upstairs, not just hear it.",
+      "<strong>A follow-up sequence</strong> that keeps the conversation alive without being annoying.",
+    ],
+    justify:        [
+      "<strong>Your value in one sentence</strong> — clear, specific, impossible to dismiss.",
+      "<strong>Your specific number</strong> anchored to your role so it feels earned, not invented.",
+      "<strong>The opening line</strong> that frames the ask as a business conversation, not a favour.",
+    ],
+    timing:         [
+      "<strong>The right moment</strong> mapped to your specific situation — not a generic rule.",
+      "<strong>Your opening line</strong> that makes any moment feel like the right one.",
+      "<strong>A fallback plan</strong> if they say 'not now' — so 'not now' becomes 'when.'",
+    ],
+    prior_no:       [
+      "<strong>A reopening script</strong> that references the prior conversation without sounding bitter.",
+      "<strong>New evidence framing</strong> that gives your manager a reason to say yes this time.",
+      "<strong>The exact follow-up</strong> if they hesitate again — this time you don't leave empty-handed.",
+    ],
+    unknown_amount: [
+      "<strong>Your specific number</strong> — one number, defensible, anchored to your role.",
+      "<strong>The sentence that delivers it</strong> so it lands as confident, not greedy.",
+      "<strong>Pushback responses</strong> for the three things they're most likely to say back.",
+    ],
+    relationship:   [
+      "<strong>An approach designed to strengthen</strong> the relationship, not strain it.",
+      "<strong>Language that signals respect</strong> while still making a clear, professional ask.",
+      "<strong>A safety net</strong> — what to say if the conversation gets uncomfortable.",
+    ],
+    pushy:          [
+      "<strong>A professional framing</strong> that turns 'asking for money' into 'having a business conversation.'",
+      "<strong>The exact words</strong> that feel like you — not a script that sounds rehearsed.",
+      "<strong>Confidence anchors</strong> — facts about your role that make the ask feel obvious, not bold.",
+    ],
+    putting_off:    [
+      "<strong>A step-by-step sequence</strong> — day 1 to conversation day. No ambiguity.",
+      "<strong>Your opening line written</strong> so the hardest part (starting) is already done.",
+      "<strong>A deadline that works for you</strong> — turns 'someday' into a specific date.",
+    ],
+    other:          [
+      "<strong>Your opening script</strong> written for your exact situation.",
+      "<strong>Pushback responses</strong> for the three most likely objections you'll face.",
+      "<strong>A follow-up plan</strong> so the conversation doesn't end without a next step.",
+    ],
+  };
+  const bullets = upliftBullets[obs.code] || upliftBullets.other;
+
   const upliftHtml = `
     <div class="uplift-panel paywall-uplift">
       <div class="uplift-head">
@@ -1765,12 +1830,15 @@ async function renderPaywallBubble(opts) {
         <span class="uplift-delta">+${midDelta}pp on average</span>
       </div>
       <ul class="uplift-mechanisms">
-        <li><strong>A prepared evidence pack</strong> tailored to your role and industry, not a generic list.</li>
-        <li><strong>A tested opening line</strong> that reframes the conversation so your manager helps you get to yes.</li>
-        <li><strong>${obstacleMechanism}.</strong></li>
+        <li>${bullets[0]}</li>
+        <li>${bullets[1]}</li>
+        <li>${bullets[2]}</li>
       </ul>
     </div>
   `;
+
+  // ── Closing — coach voice, not a feature list ──
+  const closing = `Instantly available. Improves every time you add context.`;
 
   // Proof line
   const proof = pickProofLine(obs.code);
@@ -1849,9 +1917,63 @@ async function renderPaywallBubble(opts) {
 }
 
 // Deep dive handler — user chose "Not yet" at the paywall.
-// Keeps them in the funnel with follow-up questions.
+// Structured question chain that reveals readiness gaps and builds
+// personalized re-offers. 3 questions, re-offer after Q2 and Q3.
+const DEEP_DIVE_STATE = { step: 0, gaps: [] };
+
+const DEEP_DIVE_CHAIN = [
+  {
+    question: "If your manager asked 'why should I pay you more?' right now — could you answer in one sentence?",
+    chips: [
+      { value: 'yes_know',       label: "Yes, I know exactly what I'd say" },
+      { value: 'wins_not_clean', label: "I have wins but couldn't say it cleanly" },
+      { value: 'tenure_bills',   label: "I'd talk about how long I've been here" },
+    ],
+    reactions: {
+      yes_know:       "That's rare. Most people ramble or default to 'I've been here a long time.' You're ahead.",
+      wins_not_clean: "That's the gap. Your wins exist but they're not packaged — managers don't dig for your value, you have to hand it to them.",
+      tenure_bills:   "That's the most expensive mistake in negotiation. Employers pay for value delivered, not time served.",
+    },
+    gap_if: ['wins_not_clean', 'tenure_bills'],
+    gap_label: 'a clear value statement',
+  },
+  {
+    question: "Do you have a specific number you'd say out loud — not a range, one number?",
+    chips: [
+      { value: 'yes_number',  label: "Yes, I know my number" },
+      { value: 'range_mind',  label: "I have a range in mind" },
+      { value: 'say_more',    label: "I was going to say 'more' and see what happens" },
+    ],
+    reactions: {
+      yes_number: "Good. Most people don't — they walk in with 'more' and hope the manager fills the gap.",
+      range_mind: "A range gives your manager permission to pick the bottom. One anchored number changes the whole dynamic.",
+      say_more:   "That's what 80% of people do. And 80% of people leave money on the table.",
+    },
+    gap_if: ['range_mind', 'say_more'],
+    gap_label: 'a specific number',
+    reoffer_after: true,
+  },
+  {
+    question: "If your manager says 'there's no budget' or 'let's revisit next quarter' — do you know what to say next?",
+    chips: [
+      { value: 'planned',   label: "I have a response planned" },
+      { value: 'accept_it', label: "I'd probably just accept it" },
+      { value: 'freeze',    label: "I'd freeze" },
+    ],
+    reactions: {
+      planned:   "Smart. Most people accept the first no. Having a response doubles your chances.",
+      accept_it: "Most people do. 'No budget' is almost never the real answer — it's a test. The right response reopens the door.",
+      freeze:    "That's human. But freezing is what kills most negotiations — not the manager's answer, your reaction to it.",
+    },
+    gap_if: ['accept_it', 'freeze'],
+    gap_label: 'pushback responses',
+    reoffer_after: true,
+    is_final: true,
+  },
+];
+
 function beginDeepDive() {
-  // GA4 + Clarity — deep_dive_started
+  // GA4 + Clarity
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'deep_dive_started', { product: 'raise' });
@@ -1859,10 +1981,119 @@ function beginDeepDive() {
     if (typeof window.clarity === 'function') {
       window.clarity('event', 'deep_dive_started');
     }
-  } catch (e) { /* non-fatal */ }
+  } catch (e) {}
 
-  typeCoachBubble("No problem. Let's dig deeper into your situation so the plan is even more targeted. Tell me more about what's on your mind, or ask me anything.");
+  DEEP_DIVE_STATE.step = 0;
+  DEEP_DIVE_STATE.gaps = [];
   logEntry('coach_msg', { text: 'deep_dive_started', stage: 'deep_dive' });
+  runDeepDiveStep(0);
+}
+
+async function runDeepDiveStep(stepIndex) {
+  if (stepIndex >= DEEP_DIVE_CHAIN.length) {
+    // All questions done — final offer
+    renderFinalDeepDiveOffer();
+    return;
+  }
+
+  const step = DEEP_DIVE_CHAIN[stepIndex];
+  clearChips();
+  disableInput('');
+
+  await typeCoachBubble(step.question);
+  await sleep(150);
+
+  renderChips(step.chips, async (c, btn) => {
+    btn.classList.add('selected');
+    fadeOutChips();
+    appendUserBubble(c.label);
+
+    // Track gap
+    if (step.gap_if.includes(c.value)) {
+      DEEP_DIVE_STATE.gaps.push(step.gap_label);
+    }
+    DEEP_DIVE_STATE.step = stepIndex + 1;
+
+    // Coach reaction
+    const reaction = step.reactions[c.value] || "Got it.";
+    await sleep(300);
+    await typeCoachBubble(reaction);
+
+    logEntry('deep_dive_answer', { step: stepIndex, value: c.value, gaps: [...DEEP_DIVE_STATE.gaps] });
+
+    // Re-offer after this step?
+    if (step.reoffer_after && DEEP_DIVE_STATE.gaps.length > 0) {
+      await sleep(400);
+      renderDeepDiveReoffer(stepIndex);
+    } else {
+      await sleep(400);
+      runDeepDiveStep(stepIndex + 1);
+    }
+  });
+}
+
+async function renderDeepDiveReoffer(afterStep) {
+  const gaps = DEEP_DIVE_STATE.gaps;
+  const isFinal = DEEP_DIVE_CHAIN[afterStep].is_final;
+
+  let offerText;
+  if (gaps.length === 1) {
+    offerText = `You're missing ${gaps[0]} — your plan builds the best version of it, written for your situation.`;
+  } else {
+    const last = gaps[gaps.length - 1];
+    const rest = gaps.slice(0, -1).join(', ');
+    offerText = `You're going in without ${rest} and ${last}. Your plan has all of them — written for you, instantly available. Improves every time you add context.`;
+  }
+
+  await typeCoachBubble(offerText);
+  await sleep(200);
+
+  // Render CTA + optional continue
+  const wrap = el('div', 'coach-msg', '');
+  const continueHtml = isFinal ? '' : `
+    <button class="btn-deep-dive" onclick="this.closest('.coach-msg').querySelector('.btn-pay').style.display='none';this.style.display='none';runDeepDiveStep(${afterStep + 1});">
+      Not yet — keep going
+    </button>`;
+  wrap.innerHTML = `
+    <div class="bubble" style="text-align:center;padding:16px;">
+      <button class="btn-pay" onclick="startCheckout();">
+        Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      ${continueHtml}
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Instantly available · Improves every time you add context</div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  // If final — also enable free text input for post-paywall questions
+  if (isFinal) {
+    await sleep(300);
+    renderPlanPreviewChips();
+    enableInput('Ask me anything…');
+    awaitFreeText(handlePostPaywallText);
+  }
+}
+
+// Edge case: user answered all 3 questions with no gaps (rare — means they're prepared)
+async function renderFinalDeepDiveOffer() {
+  await typeCoachBubble("You're more prepared than most. The plan adds your personalized scripts, email templates, and ongoing coaching — but you've already got the foundation.");
+  await sleep(200);
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble" style="text-align:center;padding:16px;">
+      <button class="btn-pay" onclick="startCheckout();">
+        Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Instantly available · Improves every time you add context</div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+
+  await sleep(300);
+  renderPlanPreviewChips();
   enableInput('Ask me anything…');
   awaitFreeText(handlePostPaywallText);
 }
