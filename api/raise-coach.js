@@ -10,7 +10,7 @@
 // Called by the frontend after paywall appears.
 //
 // MODE 3 — NUDGE (mode:'nudge' flag): Lightweight clarification when user's
-// free-text answer during Ex1/Ex2/Ex3 is too short/generic. Haiku, not Sonnet.
+// free-text answer during Ex1/Ex2 is too short/generic. Haiku, not Sonnet.
 // Rate-limited per session. Merged into this file to stay under Vercel
 // Hobby's 12 Serverless Functions limit — was originally a separate file.
 //
@@ -169,21 +169,29 @@ Never be generic. Every response should feel like it could only be written for t
 // them a genuinely useful reply (not a paywall repeat) then append a short
 // dynamic CTA tail that references their obstacle. The "answer first, earn
 // the CTA" pattern — FA is weak at this, we do better.
-function buildFreeSystemPrompt({ profile, obstacle, final_range, accumulated_exchanges }) {
+function buildFreeSystemPrompt({ profile, obstacle, timing, final_range, accumulated_exchanges }) {
   const a   = profile || {};
   const ex1 = accumulated_exchanges?.ex1?.extracted || {};
   const ex2 = accumulated_exchanges?.ex2?.extracted || {};
-  const ex3 = accumulated_exchanges?.ex3?.extracted || {};
   const obs = obstacle || {};
   const fr  = final_range || {};
+  const userTiming = timing || 'exploring';
 
   const roleLabel = ex1.job_title_normalised || '(role unknown)';
-  const priorAsk  = ex3.prior_ask || 'not_mentioned';
 
-  return `You are a salary negotiation coach chatting with someone who has just completed a 3-exchange assessment but has NOT YET paid for the full coaching plan. They're on the free chat page, saw the paywall ($${PRICE_USD} coaching plan), and are asking you another question instead of clicking.
+  // Infer manager_relationship and prior_ask from obstacle (Ex3 removed)
+  const inferredManagerRel = {
+    relationship: 'complicated',
+    pushy:        'complicated',
+    budget:       'professional',
+    prior_no:     'professional',
+  }[obs.code] || 'unknown';
+  const inferredPriorAsk = obs.code === 'prior_no' ? 'asked_got_no' : 'not_mentioned';
+
+  return `You are a salary negotiation coach chatting with someone who has just completed a 2-exchange assessment but has NOT YET paid for the full coaching plan. They're on the free chat page, saw the paywall ($${PRICE_USD} coaching plan), and are asking you another question instead of clicking.
 
 YOUR JOB — in this exact order:
-1. Answer their question usefully and specifically. Reference what they told you in the exchanges (role, evidence, manager, obstacle). This is NOT a sales pitch — give them a genuinely helpful answer a coach would give. 3-5 sentences max.
+1. Answer their question usefully and specifically. Reference what they told you in the exchanges (role, evidence, obstacle). This is NOT a sales pitch — give them a genuinely helpful answer a coach would give. 3-5 sentences max.
 2. End with a short transition (1-2 sentences) that references their stated obstacle and points out that the FULL version of what you just gave them (exact words, specific numbers, personalised to them) is in the paid plan.
 3. DO NOT repeat any part of the main paywall copy. This is a continuation, not a restart.
 
@@ -192,9 +200,10 @@ USER SNAPSHOT:
 - Company situation: ${a.company_situation || 'unknown'}
 - Last raise: ${a.last_raise || 'unknown'}
 - Performance signal: ${ex2.performance_rating || ex2.external_leverage || 'unclear'}
-- Manager relationship: ${ex3.manager_relationship || 'unknown'}
-- Prior ask history: ${priorAsk}
+- Manager relationship (inferred): ${inferredManagerRel}
+- Prior ask history (inferred): ${inferredPriorAsk}
 - Their stated biggest worry: ${obs.code || 'unknown'}${obs.label ? ` — "${obs.label}"` : ''}${obs.free_text ? ` (their words: "${obs.free_text}")` : ''}
+- Their timeline: ${userTiming}${userTiming === 'this_week' ? ' (URGENT — conversation could be any day)' : ''}
 - Their final range: ${fr.floor || '?'}–${fr.ceiling || '?'}%
 
 TONE:
@@ -272,11 +281,11 @@ module.exports = async function handler(req, res) {
 };
 
 // ════════════════════════════════════════════════════════════
-// ══ NUDGE MODE — dynamic clarification during Ex1/Ex2/Ex3 ══
+// ══ NUDGE MODE — dynamic clarification during Ex1/Ex2 ═════
 // ════════════════════════════════════════════════════════════
 async function handleNudgeMode(body, res) {
   const {
-    exchange,        // 1 | 2 | 3
+    exchange,        // 1 | 2
     question,        // the coach question that was asked
     user_answer,     // what the user typed THIS turn
     prior_messages,  // array of prior free-text answers in this exchange
@@ -285,7 +294,7 @@ async function handleNudgeMode(body, res) {
     session_id,      // profileHash for rate limiting
   } = body;
 
-  if (!exchange || exchange < 1 || exchange > 3) {
+  if (!exchange || exchange < 1 || exchange > 2) {
     return res.status(400).json({ error: 'Invalid exchange' });
   }
   if (!user_answer || typeof user_answer !== 'string') {
@@ -369,8 +378,9 @@ async function handleFreeMode(body, res) {
   const {
     profile,                  // assessment-level profile
     obstacle,                 // { code, label, free_text? }
+    timing,                   // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
     final_range,              // { floor, ceiling }
-    accumulated_exchanges,    // { ex1: {...}, ex2: {...}, ex3: {...} }
+    accumulated_exchanges,    // { ex1: {...}, ex2: {...} }
     message,                  // user's message
     session_id,               // profile_hash — anonymous user identifier
     free_dialog_count,        // how many free-mode msgs this user has sent
@@ -387,7 +397,7 @@ async function handleFreeMode(body, res) {
   }
 
   const systemPrompt = buildFreeSystemPrompt({
-    profile, obstacle, final_range, accumulated_exchanges,
+    profile, obstacle, timing, final_range, accumulated_exchanges,
   });
 
   try {
