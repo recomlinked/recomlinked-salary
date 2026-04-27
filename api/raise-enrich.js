@@ -7,20 +7,17 @@
 // under raise:enrich:{profileHash} with 7-day TTL. The webhook on payment
 // merges this into raise:user:{email}:plan.
 //
-// ── Round 2 updates ──────────────────────────────────────
-// NEW SIGNALS CONSUMED:
-//   obstacle                    — { code, label, free_text?, coach_line? } from Ex4
-//   exchanges.ex1.extracted.seniority_signal_from_text — Ex1 title-inference
-//   exchanges.ex3.extracted.prior_ask                  — "never_asked"|"asked_got_no"|...
+// ── 2-exchange flow update ───────────────────────────────
+// Ex3 (manager/prior_ask) has been removed. The flow is now:
+//   Ex1 (role) → Ex2 (evidence) → Timeframe → Obstacle → Paywall
 //
-// SECTION TITLES now rewritten as user-voice questions, matching the chat
-// page's plan-preview chips 1:1. When the user taps a chip on the chat page,
-// they're asking the same question that titles the section on the plan page.
+// Manager relationship and prior_ask signals are now INFERRED from the
+// enriched obstacle chips (e.g. prior_no → asked_got_no, relationship →
+// complicated). The enrich prompt handles missing Ex3 gracefully.
 //
-// OBSTACLE_HOOK per section — a short line the plan page renders at the top
-// of each section that references the user's stated obstacle. Lets the plan
-// feel like it's answering their specific worry section-by-section, not
-// giving generic coaching.
+// NEW SIGNAL: timing — 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
+// Used to calibrate the 30-day prep plan (compress to 1-day for this_week)
+// and to adjust section tone (urgency vs thoroughness).
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { Redis }  = require('@upstash/redis');
@@ -37,33 +34,43 @@ function makeEnrichKey(profileHash) {
   return `raise:enrich|${profileHash}`;
 }
 
-// System prompt — teaches Claude the 3-exchange + obstacle schema and the
+// System prompt — teaches Claude the 2-exchange + obstacle schema and the
 // output shape (user-voice section titles + obstacle hooks).
 const ENRICH_PROMPT = `You are a senior salary negotiation coach generating the paid coaching plan for a specific user.
 
-You have their full assessment + 3 chat exchange answers + obstacle they flagged + final probability range. Generate a complete coaching plan tailored to their situation.
+You have their full assessment + 2 chat exchange answers + timing signal + obstacle they flagged + final probability range. Generate a complete coaching plan tailored to their situation.
 
 INPUTS YOU'LL RECEIVE:
 - Assessment: company_situation, last_raise, company_size
 - Ex1 extracted: job_title_normalised, function, industry, company_type, seniority_signal_from_text
 - Ex2 extracted: performance_rating, external_leverage, market_position, specific_achievements, leverage_detail
-- Ex3 extracted: manager_relationship, prior_ask, context_detail
-- Obstacle: code (budget|justify|timing|prior_no|unknown_amount|other), label, optional free_text, coach_line
+- (Ex3 is NOT collected — manager_relationship and prior_ask are INFERRED from obstacle code; see below)
+- Timing: this_week | few_weeks | this_quarter | exploring
+- Obstacle: code (budget|justify|timing|prior_no|unknown_amount|relationship|pushy|putting_off|other), label, optional free_text, coach_line
 - Final range: floor-ceiling %
 
 SIGNALS TO TREAT AS LOAD-BEARING:
 1. seniority_signal_from_text — if present and not "unclear", treat as more reliable than the default "mid" in the assessment. Use it to calibrate amount_range (junior ≈ lower %, senior/lead ≈ higher %) and to shape language (a VP needs different coaching than a junior analyst).
 
-2. prior_ask — if "asked_got_no" or "asked_got_partial", the opening_script and pushback_responses MUST address reopening the conversation after a prior no. Don't pretend it didn't happen. The plan's first blocker often is "how to reopen without looking desperate or bitter".
+2. prior_ask (inferred) — if obstacle.code is "prior_no", treat as asked_got_no. The opening_script and pushback_responses MUST address reopening the conversation after a prior no. If obstacle.code is anything else, treat prior_ask as "not_mentioned" unless context suggests otherwise.
 
-3. obstacle.code — the user explicitly told you what they're most worried about. Every section of the plan should make contact with it. The obstacle_hook field on each section is where you name it directly.
+3. manager_relationship (inferred) — if obstacle.code is "relationship" or "pushy", treat the manager relationship as complicated/sensitive. If obstacle.code is "budget", treat as professional (manager is not hostile, just constrained). Otherwise default to professional.
+
+4. obstacle.code — the user explicitly told you what they're most worried about. Every section of the plan should make contact with it. The obstacle_hook field on each section is where you name it directly.
+
+5. timing — shapes urgency and plan structure:
+   - this_week: compress the prep plan to 1-3 days. Focus on what they can do TODAY. Speed matters.
+   - few_weeks: standard 2-3 week prep window. Review-oriented framing.
+   - this_quarter: full 30-day plan with thorough preparation.
+   - exploring: no timeline pressure. Emphasise building the strongest possible case.
 
 OUTPUT RULES:
-- Be highly personalised — reference their specific function, industry, seniority, performance, leverage, manager relationship, and prior ask history.
+- Be highly personalised — reference their specific function, industry, seniority, performance, leverage, and the obstacle they flagged.
 - Section TITLES use second-person user-voice questions, matching how the user asked the question ("How should I open the conversation?" not "Opening script").
 - Section SUBTITLES are the coach's short framing of what that section delivers.
 - Every section's obstacle_hook is one sentence that ties the section to the user's stated obstacle. If the obstacle doesn't genuinely relate to that section, write a hook that bridges honestly ("This isn't directly about your timing worry, but it feeds it — here's why").
 - amount_range must be defensible for their specific seniority + function + industry + market position.
+- The 30_day_prep_plan MUST adapt to timing: if this_week, compress to a 1-3 day rapid prep. If few_weeks, use a 2-3 week plan. If this_quarter or exploring, use the full 4-week structure.
 
 RESPOND ONLY WITH VALID JSON. No markdown, no preamble. Just raw JSON matching this schema:
 
@@ -168,7 +175,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
-  const { profile, exchanges, obstacle, final_range, profile_hash } = req.body || {};
+  const { profile, exchanges, obstacle, timing, final_range, profile_hash } = req.body || {};
 
   if (!profile || !exchanges || !final_range || !profile_hash) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -188,25 +195,38 @@ module.exports = async function handler(req, res) {
   res.status(202).json({ ok: true, cached: false });
 
   // ── Build a load-bearing context block for Claude ──────
-  // Pull out the signals we specifically want Claude to reason over so they
-  // don't get buried in the JSON dump.
   const ex1  = exchanges.ex1?.extracted || {};
   const ex2  = exchanges.ex2?.extracted || {};
-  const ex3  = exchanges.ex3?.extracted || {};
   const seniorityFromText = ex1.seniority_signal_from_text || 'unclear';
-  const priorAsk          = ex3.prior_ask || 'not_mentioned';
   const obstacleCode      = obstacle?.code || 'other';
   const obstacleLabel     = obstacle?.label || '';
   const obstacleFreeText  = obstacle?.free_text || '';
+  const userTiming        = timing || 'exploring';
+
+  // Infer manager_relationship and prior_ask from obstacle code (Ex3 removed)
+  const inferredManagerRel = {
+    relationship: 'complicated',
+    pushy:        'complicated',
+    budget:       'professional',
+    prior_no:     'professional',
+  }[obstacleCode] || 'unknown';
+
+  const inferredPriorAsk = obstacleCode === 'prior_no' ? 'asked_got_no' : 'not_mentioned';
 
   const loadBearingContext = `
 LOAD-BEARING SIGNALS (pay extra attention):
 - seniority_signal_from_text: ${seniorityFromText}
   ${seniorityFromText !== 'unclear' ? `(USE THIS over the default "mid" from the assessment.)` : '(fall back to mid-level calibration.)'}
-- prior_ask: ${priorAsk}
-  ${priorAsk === 'asked_got_no' || priorAsk === 'asked_got_partial'
-      ? '(The user has asked before and was told no or given less than requested. The plan MUST address reopening the conversation.)'
-      : '(No prior refusal to work around.)'}
+- manager_relationship (inferred from obstacle): ${inferredManagerRel}
+- prior_ask (inferred from obstacle): ${inferredPriorAsk}
+  ${inferredPriorAsk === 'asked_got_no'
+      ? '(The user has asked before and was told no. The plan MUST address reopening the conversation.)'
+      : '(No prior refusal detected.)'}
+- timing: ${userTiming}
+  ${userTiming === 'this_week' ? '(URGENT — compress prep plan to 1-3 days. Focus on what to do TODAY.)' : ''}
+  ${userTiming === 'few_weeks' ? '(Review coming up — standard 2-3 week prep window.)' : ''}
+  ${userTiming === 'this_quarter' ? '(Planning mode — full 4-week prep plan.)' : ''}
+  ${userTiming === 'exploring' ? '(No timeline — emphasise building the strongest case.)' : ''}
 - obstacle: ${obstacleCode} — "${obstacleLabel}"
   ${obstacleFreeText ? `User's exact words: "${obstacleFreeText}"` : ''}
   (Every section's obstacle_hook should tie back to this worry.)
@@ -222,6 +242,8 @@ ${JSON.stringify(exchanges, null, 2)}
 
 Obstacle:
 ${JSON.stringify(obstacle || {}, null, 2)}
+
+Timing: ${userTiming}
 
 Final probability range: ${final_range.floor}–${final_range.ceiling}%
 
@@ -261,13 +283,15 @@ Generate the full coaching plan JSON per the schema above.`;
       meta: {
         obstacle_code:     obstacleCode,
         seniority_used:    seniorityFromText,
-        prior_ask:         priorAsk,
+        prior_ask:         inferredPriorAsk,
+        manager_rel:       inferredManagerRel,
+        timing:            userTiming,
         generated_at:      new Date().toISOString(),
       },
     };
 
     await redis.set(enrichKey, JSON.stringify(flattened), { ex: CACHE_TTL });
-    console.log(`[raise-enrich] stored key="${enrichKey}" obstacle="${obstacleCode}" seniority="${seniorityFromText}" priorAsk="${priorAsk}"`);
+    console.log(`[raise-enrich] stored key="${enrichKey}" obstacle="${obstacleCode}" seniority="${seniorityFromText}" priorAsk="${inferredPriorAsk}" timing="${userTiming}"`);
   } catch (err) {
     console.error(`[raise-enrich] failed key="${enrichKey}" error="${err.message}"`);
     // Non-fatal — paid dashboard will re-generate on load if plan missing
