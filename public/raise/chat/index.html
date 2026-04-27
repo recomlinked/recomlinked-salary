@@ -193,6 +193,13 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   flex-wrap:wrap;
 }
 .trust-row .dot{color:rgba(255,255,255,0.18);}
+.btn-deep-dive{
+  width:100%;background:transparent;color:rgba(255,255,255,0.55);
+  border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;margin-top:6px;
+  font-size:13px;font-weight:500;cursor:pointer;font-family:var(--sans);
+  transition:color 0.12s,border-color 0.12s;
+}
+.btn-deep-dive:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.25);}
 
 /* ── Uplift panel — "with the coaching plan, your range is X-Y%" ──
    Sits between the middle coach line and the closing paragraph. Green-accented
@@ -494,10 +501,10 @@ const state = {
   profile: null,
   initial_floor: null,
   current_range: null,
-  current_exchange: 0,          // 0 before analyze, 1..3 during, 4 = obstacle, 5 = paywall
-  accumulated: {},              // { ex1: {...}, ex2: {...}, ex3: {...} }
+  current_exchange: 0,          // 0 before analyze, 1..2 during, 3 = timeframe, 4 = obstacle, 5 = paywall
+  accumulated: {},              // { ex1: {...}, ex2: {...} }
   chat_log: [],                 // array of log entries — drives transcript replay on refresh
-  ex3_partial: null,            // { relationship?, free_text? } — Ex3 is manager-only
+  timing: null,                 // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
   obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
   saved_at: null,               // ms timestamp — used for 24h staleness check
   free_dialog_count: 0,         // count of post-paywall free-text messages (caps at FREE_DIALOG_LIMIT)
@@ -533,14 +540,20 @@ const VERDICT_BY_COLOR = {
 };
 
 // Obstacle question — chip options + their canonical codes.
+// Enriched with emotional blockers (relationship, pushy, putting_off) that
+// resonate with the female 35-54 demographic and also capture manager/prior_ask
+// signals that were previously collected in the now-removed Ex3.
 // Last chip is the "type yours" free-text escape (visually distinct).
 const OBSTACLE_CHIPS = [
+  { code: 'pushy',          label: "I don't want to seem greedy or pushy" },
+  { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
   { code: 'budget',         label: "My manager will say there's no budget" },
+  { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
   { code: 'justify',        label: "I'm not sure how to justify my number" },
   { code: 'timing',         label: "Timing feels off — no review scheduled" },
   { code: 'prior_no',       label: "I've asked before and got no / delay" },
-  { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
-  { code: 'other',          label: 'Type yours…', isFreeText: true },
+  { code: 'putting_off',    label: "I keep putting it off" },
+  { code: 'other',          label: 'Something else…', isFreeText: true },
 ];
 
 // Plan-preview chips — rendered in bottom panel after obstacle + paywall.
@@ -787,14 +800,13 @@ function stopThinkingAnimation() {
 }
 
 /* ── Score card ──────────────────────────────────────────── */
-// stage: 0 = initial, 1-3 = card posted after each exchange.
-// There is no stage-4 card — the obstacle question doesn't change the range,
-// so the stage-3 card (gold-bordered, "Your range") is the final.
+// stage: 0 = initial, 1-2 = card posted after each exchange.
+// There is no stage-3 card — the timeframe question doesn't change the range,
+// so the stage-2 card (gold-bordered, "Your range") is the final.
 const CARD_STAGE_LABEL = {
   0: 'Starting range',
   1: 'After: your role and field',
-  2: 'After: your evidence and leverage',
-  3: 'Your range',
+  2: 'Your range',
 };
 
 function renderScoreCard(range, reasonLine, stage, signal) {
@@ -802,7 +814,7 @@ function renderScoreCard(range, reasonLine, stage, signal) {
   const ceiling = range.ceiling;
   const floor   = range.floor;
   const stageLabel = CARD_STAGE_LABEL[stage || 0];
-  const isFinal = stage === 3;
+  const isFinal = stage === 2;
 
   const cardWrap = el('div', 'coach-msg score-card-msg', '');
   cardWrap.dataset.stage = String(stage || 0);
@@ -1191,7 +1203,7 @@ async function init() {
 
 /** Constructs the first coach message — references 3 questions (was 4). */
 function firstCoachMessageFor(range) {
-  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. Three quick questions will narrow it and show where your real leverage is.`;
+  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. Two quick questions will narrow it and show where your real leverage is.`;
 }
 
 /* ── Resume from saved state — replay full transcript ────── */
@@ -1237,7 +1249,7 @@ async function resumeFromState() {
   const where = state.current_exchange;
   if (where === 1)      beginExchange1();
   else if (where === 2) beginExchange2();
-  else if (where === 3) beginExchange3();
+  else if (where === 3) beginTimeframeQuestion();
   else if (where === 4) beginObstacle();
   else if (where === 5) {
     // Paywall state — ensure chips + post-paywall input wiring is live
@@ -1296,120 +1308,38 @@ function showExchange2Chips() {
   });
 }
 
-/* ── Exchange 3: manager relationship + prior_ask ──────── */
-async function beginExchange3() {
+/* ── Timeframe question (replaces Ex3) ─────────────────── */
+/* Pure frontend — no API call. Stores timing signal for paywall + enrichment. */
+async function beginTimeframeQuestion() {
   clearChips();
-  disableInput('Thinking…');
-  state.ex3_partial = {};
+  disableInput('');
+  state.current_exchange = 3;
   saveState();
-  const q = "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?";
-  currentQuestion[3] = q;
+
+  const q = "Your range is set. Before I map out your plan — when are you planning to have the conversation?";
   await typeCoachBubble(q);
+  logEntry('coach_msg', { text: q, stage: 'timeframe' });
   await sleep(150);
-  renderExchange3Chips();
-  enableInput("If you've asked before, tell me what happened…");
-  awaitFreeText((text) => {
-    // Ex3: if a chip was picked, combine with free text. Otherwise free-text-only path.
-    const rel = state.ex3_partial?.relationship;
-    if (rel) {
-      submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-    } else if (text && text.length > 6) {
-      // Free-text only — no chip picked
-      submitExchange3({ relationship: '', free_text: text });
-    } else {
-      // Under-substantive free text without a chip — static nudge + re-arm
-      nudgeEx3NoChip();
-    }
-  });
-}
 
-/* Ex3 helper: user typed something too short and hasn't picked a chip yet.
- * Show a static nudge coach bubble and re-arm the free-text listener so
- * another attempt (with or without a chip) still routes correctly. */
-function nudgeEx3NoChip() {
-  typeCoachBubble(TEXT_NUDGE_FALLBACKS[3]);
-  enableInput(placeholderForExchange(3));
-  awaitFreeText((t2) => {
-    const r2 = state.ex3_partial?.relationship;
-    if (r2) {
-      submitExchange3({ relationship: r2, free_text: t2, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-    } else if (t2 && t2.length > 6) {
-      submitExchange3({ relationship: '', free_text: t2 });
-    } else {
-      nudgeEx3NoChip();
-    }
-  });
-}
-
-function renderExchange3Chips() {
-  const wrap = el('div', 'user-msg chips-msg ex3-chips', '');
-
-  const rowChips = [
-    { value: 'strong',       label: 'Strong — they advocate for me' },
-    { value: 'professional', label: 'Professional but not close' },
-    { value: 'complicated',  label: "It's complicated" },
-    { value: 'never_asked',  label: "I haven't asked before" },
+  const timeChips = [
+    { value: 'this_week',    label: 'Before my next meeting · this week' },
+    { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
+    { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
+    { value: 'exploring',    label: "I'm just exploring · no timeline" },
   ];
-  const inner = el('div', 'user-chips', '');
-  rowChips.forEach(c => {
-    const btn = el('button', 'chip', c.label);
-    btn.type = 'button';
-    btn.dataset.val = c.value;
-    btn.onclick = () => pickEx3Relationship(c.value, c.label, btn);
-    inner.appendChild(btn);
-  });
-  wrap.appendChild(inner);
-
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  currentChipsWrap = wrap;
-}
-
-function pickEx3Relationship(value, label, btn) {
-  state.ex3_partial = state.ex3_partial || {};
-  state.ex3_partial.relationship = value;
-  state.ex3_partial.relationship_label = label;
-  saveState();
-
-  // Deselect siblings
-  if (currentChipsWrap) {
-    currentChipsWrap.querySelectorAll('.chip').forEach(c => {
-      c.classList.toggle('selected', c === btn);
-    });
-  }
-
-  // Submit immediately if no prior_ask follow-up expected — let Claude
-  // infer prior_ask from the chip alone (it defaults to not_mentioned if
-  // not clear). Users who want to elaborate can still type after picking.
-  setTimeout(() => {
+  renderChips(timeChips, (c, btn) => {
+    btn.classList.add('selected');
     fadeOutChips();
-    submitExchange3({
-      relationship: value,
-      free_text:    '',
-      displayLabels: { relationship: label },
-    });
-  }, 240);
-}
-
-async function submitExchange3(answer) {
-  let displayText = '';
-  if (answer.displayLabels && answer.displayLabels.relationship) {
-    displayText = answer.displayLabels.relationship;
-    if (answer.free_text) displayText += ` · ${answer.free_text}`;
-  } else if (answer.free_text) {
-    displayText = answer.free_text;
-  } else {
-    displayText = answer.relationship;
-  }
-  appendUserBubble(displayText);
-
-  await runExchangeCall(3, {
-    relationship: answer.relationship,
-    free_text:    answer.free_text || '',
+    appendUserBubble(c.label);
+    state.timing = c.value;
+    logEntry('user_msg', { text: c.label, stage: 'timeframe', timing: c.value });
+    saveState();
+    // Transition to obstacle/blocker question
+    setTimeout(() => beginObstacle(), 300);
   });
 }
 
-/* ── Obstacle capture (after Ex3) ───────────────────────── */
+/* ── Obstacle capture (after timeframe question) ──────── */
 async function beginObstacle() {
   clearChips();
   disableInput('Thinking…');
@@ -1512,6 +1442,7 @@ async function runObstacleCall(answer) {
       body: JSON.stringify({
         exchange:              4,
         answer,
+        timing:                state.timing || 'exploring',
         profile:               state.profile,
         current_range:         state.current_range,
         initial_floor:         state.initial_floor,
@@ -1543,7 +1474,7 @@ async function runObstacleCall(answer) {
   saveState();
 
   // NOTE: no range card rendered here. The obstacle doesn't change range
-  // math — the stage-3 card (gold-bordered "Your range") is already the
+  // math — the stage-2 card (gold-bordered "Your range") is already the
   // final. Rendering another card here would be a confusing duplicate.
 
   // Coach bridge line from Claude — acknowledges the obstacle, leads into paywall
@@ -1637,21 +1568,8 @@ async function runExchangeCall(exchangeNum, answer) {
     await typeCoachBubble(nudgeText);
     enableInput(placeholderForExchange(exchangeNum));
     $('chat-input').focus();
-    // Re-arm the free-text handler for this exchange
-    if (exchangeNum === 3) {
-      awaitFreeText((text) => {
-        const rel = state.ex3_partial?.relationship;
-        if (rel) {
-          submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-        } else if (text && text.length > 6) {
-          submitExchange3({ relationship: '', free_text: text });
-        } else {
-          nudgeEx3NoChip();
-        }
-      });
-    } else {
-      awaitFreeText((text) => handleExchangeAnswer(exchangeNum, text));
-    }
+    // Re-arm the free-text handler for this exchange (Ex1 or Ex2 only)
+    awaitFreeText((text) => handleExchangeAnswer(exchangeNum, text));
     return;
   }
 
@@ -1669,12 +1587,9 @@ async function runExchangeCall(exchangeNum, answer) {
     signal:    result.signal,
     extracted: result.extracted,
   };
-  if (exchangeNum === 3) {
-    // After Ex3 → obstacle question
-    state.current_exchange = 4;
-  } else {
-    state.current_exchange = exchangeNum + 1;
-  }
+  // After Ex2 (is_final) → current_exchange advances to 3 (timeframe question)
+  // After Ex1 → advances to 2 (Ex2)
+  state.current_exchange = exchangeNum + 1;
   saveState();
 
   // Successful exchange → clear any lingering chips now
@@ -1711,10 +1626,10 @@ async function runExchangeCall(exchangeNum, answer) {
 
   await sleep(800);
 
-  // Exchange 3 complete → obstacle question (no next_question from backend)
+  // Exchange 2 complete (is_final) → timeframe question (no next_question from backend)
   if (result.is_final) {
     await sleep(400);
-    beginObstacle();
+    beginTimeframeQuestion();
     return;
   }
 
@@ -1740,18 +1655,8 @@ function routeToExchange(n) {
     // Ex1 ran. Without this, the user can click Send but nothing happens.
     awaitFreeText((text) => handleExchangeAnswer(2, text));
   } else if (n === 3) {
-    renderExchange3Chips();
-    enableInput("If you've asked before, tell me what happened…");
-    awaitFreeText((text) => {
-      const rel = state.ex3_partial?.relationship;
-      if (rel) {
-        submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-      } else if (text && text.length > 6) {
-        submitExchange3({ relationship: '', free_text: text });
-      } else {
-        nudgeEx3NoChip();
-      }
-    });
+    // Timeframe — handled by beginTimeframeQuestion(), not routeToExchange
+    beginTimeframeQuestion();
   }
 }
 
@@ -1796,18 +1701,15 @@ async function showPaywall() {
 }
 
 // Composes and renders the main paywall bubble from current state
-// (profile, range, obstacle). Called on initial paywall show AND on
-// transcript replay from saved state.
+// (profile, range, obstacle, timing). Conversational style — uses regular
+// coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   const r   = state.current_range || { floor: 0, ceiling: 0 };
   const obs = state.obstacle      || { code: 'other' };
   const role = niceRoleLabel();
-
-  // User phrase echo (optional) — shown when they typed free text
-  const echoHtml = (obs.free_text && obs.free_text.length > 3)
-    ? `<div class="echo">"${escapeHtml(obs.free_text)}"</div>` : '';
+  const timing = state.timing || 'exploring';
 
   // Obstacle-keyed middle paragraph. Uses Claude's coach_line if it was
   // generated, otherwise falls back to a canonical line per obstacle code.
@@ -1816,33 +1718,49 @@ async function renderPaywallBubble(opts) {
     : fallbackObstacleLine(obs.code);
 
   // ── Uplift computation ──────────────────────────────────
-  // With a prepared negotiation (the plan delivers: specific evidence, tested
-  // opening, responses to pushbacks), research on negotiation outcomes suggests
-  // prepared negotiators capture meaningfully better results than unprepared
-  // ones. Here we represent that as an +8pp lift to the floor and +10pp to
-  // the ceiling, clamped at 92% so the number stays credible, never 95-100%.
-  // Adjust here if A/B testing shows the lift feels too big or too small.
   const UPLIFT_FLOOR = 8;
   const UPLIFT_CEIL  = 10;
   const upliftFloor  = Math.min(92 - 5, r.floor + UPLIFT_FLOOR);
   const upliftCeil   = Math.min(92, r.ceiling + UPLIFT_CEIL);
   const midDelta     = Math.round(((upliftFloor + upliftCeil) - (r.floor + r.ceiling)) / 2);
 
-  // Obstacle-specific mechanism framing — the 3rd mechanism adapts to the
-  // worry they flagged so the reasoning connects to their specific situation.
+  // Obstacle-specific mechanism — the 3rd bullet adapts to their worry
   const obstacleMechanism = {
     budget:         "A budget-deflection response that reopens the conversation instead of closing it",
-    justify:        "A 3-sentence justification structure that makes the number feel defensible, not ambitious",
+    justify:        "A justification structure that makes the number feel defensible, not ambitious",
     timing:         "A timing window designed for your review cycle, not a generic calendar rule",
-    prior_no:       "A reopening script that handles the prior no without looking bitter or desperate",
+    prior_no:       "A reopening script that handles the prior no without looking desperate",
     unknown_amount: "A specific number anchored to your role, industry, and market position",
-    other:          "A response to the specific worry you flagged, built around your situation",
+    relationship:   "An approach that actually strengthens the relationship instead of straining it",
+    pushy:          "A professional framing that feels like a business conversation, not a demand",
+    putting_off:    "A step-by-step sequence that turns thinking into doing — starting today",
+    other:          "A response to your specific situation, not a generic template",
   }[obs.code] || "A response to your specific situation, not a generic template";
 
+  // ── Timing-aware headline ──────────────────────────────
+  const rolePrefix = role ? `${role}, ` : '';
+  const headlineByTiming = {
+    this_week:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Your conversation is soon — here's what I'd prepare for you:`,
+    few_weeks:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Your review is coming up — let's get you fully prepared:`,
+    this_quarter: `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. You have time to build the strongest case possible:`,
+    exploring:    `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. Here's what your plan would include:`,
+  };
+  const headline = headlineByTiming[timing] || headlineByTiming.exploring;
+
+  // ── Timing-aware closing ──────────────────────────────
+  const closingByTiming = {
+    this_week:    `Your 3 specific blockers, the exact words to open with, and responses to the pushbacks you'll hear — ready in 15 minutes.`,
+    few_weeks:    `Your complete toolkit: blockers, opening script, pushback responses, and email template. Refine it before your review — the plan updates in minutes.`,
+    this_quarter: `The full plan: market research, evidence pack, scripts, pushback responses, email templates. Add context anytime — your plan improves instantly.`,
+    exploring:    `Your 3 specific blockers, the exact words to open with, responses to pushbacks, and the email template. Ready in 15 minutes. Add context anytime — your plan updates instantly.`,
+  };
+  const closing = closingByTiming[timing] || closingByTiming.exploring;
+
+  // Uplift panel — "With your plan" not "With the coaching plan"
   const upliftHtml = `
     <div class="uplift-panel paywall-uplift">
       <div class="uplift-head">
-        <span class="uplift-label">With the coaching plan</span>
+        <span class="uplift-label">With your plan</span>
         <span class="uplift-range">${upliftFloor}–${upliftCeil}%</span>
         <span class="uplift-delta">+${midDelta}pp on average</span>
       </div>
@@ -1854,29 +1772,25 @@ async function renderPaywallBubble(opts) {
     </div>
   `;
 
-  // Proof line — single rotating claim rendered below CTA. Bold phrase is
-  // baked into the text (PROOF_LINES entries include <strong>). Inserted as
-  // innerHTML (not textContent) so the strong tag renders.
+  // Proof line
   const proof = pickProofLine(obs.code);
 
-  // Headline: role + locked range + verdict clause
-  const rolePrefix = role ? `${role}, ` : '';
-  const headline = `${rolePrefix}your range locked at ${r.floor}–${r.ceiling}%. That's where you start today, without any prep.`;
-  const closing  = `The full plan is everything I'd tell you if we were sitting down for an hour: your 3 specific blockers, the exact words to open with, responses to the pushbacks you'll actually hear, the email template, and 30 days of coaching where I remember every conversation.`;
-
+  // ── Build HTML — conversational style, uses .bubble not .paywall-bubble ──
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
-    <div class="paywall-bubble">
+    <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      ${echoHtml ? `<div class="echo paywall-echo">"${escapeHtml(obs.free_text)}"</div>` : ''}
       <p class="paywall-middle"><span class="paywall-typed-middle"></span><span class="paywall-middle-cursor"></span></p>
       ${upliftHtml}
       <p class="paywall-closing">${escapeHtml(closing)}</p>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      <button class="btn-deep-dive paywall-deep-dive" id="btn-deep-dive">
+        Not yet — let's deep dive more
       </button>
       <div class="trust-row paywall-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
+        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>30-day coaching included</span>
       </div>
       <div class="proof-line paywall-proof">${proof}</div>
     </div>
@@ -1885,6 +1799,9 @@ async function renderPaywallBubble(opts) {
 
   const btn = wrap.querySelector('[id="btn-pay-cta"]');
   if (btn) btn.onclick = startCheckout;
+
+  const deepDiveBtn = wrap.querySelector('[id="btn-deep-dive"]');
+  if (deepDiveBtn) deepDiveBtn.onclick = beginDeepDive;
 
   if (!opts.animated) {
     // Instant render (transcript replay) — fill all text up front, no cursors
@@ -1896,18 +1813,17 @@ async function renderPaywallBubble(opts) {
     return wrap;
   }
 
-  // Animated render — type headline, uplift panel fades in, middle types,
-  // then the rest fades in together.
-  const echo      = wrap.querySelector('.paywall-echo');
+  // Animated render — type headline, middle types, rest fades in
   const upliftEl  = wrap.querySelector('.paywall-uplift');
   const closingEl = wrap.querySelector('.paywall-closing');
   const ctaEl     = wrap.querySelector('.paywall-cta');
+  const deepEl    = wrap.querySelector('.paywall-deep-dive');
   const trustEl   = wrap.querySelector('.paywall-trust');
   const proofEl   = wrap.querySelector('.paywall-proof');
-  if (echo)      echo.style.opacity      = '0';
   upliftEl.style.opacity  = '0';
   closingEl.style.opacity = '0';
   ctaEl.style.opacity     = '0';
+  deepEl.style.opacity    = '0';
   trustEl.style.opacity   = '0';
   proofEl.style.opacity   = '0';
   scrollChatToBottom();
@@ -1918,41 +1834,60 @@ async function renderPaywallBubble(opts) {
   await typeIntoElement(headSpan, headline);
   if (headCursor) headCursor.remove();
 
-  // Brief pause, fade the echo in (if any), then type the middle
+  // Type the middle (coach's obstacle response)
   await sleep(250);
-  if (echo) {
-    fadeInElement(echo);
-    await sleep(200);
-  }
-
   const midSpan   = wrap.querySelector('.paywall-typed-middle');
   const midCursor = wrap.querySelector('.paywall-middle-cursor');
   await typeIntoElement(midSpan, middle);
   if (midCursor) midCursor.remove();
 
-  // Uplift panel reveals next — this is the "here's what changes" beat
+  // Uplift panel reveals
   await sleep(350);
   fadeInElement(upliftEl);
 
-  // Closing + CTA + trust + proof fade in together afterward
+  // Closing + CTA + deep dive + trust + proof
   await sleep(400);
   fadeInElement(closingEl);
   await sleep(150);
   fadeInElement(ctaEl);
+  await sleep(100);
+  fadeInElement(deepEl);
   fadeInElement(trustEl);
   fadeInElement(proofEl);
 
   return wrap;
 }
 
+// Deep dive handler — user chose "Not yet" at the paywall.
+// Keeps them in the funnel with follow-up questions.
+function beginDeepDive() {
+  // GA4 + Clarity — deep_dive_started
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'deep_dive_started', { product: 'raise' });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('event', 'deep_dive_started');
+    }
+  } catch (e) { /* non-fatal */ }
+
+  typeCoachBubble("No problem. Let's dig deeper into your situation so the plan is even more targeted. Tell me more about what's on your mind, or ask me anything.");
+  logEntry('coach_msg', { text: 'deep_dive_started', stage: 'deep_dive' });
+  enableInput('Ask me anything…');
+  awaitFreeText(handlePostPaywallText);
+}
+
 // Fallback middle line per obstacle code — used if Claude didn't provide one
 function fallbackObstacleLine(code) {
   const map = {
-    budget:         "The 'no budget' line is the single most common deflection, and it almost always means 'I need ammunition to take upstairs', not 'no'. We can fix that.",
-    justify:        "Justifying the number is the easiest part once you see the framing. Most people over-complicate it. There are three moves that do the work for you.",
-    timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled.",
-    prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable.",
-    unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation that gets you to a defensible ask.",
+    budget:         "The 'no budget' line is the single most common deflection, and it almost always means 'help me make the case upstairs'. We can fix that.",
+    justify:        "Justifying the number is the easiest part once you see the framing. There are three moves that do the work for you.",
+    timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work.",
+    prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is teachable.",
+    unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation.",
+    relationship:   "Worrying about the relationship is a sign you care about doing this right. The best approach actually strengthens it.",
+    pushy:          "The fear of seeming pushy is the single biggest reason people leave money on the table. There's a way to ask that feels professional.",
+    putting_off:    "The fact that you're here means you're closer than you think. Let's turn this into a plan.",
     other:          "That's a real concern, and the plan has a specific answer for it.",
   };
   return map[code] || map.other;
@@ -1970,6 +1905,7 @@ function fireEnrichment() {
     profile:      state.profile,
     exchanges:    state.accumulated,
     obstacle:     state.obstacle,
+    timing:       state.timing || 'exploring',
     final_range:  state.current_range,
     profile_hash: profileHash(),
   };
@@ -2184,6 +2120,7 @@ async function handlePostPaywallText(text) {
       body: JSON.stringify({
         profile:               state.profile,
         obstacle:              state.obstacle,
+        timing:                state.timing || 'exploring',
         final_range:           state.current_range,
         accumulated_exchanges: state.accumulated,
         message:               text,
@@ -2327,13 +2264,11 @@ function awaitFreeText(onSubmit) {
 const TEXT_NUDGE_FALLBACKS = {
   1: "Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
   2: "Tap a chip above or give me one sentence on your strongest evidence — a win, an offer, or a sense you're underpaid.",
-  3: "Pick a chip or write one line about your manager relationship and any prior raise ask.",
   4: "Tap a chip above, or type one line about what's worrying you most.",
 };
 
 // Tracks how many nudges have fired per exchange in the current session.
-// Kept for logging + tone progression but no longer gates any logic path.
-const nudgeAttempts = { 1: 0, 2: 0, 3: 0, 4: 0 };
+const nudgeAttempts = { 1: 0, 2: 0, 4: 0 };
 
 // Currently-displayed coach question per exchange.
 const currentQuestion = { 1: '', 2: '', 3: '', 4: '' };
