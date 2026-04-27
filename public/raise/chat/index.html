@@ -1322,7 +1322,7 @@ async function beginTimeframeQuestion() {
   await sleep(150);
 
   const timeChips = [
-    { value: 'this_week',    label: 'Before my next meeting · this week' },
+    { value: 'this_week',    label: 'I need to act this week · this week' },
     { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
     { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
     { value: 'exploring',    label: "I'm just exploring · no timeline" },
@@ -2151,7 +2151,7 @@ async function handlePostPaywallText(text) {
       <p class="coach-typed"><span class="typed-text"></span><span class="cursor"></span></p>
       <p class="coach-tail" style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
       <button class="btn-pay coach-tail-btn" style="margin-top:10px;" data-tail-cta>
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
     </div>
   `;
@@ -2203,7 +2203,7 @@ async function renderLockedReply(userText) {
     <div class="paywall-bubble">
       <p class="lock-lead"><span class="lock-typed"></span><span class="lock-cursor"></span></p>
       <button class="btn-pay lock-cta" data-tail-cta>
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row lock-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
