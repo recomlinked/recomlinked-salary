@@ -1,32 +1,18 @@
 // api/raise-exchange.js
 // Salary Negotiation Coach — Per-exchange range update
-// Called after each of the 3 coaching exchanges + the final obstacle capture
+// Called after each of the 2 coaching exchanges + the final obstacle capture
 // during free chat. Receives: current state + user's new answer.
 // Returns: new range, movement reason line, extracted fields, next question
-// (or is_final=true when exchange=3 so the frontend can show the obstacle
-// question; obstacle submission uses exchange=4 and returns is_paywall=true).
+// (or is_final=true when exchange=2 so the frontend can show the timeframe
+// question + blocker chips; obstacle submission uses exchange=4 and returns
+// is_paywall=true).
 //
-// INPUT (re. the 3-question assessment reduction): `profile` from the chat page
-// contains 3 real user-selected fields (company_situation, last_raise, company_size)
-// plus 2 legacy default fields kept for chat-page profileHash compatibility
-// (country:'us', seniority:'mid'). This file ignores the legacy defaults when
-// building prompts so Claude doesn't treat them as real user answers.
-// Ex1 now extracts seniority_signal_from_text from the user's role description,
-// which downstream (raise-enrich.js) can use in place of the default.
-//
-// Claude's job: extract structured fields from free-text OR validate chip choice,
-// classify the overall signal (strong_positive | positive | neutral | negative),
-// and write the reason line. The range math itself runs DETERMINISTICALLY in code
-// (see spec § 9 canonical rules).
-//
-// 3-exchange redesign notes:
-//   Ex1 = role & industry (free text)              — unchanged
-//   Ex2 = your case: performance + leverage merged  — NEW merged question
-//         (was Ex2 perf + Ex3 market in the old 4-exchange version)
-//   Ex3 = manager + prior_ask only (timing dropped, moved to obstacle chip)
-//   Ex4 = OBSTACLE capture only — no range math, just classify the obstacle
-//         for paywall copy composition. Coach line is the final line before
-//         the paywall bubble renders.
+// 2-exchange redesign (was 3):
+//   Ex1 = role & industry (free text)
+//   Ex2 = your case: performance + leverage merged — FINAL exchange
+//   Ex3 = REMOVED (manager/prior_ask captured via enriched blocker chips)
+//   Ex4 = OBSTACLE capture only — no range math, just classify for paywall
+//         Now also receives timing signal from the frontend timeframe question.
 
 const Anthropic = require('@anthropic-ai/sdk');
 const { Redis }  = require('@upstash/redis');
@@ -37,11 +23,10 @@ const redis  = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 });
 
-// Target widths per exchange — 3-step tightening (was 4-step 25/19/13/5)
-// Ex1: 25pp width (widest tightening)
-// Ex2: 15pp width (merged perf + leverage, bigger signal, bigger shrink)
-// Ex3: 5pp  width (final locked range)
-const TARGET_WIDTH = { 1: 25, 2: 15, 3: 5 };
+// Target widths per exchange — 2-step tightening (was 3-step 25/15/5)
+// Ex1: 20pp width (role/industry context)
+// Ex2: 10pp width (evidence/leverage — final locked range)
+const TARGET_WIDTH = { 1: 20, 2: 10 };
 
 // ── Range math — spec § 9 "tightens but doesn't tank" ─────
 // Signal: 'strong_positive' | 'positive' | 'neutral' | 'negative' | 'strong_negative'
@@ -282,43 +267,11 @@ Respond ONLY with valid JSON, no preamble:
   "nudge_line": "..."
 }`;
 
-// ── Exchange 3: MANAGER relationship + prior_ask (timing removed) ────
-// Timing moved to obstacle-question chip in the frontend. Ex3 stays focused
-// on the relational axis which is a distinct signal from evidence.
-const EXCHANGE_3_SYSTEM = `You are a salary negotiation coach. The user has just told you about their manager relationship and whether they've asked for a raise before. This is the FINAL exchange before the obstacle capture.
-
-FIRST — CHECK IF THE ANSWER HAS SIGNAL:
-If they selected a chip (relationship = strong|professional|complicated|never_asked), that IS valid signal even if free_text is empty. Only return "insufficient" if BOTH relationship is empty AND the free_text doesn't describe a manager relationship or prior ask. Off-topic free text ("I don't trust my process", "hi", "asdf") with no chip selected is insufficient.
-
-Fields to extract (only if signal is NOT insufficient):
-- manager_relationship: one of [strong, professional, complicated, never_asked]
-- prior_ask: one of [not_mentioned, never_asked, asked_got_yes, asked_got_no, asked_got_partial]
-- context_detail: string
-
-Signal classification — relationship × prior_ask matrix:
-- insufficient: no chip and no relationship content in free text
-- strong_positive: strong + (asked_got_yes OR never_asked/not_mentioned)
-- positive: professional + (asked_got_yes OR never_asked) OR strong + asked_got_partial
-- neutral: professional + (never_asked OR not_mentioned) OR strong + asked_got_no
-- negative: complicated + any OR professional + asked_got_no OR any + asked_got_partial
-- strong_negative: complicated + asked_got_no
-
-Reason line (max 22 words) — ONLY if NOT insufficient.
-- USE THE FULL CONTEXT AVAILABLE. The user's payload includes "Assessment" (company_situation, last_raise, company_size) and "Prior accumulated profile" (their Ex1 role/industry and Ex2 performance/leverage signal). This is the FINAL range card before the paywall — the reason line should feel like a confident coach summary, not a bullet point.
-- Weave the strongest 1-2 factors across all three exchanges. Examples:
-  * strong manager + exec role + growing company: "Advocate manager plus exec demand plus growth timing — every factor is working in your favour."
-  * complicated manager + no leverage + cost_cutting: "A complicated manager dynamic and a cost-cutting environment narrow the window; precision matters more than ambition here."
-  * professional manager + competing_offer + 2_3_years raise gap: "Your offer in hand plus a 2+ year gap gives a professional manager an easy yes — the case writes itself."
-
-Nudge line (max 25 words) — ONLY if insufficient. Ask for the missing relationship piece; don't repeat the original question.
-
-Respond ONLY with valid JSON, no preamble:
-{
-  "extracted": { "manager_relationship": "...", "prior_ask": "...", "context_detail": "..." },
-  "signal": "insufficient|strong_positive|positive|neutral|negative|strong_negative",
-  "reason_line": "...",
-  "nudge_line": "..."
-}`;
+// ── Exchange 3: REMOVED ──────────────────────────────────
+// Manager relationship + prior_ask signals now captured via enriched blocker
+// chips in the frontend. Ex2 is the final range-tightening exchange.
+// Exchange numbers 3 (timeframe) and 4 (obstacle) are handled frontend-only
+// and obstacle-API respectively.
 
 // ── Exchange 4: OBSTACLE capture (no range math) ─────────
 // The user has already seen their final range card. They've just told us
@@ -327,7 +280,7 @@ Respond ONLY with valid JSON, no preamble:
 // that bridges directly into the paywall bubble.
 const EXCHANGE_4_SYSTEM = `You are a salary negotiation coach. The user has seen their final probability range and you've just asked: "Before I map out your plan, what's the one thing you're most worried about?"
 
-They may have tapped a canonical chip OR typed free text. Your job is to classify their worry into one of six canonical obstacle codes AND write a short, empathetic coach line that acknowledges their specific worry and bridges into the paywall that follows.
+They may have tapped a canonical chip OR typed free text. Your job is to classify their worry into one of nine canonical obstacle codes AND write a short, empathetic coach line that acknowledges their specific worry and bridges into the paywall that follows.
 
 Canonical obstacle codes:
 - budget         : manager will cite budget constraints / no money / "bad year"
@@ -335,35 +288,51 @@ Canonical obstacle codes:
 - timing         : no review scheduled / just happened / feels like the wrong moment
 - prior_no       : asked before and got a no or a delay
 - unknown_amount : doesn't know what specific number to ask for
-- other          : something meaningfully different from the five above
+- relationship   : afraid of damaging the relationship with manager / team
+- pushy          : worried about seeming greedy, pushy, or ungrateful
+- putting_off    : keeps delaying / procrastinating / can't get started
+- other          : something meaningfully different from the above
 
-If the user TYPED free text, classify to the CLOSEST canonical code (don't default to "other" unless genuinely none of the five fit). Preserve their exact phrasing in user_phrase_echo for the paywall to reference.
+If the user TYPED free text, classify to the CLOSEST canonical code (don't default to "other" unless genuinely none fit). Preserve their exact phrasing in user_phrase_echo for the paywall to reference.
+
+You will also receive the user's TIMING signal (how soon they plan to have the conversation):
+- this_week: urgent — conversation could be any day now
+- few_weeks: review coming up in 1-4 weeks
+- this_quarter: planning for the next 1-3 months
+- exploring: no timeline yet
+
+USE THE TIMING in your coach line when relevant. If timing is "this_week" and obstacle is "budget", acknowledge urgency. If "exploring", tone can be more reflective.
 
 Coach line (max 30 words):
 - Must acknowledge their SPECIFIC worry (reference the obstacle)
 - Must hint that the paid plan addresses exactly this thing
+- When timing is urgent (this_week), add a speed/readiness note
 - Must NOT say "upgrade" or "pay" or "unlock" — the paywall bubble handles that
 - Must feel like a natural next sentence from a coach, not a sales line
 - Ends with something that leads smoothly into the paywall
 
 Example coach lines:
-- budget:         "That 'no budget' line is the single most common deflection, and it almost always means 'I need ammunition to take upstairs', not 'no'. We can fix that."
-- justify:        "Justifying the number is the easiest part once you see the framing. Most people over-complicate it. There are three moves that do the work for you."
-- timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled."
-- prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable."
-- unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation that gets you to a defensible ask."
-- other:          (improvise, same structure, same tone)
+- budget + this_week:  "That 'no budget' line is the most common deflection. Since your conversation is soon, let's get you the exact response ready."
+- budget:              "That 'no budget' line is the single most common deflection, and it almost always means 'help me make the case upstairs'. We can fix that."
+- justify:             "Justifying the number is the easiest part once you see the framing. There are three moves that do the work for you."
+- timing:              "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled."
+- prior_no:            "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable."
+- unknown_amount:      "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation."
+- relationship:        "Worrying about the relationship is a sign you care about doing this right. The best approach actually strengthens it."
+- pushy:               "The fear of seeming pushy is the single biggest reason people leave money on the table. There's a way to ask that feels professional, not aggressive."
+- putting_off:         "The fact that you're here means you're closer than you think. Let's turn this into a plan so it stops being something you think about and starts being something you do."
+- other:               (improvise, same structure, same tone)
 
 Respond ONLY with valid JSON, no preamble:
 {
-  "obstacle_code": "budget|justify|timing|prior_no|unknown_amount|other",
+  "obstacle_code": "budget|justify|timing|prior_no|unknown_amount|relationship|pushy|putting_off|other",
   "user_phrase_echo": "<their exact words if free text, else empty string>",
   "coach_line": "<1-2 sentences, max 30 words>"
 }`;
 
 // ── Next-question payloads ──────────────────────────────
-// Ex1 → Ex2, Ex2 → Ex3. After Ex3, frontend renders obstacle question locally.
-// After Ex4 (obstacle), frontend renders paywall.
+// Ex1 → Ex2. After Ex2 (is_final=true), frontend renders timeframe question
+// + blocker chips + paywall locally. No Ex3.
 const NEXT_QUESTIONS = {
   1: {
     question: "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.",
@@ -377,23 +346,13 @@ const NEXT_QUESTIONS = {
     ],
     allows_free_text: true,
   },
-  2: {
-    question: "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?",
-    chips_row_1: [
-      { value: 'strong',       label: 'Strong — they advocate for me' },
-      { value: 'professional', label: 'Professional but not close' },
-      { value: 'complicated',  label: "It's complicated" },
-      { value: 'never_asked',  label: "I haven't asked before" },
-    ],
-    allows_free_text: true,
-    free_text_hint: 'If you asked before, tell me what happened — that changes the playbook.',
-  },
+  // No entry for 2 — Ex2 is final (is_final=true). Frontend handles transition.
 };
 
 function systemForExchange(n) {
   if (n === 1) return EXCHANGE_1_SYSTEM;
   if (n === 2) return EXCHANGE_2_SYSTEM;
-  if (n === 3) return EXCHANGE_3_SYSTEM;
+  // No Ex3 — removed. Ex4 (obstacle) is next.
   if (n === 4) return EXCHANGE_4_SYSTEM;
   return null;
 }
@@ -407,7 +366,7 @@ function fallbackResult(exchange, answer) {
       coach_line: "That's a real concern, and the coaching plan has a specific answer for it.",
     };
   }
-  // Used if Claude call fails for Ex1-3 — keeps the UX alive
+  // Used if Claude call fails for Ex1-2 — keeps the UX alive
   return {
     extracted: {},
     signal: 'neutral',
@@ -445,7 +404,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
   const {
-    exchange,              // 1 | 2 | 3 (range tightening) | 4 (obstacle capture)
+    exchange,              // 1 | 2 (range tightening) | 4 (obstacle capture)
     messages,              // NEW (preferred): array of {role, text} for the current exchange's conversation history
     answer,                // LEGACY: free-text answer OR chip value OR {relationship, free_text} for ex3 OR {obstacle_code, label, free_text} for ex4
     profile,               // chat-page profile: 3 real fields + 2 legacy defaults
@@ -455,7 +414,7 @@ module.exports = async function handler(req, res) {
   } = req.body || {};
 
   // Validation
-  if (!exchange || exchange < 1 || exchange > 4) {
+  if (!exchange || ![1, 2, 4].includes(exchange)) {
     return res.status(400).json({ error: 'Invalid exchange number' });
   }
   if (!profile) {
@@ -463,7 +422,7 @@ module.exports = async function handler(req, res) {
   }
   // Ex4 (obstacle) doesn't need current_range for math, but we still want it
   // for context. Ex1-3 require it.
-  if (exchange <= 3 && !current_range) {
+  if (exchange <= 2 && !current_range) {
     return res.status(400).json({ error: 'Missing current_range' });
   }
 
@@ -512,23 +471,18 @@ module.exports = async function handler(req, res) {
   }
 
   let userMessage;
-  if (exchange === 3) {
-    // Ex3: manager-only, optional free text. Legacy answer format still supported.
-    const rel  = typeof latestUserAnswer === 'object' ? (latestUserAnswer.relationship || '') : '';
-    const free = typeof latestUserAnswer === 'object' ? (latestUserAnswer.free_text || '') : (typeof latestUserAnswer === 'string' ? latestUserAnswer : '');
-    userMessage = `User's relationship chip: ${rel || '(not selected)'}
-User's free text: ${free || '(none)'}
-Prior accumulated profile: ${JSON.stringify(accumulated_exchanges || {})}
-Assessment: ${JSON.stringify(cleanProfile)}`;
-  } else if (exchange === 4) {
+  if (exchange === 4) {
     // Ex4: obstacle capture. Answer is { obstacle_code, label, free_text? }
     // for chip selection, OR { free_text } for typed input.
+    // Also receives timing signal from the frontend timeframe question.
     const chipCode  = typeof latestUserAnswer === 'object' ? (latestUserAnswer.obstacle_code || '') : '';
     const chipLabel = typeof latestUserAnswer === 'object' ? (latestUserAnswer.label || '') : '';
     const free      = typeof latestUserAnswer === 'object' ? (latestUserAnswer.free_text || '') : (typeof latestUserAnswer === 'string' ? latestUserAnswer : '');
+    const timing    = req.body?.timing || 'exploring';
     userMessage = `User's obstacle chip (if any): ${chipCode || '(free text only)'}
 Chip label (if any): ${chipLabel || '(none)'}
 User's free text (if any): ${free || '(none)'}
+User's timing: ${timing} (this_week = urgent, few_weeks = review coming, this_quarter = planning, exploring = no timeline)
 Final range: ${current_range ? `${current_range.floor}-${current_range.ceiling}%` : 'unknown'}
 Accumulated exchanges so far: ${JSON.stringify(accumulated_exchanges || {})}`;
   } else {
@@ -573,7 +527,7 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
       obstacle_code:     claudeResult.obstacle_code    || 'other',
       user_phrase_echo:  claudeResult.user_phrase_echo || '',
       coach_line:        claudeResult.coach_line       || "Let's get you a plan.",
-      // Range unchanged — frontend already has it from Ex3
+      // Range unchanged — frontend already has it from Ex2
       floor:   current_range ? current_range.floor   : null,
       ceiling: current_range ? current_range.ceiling : null,
     });
@@ -635,8 +589,8 @@ Assessment: ${JSON.stringify(cleanProfile)}`;
     reason_line:   claudeResult.reason_line || 'Your range is tightening as we learn more.',
     extracted:     claudeResult.extracted   || {},
     signal:        claudeResult.signal      || 'neutral',
-    next_question: next,                // null if exchange===3 → client shows obstacle question
-    is_final:      exchange === 3,      // true after ex3 → render final range card + obstacle question
+    next_question: next,                // null if exchange===2 → client shows timeframe + blocker
+    is_final:      exchange === 2,      // true after ex2 → render final range card + timeframe + blocker
     is_obstacle:   false,
     is_paywall:    false,
   });
