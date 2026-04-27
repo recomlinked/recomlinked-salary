@@ -2,2401 +2,2261 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Your Raise Probability · Salary Negotiation Coach</title>
-<meta name="robots" content="noindex"/>
-<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
-<style>
-/* ── Variables ─────────────────────────────────────────── */
-:root{
-  --gold:#c9a84c;--gold2:#d8b75a;
-  --teal:#00c4a0;--red:#e05555;
-  --navy:#1e3d72;
-  --bg:#07090f;--bg2:#0f1117;--bg3:#141722;--bg4:#1c2030;
-  --page:#f4f5f8;--card:#ffffff;
-  --divider:#dde0e8;--muted:#eceef2;
-  --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --radius:12px;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;overflow:hidden;overflow-x:hidden;max-width:100vw;}
-body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14px;display:flex;flex-direction:column;height:100dvh;}
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>How to Ask for a Raise: Your Pro Salary Negotiation Plan</title>
+<meta name="description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
 
-.page-wrap{max-width:700px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
+<!-- Open Graph / social sharing -->
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Recomlinked"/>
+<meta property="og:url" content="https://salary.recomlinked.com/raise/"/>
+<meta property="og:title" content="How to Ask for a Raise: Your Pro Salary Negotiation Plan"/>
+<meta property="og:description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
+<meta property="og:image" content="https://salary.recomlinked.com/og-image.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta property="og:image:alt" content="Salary Negotiation Coach. Know your chance. Negotiate with a plan."/>
+
+<!-- Twitter/X card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="How to Ask for a Raise: Your Pro Salary Negotiation Plan"/>
+<meta name="twitter:description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
+<meta name="twitter:image" content="https://salary.recomlinked.com/og-image.png"/>
+<link rel="canonical" href="https://salary.recomlinked.com/raise/"/>
+<link rel="preconnect" href="https://h.clarity.ms">
+<link rel="preconnect" href="https://www.clarity.ms">
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png"/>
+<style>
+/* ── Variables (FA visual system) ─────────────────────── */
+:root {
+  --bg:      #07090f;
+  --bg2:     #0f1117;
+  --bg3:     #141722;
+  --bg4:     #1c2030;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --gold:    #c9a84c;
+  --gold2:   #d8b75a;
+  --teal:    #00c4a0;
+  --red:     #e05555;
+  --text:    #e8eaf2;
+  --text2:   #8a90a8;
+  --text3:   #454d60;
+  --sans:    -apple-system, 'Segoe UI', system-ui, sans-serif;
+  --radius:  6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+button { font-family: var(--sans); cursor: pointer; }
 
 /* ── Header ────────────────────────────────────────────── */
-.site-header{
-  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
-  position:sticky;top:0;z-index:400;flex-shrink:0;
+.site-header {
+  padding: 16px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
 }
-.logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
-.logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
-.logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
-.header-right{display:flex;align-items:center;gap:10px;}
+.logo-wrap {
+  display: flex; align-items: center;
+  font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
+  text-decoration: none;
+}
+.logo-recom  { background: var(--gold); color: #07090f; padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
+.logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--bg4); border-radius: 0 3px 3px 0; }
 
-/* ── Chat area ─────────────────────────────────────────── */
-/* No flex gap — each message wrapper owns its own top/bottom padding,
-   which gives consistent breathing room regardless of what's adjacent. */
-.chat-wrap{
-  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:8px 16px 16px;display:flex;flex-direction:column;
+/* ── Layout ────────────────────────────────────────────── */
+.main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
 }
-.chat-wrap::-webkit-scrollbar{display:none;}
-
-/* ── Coach message ─────────────────────────────────────── */
-.coach-msg{display:flex;flex-direction:column;gap:4px;padding:14px 0;animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);}
-@keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
-.bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-.bubble p{font-size:13.5px;color:var(--t1);line-height:1.6;}
-.bubble p + p{margin-top:8px;}
-.bubble.card-bubble{padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
-.coach-msg .cursor{display:inline-block;width:1.5px;height:14px;background:var(--t2);margin-left:1px;vertical-align:middle;animation:blink 0.9s infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-
-/* ── Probability card ──────────────────────────────────── */
-.prob-card{
-  background:var(--bg);border-radius:var(--radius);padding:18px 16px;
-  position:relative;overflow:hidden;
-}
-.prob-stage{
-  font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);
-  letter-spacing:0.09em;text-transform:uppercase;margin-bottom:8px;
-}
-.bubble.card-bubble.final-card{
-  box-shadow:0 0 0 1.5px var(--gold), 0 2px 12px rgba(201,168,76,0.22);
-}
-.bubble.card-bubble.final-card .prob-stage{color:var(--gold);}
-
-.prob-range-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:12px;}
-.prob-range{
-  font-size:44px;font-weight:800;letter-spacing:-2.5px;line-height:1;
-  color:var(--gold);
-}
-.prob-range.red   { color:var(--red); }
-.prob-range.amber { color:var(--gold); }
-.prob-range.green { color:var(--teal); }
-.prob-verdict{
-  font-size:10px;font-weight:700;padding-bottom:6px;
-  letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);
-}
-.prob-verdict.red   { color:var(--red); }
-.prob-verdict.amber { color:var(--gold); }
-.prob-verdict.green { color:var(--teal); }
-
-.prob-track{
-  background:rgba(255,255,255,0.08);border-radius:3px;height:6px;
-  margin-bottom:12px;overflow:hidden;position:relative;
-}
-.prob-fill{
-  height:100%;border-radius:3px;
-  background:var(--gold);
-  transition:width 1s cubic-bezier(0.22,1,0.36,1);
-}
-.prob-fill.red   { background:var(--red); }
-.prob-fill.amber { background:var(--gold); }
-.prob-fill.green { background:var(--teal); }
-
-.prob-reason{
-  font-size:12px;color:rgba(255,255,255,0.6);line-height:1.55;
-}
-.prob-reason strong{color:#fff;}
-.prob-card.no-reason .prob-reason{display:none;}
-
-/* ── In-card reason — divider + color-accented left border, inside the dark
-   probability card. Colors reflect the signal direction for that exchange. */
-.prob-reason-block{
-  margin-top:14px;
-  padding-top:14px;
-  border-top:1px dashed rgba(255,255,255,0.14);
-}
-.prob-reason-inner{
-  display:flex;gap:10px;align-items:flex-start;
-  padding:10px 12px;
-  border-radius:8px;
-  border-left:3px solid rgba(255,255,255,0.25);
-  background:rgba(255,255,255,0.03);
-}
-.prob-reason-dot{
-  width:7px;height:7px;border-radius:50%;
-  margin-top:6px;flex-shrink:0;
-  background:rgba(255,255,255,0.45);
-}
-.prob-reason-text{
-  font-size:13px;line-height:1.55;
-  color:rgba(255,255,255,0.85);
-}
-/* Positive signal — teal accent */
-.prob-reason-inner.pos{
-  border-left-color:var(--teal);
-  background:rgba(0,196,160,0.07);
-}
-.prob-reason-inner.pos .prob-reason-dot{background:var(--teal);}
-/* Negative signal — red accent */
-.prob-reason-inner.neg{
-  border-left-color:var(--red);
-  background:rgba(224,85,85,0.07);
-}
-.prob-reason-inner.neg .prob-reason-dot{background:var(--red);}
-/* Neutral — gold accent */
-.prob-reason-inner.neu{
-  border-left-color:var(--gold);
-  background:rgba(201,168,76,0.06);
-}
-.prob-reason-inner.neu .prob-reason-dot{background:var(--gold);}
-
-/* ── User message ──────────────────────────────────────── */
-.user-msg{display:flex;justify-content:flex-end;padding:14px 0 14px 42px;animation:msgIn 0.3s ease;}
-.user-bubble{
-  background:var(--navy);color:#fff;
-  border-radius:14px 4px 14px 14px;
-  padding:10px 14px;font-size:13px;line-height:1.5;max-width:82%;
-  word-wrap:break-word;
+@media (max-width: 480px) {
+  .main { padding: 24px 20px 48px; }
+  .site-header { padding: 14px 20px; }
 }
 
-/* ── Coach typing indicator (FA arc pattern) ────────────── */
-.typing-bubble{padding:8px 12px;}
-.typing-indicator{display:inline-flex;align-items:center;padding:2px 0;}
+/* ── Hero ──────────────────────────────────────────────── */
+.hero {
+  text-align: center;
+  padding: 20px 0 28px;
+}
+.hero h1 {
+  font-size: clamp(26px, 5.2vw, 40px);
+  line-height: 1.25;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+.hero h1 .accent {
+  color: var(--gold);
+  font-size: 1.35em;
+  line-height: 1;
+  vertical-align: baseline;
+}
+.hero h1 .accent-soft {
+  color: var(--gold);
+}
+.hero h1 .hero-h1-line2 {
+  font-weight: 500;
+  display: inline-block;
+  margin-top: 4px;
+}
+.hero-sub {
+  font-size: clamp(15px, 2.6vw, 18px);
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text);
+  max-width: 520px;
+  margin: 0 auto 8px;
+}
+.hero-trust {
+  font-size: 11px; color: var(--text2); letter-spacing: 0.04em;
+  margin-top: 24px; text-transform: uppercase;
+}
+.hero-trust span { margin: 0 6px; }
 
-/* ── Paywall bubble (coach-voice, natural) ─────────────── */
-/* Rendered as a coach bubble, not a product surface. Dark background
-   to signal "this is the moment" but the shape + border-radius matches
-   the regular coach bubble. CTA is the only inline UI element. */
-.paywall-bubble{
-  background:var(--bg);border-radius:4px 14px 14px 14px;
-  padding:16px 16px 14px;color:#fff;
-}
-.paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:10px;}
-.paywall-bubble p:last-of-type{margin-bottom:12px;}
-.paywall-bubble p strong{color:#fff;}
-.paywall-bubble .echo{
-  font-size:12px;color:rgba(255,255,255,0.55);font-style:italic;
-  border-left:2px solid rgba(201,168,76,0.4);padding-left:10px;margin-bottom:10px;
-}
-.btn-pay{
-  width:100%;background:var(--gold);color:var(--bg);
-  border:none;border-radius:10px;padding:14px;margin-top:6px;
-  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-  transition:background 0.12s,transform 0.1s;
-}
-.btn-pay:hover{background:var(--gold2);}
-.btn-pay:active{transform:translateY(1px);}
-.btn-pay:disabled{opacity:0.6;cursor:wait;}
-.btn-pay-arrow{display:inline-block;animation:ap 1.8s ease-in-out infinite;}
-@keyframes ap{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
-.trust-row{
-  display:flex;justify-content:center;gap:8px;margin-top:10px;
-  font-size:10px;color:rgba(255,255,255,0.32);letter-spacing:0.03em;
-  flex-wrap:wrap;
-}
-.trust-row .dot{color:rgba(255,255,255,0.18);}
-
-/* ── Uplift panel — "with the coaching plan, your range is X-Y%" ──
-   Sits between the middle coach line and the closing paragraph. Green-accented
-   to signal positive change from base range. Includes 3 mechanism lines
-   that explain WHY the uplift is real (not a bare claim). */
-.uplift-panel{
-  margin:12px 0;
-  background:rgba(0,196,160,0.06);
-  border:1px solid rgba(0,196,160,0.22);
-  border-radius:10px;
-  padding:12px 14px;
-}
-.uplift-head{
-  display:flex;align-items:baseline;gap:8px;
-  margin-bottom:8px;flex-wrap:wrap;
-}
-.uplift-label{
-  font-size:10px;font-weight:800;letter-spacing:0.08em;
-  text-transform:uppercase;color:var(--teal);
-}
-.uplift-range{
-  font-size:18px;font-weight:800;color:var(--teal);
-  letter-spacing:-0.5px;
-}
-.uplift-delta{
-  font-size:11px;color:rgba(0,196,160,0.72);font-weight:600;
-}
-.uplift-mechanisms{
-  list-style:none;padding:0;margin:4px 0 0;
-}
-.uplift-mechanisms li{
-  font-size:12px;color:rgba(255,255,255,0.72);line-height:1.55;
-  padding:3px 0 3px 16px;position:relative;
-}
-.uplift-mechanisms li::before{
-  content:'+';position:absolute;left:0;top:2px;
-  color:var(--teal);font-weight:800;font-size:13px;
-}
-.uplift-mechanisms li strong{color:#fff;font-weight:700;}
-
-/* ── Proof line — rotating single-line claim below CTA.
-   Bolds a key phrase (usually the dollar figure or the value statement) to
-   anchor the cost-vs-reward asymmetry. Only one shows per card; rotation
-   happens on each render. */
-.proof-line{
-  margin-top:8px;text-align:center;
-  font-size:11.5px;color:rgba(201,168,76,0.75);line-height:1.5;
-}
-.proof-line strong{color:var(--gold);font-weight:700;}
-
-/* ── Bottom panel ──────────────────────────────────────── */
-.bottom-panel{
-  flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
-  transition:opacity 0.3s;
-}
-.bottom-panel.dimmed{opacity:0.35;pointer-events:none;}
-
-/* Bottom chips-area — populated after final range with plan-preview chips.
-   Each chip opens a section-tease paywall. Matches FA chat pattern:
-   single row, horizontal scroll, right-edge fade as scroll affordance. */
-.chips-area{
-  position:relative;
-  overflow:hidden;
-  padding:10px 0 4px;
-}
-.chips-area:empty{padding:0;height:0;}
-/* Right-edge fade gradient — signals scrollability */
-.chips-area::after{
-  content:'';
-  position:absolute;top:0;right:0;
-  width:44px;height:100%;
-  background:linear-gradient(to right, rgba(244,245,248,0), rgba(244,245,248,1));
-  pointer-events:none;
-}
-.chips-area-scroll{
-  display:flex;
-  gap:7px;
-  overflow-x:auto;
-  padding:0 14px;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-.chips-area-scroll::-webkit-scrollbar{display:none;}
-
-.plan-chip{
-  background:rgba(30,61,114,0.06);
-  border:1.5px solid rgba(30,61,114,0.18);
-  color:var(--navy);
-  border-radius:20px;
-  padding:7px 14px;font-size:12px;font-weight:600;
-  cursor:pointer;font-family:var(--sans);
-  white-space:nowrap;
-  flex-shrink:0;
-  line-height:1.3;
-  display:inline-flex;align-items:center;gap:6px;
-  transition:opacity 0.15s;
-}
-.plan-chip:active{opacity:0.7;}
-.plan-chip .lock{font-size:10px;color:var(--gold);}
-/* Flagship variant — the role-play chip gets the gold treatment */
-.plan-chip.plan-chip-gold{
-  background:rgba(201,168,76,0.06);
-  border-color:rgba(201,168,76,0.35);
-  color:#a07c2a;
+@media (max-width: 480px) {
+  .hero h1 { letter-spacing: -0.6px; }
 }
 
-/* ── Inline user-side chips (answer chips below each coach question) ── */
-.chips-msg{
-  flex-direction:column;align-items:flex-end;gap:6px;
+/* ── CTAs ──────────────────────────────────────────────── */
+.cta-stack {
+  display: flex; flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin: 32px auto 0;
 }
-.user-chips{
-  display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;
+.cta-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--gold); color: #07090f;
+  border: none; border-radius: 8px;
+  padding: 17px 34px;
+  font-size: 15px; font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.12s, opacity 0.12s, background 0.12s;
+  line-height: 1.3; text-align: center;
+  white-space: nowrap;
 }
-.chips-group{width:100%;display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
-.chips-group + .chips-group{margin-top:6px;}
-.chips-sublabel{
-  font-size:10px;font-weight:700;
-  color:var(--t3);letter-spacing:0.06em;text-transform:uppercase;
+.cta-btn:hover { opacity: 0.92; text-decoration: none; }
+.cta-btn:active { transform: translateY(1px); }
+.cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
+.cta-btn.secondary {
+  background: transparent;
+  color: var(--text2);
+  border: 1.5px solid rgba(255,255,255,0.22);
+  opacity: 1;
 }
-
-.chip{
-  background:var(--card);color:var(--t2);
-  border:1.5px solid var(--divider);
-  border-radius:20px;
-  padding:8px 14px;font-size:12.5px;font-weight:500;
-  cursor:pointer;font-family:var(--sans);
-  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s,opacity 0.18s;
-  line-height:1.3;
+.cta-btn.secondary:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.35); }
+.cta-btn.outline-gold {
+  background: transparent;
+  color: var(--gold);
+  border: 1.5px solid rgba(201,168,76,0.4);
+  padding: 13px 26px;
+  font-size: 14.5px;
 }
-.chip:hover{border-color:var(--navy);color:var(--navy);}
-.chip:active{transform:scale(0.97);}
-.chip.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;}
-.chip.fadeout{opacity:0;pointer-events:none;}
-/* Free-text escape chip visually distinct from canonical chips */
-.chip.chip-freetext{
-  border-style:dashed;border-color:var(--t4);
-  color:var(--t3);background:transparent;
-}
-.chip.chip-freetext:hover{border-color:var(--navy);color:var(--navy);border-style:solid;}
-
-/* Input bar */
-.input-bar{
-  padding:10px 12px calc(12px + env(safe-area-inset-bottom)) 12px;
-  flex-shrink:0;
-}
-.input-row{
-  display:flex;align-items:center;gap:8px;
-  background:var(--card);border:1.5px solid var(--divider);
-  border-radius:24px;padding:6px 6px 6px 16px;
-  transition:border-color 0.15s;
-}
-.input-row:focus-within{border-color:var(--navy);}
-.input-row input{
-  flex:1;border:none;background:transparent;
-  /* 16px minimum to prevent iOS Safari auto-zoom on focus. */
-  font-size:16px;color:var(--t1);font-family:var(--sans);outline:none;
-}
-.input-row input::placeholder{color:var(--t4);}
-.send-btn{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--navy);border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;transition:background 0.15s,opacity 0.15s;
-}
-.send-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.send-btn:active:not(:disabled){opacity:0.82;}
-.send-btn svg{width:14px;height:14px;}
-
-/* ── Thinking screen ───────────────────────────────────── */
-.thinking-screen{padding:16px 16px 8px;display:flex;flex-direction:column;gap:12px;}
-.thinking-bubble{
-  background:var(--card);border-radius:4px 14px 14px 14px;
-  padding:14px 16px;border:1px solid var(--divider);
-  display:flex;align-items:center;gap:10px;min-height:48px;
-  animation:msgIn 0.45s cubic-bezier(0.22,1,0.36,1);
-}
-.thinking-arc{flex-shrink:0;}
-.thinking-txt{
-  font-size:13px;color:var(--t2);line-height:1.5;
-  flex:1;min-height:18px;
-}
-.thinking-cursor{
-  display:inline-block;width:1.5px;height:13px;
-  background:var(--t2);margin-left:1px;vertical-align:middle;
-  animation:blink 0.9s infinite;
+.cta-btn.outline-gold:hover {
+  background: rgba(201,168,76,0.08);
+  border-color: rgba(201,168,76,0.7);
 }
 
-/* ── Reason change flash ───────────────────────────────── */
-.reason-flash{
-  font-size:11px;color:var(--t3);font-style:italic;
-  padding:2px 14px 0;
-  animation:flashIn 0.4s ease;
+/* Inline CTA below How it works */
+.hiw-continue {
+  text-align: center;
+  margin: 20px 0 8px;
 }
-@keyframes flashIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
-
-/* ── Error state ───────────────────────────────────────── */
-.err-bubble{
-  background:#fff;border:1px solid #f4c7c7;
-  border-left:3px solid var(--red);
-  border-radius:4px 10px 10px 10px;padding:12px 14px;
-  font-size:12.5px;color:var(--t2);line-height:1.55;
+.hiw-continue-hint {
+  font-size: 11px;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+  text-transform: uppercase;
 }
-.err-bubble button{
-  margin-top:8px;background:var(--navy);color:#fff;
-  border:none;border-radius:8px;padding:8px 14px;
-  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);
+@media (max-width: 420px) {
+  .cta-btn { padding: 15px 26px; font-size: 14.5px; white-space: normal; }
+  .cta-stack { gap: 10px; margin-top: 24px; }
 }
 
-/* Exchange label pill */
-.exchange-pill{
-  display:inline-block;font-size:10px;font-weight:700;
-  letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--t3);padding:2px 0 0;
+/* ── Sample report card — probability + factors + checklist ─── */
+.rep-section {
+  margin: 32px 0 32px;
 }
+.rep-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.rep-link:hover { text-decoration: none; }
+.rep-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 14px 16px;
+  transition: opacity 300ms ease, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.rep-card.fading { opacity: 0; }
+.rep-link:hover .rep-card {
+  border-color: rgba(201,168,76,0.45);
+  box-shadow: 0 0 0 1px rgba(201,168,76,0.15);
+}
+.rep-link:hover .rep-cta-text { text-decoration: underline; }
+.rep-link:active .rep-card { transform: translateY(1px); }
+
+.rep-header {
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 14px;
+}
+.rep-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); flex-shrink: 0;
+}
+.rep-hlabel {
+  font-size: 12px; font-weight: 600;
+  color: var(--text);
+  line-height: 1.35;
+  flex: 1;
+}
+.rep-example-tag {
+  font-size: 9px; font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.04em; text-transform: uppercase;
+  background: rgba(255,255,255,0.04);
+  border-radius: 3px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Probability card (inside rep-card) */
+.rep-prob {
+  background: var(--bg);
+  border-radius: 6px;
+  padding: 16px 14px;
+}
+.rep-prob-stage {
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.09em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.rep-prob-row {
+  display: flex; align-items: flex-end; gap: 10px;
+  margin-bottom: 12px;
+}
+.rep-range {
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -1.2px; line-height: 1;
+  opacity: 0; transition: opacity 400ms ease;
+}
+.rep-range.show { opacity: 1; }
+.rep-verdict-lbl {
+  font-size: 10px; font-weight: 700;
+  padding-bottom: 4px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  opacity: 0; transition: opacity 400ms ease 100ms;
+}
+.rep-verdict-lbl.show { opacity: 1; }
+.rep-range.red, .rep-verdict-lbl.red { color: var(--red); }
+.rep-range.amber, .rep-verdict-lbl.amber { color: var(--gold); }
+.rep-range.green, .rep-verdict-lbl.green { color: var(--teal); }
+.rep-track {
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px; height: 6px; overflow: hidden;
+}
+.rep-fill {
+  height: 100%; border-radius: 3px; width: 0%;
+  transition: width 900ms cubic-bezier(0.22,1,0.36,1) 200ms;
+}
+.rep-fill.red   { background: var(--red); }
+.rep-fill.amber { background: var(--gold); }
+.rep-fill.green { background: var(--teal); }
+.rep-persona-label {
+  margin-top: 14px;
+  font-size: 12px; color: var(--text2); line-height: 1.45;
+  opacity: 0; transition: opacity 400ms ease 300ms;
+}
+.rep-persona-label.show { opacity: 1; }
+.rep-persona-label .rep-prole {
+  color: #b8bcce; font-weight: 600;
+}
+
+/* Section headers (factors / plan) */
+.rep-section-head {
+  margin-top: 18px;
+  font-size: 10px; font-weight: 700;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.09em; text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.rep-section-count {
+  font-size: 10px; color: var(--text2);
+  font-weight: 500; letter-spacing: 0; text-transform: none;
+}
+
+/* Factors list — REMOVED (we now show only the prep plan checklist) */
+
+.rep-show-more {
+  margin-top: 10px;
+  font-size: 11px; color: var(--text2);
+  opacity: 0; transition: opacity 400ms ease;
+}
+.rep-show-more.show { opacity: 1; }
+.rep-show-more .plus {
+  color: var(--gold); font-weight: 700; margin-right: 4px;
+}
+
+/* Checklist */
+.rep-checklist { display: flex; flex-direction: column; gap: 7px; }
+.rep-clitem {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; line-height: 1.3;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.rep-clitem.show { opacity: 1; }
+.rep-clmark {
+  width: 16px; height: 16px; border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  transform: scale(0.6);
+  transition: transform 260ms cubic-bezier(0.34,1.56,0.64,1);
+}
+.rep-clitem.show .rep-clmark { transform: scale(1); }
+.rep-clmark.done { background: var(--teal); color: var(--bg); }
+.rep-clmark.pending {
+  background: transparent; color: var(--text3);
+  border: 1.3px solid rgba(255,255,255,0.18);
+}
+.rep-cltext { flex: 1; }
+.rep-clitem.done .rep-cltext { color: #b8bcce; }
+.rep-clitem.pending .rep-cltext { color: var(--text2); }
+.rep-clpill {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: var(--text2);
+  font-size: 11px; font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Chat-with-AI row — sits between checklist and CTA */
+.rep-chat-row {
+  margin-top: 14px;
+  padding: 11px 13px;
+  background: rgba(0,196,160,0.04);
+  border: 1px solid rgba(0,196,160,0.18);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 350ms ease, transform 350ms ease;
+}
+.rep-chat-row.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+.rep-chat-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: rgba(0,196,160,0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+}
+.rep-chat-text {
+  flex: 1;
+  min-width: 0;
+}
+.rep-chat-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.rep-chat-sub {
+  font-size: 11px;
+  color: var(--teal);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+.rep-chat-pill {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--teal);
+  background: rgba(0,196,160,0.1);
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.rep-cta {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  text-align: right;
+}
+.rep-cta-text {
+  font-size: 12px; color: var(--gold); font-weight: 700;
+  cursor: pointer;
+}
+
+/* Persona indicator dots */
+.rep-indicator {
+  display: flex; gap: 6px; justify-content: center;
+  margin-top: 12px;
+}
+.rep-pi-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: background 300ms ease;
+}
+.rep-pi-dot.active { background: var(--gold); }
+
+/* ── Section ──────────────────────────────────────────── */
+.section {
+  margin: 64px 0 20px;
+}
+@media (max-width: 480px) {
+  .section { margin: 48px 0 16px; }
+}
+.section h2 {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
+  margin-bottom: 6px; color: var(--text);
+}
+h2.section-title {
+  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
+  color: var(--text);
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+.hiw-section h2.section-title {
+  margin-top: 0;
+}
+.section .section-sub {
+  font-size: 13px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+/* ── Proof bar ────────────────────────────────────────── */
+.proof-bar {
+  margin: 48px 0;
+  padding: 18px 20px;
+  background: linear-gradient(180deg, rgba(0,196,160,0.06) 0%, rgba(0,196,160,0.02) 100%);
+  border: 1px solid rgba(0,196,160,0.22);
+  border-radius: 10px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .proof-bar { margin: 40px 0; }
+}
+.proof-stat {
+  font-size: 15.5px; font-weight: 800;
+  color: var(--text); line-height: 1.5;
+  margin-bottom: 6px;
+}
+.proof-stat .proof-num { color: var(--teal); }
+.proof-src {
+  font-size: 10.5px; color: var(--text3);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+
+/* ── Reasons grid (Which one sounds like you?) ─────────── */
+.reasons-section {
+  margin-top: 0;
+}
+.reasons-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+@media (max-width: 480px) {
+  .reasons-grid { grid-template-columns: 1fr; }
+}
+.reason-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px; color: var(--text);
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  line-height: 1.4;
+  gap: 10px;
+}
+.reason-chip:hover {
+  border-color: rgba(201,168,76,0.5);
+  background: var(--bg3);
+  text-decoration: none;
+}
+.reason-chip:active { transform: translateY(1px); }
+.reason-chip .reason-arrow {
+  font-size: 14px; color: var(--gold);
+  flex-shrink: 0; opacity: 0.6;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.reason-chip:hover .reason-arrow {
+  opacity: 1; transform: translateX(2px);
+}
+
+/* CTA variant — same layout as regular chips, gold accent color */
+.reason-chip-cta {
+  border-color: rgba(201,168,76,0.45);
+  color: var(--gold);
+}
+.reason-chip-cta:hover {
+  border-color: var(--gold);
+  background: var(--bg3);
+  color: var(--gold);
+}
+.reason-chip-cta .reason-arrow {
+  color: var(--gold); opacity: 1;
+}
+
+/* ── Closing CTA (positioning block) ───────────────────── */
+.closing-pitch {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-top: 1px solid rgba(201,168,76,0.35);
+  border-radius: 10px;
+  padding: 28px 24px;
+  margin: 64px 0 20px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .closing-pitch { margin: 48px 0 16px; }
+}
+.closing-pitch h3 {
+  font-size: 18px; font-weight: 800;
+  color: var(--text); margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+.closing-pitch h3 .accent { color: var(--gold); }
+.closing-pitch p {
+  font-size: 13.5px; color: var(--text2);
+  line-height: 1.6; margin: 0 auto 18px;
+  max-width: 440px;
+}
+.closing-pitch .cta-btn {
+  max-width: 380px; margin: 0 auto;
+}
+.closing-pitch .mini-trust {
+  margin-top: 14px;
+}
+
+/* ── FAQ ──────────────────────────────────────────────── */
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px; overflow: hidden;
+}
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px; cursor: pointer;
+  font-size: 13px; font-weight: 600; color: var(--text);
+  gap: 12px; user-select: none;
+  transition: background 0.15s;
+}
+.faq-q:hover { background: var(--bg3); }
+.faq-q.open { background: var(--bg3); }
+.faq-icon {
+  font-size: 16px; color: var(--text3); flex-shrink: 0;
+  transition: transform 0.2s;
+}
+.faq-q.open .faq-icon { transform: rotate(45deg); color: var(--gold); }
+.faq-a {
+  display: none;
+  padding: 0 18px 16px;
+  font-size: 13px; color: var(--text2); line-height: 1.75;
+  border-top: 1px solid var(--border);
+}
+.faq-a.open { display: block; }
+.faq-a a { color: var(--gold); }
+
+/* ── Progress indicator (assessment) ───────────────────── */
+.progress {
+  display: flex; gap: 4px;
+  max-width: 640px; margin: 0 auto 22px;
+}
+.pseg {
+  height: 3px; flex: 1;
+  background: rgba(255,255,255,0.07);
+  border-radius: 2px;
+  transition: background 0.25s;
+}
+.pseg.done { background: var(--gold); }
+
+/* Assessment container — generous bottom space so the Continue button
+   sits well above any footer on mobile. Landing keeps the default `.main` padding. */
+#assessment-content {
+  padding-bottom: 140px;
+}
+@media (max-width: 480px) {
+  #assessment-content { padding-bottom: 120px; }
+}
+
+/* ── Step / question styles ───────────────────────────── */
+.step { display: none; }
+.step.active { display: block; animation: fadeUp 0.28s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.step-meta {
+  font-size: 11px; color: var(--text3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin-bottom: 8px; font-weight: 600;
+}
+.step h2 {
+  font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+  margin-bottom: 8px; color: var(--text); line-height: 1.25;
+}
+.step .sub {
+  font-size: 13.5px; color: var(--text2); line-height: 1.55;
+  margin-bottom: 22px;
+}
+
+/* ── Chip / option grids ───────────────────────────────── */
+.opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.opts.row { flex-direction: row; flex-wrap: wrap; }
+.opt {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 14px; color: var(--text); font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  line-height: 1.35;
+}
+.opts.row .opt {
+  flex: 1 1 auto; min-width: 0;
+  padding: 12px 14px; font-size: 13px;
+}
+.opt small {
+  display: block; font-size: 11.5px; color: var(--text3);
+  margin-top: 3px; font-weight: 400;
+}
+.opt.sel {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.06);
+}
+.opt.sel small { color: var(--text2); }
+.opt:hover { border-color: var(--border2); background: var(--bg3); }
+.opt.sel:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
+
+/* ── Nav ──────────────────────────────────────────────── */
+.step-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 22px; padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.step-counter { font-size: 12px; color: var(--text3); font-weight: 500; }
+.nav-right { display: flex; gap: 10px; }
+.btn-back, .btn-continue {
+  border: none; border-radius: 8px;
+  padding: 11px 18px; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--sans);
+  transition: opacity 0.15s, background 0.15s, transform 0.1s;
+}
+.btn-back {
+  background: transparent; color: var(--text2);
+  border: 1px solid var(--border2);
+}
+.btn-back:hover { background: var(--bg3); color: var(--text); }
+.btn-continue {
+  background: var(--gold); color: #07090f;
+  opacity: 0.4; cursor: not-allowed;
+}
+.btn-continue.active {
+  opacity: 1; cursor: pointer;
+}
+.btn-continue.active:hover { background: var(--gold2); }
+.btn-continue:active { transform: translateY(1px); }
+.err {
+  display: none;
+  color: var(--red); font-size: 12px; margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(224,85,85,0.08);
+  border-left: 2px solid var(--red);
+  border-radius: 4px;
+}
+.err.show { display: block; animation: errShake 0.35s cubic-bezier(0.36,0.07,0.19,0.97); }
+@keyframes errShake {
+  10%,90% { transform: translateX(-1px); }
+  20%,80% { transform: translateX(2px); }
+  30%,50%,70% { transform: translateX(-3px); }
+  40%,60% { transform: translateX(3px); }
+}
+
+/* ── Jump button from landing to assessment ───────────── */
+.scroll-cue {
+  text-align: center; margin-top: 24px;
+  font-size: 12px; color: var(--text3);
+}
+
+/* ── Proof rotator (typewriter between sample card and how-it-works) ── */
+.proof-rotator {
+  margin: 36px 0 36px;
+  text-align: center;
+  min-height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 12px;
+}
+.proof-rotator-text {
+  font-size: 17px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  max-width: 520px;
+}
+.proof-rotator-text .emph {
+  color: var(--gold);
+  font-weight: 700;
+}
+.proof-rotator-text .cursor {
+  display: inline-block;
+  width: 2px;
+  background: var(--gold);
+  margin-left: 2px;
+  animation: proof-blink 0.9s steps(2, end) infinite;
+  height: 1em;
+  vertical-align: text-bottom;
+}
+@keyframes proof-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@media (max-width: 480px) {
+  .proof-rotator-text { font-size: 15px; }
+}
+
+/* ── How it works (vertical cards) ────────────────────── */
+.hiw-section {
+  margin: 32px 0 32px;
+}
+.hiw-card,
+.hiw-card *,
+.hiw-card:hover,
+.hiw-card:hover *,
+.hiw-card:focus,
+.hiw-card:focus * {
+  text-decoration: none !important;
+}
+.hiw-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 16px 18px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  color: inherit;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.hiw-card:hover,
+.hiw-card:focus-visible {
+  border-color: rgba(201,168,76,0.35);
+  background: rgba(20,23,34,0.9);
+  outline: none;
+}
+.hiw-card:active {
+  transform: scale(0.995);
+}
+.hiw-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(201,168,76,0.1);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold);
+  font-size: 14px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hiw-body { flex: 1; min-width: 0; }
+.hiw-title {
+  font-size: 15px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.hiw-desc {
+  font-size: 13px;
+  color: #b8bcce;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.hiw-desc b {
+  color: var(--text);
+  font-weight: 700;
+}
+.hiw-desc .range {
+  color: var(--text);
+  font-weight: 700;
+}
+.hiw-meta {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.hiw-meta .pill {
+  display: inline-block;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.hiw-meta .pill.free {
+  background: rgba(0,196,160,0.08);
+  border-color: rgba(0,196,160,0.3);
+  color: var(--teal);
+}
+/* Inline CTA at the end of each card body — visually mimics a link, but
+   is just a styled div (the whole card is already an <a>). */
+.hiw-cta {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}
+.hiw-cta-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  transition: transform 220ms ease;
+}
+.hiw-card:hover .hiw-cta-arrow,
+.hiw-card:focus-visible .hiw-cta-arrow {
+  transform: translateX(3px);
+}
+
+/* ── Section dividers (below-fold) ─────────────────────── */
+.divider {
+  height: 1px; background: var(--border);
+  margin: 32px 0;
+}
+
+/* ── Footer micro trust line ──────────────────────────── */
+.mini-trust {
+  text-align: center;
+  font-size: 11px; color: var(--text3);
+  margin-top: 32px; letter-spacing: 0.02em;
+}
+.mini-trust strong { color: var(--text2); }
+
+/* ══════════════════════════════════════════════════════════════ */
+/* ── Compound-raise calculator                                ── */
+/* ══════════════════════════════════════════════════════════════ */
+.calc-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: -0.2px;
+}
+.calc-inputs {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 20px;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.calc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.calc-field:first-child {
+  flex: 1;
+}
+.calc-field-salary {
+  flex: 1.4;
+}
+.calc-field-years {
+  flex: 0 0 88px;
+}
+.calc-micro-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding-left: 2px;
+}
+.calc-input-wrap {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+.calc-input {
+  width: 100%;
+  background: rgba(20,23,34,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-size: 16px; /* iOS Safari auto-zooms inputs < 16px on focus */
+  font-weight: 700;
+  padding: 9px 12px;
+  line-height: 1.25;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  -moz-appearance: textfield;
+  box-sizing: border-box;
+}
+/* Raise input: extra right padding to clear the % suffix */
+.calc-input-raise {
+  padding-right: 26px;
+}
+/* When an input is preceded by a prefix ($), shift text right to clear the prefix */
+.calc-input-prefix + .calc-input {
+  padding-left: 24px;
+}
+.calc-input::-webkit-outer-spin-button,
+.calc-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.calc-input:focus {
+  border-color: rgba(201,168,76,0.5);
+  background: rgba(20,23,34,0.95);
+}
+.calc-input-prefix {
+  position: absolute;
+  left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  font-size: 14px; font-weight: 700;
+  pointer-events: none;
+}
+.calc-input-suffix {
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  font-size: 13px; font-weight: 700;
+  pointer-events: none;
+}
+.calc-year-select {
+  width: 100%;
+  background: rgba(20,23,34,0.7);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-size: 16px; /* iOS Safari auto-zooms selects < 16px on focus */
+  font-weight: 700;
+  padding: 9px 28px 9px 12px;
+  line-height: 1.25;
+  border-radius: 6px;
+  font-family: inherit;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  box-sizing: border-box;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a90a8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.calc-year-select:focus {
+  border-color: rgba(201,168,76,0.5);
+  background-color: rgba(20,23,34,0.95);
+}
+
+/* Interactive calculator — two-bar chart */
+.calc-chart-wrap {
+  position: relative;
+  margin: 0 -4px 8px;
+}
+.bars-chart {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 40px;
+  height: 240px;
+  padding: 30px 20px 0;
+  margin: 0 auto;
+  max-width: 340px;
+}
+.bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  position: relative;
+  padding-top: 30px;
+  padding-bottom: 44px;
+}
+.bar-total {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 600ms ease-out, transform 600ms ease-out;
+}
+.bar-col-nego .bar-total { color: var(--teal); }
+.bar-stack {
+  width: 72px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-start;
+  position: relative;
+}
+.bar-segment {
+  width: 100%;
+  transform: scaleY(0);
+  transform-origin: bottom;
+}
+.bar-gray {
+  background: linear-gradient(180deg, #8a90a8 0%, #5b6075 100%);
+  border-radius: 4px 4px 0 0;
+  transition: height 1800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bar-col-nego .bar-gray {
+  border-radius: 0;
+}
+.bar-gold {
+  background: linear-gradient(180deg, #d8b75a 0%, #c9a84c 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 -4px 14px rgba(201,168,76,0.22);
+  transition: height 1400ms cubic-bezier(0.22, 1, 0.36, 1) 1200ms;
+}
+.bar-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
+  opacity: 0;
+  transition: opacity 500ms ease-out;
+}
+.bar-col-nego .bar-caption { color: var(--gold); }
+
+/* First-view reveal animation */
+.calc-chart-wrap:not(.revealed) .bar-segment { transform: scaleY(0); }
+.calc-chart-wrap.revealed .bar-segment {
+  animation: bar-grow 1200ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards;
+}
+.calc-chart-wrap.revealed .bar-gold {
+  animation: bar-grow 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms forwards;
+}
+.calc-chart-wrap.revealed .bar-total {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 1400ms;
+}
+.calc-chart-wrap.revealed .bar-caption {
+  opacity: 1;
+  transition-delay: 1600ms;
+}
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.calc-result {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+.calc-result-num {
+  font-size: 38px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  transition: color 200ms ease;
+}
+.calc-result-sub {
+  font-size: 11.5px;
+  color: var(--text2);
+  margin-top: 10px;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
+}
+#calc-result-sticky {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  display: inline-block;
+  margin-bottom: 4px;
+}
+.calc-result-disclaimer {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.03em;
+}
+
+/* CTA block below the calculator panel */
+.calc-cta {
+  text-align: center;
+  margin: 24px 0 48px;
+}
+.calc-cta-hook {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+.calc-cta-hook .gold { color: var(--gold); }
+
 </style>
 </head>
 
 <body>
 
+<!-- ── Header ───────────────────────────────────────────── -->
 <header class="site-header">
-  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <a href="/" class="logo-wrap"><span class="logo-recom">Recom</span><span class="logo-linked">linked</span></a>
 </header>
 
-<div class="page-wrap">
+<div class="main">
 
-  <!-- Chat area ──────────────────────────────────────── -->
-  <div class="chat-wrap" id="chat-wrap">
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ──  LANDING CONTENT                                  ── -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="landing-content">
 
-    <!-- Thinking bubble (shown while analyze in flight) — FA pattern -->
-    <div class="thinking-screen" id="thinking-screen">
-      <div class="thinking-bubble">
-        <svg width="36" height="36" viewBox="0 0 52 52" id="thinking-arc" style="flex-shrink:0;">
-          <circle id="thinking-arc-track" cx="26" cy="26" r="18" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="3" stroke-linecap="round" transform="rotate(-210 26 26)"/>
-          <circle id="thinking-arc-fill" cx="26" cy="26" r="18" fill="none" stroke="#c9a84c" stroke-width="3" stroke-linecap="round" stroke-dasharray="113.1" stroke-dashoffset="68" transform="rotate(-210 26 26)"/>
-        </svg>
-        <span class="thinking-txt" id="thinking-txt"></span>
-        <span class="thinking-cursor"></span>
+  <!-- Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <h1>How to ask for a <span class="accent">raise</span><br><span class="hero-h1-line2">with a professional <span class="accent-soft">negotiation plan</span></span></h1>
+
+    <p class="hero-sub">No need to be a negotiator. The plan writes the words for you.</p>
+
+    <div class="cta-stack">
+      <a href="/raise/?start=1#assessment-top" class="cta-btn" id="cta-raise">
+        <span>Start free</span>
+        <span class="cta-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="hero-trust">
+      NO EMAIL REQUIRED
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
+  <section class="section hiw-section" id="how-it-works">
+    <h2 class="section-title">In 3 simple steps</h2>
+
+    <a href="/raise/?start=1#assessment-top" class="hiw-card" aria-label="Step 1: build your raise case">
+      <div class="hiw-num">1</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Build your case</div>
+        <div class="hiw-desc">Every raise comes down to a few key factors — your <b>company's situation</b>, your <b>performance</b>, your <b>manager</b>, and your <b>timing</b>. Estimating your chances first lets you build the right strategy based on the <b>strengths</b> and <b>weaknesses</b> of your raise case. We calculate that winning chance in a few quick taps.</div>
+        <div class="hiw-cta">See your winning chance in 1 minute <span class="hiw-cta-arrow">→</span></div>
+      </div>
+    </a>
+
+    <a href="#calculator" class="hiw-card" aria-label="Step 2: set your number, see the calculator below">
+      <div class="hiw-num">2</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Set your number</div>
+        <div class="hiw-desc">A vague "more money" never works. You need a specific number, backed by <b>market data</b> and your <b>real scope</b>. And remember — <b>even 1%</b> more or less <b>compounds</b> into a huge amount over the years. In the next section we help you calculate exactly what your raise number means for your future.</div>
+        <div class="hiw-cta">Calculate what each 1% raise means over your career <span class="hiw-cta-arrow">→</span></div>
+      </div>
+    </a>
+
+    <a href="#blockers" class="hiw-card" aria-label="Step 3: know what's blocking your raise">
+      <div class="hiw-num">3</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Know what's blocking your raise</div>
+        <div class="hiw-desc">Every raise blocker has a specific response. Don't know your number? That's <b>market research</b>. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. Not sure about timing? That's a <b>timing strategy</b>. Each piece of your action plan exists to remove one specific blocker.</div>
+        <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
+      </div>
+    </a>
+
+    <!-- Blockers section — each chip is one dimension of the full plan -->
+    <div class="divider"></div>
+    <div class="reasons-section" id="blockers">
+      <h2 class="section-title">Most common raise blockers</h2>
+      <div class="reasons-grid">
+        <a href="/raise/?start=1&amp;reason=underpaid#assessment-top" class="reason-chip">
+          <span>I think I'm underpaid but I can't prove it</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=quiet_performer#assessment-top" class="reason-chip">
+          <span>I'm a strong performer but quiet, and it's costing me</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=unknown_timing#assessment-top" class="reason-chip">
+          <span>I'm not sure if now is the right time</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=no_advocate#assessment-top" class="reason-chip">
+          <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=unknown_number#assessment-top" class="reason-chip">
+          <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=no_script#assessment-top" class="reason-chip">
+          <span>I don't know how to start the conversation</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=fear_no#assessment-top" class="reason-chip">
+          <span>What if they say no?</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=already_asked#assessment-top" class="reason-chip">
+          <span>I already asked and got nothing</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/raise/?start=1&amp;reason=other#assessment-top" class="reason-chip reason-chip-cta">
+          <span>None of these? Let's find yours</span><span class="reason-arrow">→</span>
+        </a>
       </div>
     </div>
 
-    <!-- Coach messages and card render into this area -->
-    <div id="messages"></div>
+  </section>
 
+  <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
+  <div class="proof-rotator" id="proof-rotator">
+    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
   </div>
 
-  <!-- Bottom panel ──────────────────────────────────── -->
-  <div class="bottom-panel dimmed" id="bottom-panel">
-    <!-- Plan-preview chips area. Empty during ranging flow; populated with
-         7 plan-section chips after the obstacle answer (final range card +
-         main paywall render). Tapping a chip opens a section-tease paywall. -->
-    <div class="chips-area" id="chips-area">
-      <div class="chips-area-scroll" id="chips-area-scroll"></div>
+  <div class="divider"></div>
+
+  <h2 class="section-title" id="calculator">What each 1% raise means for your career</h2>
+
+  <!-- Interactive compound-raise calculator -->
+  <div class="proof-bar">
+    <div class="calc-title" id="calc-title">8% raise today, compounded over 25 years means:</div>
+
+    <div class="calc-inputs">
+      <div class="calc-field">
+        <span class="calc-micro-label">Raise</span>
+        <div class="calc-input-wrap">
+          <input type="text" inputmode="numeric" class="calc-input calc-input-raise" id="calc-raise" value="8" aria-label="Raise percentage" />
+          <span class="calc-input-suffix">%</span>
+        </div>
+      </div>
+      <div class="calc-field calc-field-salary">
+        <span class="calc-micro-label">Salary</span>
+        <div class="calc-input-wrap">
+          <span class="calc-input-prefix">$</span>
+          <input type="text" inputmode="numeric" class="calc-input" id="calc-salary" value="70,000" aria-label="Current salary" />
+        </div>
+      </div>
+      <div class="calc-field calc-field-years">
+        <span class="calc-micro-label">Years</span>
+        <select class="calc-year-select" id="calc-year-select" aria-label="Number of years">
+          <option value="5">5y</option>
+          <option value="10">10y</option>
+          <option value="15">15y</option>
+          <option value="20">20y</option>
+          <option value="25" selected>25y</option>
+          <option value="30">30y</option>
+        </select>
+      </div>
     </div>
-    <div class="input-bar">
-      <div class="input-row">
-        <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
-        <button class="send-btn" id="send-btn" disabled aria-label="Send">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </button>
+
+    <div class="calc-chart-wrap" id="calc-bars">
+      <div class="bars-chart">
+        <div class="bar-col" id="bar-col-base">
+          <div class="bar-total" id="bar-total-base">$2.55M</div>
+          <div class="bar-stack" id="bar-stack-base">
+            <div class="bar-segment bar-gray" id="bar-gray-base"></div>
+          </div>
+          <div class="bar-caption">Don't<br/>negotiate</div>
+        </div>
+        <div class="bar-col bar-col-nego" id="bar-col-nego">
+          <div class="bar-total" id="bar-total-nego">$2.76M</div>
+          <div class="bar-stack" id="bar-stack-nego">
+            <div class="bar-segment bar-gray" id="bar-gray-nego"></div>
+            <div class="bar-segment bar-gold" id="bar-gold-cap"></div>
+          </div>
+          <div class="bar-caption">Negotiate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="calc-result">
+      <div class="calc-result-num" id="calc-result-num">+$204,172</div>
+      <div class="calc-result-sub"><span id="calc-result-sticky">Almost 3 years of your salary</span><br/><span class="calc-result-disclaimer">Assumes 3% annual merit raises after your one-time negotiated raise</span></div>
+    </div>
+  </div>
+
+  <!-- CTA after the calculator -->
+  <div class="calc-cta">
+    <div class="calc-cta-hook">The best negotiations take <span class="gold">a few hours of prep</span></div>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my plan</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Sample report card — probability + factors + checklist, rotates through personas ─── -->
+  <div class="rep-section" id="rep-section">
+    <a href="/raise/?start=1#assessment-top" class="rep-link">
+    <div class="rep-card" id="rep-card">
+      <div class="rep-header">
+        <div class="rep-dot"></div>
+        <span class="rep-hlabel">Find out how strong your raise case really is</span>
+        <span class="rep-example-tag">Example</span>
+      </div>
+
+      <div class="rep-prob">
+        <div class="rep-prob-row">
+          <span class="rep-range amber show" id="rep-range">54–68%</span>
+          <span class="rep-verdict-lbl amber show" id="rep-verdict-lbl">Moderate chance</span>
+        </div>
+        <div class="rep-track"><div class="rep-fill amber" id="rep-fill" style="width:68%"></div></div>
+        <div class="rep-persona-label show" id="rep-persona-label"><span class="rep-prole">Senior Nurse · Hospital System</span><br>Covers extra shifts without a pay bump. Union contract helps.</div>
+      </div>
+
+      <div class="rep-section-head">
+        <span>Your preparation plan</span>
+        <span class="rep-section-count" id="rep-cl-count">3 of 10 done</span>
+      </div>
+      <div class="rep-checklist" id="rep-checklist">
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Top 3 blockers identified</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Your specific raise number set</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Opening script drafted</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Pushback responses prepared</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Manager objections mapped</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Counteroffer scenarios ready</span><span class="rep-clpill">Draft →</span></div>
+        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Email follow-up drafted</span></div>
+      </div>
+      <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>3 more in your plan</div>
+
+      <div class="rep-chat-row show" id="rep-chat-row">
+        <div class="rep-chat-icon" aria-hidden="true">
+          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5h10v7H6l-3 2.5V5z"/>
+            <path d="M7 9h11v6h-3l-2 2v-2h-6V9z" fill="rgba(0,196,160,0.06)"/>
+          </svg>
+        </div>
+        <div class="rep-chat-text">
+          <div class="rep-chat-title">Chat with your AI coach</div>
+          <div class="rep-chat-sub">Ongoing coaching</div>
+        </div>
+        <span class="rep-chat-pill">30 days</span>
+      </div>
+
+      <div class="rep-cta">
+        <div class="rep-cta-text">Get your plan →</div>
+      </div>
+    </div>
+    </a>
+    <div class="rep-indicator" id="rep-indicator">
+      <div class="rep-pi-dot active"></div>
+      <div class="rep-pi-dot"></div>
+      <div class="rep-pi-dot"></div>
+      <div class="rep-pi-dot"></div>
+    </div>
+  </div>
+
+  <!-- Proof bar (cited stats) — research validation after product demo -->
+  <div class="proof-bar">
+    <div class="proof-stat">
+      People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+    </div>
+    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+  </div>
+
+  <!-- Closing CTA (positioning statement lands here) ──────── -->
+  <div class="closing-pitch">
+    <h3><span class="accent">A negotiation coach</span> for people who hate asking</h3>
+    <p>
+      Asking for a raise and selling your work <strong>isn't greedy</strong>. It's how careers move. We coach you to <strong>ask for what you're worth</strong>: professionally, with evidence, in words that sound like you.
+    </p>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my plan</span>
+      <span class="cta-arrow">→</span>
+    </a>
+    <div class="mini-trust">
+      <strong>Free</strong> · No email needed
+    </div>
+  </div>
+
+  <!-- FAQ ─────────────────────────────────────────────── -->
+  <section class="section">
+    <h2>Common questions</h2>
+    <div style="margin-top: 16px;">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors, then gives you a personalized plan and remembers every conversation for 30 days as you prepare.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How much does it cost?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The assessment and coaching chat are free. If you want the full plan, including your specific number, opening script, pushback responses, email template, and 30 days of coach chat, it's $39 one-time. No subscription, no upsells. Backed by a 14-day refund if it's not useful for your situation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability score?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The score is an estimate based on your specific situation and market conditions, not a guarantee. It's calibrated on the structural factors that actually drive raise outcomes. It's designed to be directionally accurate so you know whether you're in a strong position, a weak one, or somewhere in between, and exactly what moves it.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What if I'm not sure about some of the answers?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Pick the closest option. The coaching chat handles the nuance: if you're unsure about your market rate, your manager's position, or when exactly your review is, the coach will help you figure it out.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Will my employer find out I'm using this?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No. Nothing you type here leaves this site. We don't share data, and we don't sell anything. You can delete everything with one click from your dashboard after you've bought the plan.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What does the 30-day coaching look like?<span class="faq-icon">+</span></div>
+        <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need. Your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice. You're working through a specific plan with a coach who knows your situation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Do you store my company name or sensitive info?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Anything you share in the chat is stored only for the 30-day coaching window and is used solely to personalize your coaching. We never sell or share your data. You can export or delete it at any time from inside your paid dashboard.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What about a job offer I'm negotiating?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Different product, different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/">Join the waitlist</a> and we'll let you know when it's live.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Refund policy?<span class="faq-icon">+</span></div>
+        <div class="faq-a">If the plan isn't useful for your situation, email <a href="mailto:support@recomlinked.com">support@recomlinked.com</a> within 14 days and we'll refund you. We'd rather lose $39 than have an unhappy user.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secondary CTA at bottom of landing ───────────────── -->
+  <div style="text-align:center; margin: 36px 0 10px;">
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Still here? Good.</div>
+    <a href="/raise/?start=1#assessment-top" class="cta-btn">
+      <span>Get my plan</span>
+      <span class="cta-arrow">→</span>
+    </a>
+  </div>
+
+</div><!-- /landing-content -->
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- ──  ASSESSMENT CONTENT                               ── -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="assessment-content" style="display:none;">
+
+  <div id="assessment-top" style="padding-top: 4px;"></div>
+
+  <!-- Progress ─────────────────────────────────────────── -->
+  <div class="progress">
+    <div class="pseg" id="p0"></div>
+    <div class="pseg" id="p1"></div>
+    <div class="pseg" id="p2"></div>
+  </div>
+
+  <!-- ── Step 0: Company situation ── -->
+  <div class="step active" id="step-0">
+    <div class="step-meta">Question 1 of 3</div>
+    <h2>How is your company doing right now?</h2>
+    <p class="sub">Company financial health is the single strongest structural factor shaping raise outcomes.</p>
+    <div class="opts" id="company-opts">
+      <div class="opt" data-val="growing" onclick="selectOpt(this,'company-opts')">
+        Growing fast
+        <small>Hiring, expanding, or in a healthy funding/revenue window</small>
+      </div>
+      <div class="opt" data-val="stable" onclick="selectOpt(this,'company-opts')">
+        Stable
+        <small>Steady business, no major growth or cuts</small>
+      </div>
+      <div class="opt" data-val="cutting" onclick="selectOpt(this,'company-opts')">
+        Cutting or restructuring
+        <small>Layoffs, hiring freezes, budget cuts, or pivoting</small>
+      </div>
+    </div>
+    <div class="err" id="err-0">Please select your company's current situation.</div>
+    <div class="step-nav">
+      <span class="step-counter">1 / 3</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="backToLanding()">← Back</button>
+        <button class="btn-continue" id="btn-0" onclick="goStep(1)">Continue →</button>
       </div>
     </div>
   </div>
 
-</div>
+  <!-- ── Step 1: Last raise ── -->
+  <div class="step" id="step-1">
+    <div class="step-meta">Question 2 of 3</div>
+    <h2>When was your last raise?</h2>
+    <p class="sub">Timing is one of the biggest factors.</p>
+    <div class="opts" id="raise-opts">
+      <div class="opt" data-val="under_1_year" onclick="selectOpt(this,'raise-opts')">
+        Under 1 year at this job
+      </div>
+      <div class="opt" data-val="annual_raise_want_more" onclick="selectOpt(this,'raise-opts')">
+        Got a raise in the past year, want more
+      </div>
+      <div class="opt" data-val="1_2_years" onclick="selectOpt(this,'raise-opts')">
+        1-2 years since my last raise
+      </div>
+      <div class="opt" data-val="2_plus_years" onclick="selectOpt(this,'raise-opts')">
+        2+ years since my last raise
+      </div>
+      <div class="opt" data-val="never_asked" onclick="selectOpt(this,'raise-opts')">
+        Never actively asked for one
+      </div>
+    </div>
+    <div class="err" id="err-1">Please select your last raise timing.</div>
+    <div class="step-nav">
+      <span class="step-counter">2 / 3</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="goStep(0)">← Back</button>
+        <button class="btn-continue" id="btn-1" onclick="goStep(2)">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Step 2: Company size ── -->
+  <div class="step" id="step-2">
+    <div class="step-meta">Last question</div>
+    <h2>How big is your company?</h2>
+    <p class="sub">Larger companies tend to have structured raise bands. Smaller ones usually have more case-by-case flexibility.</p>
+    <div class="opts" id="size-opts">
+      <div class="opt" data-val="under_50"     onclick="selectOpt(this,'size-opts')">Under 50</div>
+      <div class="opt" data-val="50_250"       onclick="selectOpt(this,'size-opts')">50-250</div>
+      <div class="opt" data-val="250_1000"     onclick="selectOpt(this,'size-opts')">250-1,000</div>
+      <div class="opt" data-val="1000_10000"   onclick="selectOpt(this,'size-opts')">1,000-10,000</div>
+      <div class="opt" data-val="10000_plus"   onclick="selectOpt(this,'size-opts')">10,000+</div>
+    </div>
+    <div class="err" id="err-2">Please select your company size.</div>
+    <div class="step-nav">
+      <span class="step-counter">3 / 3</span>
+      <div class="nav-right">
+        <button class="btn-back" onclick="goStep(1)">← Back</button>
+        <button class="btn-continue" id="btn-2" onclick="submitAssessment()">Get my plan →</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /assessment-content -->
+
+</div><!-- /main -->
+
 
 <script>
-/* ═══════════════════════════════════════════════════════════ */
-/* ══  SALARY NEGOTIATION COACH — CHAT PAGE STATE MACHINE   ══ */
-/* ══  3-exchange flow + obstacle capture + dynamic paywall ══ */
-/* ═══════════════════════════════════════════════════════════ */
+/* ───────────────────────────────────────────────────────── */
+/* ── State & initialisation                              ── */
+/* ───────────────────────────────────────────────────────── */
 
-// Hide any footer injected by shared.js — chat page uses full-height layout
-document.addEventListener('DOMContentLoaded', function() {
-  var footer = document.querySelector('footer');
-  if (footer) {
-    var wrap = footer.parentElement;
-    if (wrap && wrap !== document.body) wrap.style.display = 'none';
-    else footer.style.display = 'none';
+const S = {
+  company_situation: null,
+  last_raise:        null,
+  company_size:      null,
+  currentStep:       0,
+};
+
+// If URL has ?start=1, hide landing content, show assessment
+(function initMode() {
+  const params = new URLSearchParams(location.search);
+  const startMode = params.get('start') === '1';
+  if (startMode) {
+    document.getElementById('landing-content').style.display = 'none';
+    document.getElementById('assessment-content').style.display = 'block';
+    // Scroll to top of assessment after paint
+    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+
+    // GA4 + Clarity — assessment_started (fires for every entry path:
+    // hero CTA, reason chips, closing CTAs — they all land here with ?start=1)
+    try {
+      const reason = params.get('reason') || '';
+      const ref    = params.get('ref')    || '';
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'assessment_started', {
+          product: 'raise',
+          reason:  reason,
+          ref:     ref,
+        });
+      }
+      if (typeof window.clarity === 'function') {
+        window.clarity('set', 'funnel_stage', 'assessment_started');
+        window.clarity('event', 'assessment_started');
+      }
+    } catch (e) { /* non-fatal */ }
   }
-});
+})();
 
-const LS_PROFILE = 'rl_raise_profile';
-const LS_STATE   = 'rl_raise_state';
-const API_ANALYZE  = '/api/raise-analyze';
-const API_EXCHANGE = '/api/raise-exchange';
-const API_ENRICH   = '/api/raise-enrich';
-const API_CHECKOUT = '/api/raise-checkout';
+/* ───────────────────────────────────────────────────────── */
+/* ── FAQ toggle                                          ── */
+/* ───────────────────────────────────────────────────────── */
+function toggleFaq(qEl) {
+  const answer = qEl.nextElementSibling;
+  qEl.classList.toggle('open');
+  if (answer) answer.classList.toggle('open');
+}
 
-// Freshness — if saved state is older than this, start from scratch.
-// (Per TODO: staleness check. User typically finishes in 3-5 min,
-//  so 24h is conservative — covers overnight but not multi-day abandoned sessions.)
-const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
-
-// Price — single source of truth. Change here to retest.
-const PRICE_USD = 39;
-
-// Canonical state shape. Persists in localStorage between reloads.
-const state = {
-  profile: null,
-  initial_floor: null,
-  current_range: null,
-  current_exchange: 0,          // 0 before analyze, 1..3 during, 4 = obstacle, 5 = paywall
-  accumulated: {},              // { ex1: {...}, ex2: {...}, ex3: {...} }
-  chat_log: [],                 // array of log entries — drives transcript replay on refresh
-  ex3_partial: null,            // { relationship?, free_text? } — Ex3 is manager-only
-  obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
-  saved_at: null,               // ms timestamp — used for 24h staleness check
-  free_dialog_count: 0,         // count of post-paywall free-text messages (caps at FREE_DIALOG_LIMIT)
-  // Turn-by-turn conversation history for Ex1/Ex2 only. Each value is an
-  // array of {role: 'user'|'assistant', text: string} for the CURRENT exchange.
-  // Sent to /api/raise-exchange so the classifier sees history and decides
-  // sufficient/insufficient based on cumulative content, not single-message length.
-  // Cleared when an exchange completes (advance=true).
-  exchange_messages: { 1: [], 2: [] },
-};
-
-// Free-text dialog cap before paywall-lock mode engages. User can ask up to
-// this many questions after the paywall; each gets a real coach answer + CTA.
-// After this, replies become terse "upgrade to continue" variants.
-const FREE_DIALOG_LIMIT = 3;
-
-const THINKING_ITEMS = [
-  "Mapping your company situation",
-  "Factoring in your tenure",
-  "Weighing company-size effects",
-  "Setting your probability floor",
-  "Setting your probability ceiling",
-  "Identifying structural tailwinds",
-  "Identifying structural headwinds",
-  "Preparing your coaching questions",
-  "Building your personalised range",
+/* ───────────────────────────────────────────────────────── */
+/* ── Sample report card — 4 personas, animated build     ── */
+/* ───────────────────────────────────────────────────────── */
+const PLAN_ITEMS = [
+  "Top 3 blockers identified",
+  "Your specific raise number set",
+  "Opening script drafted",
+  "Pushback responses prepared",
+  "Manager objections mapped",
+  "Counteroffer scenarios ready",
+  "Email follow-up drafted"
 ];
 
-const VERDICT_BY_COLOR = {
-  red:   'Low chance',
-  amber: 'Moderate chance',
-  green: 'High chance',
-};
-
-// Obstacle question — chip options + their canonical codes.
-// Last chip is the "type yours" free-text escape (visually distinct).
-const OBSTACLE_CHIPS = [
-  { code: 'budget',         label: "My manager will say there's no budget" },
-  { code: 'justify',        label: "I'm not sure how to justify my number" },
-  { code: 'timing',         label: "Timing feels off — no review scheduled" },
-  { code: 'prior_no',       label: "I've asked before and got no / delay" },
-  { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
-  { code: 'other',          label: 'Type yours…', isFreeText: true },
+const PERSONAS = [
+  {
+    role: "Senior Nurse · Hospital System",
+    desc: "Covers extra shifts without a pay bump. Union contract helps.",
+    floor: 54, ceiling: 68, color: "amber", verdict: "Moderate chance",
+    factors: [
+      ["pos", "Performance case", "Strong"],
+      ["pos", "Scope expansion", "Significant"],
+      ["neu", "Manager relationship", "Professional"],
+      ["neg", "Last raise timing", "6 months ago"],
+      ["neg", "Review timing", "6+ weeks out"]
+    ],
+    done: [1,0,1,0,0,0,1]
+  },
+  {
+    role: "Account Manager · Consulting",
+    desc: "Strong case, recent competing offer, clear leverage.",
+    floor: 68, ceiling: 82, color: "green", verdict: "High chance",
+    factors: [
+      ["pos", "Company situation", "Stable"],
+      ["pos", "Performance case", "Exceeded"],
+      ["pos", "Market position", "Competing offer"],
+      ["neu", "Last raise timing", "14 months ago"],
+      ["pos", "Review timing", "2 weeks out"]
+    ],
+    done: [1,1,1,0,0,0,0]
+  },
+  {
+    role: "Ops Lead · Manufacturing",
+    desc: "Strong performance but the company is cutting costs.",
+    floor: 32, ceiling: 45, color: "red", verdict: "Low chance",
+    factors: [
+      ["pos", "Performance case", "Strong"],
+      ["neu", "Manager relationship", "Professional"],
+      ["neg", "Company situation", "Cost-cutting"],
+      ["neg", "Last raise timing", "3 months ago"],
+      ["neg", "Market position", "Underpaid"]
+    ],
+    done: [1,0,0,0,1,0,1]
+  },
+  {
+    role: "Engineering Manager · Fintech",
+    desc: "Took on scope without a title bump. Evidence is piling up.",
+    floor: 61, ceiling: 74, color: "amber", verdict: "Moderate chance",
+    factors: [
+      ["pos", "Scope expansion", "Significant"],
+      ["pos", "Performance case", "Strong"],
+      ["neu", "Company situation", "Stable"],
+      ["neu", "Manager relationship", "Strong"],
+      ["neg", "Last raise timing", "9 months ago"]
+    ],
+    done: [1,0,1,0,0,1,0]
+  }
 ];
 
-// Plan-preview chips — rendered in bottom panel after obstacle + paywall.
-// Each maps to a plan page section. Tapping opens a section-tease paywall.
-// Role-play leads as the flagship (gold), matching FA's gold-chip treatment.
-const PLAN_PREVIEW_CHIPS = [
-  { section: 'roleplay', label: "Let's role-play the conversation", gold: true },
-  { section: 'blockers', label: 'Show me the 3 blockers on my number' },
-  { section: 'script',   label: 'Give me the exact words to open with' },
-  { section: 'pushback', label: "Handle the pushbacks I'll hear" },
-  { section: 'timing',   label: "When's my best moment to ask?" },
-  { section: 'email',    label: 'Draft the email for me' },
-  { section: 'prep',     label: 'Give me the 30-day prep plan' },
-];
+let repIdx = 0;
+let repTimer = null;
 
-// Section-tease content — each chip triggers a coach-voice paywall bubble
-// that teases what's inside that section. Copy speaks like the coach answering.
-// Obstacle context can be interpolated via {obstacle_hook} — a short line
-// picked from OBSTACLE_HOOKS below based on user's obstacle.
-const SECTION_TEASES = {
-  blockers: {
-    lead: "Three things are keeping your number lower than it could be. {obstacle_hook} I can name each one and give you the fix, but they're specific to your situation — your role, your evidence, your manager's constraints. That's what the plan lays out.",
-    cta:  'Show me my 3 blockers',
-  },
-  script: {
-    lead: "The opening is 80% of the outcome. There's one sentence that reframes the conversation so your manager is no longer deciding whether to give you a raise, they're deciding how to help you get one. I'll give you that sentence plus the full 3-minute opener tailored to your range.",
-    cta:  'Get my opening script',
-  },
-  pushback: {
-    lead: "\"There's no budget.\" \"Let's revisit next cycle.\" \"I need to talk to my boss.\" Every one of these has a specific response that doesn't close the door. {obstacle_hook} The plan maps the three you're most likely to hear and the exact words for each.",
-    cta:  'Get my pushback responses',
-  },
-  timing: {
-    lead: "Timing isn't 'review day or nothing'. There are five windows in a normal year where the ask lands well, and most people only see one of them. I'll tell you which one is nearest for your situation and exactly how to set it up.",
-    cta:  'Show me my best timing',
-  },
-  email: {
-    lead: "The email that gets the meeting booked isn't the one explaining what you want. It's the one that makes it impossible to say no to a 15-minute conversation. I'll draft it for you, subject line and all, specific to your manager and your situation.",
-    cta:  'Get my ready-to-send email',
-  },
-  prep: {
-    lead: "You've got four weeks. Week 1 is intel — what they think about you, what the constraints actually are. Week 2 is positioning. Week 3 is the conversation setup. Week 4 is the ask itself. Each step is concrete, takes under an hour, and stacks.",
-    cta:  'Give me my 30-day plan',
-  },
-  roleplay: {
-    lead: "The only way to not feel rehearsed in the conversation is to actually rehearse it. I'll play your manager — real responses, real pushbacks, real silences. We practise until it feels natural. You walk in with your nervous system already familiar with the room.",
-    cta:  "Let's role-play it",
-  },
-};
+function renderRepPersona(p) {
+  const pRange   = document.getElementById('rep-range');
+  const pVerdict = document.getElementById('rep-verdict-lbl');
+  const pFill    = document.getElementById('rep-fill');
+  const pLabel   = document.getElementById('rep-persona-label');
+  const checklist= document.getElementById('rep-checklist');
+  const clCount  = document.getElementById('rep-cl-count');
+  const cMore    = document.getElementById('rep-checklist-more');
+  const chatRow  = document.getElementById('rep-chat-row');
+  if (!pRange || !pFill || !checklist) return;
 
-// Short obstacle-specific hooks inserted into section teases where {obstacle_hook}
-// appears. Keeps teases feeling personalised without generating custom copy for
-// every section × obstacle pair.
-const OBSTACLE_HOOKS = {
-  budget:         "The 'no budget' problem is usually blocker number one.",
-  justify:        "If you're unsure how to justify it, blocker number one is almost always framing, not the number itself.",
-  timing:         "Timing worries usually tie directly to one of the three blockers.",
-  prior_no:       "A prior no makes blocker identification doubly important — some blockers lifted since then, some didn't.",
-  unknown_amount: "The amount uncertainty itself is one of the three blockers for most people.",
-  other:          '',
-};
+  pRange.className   = 'rep-range ' + p.color;
+  pVerdict.className = 'rep-verdict-lbl ' + p.color;
+  pFill.className    = 'rep-fill ' + p.color;
 
-// Paywall proof lines — shown randomly below CTA. Weighted by obstacle so
-// the most relevant proof shows more often for each obstacle type.
-// Proof list — rendered below CTA in the main paywall bubble.
-// Bolded key phrases draw the eye; rest is supportive context. Keep tight.
-// These replace the rotating single-line proof system for the main paywall
-// (section-tease paywalls + locked replies still use the single line since
-// they're secondary surfaces).
-// Proof lines — single-line claims that anchor the "cost is nothing compared
-// to the reward" framing. One shows per paywall card, randomly picked with
-// obstacle-specific weighting. Key phrases use <strong> for visual weight.
-// All lines frame $39 as trivial vs the dollar value or time-value of a raise.
+  pRange.textContent   = p.floor + '-' + p.ceiling + '%';
+  pVerdict.textContent = p.verdict;
+  pLabel.innerHTML     = '<span class="rep-prole">' + p.role + '</span><br>' + p.desc;
+
+  pFill.style.width = '0%';
+  [pRange, pVerdict, pLabel, cMore, chatRow].forEach(e => { if (e) e.classList.remove('show'); });
+
+  const doneCount = p.done.reduce((a,b) => a + b, 0);
+  // Real product has 10 items; we show 7, hide 3 ("+3 more in your plan")
+  clCount.textContent = doneCount + ' of 10 done';
+
+  // Checklist animations start where factors used to: ~350ms after card show
+  const checklistStart = 350;
+  checklist.innerHTML = PLAN_ITEMS.map((it, i) => {
+    const d = p.done[i];
+    const delay = checklistStart + i * 60;
+    return '<div class="rep-clitem ' + (d ? 'done' : 'pending') +
+      '" style="transition-delay:' + delay + 'ms">' +
+      '<span class="rep-clmark ' + (d ? 'done' : 'pending') + '">' + (d ? '✓' : '○') + '</span>' +
+      '<span class="rep-cltext">' + it + '</span>' +
+      (d ? '' : '<span class="rep-clpill">Draft →</span>') +
+    '</div>';
+  }).join('');
+
+  const cMoreDelay = checklistStart + PLAN_ITEMS.length * 60 + 100;
+  cMore.style.transitionDelay = cMoreDelay + 'ms';
+  // Chat row appears just after the "+3 more" line — final beat in the reveal
+  if (chatRow) chatRow.style.transitionDelay = (cMoreDelay + 200) + 'ms';
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      pRange.classList.add('show');
+      pVerdict.classList.add('show');
+      pLabel.classList.add('show');
+      pFill.style.width = p.ceiling + '%';
+      document.querySelectorAll('#rep-checklist .rep-clitem').forEach(c => c.classList.add('show'));
+      cMore.classList.add('show');
+      if (chatRow) chatRow.classList.add('show');
+    });
+  });
+
+  const dots = document.querySelectorAll('#rep-indicator .rep-pi-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === repIdx));
+}
+
+function rotateRep() {
+  const card = document.getElementById('rep-card');
+  if (!card) return;
+  card.classList.add('fading');
+  setTimeout(() => {
+    repIdx = (repIdx + 1) % PERSONAS.length;
+    renderRepPersona(PERSONAS[repIdx]);
+    card.classList.remove('fading');
+  }, 350);
+}
+
+function playPersonas() {
+  if (!document.getElementById('rep-section')) return;
+  // HTML is pre-rendered with PERSONAS[0] content for fast LCP paint.
+  // Skip the initial re-render; just start the rotation timer so the first
+  // animated transition happens at the 6-second mark (persona 0 → persona 1).
+  if (repTimer) clearInterval(repTimer);
+  repTimer = setInterval(rotateRep, 6000);
+}
+
+// Start when the card is in view
+if (document.getElementById('rep-section')) {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(playPersonas, 300);
+        obs.disconnect();
+      }
+    });
+  }, { threshold: 0.25 });
+  obs.observe(document.getElementById('rep-section'));
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Proof rotator — typewriter animation between sample   ── */
+/* ──  card and How it works                                ── */
+/* ───────────────────────────────────────────────────────── */
 const PROOF_LINES = [
-  { text: `<strong>A 3% bump on a typical salary is $2,400+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 3, unknown_amount: 3 } },
-  { text: `<strong>A 5% bump on a typical salary is $4,000+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 2, unknown_amount: 2 } },
-  { text: `<strong>Your first raise pays this back over 60×</strong>.`,                                              weight: { all: 2 } },
-  { text: `<strong>$39 once, for a conversation that adds thousands to your year-one salary</strong>.`,              weight: { all: 2, budget: 2 } },
-  { text: `<strong>A few hours of prep, a raise that lasts years</strong>.`,                                         weight: { all: 1, timing: 2 } },
-  { text: `<strong>Your raise pays this back in week one</strong>.`,                                                 weight: { all: 2 } },
+  'A conversation that adds <span class="emph">thousands to your year-one salary</span>.',
+  'A few hours of prep, <span class="emph">a raise that lasts years</span>.'
 ];
 
-function pickProofLine(obstacleCode) {
-  const weighted = PROOF_LINES.map(l => ({
-    text: l.text,
-    w: Math.max(l.weight.all || 0, (l.weight[obstacleCode] || 0)),
-  }));
-  const total = weighted.reduce((s, l) => s + l.w, 0);
-  let r = Math.random() * total;
-  for (const l of weighted) {
-    r -= l.w;
-    if (r <= 0) return l.text;
-  }
-  return weighted[0].text;
-}
+const PROOF_TYPE_SPEED    = 32;   // ms per character while typing
+const PROOF_ERASE_SPEED   = 14;   // ms per character while erasing (faster)
+const PROOF_HOLD_FULL_MS  = 3400; // hold after typed in
+const PROOF_HOLD_EMPTY_MS = 260;  // pause between lines
+let proofRunning = false;
 
-/* ── Utilities ──────────────────────────────────────────── */
-function $(id) { return document.getElementById(id); }
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html != null) e.innerHTML = html;
-  return e;
-}
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-function scrollChatToBottom() {
-  const w = $('chat-wrap');
-  if (!w) return;
-  requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
-}
-function midpoint(r) { return (r.floor + r.ceiling) / 2; }
-function colorFor(range) {
-  const m = midpoint(range);
-  if (m < 40) return 'red';
-  if (m < 60) return 'amber';
-  return 'green';
-}
-
-function saveState() {
-  try {
-    state.saved_at = Date.now();
-    localStorage.setItem(LS_STATE, JSON.stringify(state));
-  } catch (e) { /* storage may be full / disabled */ }
-}
-function loadState() {
-  try {
-    const raw = localStorage.getItem(LS_STATE);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) { return null; }
-}
-function loadProfile() {
-  try {
-    const raw = localStorage.getItem(LS_PROFILE);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) { return null; }
-}
-function clearAll() {
-  try {
-    localStorage.removeItem(LS_PROFILE);
-    localStorage.removeItem(LS_STATE);
-  } catch (e) {}
-}
-
-function profileHash() {
-  // Same formula as spec §14 — used to cache enrichment in Redis
-  const p = state.profile || {};
-  const ex = state.accumulated || {};
-  const s = `${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`
-          + `|${ex.ex1?.signal || ''}|${ex.ex2?.signal || ''}`
-          + `|${ex.ex3?.signal || ''}|${state.obstacle?.code || ''}`;
-  try {
-    return btoa(unescape(encodeURIComponent(s))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
-  } catch (e) {
-    return s.replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
-  }
-}
-
-/* ── Chat log — append-only record of what rendered ─────── */
-// Each entry is { type, payload } so resumeFromState can replay the
-// visible transcript without re-running animations. Types used:
-//   'coach_bubble'    { text }
-//   'user_bubble'     { text }
-//   'score_card'      { range, reason_line, stage }
-//   'paywall'         — rendered from state.obstacle + current_range
-//   'obstacle_q'      — triggers obstacle-question render
-function logEntry(type, payload) {
-  if (!state.chat_log) state.chat_log = [];
-  state.chat_log.push({ type, payload: payload || {}, ts: Date.now() });
-  saveState();
-}
-
-/* ── Thinking screen ────────────────────────────────────── */
-let thinkingTimer = null;
-let thinkingRunning = false;
-
-async function runThinkingAnimation() {
-  thinkingRunning = true;
-  const txt = $('thinking-txt');
-
-  // ── Arc animation (FA pattern) — arc randomly fills/empties 20-90%,
-  //    color smoothly interpolates teal (low) → gold (mid) → red (high) ──
-  const arcFill  = $('thinking-arc-fill');
-  const arcTrack = $('thinking-arc-track');
-  const CIRC = 113.1; // 2 * PI * 18
-  let arcCurrent = 0.4;
-
-  function arcColorFor(f) {
-    if (f < 0.45) return '#00c4a0';
-    if (f < 0.65) return '#c9a84c';
-    return '#e05555';
-  }
-  function arcLerp(a, b, t) {
-    const p = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
-    const [r1,g1,b1]=p(a),[r2,g2,b2]=p(b);
-    return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
-  }
-  function arcStep() {
-    if (!thinkingRunning) return;
-    const next = 0.20 + Math.random() * 0.70;
-    const dur  = 900 + Math.random() * 700;
-    const s0   = CIRC * (1 - arcCurrent), s1 = CIRC * (1 - next);
-    const c0   = arcColorFor(arcCurrent), c1 = arcColorFor(next);
-    const t0   = performance.now();
-    function tick(now) {
-      if (!thinkingRunning) return;
-      const t = Math.min((now - t0) / dur, 1);
-      const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-      const col = arcLerp(c0, c1, e);
-      if (arcFill)  { arcFill.style.strokeDashoffset  = s0 + (s1 - s0) * e; arcFill.style.stroke = col; }
-      if (arcTrack) { arcTrack.style.stroke = col; }
-      if (t < 1) requestAnimationFrame(tick);
-      else { arcCurrent = next; setTimeout(arcStep, 150 + Math.random() * 300); }
-    }
-    requestAnimationFrame(tick);
-  }
-  arcStep();
-
-  // Typing phrases (type in → pause → type out → next)
+async function runProofRotator() {
+  if (proofRunning) return;
+  const host = document.getElementById('proof-rotator-text');
+  if (!host) return;
+  proofRunning = true;
   let i = 0;
-  while (thinkingRunning) {
-    const item = THINKING_ITEMS[i % THINKING_ITEMS.length];
-    for (let c = 1; c <= item.length && thinkingRunning; c++) {
-      txt.textContent = item.slice(0, c);
-      await sleep(28);
-    }
-    if (!thinkingRunning) break;
-    await sleep(650);
-    if (!thinkingRunning) break;
-    for (let c = item.length; c >= 0 && thinkingRunning; c--) {
-      txt.textContent = item.slice(0, c);
-      await sleep(12);
-    }
-    await sleep(180);
-    i++;
-  }
-}
 
-function stopThinkingAnimation() {
-  thinkingRunning = false;
-  const s = $('thinking-screen');
-  if (s) s.style.display = 'none';
-}
-
-/* ── Score card ──────────────────────────────────────────── */
-// stage: 0 = initial, 1-3 = card posted after each exchange.
-// There is no stage-4 card — the obstacle question doesn't change the range,
-// so the stage-3 card (gold-bordered, "Your range") is the final.
-const CARD_STAGE_LABEL = {
-  0: 'Starting range',
-  1: 'After: your role and field',
-  2: 'After: your evidence and leverage',
-  3: 'Your range',
-};
-
-function renderScoreCard(range, reasonLine, stage, signal) {
-  const color = colorFor(range);
-  const ceiling = range.ceiling;
-  const floor   = range.floor;
-  const stageLabel = CARD_STAGE_LABEL[stage || 0];
-  const isFinal = stage === 3;
-
-  const cardWrap = el('div', 'coach-msg score-card-msg', '');
-  cardWrap.dataset.stage = String(stage || 0);
-
-  // Signal → color class for the in-card reason block
-  let reasonCls = 'neu';
-  if (signal === 'strong_positive' || signal === 'positive') reasonCls = 'pos';
-  else if (signal === 'negative' || signal === 'strong_negative') reasonCls = 'neg';
-
-  const reasonBlock = reasonLine ? `
-    <div class="prob-reason-block">
-      <div class="prob-reason-inner ${reasonCls}">
-        <div class="prob-reason-dot"></div>
-        <div class="prob-reason-text">${escapeHtml(reasonLine)}</div>
-      </div>
-    </div>
-  ` : '';
-
-  cardWrap.innerHTML = `
-    <div class="bubble card-bubble ${isFinal ? 'final-card' : ''}">
-      <div class="prob-card">
-        <div class="prob-stage">${stageLabel}</div>
-        <div class="prob-range-row">
-          <span class="prob-range ${color}">${floor}–${ceiling}%</span>
-          <span class="prob-verdict ${color}">${VERDICT_BY_COLOR[color]}</span>
-        </div>
-        <div class="prob-track"><div class="prob-fill ${color}" style="width:0%;"></div></div>
-        ${reasonBlock}
-      </div>
-    </div>
-  `;
-  $('messages').appendChild(cardWrap);
-
-  // Animate fill in after the card mounts
-  requestAnimationFrame(() => {
-    const f = cardWrap.querySelector('.prob-fill');
-    if (f) f.style.width = ceiling + '%';
+  // Plain-text version of each line for typing, plus the HTML for final render
+  const lines = PROOF_LINES.map(html => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return { html: html, text: tmp.textContent };
   });
 
-  scrollChatToBottom();
-  return cardWrap;
-}
-
-// Legacy alias — code that still calls renderInitialCard will work.
-function renderInitialCard(range, contextLine) {
-  return renderScoreCard(range, contextLine, 0);
-}
-
-/* ── Coach bubble with typing effect ────────────────────── */
-async function typeCoachBubble(text, opts) {
-  opts = opts || {};
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-
-  const textEl = wrap.querySelector('.typed-text');
-  const cursorEl = wrap.querySelector('.cursor');
-  const t = text || '';
-  for (let i = 1; i <= t.length; i++) {
-    textEl.textContent = t.slice(0, i);
-    const ch = t[i-1];
-    const delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
-    if (i % 30 === 0) scrollChatToBottom();
-    await sleep(delay);
+  function renderCursor() {
+    return '<span class="cursor"></span>';
   }
-  if (cursorEl) cursorEl.remove();
-  scrollChatToBottom();
 
-  if (!opts.skipLog) logEntry('coach_bubble', { text });
-  return wrap;
-}
-
-// Non-animated coach bubble — used by rehydrate so refresh is instant.
-function insertCoachBubble(text) {
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(text)}</p></div>`;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  return wrap;
-}
-
-/** Type plain text into a target element char-by-char, matching the rhythm
- *  of typeCoachBubble (18ms per char, 80ms pause on sentence punctuation).
- *  Used for paywall bubbles and post-paywall coach replies so all text feels
- *  typed by the coach, not dumped. Returns when the animation finishes.
- *
- *  Note: intentionally plain-text only. For bolded segments or CTAs, render
- *  them as sibling elements that fade in after the typing completes. */
-async function typeIntoElement(targetEl, text, opts) {
-  opts = opts || {};
-  const t = text || '';
-  const scrollEvery = opts.scrollEvery || 30;
-  for (let i = 1; i <= t.length; i++) {
-    targetEl.textContent = t.slice(0, i);
-    const ch = t[i-1];
-    const delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
-    if (i % scrollEvery === 0) scrollChatToBottom();
-    await sleep(delay);
-  }
-  scrollChatToBottom();
-}
-
-/** Fade an element in — used for CTAs and tail paragraphs that appear
- *  AFTER the main text has typed. */
-function fadeInElement(el, durationMs) {
-  el.style.opacity = '0';
-  el.style.transition = `opacity ${durationMs || 300}ms ease`;
-  // Force reflow so the transition triggers
-  void el.offsetHeight;
-  requestAnimationFrame(() => {
-    el.style.opacity = '1';
-    scrollChatToBottom();
-  });
-}
-
-function appendUserBubble(text, opts) {
-  opts = opts || {};
-  const wrap = el('div', 'user-msg', '');
-  wrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  if (!opts.skipLog) logEntry('user_bubble', { text });
-  return wrap;
-}
-
-function escapeHtml(s) {
-  return (s || '').replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[c]);
-}
-
-/* ── Coach typing placeholder while awaiting exchange API (FA arc pattern) ─ */
-let currentTypingWrap = null;
-function showCoachTyping() {
-  if (currentTypingWrap) return;
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="bubble typing-bubble">
-      <div class="typing-indicator">
-        <svg class="rl-typing-arc" width="28" height="28" viewBox="0 0 32 32">
-          <circle class="rl-arc-track" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="2.5" stroke-linecap="round" transform="rotate(-210 16 16)"/>
-          <circle class="rl-arc-fill"  cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="35" transform="rotate(-210 16 16)"/>
-        </svg>
-      </div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  currentTypingWrap = wrap;
-  startTypingArcAnimation(wrap);
-}
-function hideCoachTyping() {
-  if (currentTypingWrap) {
-    if (currentTypingWrap._arcStop) currentTypingWrap._arcStop();
-    currentTypingWrap.remove();
-    currentTypingWrap = null;
-  }
-}
-
-/**
- * FA's stepped arc animation — cycles through 4 defined states
- * (gold 50% → red 80% → gold 50% → teal 20%) with 700ms transitions,
- * smoothly lerping color between steps.
- */
-function startTypingArcAnimation(row) {
-  const arc   = row.querySelector('.rl-arc-fill');
-  const track = row.querySelector('.rl-arc-track');
-  if (!arc || !track) return;
-  const circ = 69.1; // 2 * PI * 11
-  const STEPS = [
-    { f: 0.50, c: '#c9a84c' },
-    { f: 0.80, c: '#e05555' },
-    { f: 0.50, c: '#c9a84c' },
-    { f: 0.20, c: '#00c4a0' },
-  ];
-  const STEP_MS = 700;
-  let stopped = false, stepIdx = 0;
-
-  arc.style.strokeDashoffset = circ * (1 - STEPS[0].f);
-  arc.style.stroke = STEPS[0].c;
-  track.style.stroke = STEPS[0].c;
-
-  function lerp(a, b, t) {
-    const p = h => [parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
-    const [r1,g1,b1]=p(a),[r2,g2,b2]=p(b);
-    return `rgb(${Math.round(r1+(r2-r1)*t)},${Math.round(g1+(g2-g1)*t)},${Math.round(b1+(b2-b1)*t)})`;
-  }
-  function step() {
-    if (stopped) return;
-    const from = STEPS[stepIdx];
-    stepIdx = (stepIdx + 1) % STEPS.length;
-    const to = STEPS[stepIdx];
-    const s0 = circ * (1 - from.f), s1 = circ * (1 - to.f);
-    const t0 = performance.now();
-    function tick(now) {
-      if (stopped) return;
-      const t = Math.min((now - t0) / STEP_MS, 1);
-      const e = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-      arc.style.strokeDashoffset = s0 + (s1 - s0) * e;
-      arc.style.stroke = lerp(from.c, to.c, e);
-      track.style.stroke = lerp(from.c, to.c, e);
-      if (t < 1) requestAnimationFrame(tick);
-      else setTimeout(step, 60);
+  while (proofRunning) {
+    const line = lines[i];
+    // Type plain text char-by-char
+    for (let c = 0; c <= line.text.length; c++) {
+      host.innerHTML = line.text.slice(0, c).replace(/</g, '&lt;') + renderCursor();
+      await new Promise(r => setTimeout(r, PROOF_TYPE_SPEED));
     }
-    requestAnimationFrame(tick);
-  }
-  step();
-  row._arcStop = () => { stopped = true; };
-}
-
-/* ── Chips UI (inline user-side chips) ──────────────────── */
-let currentChipsWrap = null;
-
-function clearChips() {
-  if (currentChipsWrap) {
-    currentChipsWrap.remove();
-    currentChipsWrap = null;
+    // Swap to full HTML version (adds gold emphasis on key phrases)
+    host.innerHTML = line.html + renderCursor();
+    await new Promise(r => setTimeout(r, PROOF_HOLD_FULL_MS));
+    // Erase back to empty
+    const eraseText = line.text;
+    for (let c = eraseText.length; c >= 0; c--) {
+      host.innerHTML = eraseText.slice(0, c).replace(/</g, '&lt;') + renderCursor();
+      await new Promise(r => setTimeout(r, PROOF_ERASE_SPEED));
+    }
+    await new Promise(r => setTimeout(r, PROOF_HOLD_EMPTY_MS));
+    i = (i + 1) % lines.length;
   }
 }
 
-function fadeOutChips() {
-  if (!currentChipsWrap) return;
-  currentChipsWrap.querySelectorAll('.chip').forEach(c => c.classList.add('fadeout'));
-  const toRemove = currentChipsWrap;
-  currentChipsWrap = null;
-  setTimeout(() => { toRemove.remove(); }, 260);
-}
-
-/**
- * Renders chips inline on the user side (right-aligned, below the question).
- * Tapping a chip runs onSelect(chip, button). Caller is responsible for
- * clearing / fading via the helpers above.
- */
-function renderUserChips(chips, onSelect) {
-  const wrap = el('div', 'user-msg chips-msg', '');
-  const inner = el('div', 'user-chips', '');
-  chips.forEach(c => {
-    const btn = el('button', 'chip' + (c.isFreeText ? ' chip-freetext' : ''), c.label);
-    btn.type = 'button';
-    btn.dataset.val = c.value || c.code || '';
-    btn.onclick = () => onSelect(c, btn);
-    inner.appendChild(btn);
-  });
-  wrap.appendChild(inner);
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  currentChipsWrap = wrap;
-  return wrap;
-}
-
-// Legacy alias
-function renderChips(chips, onSelect) {
-  return renderUserChips(chips, onSelect);
-}
-
-/* ── Bottom panel enable/disable ───────────────────────── */
-function enableInput(placeholder) {
-  const p = $('bottom-panel');
-  p.classList.remove('dimmed');
-  const input = $('chat-input');
-  input.disabled = false;
-  input.placeholder = placeholder || 'Type your answer…';
-  $('send-btn').disabled = false;
-}
-function disableInput(placeholder) {
-  const p = $('bottom-panel');
-  p.classList.add('dimmed');
-  const input = $('chat-input');
-  input.disabled = true;
-  if (placeholder) input.placeholder = placeholder;
-  $('send-btn').disabled = true;
-}
-
-/* ── Error bubble ──────────────────────────────────────── */
-function showErrorBubble(message, onRetry) {
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="bubble err-bubble">
-      ${escapeHtml(message)}
-      ${onRetry ? '<br/><button type="button" id="err-retry">Retry</button>' : ''}
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  if (onRetry) {
-    const b = wrap.querySelector('#err-retry');
-    if (b) b.onclick = () => { wrap.remove(); onRetry(); };
-  }
-  return wrap;
+// Start proof rotator when it scrolls into view
+if (document.getElementById('proof-rotator')) {
+  const pobs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        runProofRotator();
+        pobs.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  pobs.observe(document.getElementById('proof-rotator'));
 }
 
 /* ───────────────────────────────────────────────────────── */
-/* ── MAIN FLOW                                           ── */
+/* ── Option selection                                    ── */
 /* ───────────────────────────────────────────────────────── */
+function selectOpt(el, groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
 
-async function init() {
-  const saved = loadState();
-  const profile = loadProfile();
+  const val = el.dataset.val;
+  if (groupId === 'company-opts')    S.company_situation = val;
+  if (groupId === 'raise-opts')      S.last_raise = val;
+  if (groupId === 'size-opts')       S.company_size = val;
 
-  // Staleness check — if state is older than STALE_AFTER_MS, discard and start fresh
-  if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
-    try { localStorage.removeItem(LS_STATE); } catch (e) {}
-  } else if (saved && saved.profile && saved.current_exchange > 0) {
-    Object.assign(state, saved);
-    // Ensure exchange_messages exists after loading pre-refactor state
-    if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
-      state.exchange_messages = { 1: [], 2: [] };
+  refreshButtons();
+  hideErr(S.currentStep);
+
+  // Ensure Continue button is visible — scrolls only if it's off-screen
+  // (FA pattern: prevents user from tapping a chip and wondering where Continue went)
+  const btn = document.getElementById('btn-' + S.currentStep);
+  if (btn) {
+    requestAnimationFrame(() => {
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+}
+
+function refreshButtons() {
+  // Step 0 → company situation
+  setBtnActive('btn-0', !!S.company_situation);
+  // Step 1 → last raise
+  setBtnActive('btn-1', !!S.last_raise);
+  // Step 2 → company size
+  setBtnActive('btn-2', !!S.company_size);
+}
+
+function setBtnActive(id, on) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('active', !!on);
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Step nav                                            ── */
+/* ───────────────────────────────────────────────────────── */
+function goStep(target) {
+  // Validate current step before advancing
+  if (target > S.currentStep) {
+    if (!validateStep(S.currentStep)) { showErr(S.currentStep); return; }
+  }
+
+  // Hide all, show target
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  const next = document.getElementById('step-' + target);
+  if (!next) return;
+  next.classList.add('active');
+
+  // Progress marks (all up-to-and-including active become filled)
+  for (let i = 0; i <= 2; i++) {
+    const p = document.getElementById('p' + i);
+    if (p) p.classList.toggle('done', i <= target);
+  }
+
+  S.currentStep = target;
+  hideErr(target);
+
+  // Scroll to top of assessment (not the whole page — keep header visible)
+  const top = document.getElementById('assessment-top');
+  if (top) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function validateStep(n) {
+  if (n === 0) return !!S.company_situation;
+  if (n === 1) return !!S.last_raise;
+  if (n === 2) return !!S.company_size;
+  return true;
+}
+
+// Back from Q1 → return to landing view (no page reload; just toggle display
+// and clean the ?start=1 query param so the URL reflects what's shown).
+function backToLanding() {
+  document.getElementById('assessment-content').style.display = 'none';
+  document.getElementById('landing-content').style.display = 'block';
+  try {
+    if (history.replaceState) {
+      const cleanUrl = location.pathname + (location.hash === '#assessment-top' ? '' : location.hash);
+      history.replaceState({}, '', cleanUrl);
     }
-    if (!Array.isArray(state.exchange_messages[1])) state.exchange_messages[1] = [];
-    if (!Array.isArray(state.exchange_messages[2])) state.exchange_messages[2] = [];
-    await resumeFromState();
-    return;
-  }
+  } catch (e) { /* non-fatal */ }
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
 
-  if (!profile) {
-    window.location.replace('/raise/');
-    return;
-  }
+function showErr(n) {
+  const el = document.getElementById('err-' + n);
+  if (!el) return;
+  // Remove the class first so re-triggering restarts the shake animation
+  el.classList.remove('show');
+  // Force reflow so the animation re-fires on repeated taps
+  void el.offsetWidth;
+  el.classList.add('show');
+}
+function hideErr(n) {
+  const el = document.getElementById('err-' + n);
+  if (el) el.classList.remove('show');
+}
 
-  state.profile = profile;
-  state.chat_log = [];
-  saveState();
+/* ───────────────────────────────────────────────────────── */
+/* ── Submit: save to localStorage, redirect to chat      ── */
+/* ───────────────────────────────────────────────────────── */
+function submitAssessment() {
+  if (!validateStep(2)) { showErr(2); return; }
 
-  const thinkingPromise = runThinkingAnimation();
-  const minDelay = sleep(2800);
-
-  let result;
+  // GA4 event (best-effort) — send only the 3 captured fields
   try {
-    const apiCall = fetch(API_ANALYZE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...profile,
-        profile_hash: profileHash(),
-      }),
-    }).then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)));
-    const [apiResult] = await Promise.all([apiCall, minDelay]);
-    result = apiResult;
-  } catch (err) {
-    stopThinkingAnimation();
-    showErrorBubble(
-      "I couldn't calculate your starting range just now. Check your connection and try again.",
-      init
-    );
-    return;
-  }
-
-  stopThinkingAnimation();
-
-  state.initial_floor    = result.floor;
-  state.current_range    = { floor: result.floor, ceiling: result.ceiling };
-  state.current_exchange = 1;
-  logEntry('score_card', { range: { ...state.current_range }, reason_line: result.context_line, stage: 0 });
-  saveState();
-
-  // Render first card + first coach message
-  renderInitialCard(state.current_range, result.context_line);
-
-  // GA4 + Clarity — chat_analyzed (initial probability computed + rendered)
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'chat_analyzed', {
-        product:         'raise',
-        initial_floor:   state.current_range.floor,
-        initial_ceiling: state.current_range.ceiling,
+    if (typeof gtag === 'function') {
+      gtag('event', 'assessment_completed', {
+        product:           'raise',
+        company_situation: S.company_situation,
+        last_raise:        S.last_raise,
+        company_size:      S.company_size,
       });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'chat_analyzed');
-      window.clarity('event', 'chat_analyzed');
     }
   } catch (e) { /* non-fatal */ }
 
-  await sleep(400);
-  // First coach message — intentionally rewritten (backend sends an old
-  // 4-question version). We override locally for 3-exchange framing.
-  const firstMsg = firstCoachMessageFor(state.current_range);
-  await typeCoachBubble(firstMsg);
-  await sleep(200);
+  // Referral param passthrough (optional)
+  const params    = new URLSearchParams(location.search);
+  const refSource = params.get('ref') || '';
+  const reason    = params.get('reason') || '';
 
-  beginExchange1();
-}
-
-/** Constructs the first coach message — references 3 questions (was 4). */
-function firstCoachMessageFor(range) {
-  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. Three quick questions will narrow it and show where your real leverage is.`;
-}
-
-/* ── Resume from saved state — replay full transcript ────── */
-async function resumeFromState() {
-  stopThinkingAnimation();
-
-  if (!state.current_range) {
-    clearAll();
-    window.location.replace('/raise/');
+  // Save profile — chat page picks this up and fires /api/raise-analyze
+  // NOTE: country and seniority are sent as defaults to preserve the SPEC §14
+  // backend contract. 'us' is the neutral country per SPEC §2 ("Other" defaults
+  // to US rules). 'mid' is the neutral seniority; Ex1 free-text extraction in
+  // raise-exchange.js refines it from the user's job title description.
+  const profile = {
+    country:           'us',
+    company_situation: S.company_situation,
+    last_raise:        S.last_raise,
+    seniority:         'mid',
+    company_size:      S.company_size,
+    refSource,
+    reason,
+    savedAt:           Date.now(),
+  };
+  try {
+    localStorage.setItem('rl_raise_profile', JSON.stringify(profile));
+    // New assessment submission → always clear old chat state so the chat
+    // page starts a fresh analysis. Without this, re-taking the assessment
+    // (especially with the same answers) rehydrates the previous flow and
+    // shows the old paywall/final card instead of a new run.
+    localStorage.removeItem('rl_raise_state');
+  } catch (e) {
+    // localStorage disabled — fall back to URL params
+    const q = new URLSearchParams(profile).toString();
+    window.location.href = '/raise/chat/?' + q;
     return;
   }
 
-  // Replay the transcript from chat_log instantly (no animation) so refresh
-  // preserves everything the user saw. Then resume from the current_exchange
-  // cursor for whatever prompt/chip UI needs to reappear.
-  const log = Array.isArray(state.chat_log) ? state.chat_log : [];
-  for (const entry of log) {
-    if (entry.type === 'coach_bubble') {
-      insertCoachBubble(entry.payload.text || '');
-    } else if (entry.type === 'user_bubble') {
-      const wrap = el('div', 'user-msg', '');
-      wrap.innerHTML = `<div class="user-bubble">${escapeHtml(entry.payload.text || '')}</div>`;
-      $('messages').appendChild(wrap);
-    } else if (entry.type === 'score_card') {
-      renderScoreCard(
-        entry.payload.range,
-        entry.payload.reason_line,
-        entry.payload.stage,
-        entry.payload.signal
-      );
-    } else if (entry.type === 'reason_callout') {
-      // Legacy entry type (pre-v3) — reason is now inside the score card.
-      // Ignore silently during replay; the card above will already show it.
-    } else if (entry.type === 'paywall') {
-      // Paywall rendered from state.obstacle + state.current_range
-      renderPaywallBubble();
+  // Instant redirect — chat page shows the thinking animation
+  window.location.href = '/raise/chat/';
+}
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Initial progress state                              ── */
+/* ───────────────────────────────────────────────────────── */
+(function initProgress() {
+  const p0 = document.getElementById('p0');
+  if (p0) p0.classList.add('done');
+})();
+
+/* ───────────────────────────────────────────────────────── */
+/* ── Compound-raise calculator                            ── */
+/* ───────────────────────────────────────────────────────── */
+(function initCalc() {
+  const salaryEl = document.getElementById('calc-salary');
+  const raiseEl = document.getElementById('calc-raise');
+  const yearSelectEl = document.getElementById('calc-year-select');
+  const barsWrapEl = document.getElementById('calc-bars');
+  const barGrayBaseEl = document.getElementById('bar-gray-base');
+  const barStackBaseEl = document.getElementById('bar-stack-base');
+  const barTotalBaseEl = document.getElementById('bar-total-base');
+  const barGrayNegoEl = document.getElementById('bar-gray-nego');
+  const barGoldCapEl = document.getElementById('bar-gold-cap');
+  const barStackNegoEl = document.getElementById('bar-stack-nego');
+  const barTotalNegoEl = document.getElementById('bar-total-nego');
+  const resultNumEl = document.getElementById('calc-result-num');
+  const resultStickyEl = document.getElementById('calc-result-sticky');
+  const titleEl = document.getElementById('calc-title');
+
+  if (!salaryEl || !raiseEl || !barsWrapEl) return;
+
+  const MAX_BAR_PX = 150;
+  const MERIT_RATE = 0.03;
+
+  function state() {
+    const salary = parseInt(salaryEl.value.replace(/[^\d]/g, ''), 10) || 0;
+    const raise = parseFloat(raiseEl.value.replace(/[^\d.]/g, '')) || 0;
+    const years = yearSelectEl ? parseInt(yearSelectEl.value, 10) : 25;
+    return { salary, raise, years };
+  }
+
+  // Cumulative earnings formula.
+  // Baseline (don't negotiate): year i salary = salary × 1.03^i. Cumulative sum over N years.
+  // Negotiated: year 0 salary = salary × (1 + raise). 3% merit raises each year thereafter.
+  // Verified: $70k × 8% × 25y = +$204,172 (matches closed form: salary × raise/100 × (1.03^N - 1)/0.03)
+  function cumulativeSeries(salary, raisePct, years) {
+    let baseTotal = 0;
+    let negoTotal = 0;
+    const negoBase = salary * (1 + raisePct / 100);
+    for (let i = 0; i < years; i++) {
+      baseTotal += salary * Math.pow(1 + MERIT_RATE, i);
+      negoTotal += negoBase * Math.pow(1 + MERIT_RATE, i);
     }
+    return { baseTotal, negoTotal };
   }
 
-  scrollChatToBottom();
-
-  // Resume interaction based on cursor
-  const where = state.current_exchange;
-  if (where === 1)      beginExchange1();
-  else if (where === 2) beginExchange2();
-  else if (where === 3) beginExchange3();
-  else if (where === 4) beginObstacle();
-  else if (where === 5) {
-    // Paywall state — ensure chips + post-paywall input wiring is live
-    renderPlanPreviewChips();
-    enableInput('Ask me anything…');
-    awaitFreeText(handlePostPaywallText);
-  } else {
-    beginExchange1();
+  function formatMoney(v) {
+    if (v >= 1000000) return '$' + (v / 1000000).toFixed(v < 10000000 ? 2 : 1).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1') + 'M';
+    if (v >= 1000) return '$' + Math.round(v / 1000) + 'K';
+    return '$' + Math.round(v);
   }
-}
+  function formatBigMoney(v) {
+    return '$' + Math.round(v).toLocaleString('en-US');
+  }
 
-/* ── Exchange 1: Role & industry (free text only) ──────── */
-async function beginExchange1() {
-  clearChips();
-  disableInput('Thinking…');
-  const q = "What's your job title and what kind of company do you work for? Just describe it naturally — like 'Senior FP&A Manager at a mid-stage fintech' or 'Marketing Lead at a retail chain'.";
-  currentQuestion[1] = q;
-  // Reset conversation history for this exchange and seed with the coach question
-  clearExchangeMessages(1);
-  pushExchangeMessage(1, 'assistant', q);
-  await typeCoachBubble(q);
-  await sleep(200);
-  enableInput('Describe your role…');
-  $('chat-input').focus();
-  awaitFreeText((text) => handleExchangeAnswer(1, text));
-}
+  // Convert (gain / salary) ratio to a human-friendly phrase.
+  // Returns empty string when too small to meaningfully motivate (< 3 months).
+  function stickyLabel(ratio) {
+    if (ratio < 0.21) return '';
+    if (ratio < 0.38) return 'About 3 months of your salary';
+    if (ratio < 0.54) return 'About 6 months of your salary';
+    if (ratio < 0.79) return 'About 9 months of your salary';
+    if (ratio < 1.08) return 'About a year of your salary';
+    if (ratio < 1.42) return 'More than a year of your salary';
+    if (ratio < 1.75) return 'Almost 2 years of your salary';
+    if (ratio < 2.25) return 'About 2 years of your salary';
+    if (ratio < 2.75) return 'Over 2 years of your salary';
+    if (ratio < 3.25) return 'Almost 3 years of your salary';
+    if (ratio < 3.75) return 'Over 3 years of your salary';
+    if (ratio < 4.25) return 'Almost 4 years of your salary';
+    if (ratio < 4.75) return 'Over 4 years of your salary';
+    // For 5+ years: round to nearest whole year — the number speaks for itself.
+    // At extremes (e.g., 50% raise → 48 years), the visceral magnitude is the point.
+    const years = Math.round(ratio);
+    return `About ${years} years of your salary`;
+  }
 
-/* ── Exchange 2: merged performance + leverage ─────────── */
-async function beginExchange2() {
-  clearChips();
-  disableInput('Thinking…');
-  const q = "What's the strongest evidence in your corner right now? Recent wins, market offers, or a sense you're underpaid — whatever's most true.";
-  currentQuestion[2] = q;
-  // Reset conversation history for this exchange and seed with the coach question
-  clearExchangeMessages(2);
-  pushExchangeMessage(2, 'assistant', q);
-  await typeCoachBubble(q);
-  await sleep(150);
-  showExchange2Chips();
-  enableInput('Or describe it in your own words…');
-  awaitFreeText((text) => handleExchangeAnswer(2, text));
-}
-function showExchange2Chips() {
-  const chips = [
-    { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
-    { value: 'competing_offer',    label: 'I have a competing offer' },
-    { value: 'actively_recruited', label: "I'm being actively recruited" },
-    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
-    { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
-    { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
-  ];
-  renderChips(chips, (c, btn) => {
-    btn.classList.add('selected');
-    fadeOutChips();
-    handleExchangeAnswer(2, c.value, c.label);
-  });
-}
+  // Debounce timer — bar animation fires 200ms after user stops typing
+  let animateTimer = null;
 
-/* ── Exchange 3: manager relationship + prior_ask ──────── */
-async function beginExchange3() {
-  clearChips();
-  disableInput('Thinking…');
-  state.ex3_partial = {};
-  saveState();
-  const q = "Last question before I lock in your range. How's your relationship with whoever decides your salary, and have you asked for a raise before (if so, how did it go)?";
-  currentQuestion[3] = q;
-  await typeCoachBubble(q);
-  await sleep(150);
-  renderExchange3Chips();
-  enableInput("If you've asked before, tell me what happened…");
-  awaitFreeText((text) => {
-    // Ex3: if a chip was picked, combine with free text. Otherwise free-text-only path.
-    const rel = state.ex3_partial?.relationship;
-    if (rel) {
-      submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-    } else if (text && text.length > 6) {
-      // Free-text only — no chip picked
-      submitExchange3({ relationship: '', free_text: text });
-    } else {
-      // Under-substantive free text without a chip — static nudge + re-arm
-      nudgeEx3NoChip();
+  // Update all text immediately (no debounce — feels responsive while typing).
+  // Returns { grayHeight, goldHeight } for the bar animation.
+  function computeAndUpdateText() {
+    const { salary, raise, years } = state();
+    if (salary < 1000 || raise <= 0 || years <= 0) return null;
+    const { baseTotal, negoTotal } = cumulativeSeries(salary, raise, years);
+    const gain = negoTotal - baseTotal;
+
+    // Bar heights: stack always fits within MAX_BAR_PX while preserving
+    // the gold:gray ratio = gain:baseTotal.
+    // Gray represents baseline cumulative earnings, gold represents gain.
+    // Both scaled so (gray + gold) = MAX_BAR_PX.
+    const grayHeight = (baseTotal / negoTotal) * MAX_BAR_PX;
+    const goldHeight = (gain / negoTotal) * MAX_BAR_PX;
+
+    barTotalBaseEl.textContent = formatMoney(baseTotal);
+    barTotalNegoEl.textContent = formatMoney(negoTotal);
+    const raiseDisplay = Number.isInteger(raise) ? raise.toString() : raise.toFixed(1);
+    if (titleEl) titleEl.textContent = `${raiseDisplay}% raise today, compounded over ${years} years means:`;
+    resultNumEl.textContent = '+' + formatBigMoney(gain);
+
+    // Sticky-number line: concrete translation for emotional impact
+    if (resultStickyEl) {
+      const label = stickyLabel(gain / salary);
+      resultStickyEl.textContent = label;
+      resultStickyEl.style.display = label ? '' : 'none';
     }
-  });
-}
 
-/* Ex3 helper: user typed something too short and hasn't picked a chip yet.
- * Show a static nudge coach bubble and re-arm the free-text listener so
- * another attempt (with or without a chip) still routes correctly. */
-function nudgeEx3NoChip() {
-  typeCoachBubble(TEXT_NUDGE_FALLBACKS[3]);
-  enableInput(placeholderForExchange(3));
-  awaitFreeText((t2) => {
-    const r2 = state.ex3_partial?.relationship;
-    if (r2) {
-      submitExchange3({ relationship: r2, free_text: t2, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-    } else if (t2 && t2.length > 6) {
-      submitExchange3({ relationship: '', free_text: t2 });
-    } else {
-      nudgeEx3NoChip();
-    }
-  });
-}
-
-function renderExchange3Chips() {
-  const wrap = el('div', 'user-msg chips-msg ex3-chips', '');
-
-  const rowChips = [
-    { value: 'strong',       label: 'Strong — they advocate for me' },
-    { value: 'professional', label: 'Professional but not close' },
-    { value: 'complicated',  label: "It's complicated" },
-    { value: 'never_asked',  label: "I haven't asked before" },
-  ];
-  const inner = el('div', 'user-chips', '');
-  rowChips.forEach(c => {
-    const btn = el('button', 'chip', c.label);
-    btn.type = 'button';
-    btn.dataset.val = c.value;
-    btn.onclick = () => pickEx3Relationship(c.value, c.label, btn);
-    inner.appendChild(btn);
-  });
-  wrap.appendChild(inner);
-
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-  currentChipsWrap = wrap;
-}
-
-function pickEx3Relationship(value, label, btn) {
-  state.ex3_partial = state.ex3_partial || {};
-  state.ex3_partial.relationship = value;
-  state.ex3_partial.relationship_label = label;
-  saveState();
-
-  // Deselect siblings
-  if (currentChipsWrap) {
-    currentChipsWrap.querySelectorAll('.chip').forEach(c => {
-      c.classList.toggle('selected', c === btn);
-    });
+    return { grayHeight, goldHeight };
   }
 
-  // Submit immediately if no prior_ask follow-up expected — let Claude
-  // infer prior_ask from the chip alone (it defaults to not_mentioned if
-  // not clear). Users who want to elaborate can still type after picking.
-  setTimeout(() => {
-    fadeOutChips();
-    submitExchange3({
-      relationship: value,
-      free_text:    '',
-      displayLabels: { relationship: label },
-    });
-  }, 240);
-}
+  // Animate bars: snap to zero, then grow smoothly to target.
+  function animateBarsTo(grayHeight, goldHeight, opts) {
+    const skipZeroReset = opts && opts.skipZeroReset;
 
-async function submitExchange3(answer) {
-  let displayText = '';
-  if (answer.displayLabels && answer.displayLabels.relationship) {
-    displayText = answer.displayLabels.relationship;
-    if (answer.free_text) displayText += ` · ${answer.free_text}`;
-  } else if (answer.free_text) {
-    displayText = answer.free_text;
-  } else {
-    displayText = answer.relationship;
-  }
-  appendUserBubble(displayText);
+    barStackBaseEl.style.height = grayHeight + 'px';
+    barStackNegoEl.style.height = (grayHeight + goldHeight) + 'px';
 
-  await runExchangeCall(3, {
-    relationship: answer.relationship,
-    free_text:    answer.free_text || '',
-  });
-}
-
-/* ── Obstacle capture (after Ex3) ───────────────────────── */
-async function beginObstacle() {
-  clearChips();
-  disableInput('Thinking…');
-  state.current_exchange = 4;
-  saveState();
-
-  const q = "Before I map out your plan, what's the one thing you're most worried about?";
-  currentQuestion[4] = q;
-  await typeCoachBubble(q);
-  await sleep(150);
-  renderObstacleChips();
-  enableInput('Or type your own…');
-  awaitFreeText((text) => handleObstacleFreeText(text));
-}
-
-function renderObstacleChips() {
-  // Normal wrap layout, right-anchored — same pattern as Ex2/Ex3 chips.
-  // (Horizontal scroll is reserved for the plan-preview chip strip above
-  // the input bar — those are predefined PROMPT chips. These are answer
-  // chips, and should wrap like all other answer chip sets.)
-  renderUserChips(OBSTACLE_CHIPS.map(c => ({
-    code: c.code, label: c.label, isFreeText: !!c.isFreeText,
-  })), (c, btn) => {
-    if (c.isFreeText) {
-      // "Type yours…" — enable input focus. Don't submit yet.
-      $('chat-input').focus();
+    if (skipZeroReset) {
+      barGrayBaseEl.style.height = grayHeight + 'px';
+      barGrayNegoEl.style.height = grayHeight + 'px';
+      barGoldCapEl.style.height = goldHeight + 'px';
       return;
     }
-    btn.classList.add('selected');
-    fadeOutChips();
-    handleObstacleChip(c.code, c.label);
+
+    // Snap to zero (transitions temporarily disabled)
+    barGrayBaseEl.style.transition = 'none';
+    barGrayNegoEl.style.transition = 'none';
+    barGoldCapEl.style.transition = 'none';
+    barGrayBaseEl.style.height = '0px';
+    barGrayNegoEl.style.height = '0px';
+    barGoldCapEl.style.height = '0px';
+
+    // Force reflow
+    void barGrayBaseEl.offsetHeight;
+
+    // Re-enable transitions, grow to target
+    requestAnimationFrame(() => {
+      barGrayBaseEl.style.transition = '';
+      barGrayNegoEl.style.transition = '';
+      barGoldCapEl.style.transition = '';
+      barGrayBaseEl.style.height = grayHeight + 'px';
+      barGrayNegoEl.style.height = grayHeight + 'px';
+      barGoldCapEl.style.height = goldHeight + 'px';
+    });
+  }
+
+  function onInputChange() {
+    const result = computeAndUpdateText();
+    if (!result) return;
+
+    // If reveal animation hasn't fired yet, just set heights silently
+    if (!barsWrapEl.classList.contains('revealed')) {
+      animateBarsTo(result.grayHeight, result.goldHeight, { skipZeroReset: true });
+      return;
+    }
+
+    // Debounce the bar animation
+    if (animateTimer) clearTimeout(animateTimer);
+    animateTimer = setTimeout(() => {
+      animateBarsTo(result.grayHeight, result.goldHeight);
+      animateTimer = null;
+    }, 200);
+  }
+
+  // Salary input — format with commas as user types
+  salaryEl.addEventListener('input', () => {
+    const raw = salaryEl.value.replace(/[^\d]/g, '');
+    if (raw === '') {
+      salaryEl.value = '';
+    } else {
+      const capped = Math.min(parseInt(raw, 10), 9999999);
+      salaryEl.value = capped.toLocaleString('en-US');
+    }
+    onInputChange();
   });
-}
 
-async function handleObstacleChip(code, label) {
-  appendUserBubble(label);
-  disableInput('Thinking…');
-  state.obstacle = { code, label };
-  saveState();
+  // Raise input — numeric with up to 1 decimal, capped at 100%
+  // (100% covers extreme-but-real scenarios like new-job market correction;
+  // above that is nonsense territory)
+  raiseEl.addEventListener('input', () => {
+    const raw = raiseEl.value.replace(/[^\d.]/g, '');
+    const parts = raw.split('.');
+    let v = parts[0];
+    if (parts.length > 1) v += '.' + parts[1].slice(0, 1);
+    const n = parseFloat(v);
+    if (!isNaN(n) && n > 100) v = '100';
+    raiseEl.value = v;
+    onInputChange();
+  });
 
-  // GA4 + Clarity — obstacle_answered
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'obstacle_answered', {
-        product:       'raise',
-        obstacle_code: code,
-        source:        'chip',
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'obstacle_answered');
-      window.clarity('event', 'obstacle_answered');
-    }
-  } catch (e) { /* non-fatal */ }
-
-  await runObstacleCall({ obstacle_code: code, label });
-}
-
-async function handleObstacleFreeText(text) {
-  if (!text || text.length < 6) {
-    const wrap = el('div', 'coach-msg', '');
-    wrap.innerHTML = `<div class="bubble"><p style="color:var(--t3);font-size:12px;">Tap a chip above, or give me a sentence or two.</p></div>`;
-    $('messages').appendChild(wrap);
-    scrollChatToBottom();
-    return;
-  }
-  appendUserBubble(text);
-  clearChips();
-  disableInput('Thinking…');
-  state.obstacle = { code: null, label: text, free_text: text };
-  saveState();
-
-  // GA4 + Clarity — obstacle_answered (free-text path)
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'obstacle_answered', {
-        product:       'raise',
-        obstacle_code: 'free_text',
-        source:        'text',
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'obstacle_answered');
-      window.clarity('event', 'obstacle_answered');
-    }
-  } catch (e) { /* non-fatal */ }
-
-  await runObstacleCall({ free_text: text });
-}
-
-async function runObstacleCall(answer) {
-  await sleep(300);
-  showCoachTyping();
-
-  let result;
-  try {
-    const res = await fetch(API_EXCHANGE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        exchange:              4,
-        answer,
-        profile:               state.profile,
-        current_range:         state.current_range,
-        initial_floor:         state.initial_floor,
-        accumulated_exchanges: state.accumulated,
-      }),
+  // Year select — fire immediately, no debounce
+  if (yearSelectEl) {
+    yearSelectEl.addEventListener('change', () => {
+      const result = computeAndUpdateText();
+      if (!result) return;
+      if (animateTimer) { clearTimeout(animateTimer); animateTimer = null; }
+      if (!barsWrapEl.classList.contains('revealed')) {
+        animateBarsTo(result.grayHeight, result.goldHeight, { skipZeroReset: true });
+      } else {
+        animateBarsTo(result.grayHeight, result.goldHeight);
+      }
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    result = await res.json();
-  } catch (err) {
-    hideCoachTyping();
-    showErrorBubble(
-      "Something failed. Let's try that once more.",
-      () => runObstacleCall(answer)
-    );
-    return;
   }
 
-  hideCoachTyping();
-
-  // Save obstacle with Claude's classification + coach line
-  state.obstacle = {
-    code:       result.obstacle_code      || state.obstacle?.code || 'other',
-    label:      state.obstacle?.label     || '',
-    free_text:  state.obstacle?.free_text || '',
-    user_phrase_echo: result.user_phrase_echo || '',
-    coach_line: result.coach_line || '',
-  };
-  state.current_exchange = 5;
-  saveState();
-
-  // NOTE: no range card rendered here. The obstacle doesn't change range
-  // math — the stage-3 card (gold-bordered "Your range") is already the
-  // final. Rendering another card here would be a confusing duplicate.
-
-  // Coach bridge line from Claude — acknowledges the obstacle, leads into paywall
-  if (result.coach_line) {
-    await sleep(200);
-    await typeCoachBubble(result.coach_line);
-    await sleep(400);
+  // Initial render (heights set but CSS reveal animation plays when scrolled into view)
+  const initial = computeAndUpdateText();
+  if (initial) {
+    animateBarsTo(initial.grayHeight, initial.goldHeight, { skipZeroReset: true });
   }
 
-  // Main paywall
-  await showPaywall();
-}
-
-/* ── Common exchange handling (ex1-3) ────────────────────
- * Every user turn flows through here. For Ex1/Ex2 we push the user message
- * into state.exchange_messages so the backend sees full conversation history.
- * Backend decides advance-vs-nudge. No length heuristics on the client.
- */
-async function handleExchangeAnswer(exchangeNum, value, displayLabel) {
-  appendUserBubble(displayLabel || value);
-
-  // For Ex1/Ex2, record the human-readable user turn in conversation history.
-  // displayLabel is used for chip taps (e.g. "I exceeded expectations"); value
-  // is used for free-text (already human-readable).
-  if ((exchangeNum === 1 || exchangeNum === 2) && typeof value === 'string') {
-    const historyText = displayLabel || value;
-    pushExchangeMessage(exchangeNum, 'user', historyText);
-  }
-
-  // Don't clearChips() here — the API may return is_insufficient, in which
-  // case we want chips to remain visible so the user can try a different
-  // option. Chips clear on successful response only.
-  disableInput('Thinking…');
-
-  await runExchangeCall(exchangeNum, value);
-}
-
-/* ── Call /api/raise-exchange and react to the response ── */
-async function runExchangeCall(exchangeNum, answer) {
-  await sleep(300);
-  showCoachTyping();
-
-  // For Ex1/Ex2, send the full conversation history; backend classifies
-  // based on the cumulative USER content, not the latest message alone.
-  const messages = (exchangeNum === 1 || exchangeNum === 2)
-    ? getExchangeMessages(exchangeNum)
-    : undefined;
-
-  let result;
-  try {
-    const res = await fetch(API_EXCHANGE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        exchange:              exchangeNum,
-        answer,                                    // chip values + Ex3/Ex4 legacy
-        messages,                                  // Ex1/Ex2 conversation history
-        profile:               state.profile,
-        profile_hash:          profileHash(),
-        current_range:         state.current_range,
-        initial_floor:         state.initial_floor,
-        accumulated_exchanges: state.accumulated,
-      }),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    result = await res.json();
-  } catch (err) {
-    hideCoachTyping();
-    showErrorBubble(
-      "Something failed reaching your coach. Try again?",
-      () => runExchangeCall(exchangeNum, answer)
-    );
-    return;
-  }
-
-  hideCoachTyping();
-
-  // ── Insufficient signal → backend nudge ─────────────────
-  // Backend classified the cumulative user answer as lacking signal. Render
-  // the nudge as a coach bubble, add it to conversation history so the
-  // NEXT call sees it, and leave chips/input where they were.
-  if (result.is_insufficient) {
-    nudgeAttempts[exchangeNum] = (nudgeAttempts[exchangeNum] || 0) + 1;
-    const nudgeText = result.nudge_line || TEXT_NUDGE_FALLBACKS[exchangeNum] || "Can you give me a bit more to work with?";
-
-    // Record the coach's nudge in conversation history (Ex1/Ex2 only)
-    if (exchangeNum === 1 || exchangeNum === 2) {
-      pushExchangeMessage(exchangeNum, 'assistant', nudgeText);
-    }
-
-    await typeCoachBubble(nudgeText);
-    enableInput(placeholderForExchange(exchangeNum));
-    $('chat-input').focus();
-    // Re-arm the free-text handler for this exchange
-    if (exchangeNum === 3) {
-      awaitFreeText((text) => {
-        const rel = state.ex3_partial?.relationship;
-        if (rel) {
-          submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-        } else if (text && text.length > 6) {
-          submitExchange3({ relationship: '', free_text: text });
-        } else {
-          nudgeEx3NoChip();
+  // Reveal animation when chart scrolls into view (once per page load)
+  if ('IntersectionObserver' in window) {
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          requestAnimationFrame(() => barsWrapEl.classList.add('revealed'));
+          revealObs.disconnect();
         }
       });
-    } else {
-      awaitFreeText((text) => handleExchangeAnswer(exchangeNum, text));
-    }
-    return;
-  }
-
-  // ── Advance ──────────────────────────────────────────────
-  // Exchange complete. Clear this exchange's conversation history (it was
-  // only needed to decide sufficient/insufficient) and move on.
-  if (exchangeNum === 1 || exchangeNum === 2) {
-    clearExchangeMessages(exchangeNum);
-  }
-
-  // Save state
-  state.current_range = { floor: result.floor, ceiling: result.ceiling };
-  state.accumulated['ex' + exchangeNum] = {
-    answer,
-    signal:    result.signal,
-    extracted: result.extracted,
-  };
-  if (exchangeNum === 3) {
-    // After Ex3 → obstacle question
-    state.current_exchange = 4;
+    }, { threshold: 0.35 });
+    revealObs.observe(barsWrapEl);
   } else {
-    state.current_exchange = exchangeNum + 1;
+    barsWrapEl.classList.add('revealed');
   }
-  saveState();
-
-  // Successful exchange → clear any lingering chips now
-  clearChips();
-
-  // Post a fresh score card for this exchange (stages 1, 2, 3).
-  // Stage-3 card is gold-bordered and labelled "Your range" — the final.
-  // Reason block renders inside the card, color-coded by signal.
-  renderScoreCard(state.current_range, result.reason_line, exchangeNum, result.signal);
-  logEntry('score_card', {
-    range: { ...state.current_range },
-    reason_line: result.reason_line,
-    stage: exchangeNum,
-    signal: result.signal,
-  });
-
-  // GA4 + Clarity — exchange_N_completed (fires after Ex1, Ex2, Ex3)
-  try {
-    const evtName = 'exchange_' + exchangeNum + '_completed';
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', evtName, {
-        product:         'raise',
-        exchange_number: exchangeNum,
-        signal:          result.signal || '',
-        floor:           state.current_range.floor,
-        ceiling:         state.current_range.ceiling,
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', evtName);
-      window.clarity('event', evtName);
-    }
-  } catch (e) { /* non-fatal */ }
-
-  await sleep(800);
-
-  // Exchange 3 complete → obstacle question (no next_question from backend)
-  if (result.is_final) {
-    await sleep(400);
-    beginObstacle();
-    return;
-  }
-
-  // Otherwise, type the next coach question and route
-  if (result.next_question && result.next_question.question) {
-    // Persist the question text so nudge mode can reference it if the user's
-    // next answer is too short or off-topic.
-    currentQuestion[exchangeNum + 1] = result.next_question.question;
-    await sleep(200);
-    await typeCoachBubble(result.next_question.question);
-    await sleep(150);
-    routeToExchange(exchangeNum + 1);
-  } else {
-    routeToExchange(exchangeNum + 1);
-  }
-}
-
-function routeToExchange(n) {
-  if (n === 2) {
-    showExchange2Chips();
-    enableInput('Or describe it in your own words…');
-    // Re-arm the free-text handler — earlier submit handler was cleared when
-    // Ex1 ran. Without this, the user can click Send but nothing happens.
-    awaitFreeText((text) => handleExchangeAnswer(2, text));
-  } else if (n === 3) {
-    renderExchange3Chips();
-    enableInput("If you've asked before, tell me what happened…");
-    awaitFreeText((text) => {
-      const rel = state.ex3_partial?.relationship;
-      if (rel) {
-        submitExchange3({ relationship: rel, free_text: text, displayLabels: { relationship: state.ex3_partial.relationship_label } });
-      } else if (text && text.length > 6) {
-        submitExchange3({ relationship: '', free_text: text });
-      } else {
-        nudgeEx3NoChip();
-      }
-    });
-  }
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── PAYWALL (main) — dynamic, coach-voice                ── */
-/* ───────────────────────────────────────────────────────── */
-
-async function showPaywall() {
-  clearChips();
-  disableInput('Or ask me anything…');
-
-  // Fire enrichment (fire-and-forget) so the paid dashboard loads instantly
-  fireEnrichment();
-
-  // Animated render — the trust moment. Headline types, middle types, rest fades in.
-  await renderPaywallBubble({ animated: true });
-  logEntry('paywall', {});
-
-  // GA4 + Clarity — paywall_viewed
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'paywall_viewed', {
-        product:       'raise',
-        final_floor:   state.current_range ? state.current_range.floor   : null,
-        final_ceiling: state.current_range ? state.current_range.ceiling : null,
-        obstacle_code: (state.obstacle && state.obstacle.code) || '',
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'paywall_viewed');
-      window.clarity('event', 'paywall_viewed');
-    }
-  } catch (e) { /* non-fatal */ }
-
-  // Populate plan-preview chips in the bottom panel
-  renderPlanPreviewChips();
-
-  // Re-enable input so user can keep asking questions after paywall.
-  // Any post-paywall text routes to handlePostPaywallText.
-  enableInput('Ask me anything…');
-  awaitFreeText(handlePostPaywallText);
-}
-
-// Composes and renders the main paywall bubble from current state
-// (profile, range, obstacle). Called on initial paywall show AND on
-// transcript replay from saved state.
-// opts.animated: type headline + middle line, fade the rest. Default false (instant).
-async function renderPaywallBubble(opts) {
-  opts = opts || {};
-  const r   = state.current_range || { floor: 0, ceiling: 0 };
-  const obs = state.obstacle      || { code: 'other' };
-  const role = niceRoleLabel();
-
-  // User phrase echo (optional) — shown when they typed free text
-  const echoHtml = (obs.free_text && obs.free_text.length > 3)
-    ? `<div class="echo">"${escapeHtml(obs.free_text)}"</div>` : '';
-
-  // Obstacle-keyed middle paragraph. Uses Claude's coach_line if it was
-  // generated, otherwise falls back to a canonical line per obstacle code.
-  const middle = (obs.coach_line && obs.coach_line.length > 10)
-    ? obs.coach_line
-    : fallbackObstacleLine(obs.code);
-
-  // ── Uplift computation ──────────────────────────────────
-  // With a prepared negotiation (the plan delivers: specific evidence, tested
-  // opening, responses to pushbacks), research on negotiation outcomes suggests
-  // prepared negotiators capture meaningfully better results than unprepared
-  // ones. Here we represent that as an +8pp lift to the floor and +10pp to
-  // the ceiling, clamped at 92% so the number stays credible, never 95-100%.
-  // Adjust here if A/B testing shows the lift feels too big or too small.
-  const UPLIFT_FLOOR = 8;
-  const UPLIFT_CEIL  = 10;
-  const upliftFloor  = Math.min(92 - 5, r.floor + UPLIFT_FLOOR);
-  const upliftCeil   = Math.min(92, r.ceiling + UPLIFT_CEIL);
-  const midDelta     = Math.round(((upliftFloor + upliftCeil) - (r.floor + r.ceiling)) / 2);
-
-  // Obstacle-specific mechanism framing — the 3rd mechanism adapts to the
-  // worry they flagged so the reasoning connects to their specific situation.
-  const obstacleMechanism = {
-    budget:         "A budget-deflection response that reopens the conversation instead of closing it",
-    justify:        "A 3-sentence justification structure that makes the number feel defensible, not ambitious",
-    timing:         "A timing window designed for your review cycle, not a generic calendar rule",
-    prior_no:       "A reopening script that handles the prior no without looking bitter or desperate",
-    unknown_amount: "A specific number anchored to your role, industry, and market position",
-    other:          "A response to the specific worry you flagged, built around your situation",
-  }[obs.code] || "A response to your specific situation, not a generic template";
-
-  const upliftHtml = `
-    <div class="uplift-panel paywall-uplift">
-      <div class="uplift-head">
-        <span class="uplift-label">With the coaching plan</span>
-        <span class="uplift-range">${upliftFloor}–${upliftCeil}%</span>
-        <span class="uplift-delta">+${midDelta}pp on average</span>
-      </div>
-      <ul class="uplift-mechanisms">
-        <li><strong>A prepared evidence pack</strong> tailored to your role and industry, not a generic list.</li>
-        <li><strong>A tested opening line</strong> that reframes the conversation so your manager helps you get to yes.</li>
-        <li><strong>${obstacleMechanism}.</strong></li>
-      </ul>
-    </div>
-  `;
-
-  // Proof line — single rotating claim rendered below CTA. Bold phrase is
-  // baked into the text (PROOF_LINES entries include <strong>). Inserted as
-  // innerHTML (not textContent) so the strong tag renders.
-  const proof = pickProofLine(obs.code);
-
-  // Headline: role + locked range + verdict clause
-  const rolePrefix = role ? `${role}, ` : '';
-  const headline = `${rolePrefix}your range locked at ${r.floor}–${r.ceiling}%. That's where you start today, without any prep.`;
-  const closing  = `The full plan is everything I'd tell you if we were sitting down for an hour: your 3 specific blockers, the exact words to open with, responses to the pushbacks you'll actually hear, the email template, and 30 days of coaching where I remember every conversation.`;
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      ${echoHtml ? `<div class="echo paywall-echo">"${escapeHtml(obs.free_text)}"</div>` : ''}
-      <p class="paywall-middle"><span class="paywall-typed-middle"></span><span class="paywall-middle-cursor"></span></p>
-      ${upliftHtml}
-      <p class="paywall-closing">${escapeHtml(closing)}</p>
-      <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row paywall-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line paywall-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[id="btn-pay-cta"]');
-  if (btn) btn.onclick = startCheckout;
-
-  if (!opts.animated) {
-    // Instant render (transcript replay) — fill all text up front, no cursors
-    wrap.querySelector('.paywall-typed-head').textContent   = headline;
-    wrap.querySelector('.paywall-typed-middle').textContent = middle;
-    wrap.querySelector('.paywall-head-cursor')?.remove();
-    wrap.querySelector('.paywall-middle-cursor')?.remove();
-    scrollChatToBottom();
-    return wrap;
-  }
-
-  // Animated render — type headline, uplift panel fades in, middle types,
-  // then the rest fades in together.
-  const echo      = wrap.querySelector('.paywall-echo');
-  const upliftEl  = wrap.querySelector('.paywall-uplift');
-  const closingEl = wrap.querySelector('.paywall-closing');
-  const ctaEl     = wrap.querySelector('.paywall-cta');
-  const trustEl   = wrap.querySelector('.paywall-trust');
-  const proofEl   = wrap.querySelector('.paywall-proof');
-  if (echo)      echo.style.opacity      = '0';
-  upliftEl.style.opacity  = '0';
-  closingEl.style.opacity = '0';
-  ctaEl.style.opacity     = '0';
-  trustEl.style.opacity   = '0';
-  proofEl.style.opacity   = '0';
-  scrollChatToBottom();
-
-  // Type the headline
-  const headSpan   = wrap.querySelector('.paywall-typed-head');
-  const headCursor = wrap.querySelector('.paywall-head-cursor');
-  await typeIntoElement(headSpan, headline);
-  if (headCursor) headCursor.remove();
-
-  // Brief pause, fade the echo in (if any), then type the middle
-  await sleep(250);
-  if (echo) {
-    fadeInElement(echo);
-    await sleep(200);
-  }
-
-  const midSpan   = wrap.querySelector('.paywall-typed-middle');
-  const midCursor = wrap.querySelector('.paywall-middle-cursor');
-  await typeIntoElement(midSpan, middle);
-  if (midCursor) midCursor.remove();
-
-  // Uplift panel reveals next — this is the "here's what changes" beat
-  await sleep(350);
-  fadeInElement(upliftEl);
-
-  // Closing + CTA + trust + proof fade in together afterward
-  await sleep(400);
-  fadeInElement(closingEl);
-  await sleep(150);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-
-  return wrap;
-}
-
-// Fallback middle line per obstacle code — used if Claude didn't provide one
-function fallbackObstacleLine(code) {
-  const map = {
-    budget:         "The 'no budget' line is the single most common deflection, and it almost always means 'I need ammunition to take upstairs', not 'no'. We can fix that.",
-    justify:        "Justifying the number is the easiest part once you see the framing. Most people over-complicate it. There are three moves that do the work for you.",
-    timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work even when nothing's scheduled.",
-    prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is a skill, and it's teachable.",
-    unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation that gets you to a defensible ask.",
-    other:          "That's a real concern, and the plan has a specific answer for it.",
-  };
-  return map[code] || map.other;
-}
-
-// Extracts a short role label like "Senior FP&A Manager" if available
-function niceRoleLabel() {
-  const ex1 = state.accumulated?.ex1?.extracted || {};
-  const title = (ex1.job_title_normalised || '').trim();
-  return title || '';
-}
-
-function fireEnrichment() {
-  const body = {
-    profile:      state.profile,
-    exchanges:    state.accumulated,
-    obstacle:     state.obstacle,
-    final_range:  state.current_range,
-    profile_hash: profileHash(),
-  };
-  try {
-    fetch(API_ENRICH, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      keepalive: true,
-    }).catch(() => {});
-  } catch (e) { /* non-fatal */ }
-}
-
-async function startCheckout() {
-  // ── Track checkout intent BEFORE redirect to Stripe ──
-  // Fires to GA4 (G-C5GQLC5FHP) and Clarity (wfantc4i14), both loaded in shared.js.
-  // Use transport:'beacon' so the event survives the page unload when we redirect.
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'checkout_started', {
-        product:        'raise',
-        value:          39,
-        currency:       'USD',
-        transport_type: 'beacon',
-        final_floor:    (state && state.current_range) ? state.current_range.floor   : null,
-        final_ceiling:  (state && state.current_range) ? state.current_range.ceiling : null,
-        obstacle_code:  (state && state.obstacle && state.obstacle.code) || '',
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'checkout_started');
-      window.clarity('event', 'checkout_started');
-    }
-  } catch (e) { /* tracking must never break checkout */ }
-
-  // Inject keyframes once, globally. Matches FA's pattern so the spinner
-  // starts spinning the moment the user clicks, even on a slow network.
-  if (!document.getElementById('rl-spin-style')) {
-    const s = document.createElement('style');
-    s.id = 'rl-spin-style';
-    s.textContent = '@keyframes rl-spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
-  }
-
-  // Small spinning circle, inline SVG — appended inside every .btn-pay on
-  // screen (main paywall, section-tease paywalls, post-paywall replies). All
-  // share the same checkout destination, all should feel clicked simultaneously.
-  const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
-
-  const allCtas = document.querySelectorAll('.btn-pay');
-  allCtas.forEach(el => {
-    // Save original HTML so we can restore if the request fails
-    if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
-    el.insertAdjacentHTML('beforeend', spinner);
-    el.style.pointerEvents = 'none';
-    el.setAttribute('disabled', 'true');
-  });
-
-  try {
-    const params = new URLSearchParams(location.search);
-    const refSource = params.get('ref') || state.profile.refSource || '';
-    const res = await fetch(API_CHECKOUT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile_hash: profileHash(),
-        profile:      state.profile,
-        final_range:  state.current_range,
-        obstacle:     state.obstacle,
-        refSource,
-      }),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data.url) throw new Error('No checkout URL');
-    // Redirect — spinners stay visible until Stripe's page loads, which
-    // matches user expectation ("it's loading, not broken").
-    window.location.href = data.url;
-  } catch (err) {
-    // Restore all CTAs to clickable state and show an error bubble
-    document.querySelectorAll('.btn-pay').forEach(el => {
-      if (el.dataset.origHtml) {
-        el.innerHTML = el.dataset.origHtml;
-        delete el.dataset.origHtml;
-      } else {
-        // Fallback: strip any spinner SVGs we added
-        el.querySelectorAll('.rl-cta-spinner').forEach(s => s.remove());
-      }
-      el.style.pointerEvents = '';
-      el.removeAttribute('disabled');
-    });
-    showErrorBubble(
-      "Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.",
-      null
-    );
-  }
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Plan-preview chips (bottom panel, after paywall)     ── */
-/* ───────────────────────────────────────────────────────── */
-
-function renderPlanPreviewChips() {
-  const scroll = $('chips-area-scroll');
-  if (!scroll) return;
-  scroll.innerHTML = '';
-  PLAN_PREVIEW_CHIPS.forEach(c => {
-    const chip = el('button', 'plan-chip' + (c.gold ? ' plan-chip-gold' : ''), '');
-    chip.type = 'button';
-    chip.innerHTML = `${escapeHtml(c.label)} <span class="lock">🔒</span>`;
-    chip.onclick = () => onSectionChipTap(c.section, c.label);
-    scroll.appendChild(chip);
-  });
-  // Reset scroll position to the start so gold flagship chip is visible first
-  scroll.scrollLeft = 0;
-}
-
-async function onSectionChipTap(section, label) {
-  // Echo the chip label as a user bubble
-  appendUserBubble(label);
-
-  // Brief coach typing, then the section-tease paywall bubble
-  await sleep(250);
-  showCoachTyping();
-  await sleep(900);
-  hideCoachTyping();
-
-  renderSectionTeaseBubble(section);
-}
-
-async function renderSectionTeaseBubble(section) {
-  const tease = SECTION_TEASES[section] || SECTION_TEASES.blockers;
-  const obs = state.obstacle || { code: 'other' };
-  const hook = OBSTACLE_HOOKS[obs.code] || '';
-  const leadWithHook = tease.lead.replace('{obstacle_hook}', hook).replace(/\s{2,}/g, ' ').trim();
-  const proof = pickProofLine(obs.code);
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="tease-lead"><span class="tease-typed"></span><span class="tease-cursor"></span></p>
-      <button class="btn-pay tease-cta" data-tease-cta>
-        ${escapeHtml(tease.cta)} · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row tease-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line tease-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[data-tease-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  // Hide CTA + trust + proof until typing completes
-  const ctaEl   = wrap.querySelector('.tease-cta');
-  const trustEl = wrap.querySelector('.tease-trust');
-  const proofEl = wrap.querySelector('.tease-proof');
-  ctaEl.style.opacity   = '0';
-  trustEl.style.opacity = '0';
-  proofEl.style.opacity = '0';
-  scrollChatToBottom();
-
-  // Type the lead
-  const leadSpan   = wrap.querySelector('.tease-typed');
-  const leadCursor = wrap.querySelector('.tease-cursor');
-  await typeIntoElement(leadSpan, leadWithHook);
-  if (leadCursor) leadCursor.remove();
-
-  // Fade the rest in
-  await sleep(300);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Post-paywall text: useful answer + dynamic CTA tail  ── */
-/* ───────────────────────────────────────────────────────── */
-
-// After paywall appears, user free-text still engages the coach via
-// /api/raise-coach free-mode. Each reply includes a dynamic CTA tail.
-// After FREE_DIALOG_LIMIT messages, we switch to paywall-lock mode where
-// the replies are terse and the CTA is the full message — prevents the
-// free chat from becoming the product.
-async function handlePostPaywallText(text) {
-  appendUserBubble(text);
-  disableInput('Thinking…');
-
-  state.free_dialog_count = (state.free_dialog_count || 0) + 1;
-  saveState();
-
-  await sleep(300);
-  showCoachTyping();
-
-  // Check dialog cap BEFORE calling the API — saves a Claude call when locked
-  if (state.free_dialog_count > FREE_DIALOG_LIMIT) {
-    await sleep(800);
-    hideCoachTyping();
-    renderLockedReply(text);
-    return;
-  }
-
-  // Call the real coach API in free mode. Include session_id and
-  // free_dialog_count so the backend can log them into the Raise Leads sheet.
-  let reply = null;
-  try {
-    const res = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile:               state.profile,
-        obstacle:              state.obstacle,
-        final_range:           state.current_range,
-        accumulated_exchanges: state.accumulated,
-        message:               text,
-        session_id:            profileHash(),
-        free_dialog_count:     state.free_dialog_count,
-      }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      reply = data.reply || null;
-    }
-  } catch (e) { /* fall through to fallback */ }
-
-  hideCoachTyping();
-
-  if (!reply) {
-    // API unavailable — render a short apologetic bubble without a CTA.
-    // Don't count this against the user's free_dialog_count (already incremented).
-    const wrap = el('div', 'coach-msg', '');
-    wrap.innerHTML = `<div class="bubble"><p>I couldn't respond just now. Try again, or jump into the plan — it has the answers to most questions you'd ask here.</p></div>`;
-    $('messages').appendChild(wrap);
-    scrollChatToBottom();
-    enableInput('Ask me anything…');
-    awaitFreeText(handlePostPaywallText);
-    return;
-  }
-
-  // Render the coach reply + dynamic CTA tail.
-  // Main reply text types char-by-char. Tail paragraph + CTA fade in after.
-  const remaining = FREE_DIALOG_LIMIT - state.free_dialog_count;
-  const tailCopy = remaining > 0
-    ? `<strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.`
-    : `<strong style="color:var(--t1);">Last free answer.</strong> The specifics — your exact words, your numbers, your handoff — live in the full plan. $${PRICE_USD} once.`;
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="bubble">
-      <p class="coach-typed"><span class="typed-text"></span><span class="cursor"></span></p>
-      <p class="coach-tail" style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
-      <button class="btn-pay coach-tail-btn" style="margin-top:10px;" data-tail-cta>
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const tailEl = wrap.querySelector('.coach-tail');
-  const btnEl  = wrap.querySelector('.coach-tail-btn');
-  tailEl.style.opacity = '0';
-  btnEl.style.opacity  = '0';
-  scrollChatToBottom();
-
-  // Type the main reply
-  const typedSpan = wrap.querySelector('.typed-text');
-  const cursorEl  = wrap.querySelector('.cursor');
-  await typeIntoElement(typedSpan, reply);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade in the tail + CTA together
-  await sleep(200);
-  fadeInElement(tailEl);
-  fadeInElement(btnEl);
-
-  logEntry('coach_bubble', { text: reply });
-
-  const btn = wrap.querySelector('[data-tail-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  enableInput('Ask me anything…');
-  awaitFreeText(handlePostPaywallText);
-}
-
-/** Post-cap reply — short, polite, all CTA. Rendered when user has exceeded
-    FREE_DIALOG_LIMIT free-text messages. */
-async function renderLockedReply(userText) {
-  const obs = state.obstacle || { code: 'other' };
-  // Three rotating lead-ins so it doesn't feel scripted if they keep typing
-  const leadIns = [
-    "I can't go further without you on the plan — but I want to. Everything you're asking is in there, answered specifically for you.",
-    "The plan is the product. Every answer I'd give you here lives in there, sharper and built around your exact situation.",
-    "I've given you what I can for free. The rest is the plan — role-play, exact scripts, 30 days of follow-up.",
-  ];
-  const lockIdx = Math.min(state.free_dialog_count - FREE_DIALOG_LIMIT - 1, leadIns.length - 1);
-  const leadIn = leadIns[Math.max(0, lockIdx)];
-
-  const proof = pickProofLine(obs.code);
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="lock-lead"><span class="lock-typed"></span><span class="lock-cursor"></span></p>
-      <button class="btn-pay lock-cta" data-tail-cta>
-        Get my coaching plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row lock-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line lock-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[data-tail-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  const ctaEl   = wrap.querySelector('.lock-cta');
-  const trustEl = wrap.querySelector('.lock-trust');
-  const proofEl = wrap.querySelector('.lock-proof');
-  ctaEl.style.opacity   = '0';
-  trustEl.style.opacity = '0';
-  proofEl.style.opacity = '0';
-  scrollChatToBottom();
-
-  // Type the lead-in
-  const typedSpan = wrap.querySelector('.lock-typed');
-  const cursorEl  = wrap.querySelector('.lock-cursor');
-  await typeIntoElement(typedSpan, leadIn);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade the rest in
-  await sleep(250);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-
-  // Keep input enabled but user gets the same locked reply each time after this
-  enableInput('Ask me anything…');
-  awaitFreeText(handlePostPaywallText);
-}
-
-/* ── Free-text input wiring ────────────────────────────── */
-let pendingSubmitHandler = null;
-
-function awaitFreeText(onSubmit) {
-  pendingSubmitHandler = onSubmit;
-}
-
-// Static fallback nudges — used ONLY when the backend classifier call fails
-// (network error or 500). In normal operation, the backend writes the nudge
-// line based on conversation history.
-const TEXT_NUDGE_FALLBACKS = {
-  1: "Your job title and kind of company, even a short phrase like 'Senior PM at a SaaS startup'.",
-  2: "Tap a chip above or give me one sentence on your strongest evidence — a win, an offer, or a sense you're underpaid.",
-  3: "Pick a chip or write one line about your manager relationship and any prior raise ask.",
-  4: "Tap a chip above, or type one line about what's worrying you most.",
-};
-
-// Tracks how many nudges have fired per exchange in the current session.
-// Kept for logging + tone progression but no longer gates any logic path.
-const nudgeAttempts = { 1: 0, 2: 0, 3: 0, 4: 0 };
-
-// Currently-displayed coach question per exchange.
-const currentQuestion = { 1: '', 2: '', 3: '', 4: '' };
-
-// ── Exchange message helpers ──────────────────────────────
-// Turn-by-turn conversation for Ex1/Ex2. Sent to /api/raise-exchange as
-// `messages` so the classifier sees cumulative context and decides
-// advance/nudge based on meaning, not message length. Ex3 chips + Ex4
-// obstacle still use the legacy answer shape.
-function pushExchangeMessage(exchange, role, text) {
-  if (exchange !== 1 && exchange !== 2) return;
-  state.exchange_messages = state.exchange_messages || { 1: [], 2: [] };
-  state.exchange_messages[exchange] = state.exchange_messages[exchange] || [];
-  state.exchange_messages[exchange].push({ role, text: String(text || '') });
-  saveState();
-}
-
-function getExchangeMessages(exchange) {
-  if (exchange !== 1 && exchange !== 2) return [];
-  return (state.exchange_messages?.[exchange] || []).slice();
-}
-
-function clearExchangeMessages(exchange) {
-  if (!state.exchange_messages) state.exchange_messages = { 1: [], 2: [] };
-  state.exchange_messages[exchange] = [];
-  saveState();
-}
-
-function handleSend() {
-  const input = $('chat-input');
-  const val = (input.value || '').trim();
-  if (!val) return;
-  if (!pendingSubmitHandler) return;
-
-  input.value = '';
-  const h = pendingSubmitHandler;
-  pendingSubmitHandler = null;
-  h(val);
-}
-
-function placeholderForExchange(n) {
-  if (n === 1) return 'Describe your role…';
-  if (n === 2) return 'Or describe it in your own words…';
-  if (n === 3) return "If you've asked before, tell me what happened…";
-  return 'Type your answer…';
-}
-
-$('send-btn').addEventListener('click', handleSend);
-$('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    handleSend();
-  }
-});
-
-/* ── Kick off ──────────────────────────────────────────── */
-init().catch(err => {
-  console.error('init failed:', err);
-  stopThinkingAnimation();
-  showErrorBubble("Something went wrong loading your session. Refresh to try again.", null);
-});
+})();
 </script>
 
+<!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
 <script defer src="/shared.js"></script>
+
 </body>
 </html>
