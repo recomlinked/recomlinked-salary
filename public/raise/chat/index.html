@@ -1316,7 +1316,7 @@ async function beginTimeframeQuestion() {
   state.current_exchange = 3;
   saveState();
 
-  const q = "Your range is set. Before I map out your plan — when are you planning to have the conversation?";
+  const q = "Your range is set. One more thing — when are you planning to have the conversation?";
   await typeCoachBubble(q);
   logEntry('coach_msg', { text: q, stage: 'timeframe' });
   await sleep(150);
@@ -1346,7 +1346,7 @@ async function beginObstacle() {
   state.current_exchange = 4;
   saveState();
 
-  const q = "Before I map out your plan, what's the one thing you're most worried about?";
+  const q = "Got it. Now — what's the one thing you're most worried about?";
   currentQuestion[4] = q;
   await typeCoachBubble(q);
   await sleep(150);
@@ -1775,12 +1775,11 @@ async function renderPaywallBubble(opts) {
   // Proof line
   const proof = pickProofLine(obs.code);
 
-  // ── Build HTML — conversational style, uses .bubble not .paywall-bubble ──
+  // ── Build HTML — conversational style, lighter than the old dark card ──
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <p class="paywall-middle"><span class="paywall-typed-middle"></span><span class="paywall-middle-cursor"></span></p>
       ${upliftHtml}
       <p class="paywall-closing">${escapeHtml(closing)}</p>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
@@ -1804,16 +1803,14 @@ async function renderPaywallBubble(opts) {
   if (deepDiveBtn) deepDiveBtn.onclick = beginDeepDive;
 
   if (!opts.animated) {
-    // Instant render (transcript replay) — fill all text up front, no cursors
+    // Instant render (transcript replay) — fill headline, no middle (coach said it above)
     wrap.querySelector('.paywall-typed-head').textContent   = headline;
-    wrap.querySelector('.paywall-typed-middle').textContent = middle;
     wrap.querySelector('.paywall-head-cursor')?.remove();
-    wrap.querySelector('.paywall-middle-cursor')?.remove();
     scrollChatToBottom();
     return wrap;
   }
 
-  // Animated render — type headline, middle types, rest fades in
+  // Animated render — type headline, rest fades in
   const upliftEl  = wrap.querySelector('.paywall-uplift');
   const closingEl = wrap.querySelector('.paywall-closing');
   const ctaEl     = wrap.querySelector('.paywall-cta');
@@ -1833,13 +1830,6 @@ async function renderPaywallBubble(opts) {
   const headCursor = wrap.querySelector('.paywall-head-cursor');
   await typeIntoElement(headSpan, headline);
   if (headCursor) headCursor.remove();
-
-  // Type the middle (coach's obstacle response)
-  await sleep(250);
-  const midSpan   = wrap.querySelector('.paywall-typed-middle');
-  const midCursor = wrap.querySelector('.paywall-middle-cursor');
-  await typeIntoElement(midSpan, middle);
-  if (midCursor) midCursor.remove();
 
   // Uplift panel reveals
   await sleep(350);
