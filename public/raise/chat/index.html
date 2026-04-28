@@ -1187,6 +1187,14 @@ const DISCOVERY_OPENERS = {
 };
 
 async function beginDiscoveryFlow(reasonParam) {
+  // Stop any thinking animation + clear the spinner bubble
+  stopThinkingAnimation();
+  const thinkBubble = document.querySelector('.thinking-bubble');
+  if (thinkBubble) thinkBubble.remove();
+  // Hide the probability card — discovery path doesn't calculate range
+  const probCard = document.querySelector('.prob-card');
+  if (probCard) probCard.style.display = 'none';
+
   const blocker = REASON_TO_BLOCKER[reasonParam] || REASON_TO_BLOCKER.other;
   DISCOVERY_STATE.blocker = blocker;
   DISCOVERY_STATE.history = [];
