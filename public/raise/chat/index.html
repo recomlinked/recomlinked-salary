@@ -487,6 +487,25 @@ const API_ANALYZE  = '/api/raise-analyze';
 const API_EXCHANGE = '/api/raise-exchange';
 const API_ENRICH   = '/api/raise-enrich';
 const API_CHECKOUT = '/api/raise-checkout';
+const API_LOG      = '/api/raise-log';
+
+// ── Session logger — one row per user, updated at each step ──
+const SESSION_START_TIME = Date.now();
+function logSession(stage, extra) {
+  const payload = {
+    event: 'RAISE_SESSION',
+    session_id: profileHash(),
+    stage,
+    duration_s: Math.round((Date.now() - SESSION_START_TIME) / 1000),
+    source: document.referrer || window.location.href,
+    ...(extra || {}),
+  };
+  fetch(API_LOG, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}
 
 // Freshness — if saved state is older than this, start from scratch.
 // (Per TODO: staleness check. User typically finishes in 3-5 min,
@@ -1190,6 +1209,12 @@ async function init() {
     }
   } catch (e) { /* non-fatal */ }
 
+  // Session logger — analyze complete
+  logSession('analyze', {
+    initial_range: state.current_range.floor + '-' + state.current_range.ceiling,
+    landing_ref: new URLSearchParams(location.search).get('reason') || '',
+  });
+
   await sleep(400);
   // First coach message — intentionally rewritten (backend sends an old
   // 4-question version). We override locally for 3-exchange framing.
@@ -1333,6 +1358,7 @@ async function beginTimeframeQuestion() {
     state.timing = c.value;
     logEntry('user_msg', { text: c.label, stage: 'timeframe', timing: c.value });
     saveState();
+    logSession('timeframe', { timing: c.value });
     // Transition to obstacle/blocker question
     setTimeout(() => beginObstacle(), 300);
   });
@@ -1378,6 +1404,7 @@ async function handleObstacleChip(code, label) {
   disableInput('Thinking…');
   state.obstacle = { code, label };
   saveState();
+  logSession('blocker', { blocker_code: code, blocker_label: label });
 
   // GA4 + Clarity — obstacle_answered
   try {
@@ -1591,6 +1618,18 @@ async function runExchangeCall(exchangeNum, answer) {
   state.current_exchange = exchangeNum + 1;
   saveState();
 
+  // Session logger — exchange complete
+  if (exchangeNum === 1) {
+    logSession('ex1', {
+      role: result.extracted?.job_title_normalised || '',
+      seniority: result.extracted?.seniority_signal_from_text || '',
+    });
+  } else if (exchangeNum === 2) {
+    logSession('ex2', {
+      final_range: state.current_range.floor + '-' + state.current_range.ceiling,
+    });
+  }
+
   // Successful exchange → clear any lingering chips now
   clearChips();
 
@@ -1673,6 +1712,7 @@ async function showPaywall() {
   // Animated render — the trust moment. Headline types, middle types, rest fades in.
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
+  logSession('paywall', { paywall_seen: true });
 
   // GA4 + Clarity — paywall_viewed
   try {
@@ -1985,6 +2025,7 @@ function beginDeepDive() {
   DEEP_DIVE_STATE.step = 0;
   DEEP_DIVE_STATE.gaps = [];
   logEntry('coach_msg', { text: 'deep_dive_started', stage: 'deep_dive' });
+  logSession('deep_dive', { paywall_action: 'deep_dive' });
   runDeepDiveStep(0);
 }
 
@@ -2019,6 +2060,10 @@ async function runDeepDiveStep(stepIndex) {
     await typeCoachBubble(reaction);
 
     logEntry('deep_dive_answer', { step: stepIndex, value: c.value, gaps: [...DEEP_DIVE_STATE.gaps] });
+    logSession('deep_dive', {
+      deep_dive_gaps: DEEP_DIVE_STATE.gaps.join(', '),
+      deep_dive_qs: DEEP_DIVE_STATE.step,
+    });
 
     // Re-offer after this step?
     if (step.reoffer_after && DEEP_DIVE_STATE.gaps.length > 0) {
@@ -2156,6 +2201,8 @@ async function startCheckout() {
       window.clarity('event', 'checkout_started');
     }
   } catch (e) { /* tracking must never break checkout */ }
+
+  logSession('checkout', { paywall_action: 'checkout_started' });
 
   // Inject keyframes once, globally. Matches FA's pattern so the spinner
   // starts spinning the moment the user clicks, even on a slow network.
@@ -2314,6 +2361,7 @@ async function handlePostPaywallText(text) {
 
   state.free_dialog_count = (state.free_dialog_count || 0) + 1;
   saveState();
+  logSession('free_text', { free_text_count: state.free_dialog_count });
 
   await sleep(300);
   showCoachTyping();
