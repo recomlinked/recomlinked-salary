@@ -267,11 +267,15 @@ module.exports = async function handler(req, res) {
   const body = req.body || {};
 
   // ── Mode discrimination ─────────────────────────────────
-  // NUDGE mode: explicit { mode: 'nudge', exchange, user_answer, ... }
-  // PAID mode:  { token, message }
-  // FREE mode:  { profile, message } (no token)
+  // NUDGE mode:      explicit { mode: 'nudge', exchange, user_answer, ... }
+  // DISCOVERY mode:  explicit { mode: 'discovery', blocker, timing, message, history }
+  // PAID mode:       { token, message }
+  // FREE mode:       { profile, message } (no token)
   if (body.mode === 'nudge') {
     return handleNudgeMode(body, res);
+  }
+  if (body.mode === 'discovery') {
+    return handleDiscoveryMode(body, res);
   }
   const isFreeMode = !body.token && !!body.profile;
   if (isFreeMode) {
@@ -549,5 +553,129 @@ async function handlePaidMode(body, res) {
   } catch (err) {
     console.error('[raise-coach] claude error:', err);
     return res.status(500).json({ error: 'Coach unavailable. Please try again.' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ DISCOVERY MODE — pre-paywall coaching-by-questions     ══
+// ════════════════════════════════════════════════════════════
+// Called when a user clicks a blocker chip on the landing page.
+// The coach asks smart questions that help the user discover
+// their own gaps. After 2 exchanges, the frontend shows the paywall.
+//
+// The coach NEVER gives solutions. Only asks questions that
+// reveal blind spots. The user sells themselves on needing the plan.
+
+const DISCOVERY_SYSTEM = `You are a senior salary negotiation coach. A user clicked a specific raise blocker on a landing page and told you their timeline. Your job is to coach by asking — NOT by telling.
+
+THE USER'S BLOCKER: {blocker_code} — "{blocker_label}"
+THE USER'S TIMELINE: {timing}
+
+YOUR FRAMEWORK — you have exactly 2 messages:
+
+MESSAGE 1 (after they answer your blocker-specific question):
+- Acknowledge what they said in 1 sentence — use THEIR words
+- Ask about their BLIND SPOT: the thing they haven't considered
+- This should be the question that creates the "oh shit" moment
+- Usually it's about what happens AFTER they do the thing they're afraid of
+- ONE question only. 2-3 sentences total.
+
+MESSAGE 2 (your final message before the paywall appears):
+- MIRROR back the 2-3 gaps they just revealed through their own answers
+- Be specific — use their exact words when reflecting back
+- Name the gaps clearly but do NOT solve them
+- End with something like "Those are exactly what a plan would address" or similar natural bridge
+- 2-3 sentences total. No lists. No bullet points.
+
+ABSOLUTE RULES:
+- NEVER give the actual solution — just make the gap visible
+- NEVER mention price, payment, or "upgrade"
+- NEVER say "the plan includes" or sell anything
+- Ask ONE question per message — never two
+- 2-3 sentences max per message
+- Use their exact words when reflecting back
+- Be warm, direct, specific. Not generic coaching-speak.
+- Reference their timeline when relevant (urgent = different tone than exploring)
+
+THE GOAL: After your 2 messages, the user should think "I need help with this" — not because you told them to, but because they DISCOVERED their own gaps through your questions.`;
+
+// Blocker-specific opening questions — these are the first coach question
+// AFTER the user taps their timing. Hardcoded for quality control.
+const DISCOVERY_OPENERS = {
+  underpaid:      "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
+  pushy:          "When you imagine asking, what specifically feels pushy about it?",
+  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
+  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
+  justify:        "What would you say if your manager asked 'why should I pay you more' right now?",
+  timing:         "What makes the timing feel off — nothing scheduled, or something else?",
+  prior_no:       "When they said no last time, what reason did they give?",
+  putting_off:    "What happens in your head right before you decide 'not today'?",
+  relationship:   "What specifically are you afraid would change in the relationship?",
+  other:          "Tell me more about what's holding you back.",
+};
+
+async function handleDiscoveryMode(body, res) {
+  const {
+    blocker,        // { code, label }
+    timing,         // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
+    message,        // user's typed answer
+    history,        // array of { role, content } — prior messages in this discovery
+    message_number, // 1 or 2 (which coach response we're generating)
+    session_id,
+  } = body;
+
+  if (!blocker || !message) {
+    return res.status(400).json({ error: 'blocker and message required' });
+  }
+  if (typeof message !== 'string' || message.length === 0) {
+    return res.status(400).json({ error: 'message must be non-empty' });
+  }
+  if (message.length > FREE_MAX_CHARS) {
+    return res.status(400).json({ error: 'message too long' });
+  }
+
+  const blockerCode  = blocker.code || 'other';
+  const blockerLabel = blocker.label || '';
+  const timingVal    = timing || 'exploring';
+  const msgNum       = message_number || 1;
+
+  // Build system prompt with blocker + timing injected
+  const system = DISCOVERY_SYSTEM
+    .replace('{blocker_code}', blockerCode)
+    .replace('{blocker_label}', blockerLabel)
+    .replace('{timing}', timingVal);
+
+  // Build messages array — include history so Claude sees the full conversation
+  const priorMessages = Array.isArray(history) ? history : [];
+  const messages = [
+    ...priorMessages,
+    { role: 'user', content: message },
+  ];
+
+  try {
+    const response = await client.messages.create({
+      model:      'claude-sonnet-4-6',
+      max_tokens: 200,  // short responses only — 2-3 sentences
+      system,
+      messages,
+    });
+    const reply = response.content[0]?.text || "Tell me more about your situation.";
+
+    return res.status(200).json({
+      reply,
+      mode: 'discovery',
+      message_number: msgNum,
+    });
+  } catch (err) {
+    console.error('[raise-coach] discovery mode error:', err);
+    // Fallback — use a generic follow-up so the UX doesn't break
+    const fallback = msgNum === 1
+      ? "That's helpful context. Here's what I'm curious about — if you had to have this conversation tomorrow, what would you say first?"
+      : "You've identified some real gaps. Those are exactly the things a structured plan would address.";
+    return res.status(200).json({
+      reply: fallback,
+      mode: 'discovery',
+      message_number: msgNum,
+    });
   }
 }
