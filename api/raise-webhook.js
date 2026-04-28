@@ -85,6 +85,26 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const rawBody = await getRawBody(req);
+
+  // ── Session logging — route RAISE_SESSION to Google Sheets ──
+  // Check raw body before Stripe signature verification. Session log
+  // events don't come from Stripe, so they have no signature.
+  try {
+    const peek = JSON.parse(rawBody.toString());
+    if (peek && peek.event === 'RAISE_SESSION') {
+      const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
+      if (webhookUrl) {
+        fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: rawBody.toString(),
+        }).catch(() => {});
+      }
+      return res.status(200).json({ ok: true });
+    }
+  } catch (e) { /* not JSON or not a session event — continue to Stripe */ }
+
+  // ── Stripe webhook handling ─────────────────────────────
   const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig     = req.headers['stripe-signature'];
 
