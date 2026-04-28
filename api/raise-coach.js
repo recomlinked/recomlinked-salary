@@ -603,15 +603,19 @@ THE GOAL: After your 2 messages, the user should think "I need help with this" �
 // AFTER the user taps their timing. Hardcoded for quality control.
 const DISCOVERY_OPENERS = {
   underpaid:      "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
-  pushy:          "When you imagine asking, what specifically feels pushy about it?",
-  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
-  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
-  justify:        "What would you say if your manager asked 'why should I pay you more' right now?",
+  quiet:          "When you think about making your work more visible, what feels hardest — finding the right moment, or finding the right words?",
   timing:         "What makes the timing feel off — nothing scheduled, or something else?",
+  no_advocate:    "When you need something from your manager, how does that usually go — do they help, or do you have to push?",
+  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
+  no_script:      "If you had to open the conversation tomorrow, what would your first sentence be — or is it completely blank?",
+  fear_no:        "When you imagine them saying no, what happens next in your head — do you have a response, or does the conversation just end?",
   prior_no:       "When they said no last time, what reason did they give?",
   putting_off:    "What happens in your head right before you decide 'not today'?",
+  pushy:          "When you imagine asking, what specifically feels pushy about it?",
   relationship:   "What specifically are you afraid would change in the relationship?",
-  other:          "Tell me more about what's holding you back.",
+  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
+  justify:        "What would you say if your manager asked 'why should I pay you more' right now?",
+  other:          "Tell me what's on your mind — what's the thing that stops you when you think about asking?",
 };
 
 async function handleDiscoveryMode(body, res) {
