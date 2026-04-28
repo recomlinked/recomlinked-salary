@@ -1338,6 +1338,17 @@ async function showDiscoveryPaywall() {
 }
 
 async function init() {
+  // Check for discovery path FIRST — chip click from landing page
+  // Must happen before saved-state resume, otherwise old session takes over
+  const params = new URLSearchParams(location.search);
+  const reason = params.get('reason');
+  if (reason) {
+    // Clear any old state so discovery starts fresh
+    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
+    beginDiscoveryFlow(reason);
+    return;
+  }
+
   const saved = loadState();
   const profile = loadProfile();
 
@@ -1357,13 +1368,6 @@ async function init() {
   }
 
   if (!profile) {
-    // Check for discovery path — chip click from landing page
-    const params = new URLSearchParams(location.search);
-    const reason = params.get('reason');
-    if (reason) {
-      beginDiscoveryFlow(reason);
-      return;
-    }
     window.location.replace('/raise/');
     return;
   }
