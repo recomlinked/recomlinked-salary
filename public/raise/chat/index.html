@@ -1132,6 +1132,211 @@ function showErrorBubble(message, onRetry) {
 /* ── MAIN FLOW                                           ── */
 /* ───────────────────────────────────────────────────────── */
 
+// ═══════════════════════════════════════════════════════════════
+// ══ DISCOVERY FLOW — chip-click path from landing page       ══
+// ═══════════════════════════════════════════════════════════════
+// When a user clicks a blocker chip on the landing page, they arrive
+// here WITHOUT a profile (no assessment). The coach acknowledges their
+// blocker, asks timing, then runs 2 coaching-by-questions exchanges
+// using the discovery mode in raise-coach.js. Paywall appears after.
+//
+// Flow: blocker acknowledged → timing tap → coach question (blocker-specific)
+//       → user types → coach blind-spot question → user types → coach mirrors
+//       → paywall
+
+const DISCOVERY_STATE = {
+  blocker: null,      // { code, label }
+  timing: null,       // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
+  history: [],        // conversation history for Claude
+  message_count: 0,   // how many user messages sent
+};
+
+// Map landing page reason params to blocker codes + labels
+const REASON_TO_BLOCKER = {
+  underpaid:        { code: 'justify',        label: "I think I'm underpaid but I can't prove it" },
+  quiet_performer:  { code: 'pushy',          label: "I'm a strong performer but quiet, and it's costing me" },
+  unknown_timing:   { code: 'timing',         label: "I'm not sure if now is the right time" },
+  no_advocate:      { code: 'relationship',   label: "My manager doesn't advocate for me" },
+  unknown_number:   { code: 'unknown_amount', label: "I don't know what number to ask for" },
+  no_script:        { code: 'justify',        label: "I don't know how to start the conversation" },
+  fear_no:          { code: 'budget',         label: "What if they say no?" },
+  already_asked:    { code: 'prior_no',       label: "I already asked and got nothing" },
+  other:            { code: 'other',          label: "I have a different concern" },
+  // Direct obstacle codes (from potential future links)
+  pushy:            { code: 'pushy',          label: "I don't want to seem greedy or pushy" },
+  relationship:     { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
+  budget:           { code: 'budget',         label: "My manager will say there's no budget" },
+  unknown_amount:   { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
+  justify:          { code: 'justify',        label: "I'm not sure how to justify my number" },
+  timing:           { code: 'timing',         label: "Timing feels off — no review scheduled" },
+  prior_no:         { code: 'prior_no',       label: "I've asked before and got no / delay" },
+  putting_off:      { code: 'putting_off',    label: "I keep putting it off" },
+};
+
+// Blocker-specific opening questions (matches raise-coach.js DISCOVERY_OPENERS)
+const DISCOVERY_OPENERS = {
+  justify:        "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
+  pushy:          "When you imagine asking, what specifically feels pushy about it?",
+  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
+  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
+  timing:         "What makes the timing feel off — nothing scheduled, or something else?",
+  prior_no:       "When they said no last time, what reason did they give?",
+  putting_off:    "What happens in your head right before you decide 'not today'?",
+  relationship:   "What specifically are you afraid would change in the relationship?",
+  other:          "Tell me more about what's holding you back.",
+};
+
+async function beginDiscoveryFlow(reasonParam) {
+  const blocker = REASON_TO_BLOCKER[reasonParam] || REASON_TO_BLOCKER.other;
+  DISCOVERY_STATE.blocker = blocker;
+  DISCOVERY_STATE.history = [];
+  DISCOVERY_STATE.message_count = 0;
+
+  // Set minimal state so profileHash doesn't crash
+  state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
+  state.obstacle = blocker;
+  state.chat_log = [];
+  state.current_exchange = 0;
+
+  logSession('discovery_start', {
+    blocker_code: blocker.code,
+    blocker_label: blocker.label,
+    landing_ref: reasonParam,
+  });
+
+  // Coach acknowledges blocker + asks timing
+  const ack = `"${blocker.label}" — that's one of the most common ones, and it's very fixable. First, when are you planning to have the conversation?`;
+  await typeCoachBubble(ack);
+  logEntry('coach_msg', { text: ack, stage: 'discovery' });
+
+  await sleep(200);
+
+  // Show timing chips
+  const timeChips = [
+    { value: 'this_week',    label: 'I need to act this week · this week' },
+    { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
+    { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
+    { value: 'exploring',    label: "I'm just exploring · no timeline" },
+  ];
+
+  renderChips(timeChips, async (c, btn) => {
+    btn.classList.add('selected');
+    fadeOutChips();
+    appendUserBubble(c.label);
+    DISCOVERY_STATE.timing = c.value;
+    state.timing = c.value;
+
+    logSession('discovery_timing', { timing: c.value });
+
+    // Now ask the blocker-specific opening question
+    await sleep(300);
+    const opener = DISCOVERY_OPENERS[blocker.code] || DISCOVERY_OPENERS.other;
+    await typeCoachBubble(opener);
+    logEntry('coach_msg', { text: opener, stage: 'discovery' });
+
+    // Track in history for Claude
+    DISCOVERY_STATE.history.push(
+      { role: 'assistant', content: ack },
+      { role: 'user', content: c.label },
+      { role: 'assistant', content: opener }
+    );
+
+    // Enable text input for user's first typed answer
+    enableInput('Type your answer…');
+    awaitFreeText(handleDiscoveryAnswer);
+  });
+}
+
+async function handleDiscoveryAnswer(text) {
+  if (!text || text.trim().length < 3) return;
+
+  appendUserBubble(text);
+  disableInput('Thinking…');
+
+  DISCOVERY_STATE.message_count++;
+  DISCOVERY_STATE.history.push({ role: 'user', content: text });
+
+  logSession('discovery_msg', {
+    message_number: DISCOVERY_STATE.message_count,
+    blocker_code: DISCOVERY_STATE.blocker.code,
+  });
+
+  // Call raise-coach.js in discovery mode
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'discovery',
+        blocker: DISCOVERY_STATE.blocker,
+        timing: DISCOVERY_STATE.timing,
+        message: text,
+        history: DISCOVERY_STATE.history,
+        message_number: DISCOVERY_STATE.message_count,
+        session_id: profileHash(),
+      }),
+    });
+    const data = await res.json();
+    const reply = data.reply || "Tell me more about your situation.";
+
+    await sleep(300);
+    await typeCoachBubble(reply);
+    logEntry('coach_msg', { text: reply, stage: 'discovery' });
+
+    DISCOVERY_STATE.history.push({ role: 'assistant', content: reply });
+
+    // After 2 user messages → show paywall
+    if (DISCOVERY_STATE.message_count >= 2) {
+      await sleep(500);
+      showDiscoveryPaywall();
+      return;
+    }
+
+    // Otherwise, re-arm for next answer
+    enableInput('Type your answer…');
+    awaitFreeText(handleDiscoveryAnswer);
+
+  } catch (err) {
+    console.error('[discovery] coach call failed:', err);
+    await sleep(300);
+    await typeCoachBubble("That's helpful context. Let me think about the best approach for your situation.");
+    enableInput('Type your answer…');
+    awaitFreeText(handleDiscoveryAnswer);
+  }
+}
+
+async function showDiscoveryPaywall() {
+  // Set obstacle in state so paywall can use it
+  state.obstacle = DISCOVERY_STATE.blocker;
+  state.timing = DISCOVERY_STATE.timing;
+  state.current_exchange = 5; // paywall state
+
+  logSession('paywall', { paywall_seen: true });
+
+  // Render paywall — uses the existing renderPaywallBubble which reads state.obstacle + state.timing
+  // Since there's no range data, we need to set a default
+  state.current_range = state.current_range || { floor: 45, ceiling: 70 };
+  state.initial_floor = state.initial_floor || 45;
+
+  await renderPaywallBubble({ animated: true });
+  logEntry('paywall', {});
+
+  // GA4 + Clarity
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'discovery' });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('event', 'discovery_paywall');
+    }
+  } catch (e) {}
+
+  // Enable deep dive + free text after paywall
+  renderPlanPreviewChips();
+  enableInput('Ask me anything…');
+  awaitFreeText(handlePostPaywallText);
+}
+
 async function init() {
   const saved = loadState();
   const profile = loadProfile();
@@ -1152,6 +1357,13 @@ async function init() {
   }
 
   if (!profile) {
+    // Check for discovery path — chip click from landing page
+    const params = new URLSearchParams(location.search);
+    const reason = params.get('reason');
+    if (reason) {
+      beginDiscoveryFlow(reason);
+      return;
+    }
     window.location.replace('/raise/');
     return;
   }
