@@ -1217,26 +1217,27 @@ async function beginDiscoveryFlow(reasonParam) {
     landing_ref: reasonParam,
   });
 
-  // Blocker-specific acknowledgments — each one validates their concern differently
+  // Blocker-specific coaching insights — each one reframes the user's problem
+  // in a way they haven't considered. NOT acknowledgment. Real coaching.
   const ACK_MESSAGES = {
-    underpaid:      "You feel underpaid but can't prove it — that's actually the most fixable problem on the list.",
-    quiet:          "Being good at your job but quiet about it — that's not a personality flaw, it's a strategy gap.",
-    timing:         "Timing feels uncertain — but timing is almost never the real blocker. Let's figure out what is.",
-    no_advocate:    "A manager who doesn't advocate for you changes the playbook — but it doesn't close the door.",
-    unknown_amount: "Not knowing your number is the most common gap — and the easiest to close.",
-    no_script:      "Not knowing how to start is what stops most people. The first sentence is everything.",
-    fear_no:        "The fear of hearing 'no' is the number one reason people never ask. But 'no' is rarely the end.",
-    prior_no:       "You asked before and got nothing — that's not a failure, it's information. The approach needs to change.",
-    putting_off:    "You keep putting it off — that usually means something specific is blocking you, not laziness.",
-    pushy:          "Worrying about seeming pushy is a sign you care about doing this right.",
-    relationship:   "Protecting the relationship matters — and the best approach actually strengthens it.",
-    budget:         "The 'no budget' line is the most common deflection — and it's almost never the real answer.",
-    justify:        "Not sure how to justify it — that means you need framing, not more evidence.",
-    other:          "Let's figure out what's really in the way.",
+    underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that you're framing it as a feeling when it needs to be framed as a business case. Those are two completely different conversations.",
+    quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's learning to name your contributions in language your manager already uses to justify budgets.",
+    timing:         "Timing matters more than most people think — but not in the way you'd expect. The best moment isn't when you feel ready. It's when your manager has the budget authority, the political capital, and a recent reminder of your value. Those three things rarely line up by accident. You have to engineer the moment.",
+    no_advocate:    "When your manager doesn't advocate for you, most people try harder to impress them. That almost never works. What works is making your ask so well-structured that your manager can take it upstairs without doing any extra work. You're not asking them to fight for you — you're handing them a case that's already won.",
+    unknown_amount: "Here's why most people get stuck on the number: they think they need to find the 'right' one. There is no right number. There's a number that's high enough to matter and defensible enough that your manager can't dismiss it. Those are two criteria, not a research project.",
+    no_script:      "The first sentence of a raise conversation determines whether your manager listens as an ally or defends as a gatekeeper. Most people open with 'I'd like to discuss my compensation' — which immediately puts the manager on guard. The best openers don't mention money at all.",
+    fear_no:        "Here's what nobody tells you about hearing 'no': it's almost never a real no. It's 'not right now,' or 'I need a reason to say yes,' or 'help me justify this.' The people who get raises aren't the ones who avoid 'no' — they're the ones who know what to say after it.",
+    prior_no:       "Getting a no last time actually gives you an advantage most people don't see. You now know exactly what didn't work, and you have a built-in opening: 'Last time we talked about this, you mentioned X. Here's what's changed since then.' That's a stronger position than asking for the first time.",
+    putting_off:    "Procrastinating on asking for a raise isn't about laziness or fear — it's about not having a clear first step. When the whole conversation feels like one giant thing you need to do, of course you put it off. The fix is breaking it into steps small enough that starting feels obvious.",
+    pushy:          "The fear of seeming pushy comes from imagining the conversation as a demand. But the best raise conversations don't feel like asking at all — they feel like solving a problem together. Your manager doesn't want to lose you. You're not demanding — you're helping them keep you.",
+    relationship:   "Worrying about the relationship means you understand something most people miss: the relationship IS the negotiation. The good news is that a well-framed ask actually strengthens trust. Your manager would rather hear from you directly than find out you're interviewing elsewhere.",
+    budget:         "When a manager says 'there's no budget,' they're almost never telling you the full story. What they're really saying is 'I don't have a strong enough reason to go find budget.' Your job isn't to accept the constraint — it's to give them the ammunition to fight for an exception.",
+    justify:        "The mistake most people make when justifying a raise is listing everything they've done. Managers don't give raises for past work — they give raises to keep people who will deliver future value. The justification that works isn't 'look what I did' — it's 'here's what you'd lose.'",
+    other:          "Every raise situation has a specific blocker, even if it's hard to name. Let's find yours.",
   };
 
   const ackText = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
-  const ack = `${ackText} First, when are you planning to have the conversation?`;
+  const ack = `${ackText} But first — when are you planning to have the conversation?`;
   await typeCoachBubble(ack);
   logEntry('coach_msg', { text: ack, stage: 'discovery' });
 
