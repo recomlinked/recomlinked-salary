@@ -82,23 +82,26 @@ async function triggerEnrichRegeneration({ profile, exchanges, obstacle, final_r
 }
 
 module.exports = async function handler(req, res) {
+  // CORS for browser session-logging requests
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
   const rawBody = await getRawBody(req);
 
   // ── Session logging — route RAISE_SESSION to Google Sheets ──
-  // Check raw body before Stripe signature verification. Session log
-  // events don't come from Stripe, so they have no signature.
   try {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
       const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
       if (webhookUrl) {
-        fetch(webhookUrl, {
+        await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: rawBody.toString(),
-        }).catch(() => {});
+        });
       }
       return res.status(200).json({ ok: true });
     }
