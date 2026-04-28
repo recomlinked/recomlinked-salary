@@ -1199,6 +1199,8 @@ async function beginDiscoveryFlow(reasonParam) {
   // Hide the probability card — discovery path doesn't calculate range
   const probCard = document.querySelector('.prob-card');
   if (probCard) probCard.style.display = 'none';
+  // Disable input during chip selection phase
+  disableInput('');
 
   const blocker = REASON_TO_BLOCKER[reasonParam] || REASON_TO_BLOCKER.other;
   DISCOVERY_STATE.blocker = blocker;
