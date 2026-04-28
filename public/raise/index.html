@@ -773,7 +773,7 @@ h2.section-title {
 }
 .hiw-card {
   background: var(--bg2);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: 10px;
   padding: 16px 16px 18px;
   margin-bottom: 12px;
@@ -787,7 +787,6 @@ h2.section-title {
 }
 .hiw-card:hover,
 .hiw-card:focus-visible {
-  border-color: rgba(201,168,76,0.35);
   background: rgba(20,23,34,0.9);
   outline: none;
 }
@@ -861,8 +860,8 @@ h2.section-title {
   transform: translateX(3px);
 }
 /* ── Step card question + icon buttons ─────────────────── */
-.hiw-sep{height:1px;background:rgba(255,255,255,0.06);margin:10px 0;}
-.hiw-question{font-size:12.5px;font-weight:600;color:rgba(255,255,255,0.75);margin-bottom:10px;line-height:1.4;}
+.hiw-sep{display:none;}
+.hiw-question{font-weight:600;color:#b8bcce;}
 .hiw-icons{display:flex;gap:12px;justify-content:center;margin-bottom:10px;}
 .hiw-icon-btn{
   width:44px;height:44px;border-radius:50%;
@@ -1209,9 +1208,7 @@ h2.section-title {
       <div class="hiw-num">1</div>
       <div class="hiw-body">
         <div class="hiw-title">Build your case</div>
-        <div class="hiw-desc">Every raise comes down to a few key factors — your <b>company's situation</b>, your <b>performance</b>, your <b>manager</b>, and your <b>timing</b>.</div>
-        <div class="hiw-sep"></div>
-        <div class="hiw-question">Do you know how strong your case is right now?</div>
+        <div class="hiw-desc">Every raise comes down to a few key factors — your <b>company's situation</b>, your <b>performance</b>, your <b>manager</b>, and your <b>timing</b>. <span class="hiw-question">Do you know how strong your case is right now?</span></div>
         <div class="hiw-cta">Estimate your winning chance in 1 minute <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
@@ -1220,9 +1217,7 @@ h2.section-title {
       <div class="hiw-num">2</div>
       <div class="hiw-body">
         <div class="hiw-title">Set your number</div>
-        <div class="hiw-desc">A vague "more money" never works. You need a specific number, backed by <b>market data</b> and your <b>real scope</b>. And it <b>compounds</b> into a huge amount over the years.</div>
-        <div class="hiw-sep"></div>
-        <div class="hiw-question">Do you know what even 1% means over the years?</div>
+        <div class="hiw-desc">A vague "more money" never works. You need a specific number, backed by <b>market data</b> and your <b>real scope</b>. And it <b>compounds</b> into a huge amount over the years. <span class="hiw-question">Do you know what even 1% means over the years?</span></div>
         <div class="hiw-cta">Calculate what each 1% raise means for you <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
@@ -1231,9 +1226,7 @@ h2.section-title {
       <div class="hiw-num">3</div>
       <div class="hiw-body">
         <div class="hiw-title">Know what's blocking your raise</div>
-        <div class="hiw-desc">Every raise blocker has a specific response. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>.</div>
-        <div class="hiw-sep"></div>
-        <div class="hiw-question">Do you know what's standing in your way?</div>
+        <div class="hiw-desc">Every raise blocker has a specific response. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. <span class="hiw-question">Do you know what's standing in your way?</span></div>
         <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
