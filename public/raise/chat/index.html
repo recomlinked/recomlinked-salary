@@ -500,11 +500,13 @@ function logSession(stage, extra) {
     source: document.referrer || window.location.href,
     ...(extra || {}),
   };
-  fetch(API_LOG, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
+  const body = JSON.stringify(payload);
+  // Use sendBeacon so the request survives page unload (e.g. Stripe redirect)
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(API_LOG, new Blob([body], { type: 'application/json' }));
+  } else {
+    fetch(API_LOG, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(() => {});
+  }
 }
 
 // Freshness — if saved state is older than this, start from scratch.
@@ -1620,9 +1622,10 @@ async function runExchangeCall(exchangeNum, answer) {
 
   // Session logger — exchange complete
   if (exchangeNum === 1) {
+    const ex1ext = result.extracted || state.accumulated?.ex1?.extracted || {};
     logSession('ex1', {
-      role: result.extracted?.job_title_normalised || '',
-      seniority: result.extracted?.seniority_signal_from_text || '',
+      role: ex1ext.job_title_normalised || ex1ext.title || answer || '',
+      seniority: ex1ext.seniority_signal_from_text || '',
     });
   } else if (exchangeNum === 2) {
     logSession('ex2', {
