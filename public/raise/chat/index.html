@@ -500,12 +500,13 @@ function logSession(stage, extra) {
     source: document.referrer || window.location.href,
     ...(extra || {}),
   };
-  fetch(API_LOG, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-    keepalive: true,
-  }).catch(() => {});
+  const body = JSON.stringify(payload);
+  // Use sendBeacon so the request survives page unload (e.g. Stripe redirect)
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(API_LOG, new Blob([body], { type: 'application/json' }));
+  } else {
+    fetch(API_LOG, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body }).catch(() => {});
+  }
 }
 
 // Freshness — if saved state is older than this, start from scratch.
