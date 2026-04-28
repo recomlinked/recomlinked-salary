@@ -1153,15 +1153,15 @@ const DISCOVERY_STATE = {
 
 // Map landing page reason params to blocker codes + labels
 const REASON_TO_BLOCKER = {
-  underpaid:        { code: 'justify',        label: "I think I'm underpaid but I can't prove it" },
-  quiet_performer:  { code: 'pushy',          label: "I'm a strong performer but quiet, and it's costing me" },
+  underpaid:        { code: 'underpaid',      label: "I think I'm underpaid but I can't prove it" },
+  quiet_performer:  { code: 'quiet',          label: "I'm a strong performer but quiet, and it's costing me" },
   unknown_timing:   { code: 'timing',         label: "I'm not sure if now is the right time" },
-  no_advocate:      { code: 'relationship',   label: "My manager doesn't advocate for me" },
+  no_advocate:      { code: 'no_advocate',    label: "My manager doesn't advocate for me" },
   unknown_number:   { code: 'unknown_amount', label: "I don't know what number to ask for" },
-  no_script:        { code: 'justify',        label: "I don't know how to start the conversation" },
-  fear_no:          { code: 'budget',         label: "What if they say no?" },
+  no_script:        { code: 'no_script',      label: "I don't know how to start the conversation" },
+  fear_no:          { code: 'fear_no',        label: "What if they say no?" },
   already_asked:    { code: 'prior_no',       label: "I already asked and got nothing" },
-  other:            { code: 'other',          label: "I have a different concern" },
+  other:            { code: 'other',          label: "Something else" },
   // Direct obstacle codes (from potential future links)
   pushy:            { code: 'pushy',          label: "I don't want to seem greedy or pushy" },
   relationship:     { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
@@ -1175,15 +1175,20 @@ const REASON_TO_BLOCKER = {
 
 // Blocker-specific opening questions (matches raise-coach.js DISCOVERY_OPENERS)
 const DISCOVERY_OPENERS = {
-  justify:        "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
-  pushy:          "When you imagine asking, what specifically feels pushy about it?",
-  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
-  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
+  underpaid:      "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
+  quiet:          "When you think about making your work more visible, what feels hardest — finding the right moment, or finding the right words?",
   timing:         "What makes the timing feel off — nothing scheduled, or something else?",
+  no_advocate:    "When you need something from your manager, how does that usually go — do they help, or do you have to push?",
+  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
+  no_script:      "If you had to open the conversation tomorrow, what would your first sentence be — or is it completely blank?",
+  fear_no:        "When you imagine them saying no, what happens next in your head — do you have a response, or does the conversation just end?",
   prior_no:       "When they said no last time, what reason did they give?",
   putting_off:    "What happens in your head right before you decide 'not today'?",
+  pushy:          "When you imagine asking, what specifically feels pushy about it?",
   relationship:   "What specifically are you afraid would change in the relationship?",
-  other:          "Tell me more about what's holding you back.",
+  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
+  justify:        "What would you say if your manager asked 'why should I pay you more' right now?",
+  other:          "Tell me what's on your mind — what's the thing that stops you when you think about asking?",
 };
 
 async function beginDiscoveryFlow(reasonParam) {
@@ -1212,8 +1217,26 @@ async function beginDiscoveryFlow(reasonParam) {
     landing_ref: reasonParam,
   });
 
-  // Coach acknowledges blocker + asks timing
-  const ack = `"${blocker.label}" — that's one of the most common ones, and it's very fixable. First, when are you planning to have the conversation?`;
+  // Blocker-specific acknowledgments — each one validates their concern differently
+  const ACK_MESSAGES = {
+    underpaid:      "You feel underpaid but can't prove it — that's actually the most fixable problem on the list.",
+    quiet:          "Being good at your job but quiet about it — that's not a personality flaw, it's a strategy gap.",
+    timing:         "Timing feels uncertain — but timing is almost never the real blocker. Let's figure out what is.",
+    no_advocate:    "A manager who doesn't advocate for you changes the playbook — but it doesn't close the door.",
+    unknown_amount: "Not knowing your number is the most common gap — and the easiest to close.",
+    no_script:      "Not knowing how to start is what stops most people. The first sentence is everything.",
+    fear_no:        "The fear of hearing 'no' is the number one reason people never ask. But 'no' is rarely the end.",
+    prior_no:       "You asked before and got nothing — that's not a failure, it's information. The approach needs to change.",
+    putting_off:    "You keep putting it off — that usually means something specific is blocking you, not laziness.",
+    pushy:          "Worrying about seeming pushy is a sign you care about doing this right.",
+    relationship:   "Protecting the relationship matters — and the best approach actually strengthens it.",
+    budget:         "The 'no budget' line is the most common deflection — and it's almost never the real answer.",
+    justify:        "Not sure how to justify it — that means you need framing, not more evidence.",
+    other:          "Let's figure out what's really in the way.",
+  };
+
+  const ackText = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
+  const ack = `${ackText} First, when are you planning to have the conversation?`;
   await typeCoachBubble(ack);
   logEntry('coach_msg', { text: ack, stage: 'discovery' });
 
