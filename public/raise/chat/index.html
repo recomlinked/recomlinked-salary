@@ -718,15 +718,19 @@ function logSession(stage, extra) {
     screen: window.innerWidth + 'x' + window.innerHeight,
     ...(extra || {}),
   };
+  console.log('[logSession]', stage, payload);
   fetch(API_LOG, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
     keepalive: true,
   }).then(r => {
-    if (!r.ok) console.warn('[logSession] webhook returned', r.status, 'for stage:', stage);
+    console.log('[logSession] →', stage, 'status:', r.status);
+    return r.text();
+  }).then(body => {
+    console.log('[logSession] →', stage, 'response:', body.slice(0, 200));
   }).catch(err => {
-    console.warn('[logSession] webhook failed for stage:', stage, err.message);
+    console.warn('[logSession] FAILED:', stage, err.message);
   });
 }
 
@@ -886,14 +890,23 @@ function colorFor(range) {
 function saveState() {
   try {
     state.saved_at = Date.now();
+    const json = JSON.stringify(state);
+    // Guard: if state is too large (>4MB), trim chat_log to last 50 entries
+    if (json.length > 4000000 && state.chat_log && state.chat_log.length > 50) {
+      state.chat_log = state.chat_log.slice(-50);
+    }
     localStorage.setItem(LS_STATE, JSON.stringify(state));
-  } catch (e) { /* storage may be full / disabled */ }
+  } catch (e) {
+    console.warn('[saveState] failed:', e.message, '— chat_log entries:', state.chat_log?.length);
+  }
 }
 function loadState() {
   try {
     const raw = localStorage.getItem(LS_STATE);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    console.log('[loadState] exchange:', parsed.current_exchange, 'chat_log:', parsed.chat_log?.length, 'paywall_shown:', parsed.paywall_shown);
+    return parsed;
   } catch (e) { return null; }
 }
 function loadProfile() {
@@ -911,7 +924,12 @@ function clearAll() {
 }
 
 function profileHash() {
-  // Same formula as spec §14 — used to cache enrichment in Redis
+  // Path B simulation: use the unique per-session ID so each user gets
+  // their own row in the Google Sheet (the default hash is identical for
+  // all Path B users because they share a dummy profile).
+  if (state.sim_session_id) return state.sim_session_id;
+
+  // Path A: same formula as spec §14 — used to cache enrichment in Redis
   const p = state.profile || {};
   const ex = state.accumulated || {};
   const s = `${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`
@@ -1990,6 +2008,11 @@ async function beginSimulationFlow(reasonParam) {
   state.chat_log = [];
   state.current_exchange = 10; // 10 = simulation mode (Path B)
   state.sim_reason = reasonParam; // preserve for resume
+  // Generate a unique session ID for Path B. The default profileHash()
+  // produces the same hash for all Path B users (dummy profile + same
+  // blocker = identical hash). Adding a timestamp + random suffix ensures
+  // each session gets its own row in the Google Sheet.
+  state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   saveState();
 
   logSession('sim_start', {
@@ -2344,6 +2367,8 @@ function renderManagerBubble(scenario) {
   `;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
+  // Log so it replays on refresh (uses coach_bubble type with a marker)
+  logEntry('coach_bubble', { text: '[MANAGER] ' + scenario.text });
   return wrap;
 }
 
@@ -2954,13 +2979,27 @@ async function resumeFromState() {
     return;
   }
 
+  // If paywall was already shown, restore the header CTA immediately
+  if (state.paywall_shown) {
+    showHeaderPurchaseButton();
+  }
+
   // Replay the transcript from chat_log instantly (no animation) so refresh
   // preserves everything the user saw. Then resume from the current_exchange
   // cursor for whatever prompt/chip UI needs to reappear.
   const log = Array.isArray(state.chat_log) ? state.chat_log : [];
   for (const entry of log) {
     if (entry.type === 'coach_bubble') {
-      insertCoachBubble(entry.payload.text || '');
+      const text = entry.payload.text || '';
+      if (text.startsWith('[MANAGER] ')) {
+        // Manager bubble — render with MANAGER label
+        const mgrText = text.slice(10);
+        const wrap = el('div', 'coach-msg', '');
+        wrap.innerHTML = `<div class="bubble"><span class="sim-mgr-label">Manager</span><p>"${escapeHtml(mgrText)}"</p></div>`;
+        $('messages').appendChild(wrap);
+      } else {
+        insertCoachBubble(text);
+      }
     } else if (entry.type === 'user_bubble') {
       const wrap = el('div', 'user-msg', '');
       wrap.innerHTML = `<div class="user-bubble">${escapeHtml(entry.payload.text || '')}</div>`;
@@ -2993,18 +3032,36 @@ async function resumeFromState() {
     SIM_STATE.context = {};
     SIM_STATE.branch_history = [];
     simTapCount = 0;
+    showToolbar();
+    showModeToggle();
 
     if (state.paywall_shown) {
-      // Paywall already shown — don't re-enter simulation. Just show
-      // header CTA and enable coaching input.
-      showToolbar();
-      showModeToggle();
       showHeaderPurchaseButton();
       enableInput('Ask me anything…');
       awaitFreeText(handlePostPaywallText);
     } else {
-      // Still in free preview — re-enter simulation
-      startSimulationAtBlocker();
+      // Re-enter simulation — show scenario pills without re-typing intro
+      disableInput('Loading scenarios…');
+      showCoachTyping();
+      try {
+        const res2 = await fetch('/api/raise-coach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'simulate_scenarios',
+            blocker: blocker,
+            context: SIM_STATE.context,
+            session_id: profileHash(),
+          }),
+        });
+        const data2 = await res2.json();
+        hideCoachTyping();
+        renderScenarioLabels((data2.scenarios && data2.scenarios.length >= 2) ? data2.scenarios : getDefaultScenarios(blocker.code));
+      } catch (e) {
+        hideCoachTyping();
+        renderScenarioLabels(getDefaultScenarios(blocker.code));
+      }
+      unlockModeToggle();
     }
   } else if (where === 1)      beginExchange1();
   else if (where === 2) beginExchange2();
