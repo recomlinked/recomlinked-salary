@@ -414,6 +414,41 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   letter-spacing:0.08em;text-transform:uppercase;
   color:var(--t3);padding:2px 0 0;
 }
+/* ── Simulation mode UI ──────────────────────────── */
+.sim-banner{background:linear-gradient(135deg,rgba(0,196,160,0.06),rgba(201,168,76,0.06));border:1.5px solid rgba(0,196,160,0.2);border-radius:12px;padding:14px 16px;margin:0;}
+.sim-banner-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.sim-banner-title{font-size:13px;font-weight:600;color:var(--teal);}
+.sim-toggle{font-size:10px;padding:3px 10px;border-radius:8px;border:1px solid rgba(0,196,160,0.3);background:rgba(0,196,160,0.08);color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.sim-toggle:hover{background:rgba(0,196,160,0.15);}
+.sim-toggle.off{border-color:var(--divider);background:var(--muted);color:var(--t3);}
+.sim-banner-desc{font-size:12px;color:var(--t2);line-height:1.5;}
+
+.sim-card{background:var(--card);border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;}
+.sim-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.03);}
+.sim-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.04);cursor:default;}
+.sim-card.faded{opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;}
+.sim-card-label{font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;}
+.sim-card-text{font-size:13px;color:var(--t1);line-height:1.5;}
+
+.sim-replies{margin-top:8px;padding-left:14px;border-left:2px solid rgba(0,196,160,0.2);animation:msgIn 0.3s ease;}
+.sim-replies-label{font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--teal);margin-bottom:8px;opacity:0.7;}
+.sim-reply{background:rgba(0,196,160,0.04);border:1.5px solid rgba(0,196,160,0.15);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.5;color:var(--t1);cursor:pointer;margin-bottom:6px;transition:all 0.15s;}
+.sim-reply:hover{border-color:rgba(0,196,160,0.35);background:rgba(0,196,160,0.08);}
+.sim-reply.selected{border-color:var(--gold);background:rgba(201,168,76,0.04);cursor:default;}
+
+.sim-rewind{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);cursor:pointer;padding:6px 0;border:none;background:none;font-family:var(--sans);opacity:0.6;transition:opacity 0.15s;}
+.sim-rewind:hover{opacity:1;}
+
+.sim-own{background:transparent;border:1.5px dashed var(--divider);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:center;transition:all 0.15s;}
+.sim-own:hover{border-color:var(--t3);}
+.sim-own-text{font-size:12px;color:var(--t3);}
+
+.color-receptive{color:#0a8a6a;}
+.color-pushback{color:#c04040;}
+.color-deflecting{color:#b08a20;}
+.color-counter{color:#5070b0;}
+.color-factcheck{color:#8a7020;}
+.color-emotional{color:#b06030;}
 </style>
 </head>
 
@@ -1330,9 +1365,9 @@ async function discoveryStep_LastRaise() {
 
 // ── Step 6: Simulation mode banner + generate opening lines ──
 async function discoveryStep_SimulationBanner() {
-  // Simulation banner
+  // Simulation banner with working toggle
   const banner = el('div', 'coach-msg', '');
-  banner.innerHTML = `<div style="background:linear-gradient(135deg,rgba(45,212,168,0.08),rgba(201,168,76,0.08));border:1px solid rgba(45,212,168,0.2);border-radius:12px;padding:14px 16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:#2dd4a8;">🎭 Practice mode</span><span style="font-size:10px;padding:3px 10px;border-radius:8px;border:1px solid rgba(45,212,168,0.3);background:rgba(45,212,168,0.1);color:#2dd4a8;">ON</span></div><div style="font-size:12px;color:var(--t2);line-height:1.5;">I'll play your manager now. Pick an opening line, then tap any scenario to see how the conversation unfolds. You can switch back to coaching anytime.</div></div>`;
+  banner.innerHTML = `<div class="sim-banner" id="sim-banner"><div class="sim-banner-head"><span class="sim-banner-title">🎭 Practice mode</span><button class="sim-toggle" id="sim-toggle-btn" onclick="toggleSimMode()">ON</button></div><div class="sim-banner-desc">I'll play your manager now. Pick an opening line, then tap any scenario to see how the conversation unfolds.</div></div>`;
   $('messages').appendChild(banner);
   scrollChatToBottom();
   await sleep(400);
@@ -1375,27 +1410,23 @@ async function discoveryStep_ShowOpenings(openings) {
   await typeCoachBubble("Here are 3 ways to open the conversation. Pick the one that feels most like you:");
   await sleep(200);
 
-  const styleColors = { 'Direct': '#e05a7a', 'Collaborative': '#c9a84c', 'Evidence-led': '#8ba0e0' };
+  const styleColorClass = { 'Direct': 'color-pushback', 'Collaborative': 'color-deflecting', 'Evidence-led': 'color-counter' };
   const wrap = el('div', 'user-msg chips-msg', '');
-  const inner = el('div', '', '');
+  wrap.id = 'opening-cards';
+  const inner = el('div', 'user-chips', '');
   inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
 
   openings.forEach((o, i) => {
-    const card = el('div', '', '');
-    const color = styleColors[o.style] || '#c9a84c';
-    card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;';
-    card.innerHTML = `<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;color:${color};">${o.style}</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">"${o.text}"</div>`;
-    card.onmouseenter = () => { card.style.borderColor = 'rgba(201,168,76,0.3)'; card.style.background = 'var(--bg3)'; };
-    card.onmouseleave = () => { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--bg2)'; };
+    const card = el('div', 'sim-card', '');
+    const colorCls = styleColorClass[o.style] || 'color-deflecting';
+    card.innerHTML = `<div class="sim-card-label ${colorCls}">${o.style}</div><div class="sim-card-text">"${o.text}"</div>`;
     card.onclick = () => {
-      // Fade others, highlight selected
       Array.from(inner.children).forEach(c => {
         if (c === card) {
-          c.style.borderColor = 'rgba(201,168,76,0.4)';
-          c.style.background = 'rgba(201,168,76,0.06)';
-          c.onclick = null; c.onmouseenter = null; c.onmouseleave = null;
+          c.classList.add('selected');
+          c.onclick = null;
         } else {
-          c.style.cssText = 'opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;';
+          c.classList.add('faded');
         }
       });
       DISCOVERY_STATE.context.opening = o.text;
@@ -1407,9 +1438,8 @@ async function discoveryStep_ShowOpenings(openings) {
   });
 
   // Write your own
-  const own = el('div', '', '');
-  own.style.cssText = 'background:transparent;border:1px dashed rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:center;';
-  own.innerHTML = '<div style="font-size:12px;color:var(--t3);">✎ Write my own opening</div>';
+  const own = el('div', 'sim-own', '');
+  own.innerHTML = '<div class="sim-own-text">✎ Write my own opening</div>';
   own.onclick = () => {
     wrap.style.display = 'none';
     enableInput('Type your opening line…');
@@ -1471,21 +1501,24 @@ function discoveryDefaultScenarios() {
 }
 
 function discoveryStep_ShowScenarios(scenarios) {
+  // Rewind button to try different opening
+  const rewindWrap = el('div', 'coach-msg', '');
+  rewindWrap.innerHTML = '<button class="sim-rewind" onclick="discoveryRewindToOpenings()">↩ Try a different opening</button>';
+  $('messages').appendChild(rewindWrap);
+
   typeCoachBubble("Your manager might respond in a few ways. Tap any scenario to see your best replies:").then(() => {
-    const typeColors = { Receptive:'rgba(94,201,154,0.6)', Pushback:'rgba(224,90,122,0.6)', Deflecting:'rgba(201,168,76,0.6)', 'Counter-offer':'rgba(139,160,224,0.6)', 'Fact-checking':'rgba(212,196,74,0.6)', Emotional:'rgba(224,160,90,0.6)' };
+    const typeColorClass = { Receptive:'color-receptive', Pushback:'color-pushback', Deflecting:'color-deflecting', 'Counter-offer':'color-counter', 'Fact-checking':'color-factcheck', Emotional:'color-emotional' };
     const wrap = el('div', 'user-msg chips-msg', '');
-    const inner = el('div', '', '');
+    wrap.id = 'scenario-cards';
+    const inner = el('div', 'user-chips', '');
     inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
 
     scenarios.forEach((s, i) => {
-      const card = el('div', '', '');
-      const color = typeColors[s.type] || 'rgba(201,168,76,0.6)';
-      card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;';
-      card.innerHTML = `<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;color:${color};">Scenario ${i+1} — ${s.type}</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">"${s.text}"</div>`;
+      const card = el('div', 'sim-card', '');
+      const colorCls = typeColorClass[s.type] || 'color-deflecting';
+      card.innerHTML = `<div class="sim-card-label ${colorCls}">Scenario ${i+1} — ${s.type}</div><div class="sim-card-text">"${s.text}"</div>`;
       card.dataset.scenarioIndex = i;
-      card.onmouseenter = () => { if (!card.dataset.expanded) { card.style.borderColor = 'rgba(255,255,255,0.2)'; card.style.background = 'var(--bg3)'; }};
-      card.onmouseleave = () => { if (!card.dataset.expanded) { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--bg2)'; }};
-      card.onclick = () => discoveryExpandScenario(s, i, card, inner, scenarios, typeColors);
+      card.onclick = () => discoveryExpandScenario(s, i, card, inner, scenarios);
       inner.appendChild(card);
     });
 
@@ -1495,49 +1528,37 @@ function discoveryStep_ShowScenarios(scenarios) {
   });
 }
 
-function discoveryExpandScenario(scenario, index, card, container, allScenarios, typeColors) {
-  if (card.dataset.expanded) return;
+function discoveryExpandScenario(scenario, index, card, container, allScenarios) {
+  if (card.classList.contains('selected')) return;
 
   // Remove old reply sections
-  container.querySelectorAll('.disc-replies').forEach(r => r.remove());
+  container.querySelectorAll('.sim-replies').forEach(r => r.remove());
 
-  // Dim others, activate this
-  Array.from(container.children).forEach((c, i) => {
-    if (c.classList && c.classList.contains('disc-replies')) return;
-    if (parseInt(c.dataset.scenarioIndex) === index) {
-      c.dataset.expanded = '1';
-      c.style.borderColor = 'rgba(201,168,76,0.4)';
-      c.style.background = 'rgba(201,168,76,0.06)';
+  // Activate this, dim others
+  Array.from(container.children).forEach((c) => {
+    if (c.classList.contains('sim-replies')) return;
+    const idx = parseInt(c.dataset.scenarioIndex);
+    if (idx === index) {
+      c.classList.add('selected');
+      c.style.opacity = '1';
     } else {
-      c.dataset.expanded = '';
+      c.classList.remove('selected');
       c.style.opacity = '0.3';
-      c.style.borderColor = 'var(--border)';
-      c.style.background = 'var(--bg2)';
     }
   });
 
   // Show replies
-  const repliesDiv = el('div', 'disc-replies', '');
-  repliesDiv.style.cssText = 'margin-top:8px;padding-left:14px;border-left:2px solid rgba(45,212,168,0.15);';
-  repliesDiv.innerHTML = '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(45,212,168,0.5);margin-bottom:8px;">Your best responses:</div>';
+  const repliesDiv = el('div', 'sim-replies', '');
+  repliesDiv.innerHTML = '<div class="sim-replies-label">Your best responses:</div>';
 
   scenario.replies.forEach((reply, ri) => {
-    const btn = el('div', '', '');
-    btn.style.cssText = 'background:rgba(45,212,168,0.04);border:1px solid rgba(45,212,168,0.15);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.5;color:rgba(45,212,168,0.8);cursor:pointer;margin-bottom:6px;transition:all 0.15s;';
+    const btn = el('div', 'sim-reply', '');
     btn.textContent = reply;
-    btn.onmouseenter = () => { btn.style.borderColor = 'rgba(45,212,168,0.35)'; btn.style.background = 'rgba(45,212,168,0.08)'; };
-    btn.onmouseleave = () => { if (!btn.dataset.selected) { btn.style.borderColor = 'rgba(45,212,168,0.15)'; btn.style.background = 'rgba(45,212,168,0.04)'; }};
     btn.onclick = () => {
-      btn.dataset.selected = '1';
-      btn.style.borderColor = 'rgba(201,168,76,0.4)';
-      btn.style.background = 'rgba(201,168,76,0.06)';
-      btn.style.color = 'rgba(255,255,255,0.8)';
+      btn.classList.add('selected');
       btn.onclick = null;
-      // Fade other replies
-      repliesDiv.querySelectorAll('div[style*="cursor:pointer"]').forEach(r => {
-        if (r !== btn && !r.dataset.selected) {
-          r.style.cssText = 'opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;';
-        }
+      repliesDiv.querySelectorAll('.sim-reply').forEach(r => {
+        if (r !== btn) r.classList.add('faded');
       });
       logSession('simulation_reply_tapped', { scenario: scenario.type, reply_index: ri });
       setTimeout(() => discoveryShowPaywall(scenario, reply), 500);
@@ -1548,17 +1569,65 @@ function discoveryExpandScenario(scenario, index, card, container, allScenarios,
   card.insertAdjacentElement('afterend', repliesDiv);
   scrollChatToBottom();
 
-  // Allow clicking other scenarios
-  Array.from(container.children).forEach((c, i) => {
-    if (c.classList && c.classList.contains('disc-replies')) return;
-    if (parseInt(c.dataset.scenarioIndex) !== index) {
+  // Re-enable clicking other scenarios
+  Array.from(container.children).forEach((c) => {
+    if (c.classList.contains('sim-replies')) return;
+    const idx = parseInt(c.dataset.scenarioIndex);
+    if (idx !== index) {
       c.onclick = () => {
-        Array.from(container.children).forEach(x => { x.dataset.expanded = ''; x.style.opacity = '1'; x.style.borderColor = 'var(--border)'; x.style.background = 'var(--bg2)'; });
-        container.querySelectorAll('.disc-replies').forEach(r => r.remove());
-        discoveryExpandScenario(allScenarios[parseInt(c.dataset.scenarioIndex)], parseInt(c.dataset.scenarioIndex), c, container, allScenarios, typeColors);
+        Array.from(container.children).forEach(x => {
+          if (!x.classList.contains('sim-replies')) { x.classList.remove('selected'); x.style.opacity = '1'; }
+        });
+        container.querySelectorAll('.sim-replies').forEach(r => r.remove());
+        discoveryExpandScenario(allScenarios[idx], idx, c, container, allScenarios);
       };
     }
   });
+}
+
+// ── Rewind to try different opening ──
+function discoveryRewindToOpenings() {
+  // Remove everything after the opening cards
+  const openingCards = $('opening-cards');
+  if (!openingCards) return;
+  // Remove all siblings after opening-cards
+  let node = openingCards.nextSibling;
+  while (node) {
+    const next = node.nextSibling;
+    node.remove();
+    node = next;
+  }
+  // Reset opening cards — show all, remove selected
+  openingCards.querySelectorAll('.sim-card').forEach(c => {
+    c.classList.remove('selected', 'faded');
+    c.style.cssText = '';
+  });
+  openingCards.querySelectorAll('.sim-own').forEach(c => {
+    c.classList.remove('faded');
+    c.style.cssText = '';
+  });
+  openingCards.style.display = '';
+  scrollChatToBottom();
+}
+
+// ── Toggle simulation mode on/off ──
+function toggleSimMode() {
+  const btn = $('sim-toggle-btn');
+  const banner = $('sim-banner');
+  if (!btn) return;
+  if (btn.textContent === 'ON') {
+    btn.textContent = 'OFF';
+    btn.classList.add('off');
+    // Switch to coaching mode — enable free text input
+    enableInput('Ask me anything…');
+    awaitFreeText(handlePostPaywallText);
+  } else {
+    btn.textContent = 'ON';
+    btn.classList.remove('off');
+    disableInput('');
+    // Re-show the simulation flow
+    discoveryStep_SimulationBanner();
+  }
 }
 
 // ── Paywall after 1 level of simulation ──
@@ -1977,8 +2046,25 @@ async function runObstacleCall(answer) {
     await sleep(400);
   }
 
-  // Main paywall
-  await showPaywall();
+  // Populate DISCOVERY_STATE.context from Path A data so simulation can use it
+  DISCOVERY_STATE.blocker = state.obstacle;
+  DISCOVERY_STATE.timing = state.timing;
+  DISCOVERY_STATE.context = DISCOVERY_STATE.context || {};
+  DISCOVERY_STATE.context.timing = state.timing || 'exploring';
+  DISCOVERY_STATE.context.company_situation = state.profile?.company_situation || 'stable';
+  DISCOVERY_STATE.context.last_raise = state.profile?.last_raise || '1_2_years';
+
+  // Extract role from Ex1 user messages, evidence from Ex2 user messages
+  const ex1msgs = (state.exchange_messages && state.exchange_messages[1]) || [];
+  const ex2msgs = (state.exchange_messages && state.exchange_messages[2]) || [];
+  const ex1user = ex1msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
+  const ex2user = ex2msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
+  DISCOVERY_STATE.context.role = ex1user || '';
+  DISCOVERY_STATE.context.evidence = ex2user || '';
+  DISCOVERY_STATE.context.evidence_label = ex2user || '';
+
+  // Go to simulation preview instead of static paywall
+  discoveryStep_SimulationBanner();
 }
 
 /* ── Common exchange handling (ex1-3) ────────────────────
