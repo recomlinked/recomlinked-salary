@@ -833,12 +833,14 @@ SITUATION: An employee is negotiating a raise. Their main concern: "${blockerLab
 ${role ? `Role: ${role}` : ''}
 ${timing ? `Timeline: ${timing}` : ''}
 
-Generate 5-6 short labels (2-4 words each) representing different ways the manager might respond at this moment. For each, provide the full text of what the manager would say (1-2 sentences, realistic, specific).
+For each scenario, provide:
+- "type": a SHORT quote (3-7 words) showing what the manager says. This is the pill label — it must be instantly understandable. Write it as a direct mini-quote in the manager's voice, like: "No budget right now" or "Why do you deserve more?" or "Let me think about it". Do NOT use abstract labels like "Deflecting upward" or "Passive agreement" — users can't tell what those mean.
+- "text": the full 1-2 sentence version of what the manager would say.
 
-The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person, not a textbook.
+The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person.
 
 JSON only, no preamble:
-{ "scenarios": [ { "type": "Budget freeze", "text": "Budgets are locked until..." }, ... ] }`;
+{ "scenarios": [ { "type": "\\"No budget right now\\"", "text": "Budgets are locked until..." }, ... ] }`;
 
   try {
     const response = await client.messages.create({
@@ -868,13 +870,13 @@ The employee's concern was: "${blocker?.label || 'asking for a raise'}"
 ${role ? `Their role: ${role}` : ''}
 
 Generate 4-5 possible REPLY THEMES the employee could use. For each, provide:
-- A short theme label (2-3 words)
-- The full response text (1-2 sentences, specific, strategic)
+- "theme": a short plain-English label (3-6 words) that instantly tells the user what they'd say. Write it as a mini-summary in first person, like: "Share my market data", "Ask what it would take", "Push back firmly", "Suggest a timeline". Do NOT use abstract labels like "Data-driven approach" — users can't tell what those mean.
+- "text": the full response (1-2 sentences, specific, strategic)
 
-Make the replies varied — some direct, some diplomatic, some data-driven, some emotional. Each should be a genuinely different approach, not variations of the same thing.
+Make the replies varied — some direct, some diplomatic, some data-driven. Each should be a genuinely different approach.
 
 JSON only:
-{ "replies": [ { "theme": "Show data", "text": "I've done some research..." }, ... ] }`;
+{ "replies": [ { "theme": "Share my market data", "text": "I've done some research..." }, ... ] }`;
 
   try {
     const response = await client.messages.create({
