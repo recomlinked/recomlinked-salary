@@ -554,6 +554,23 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .sim-back-btn:hover{border-color:var(--t2);color:var(--t1);}
 
+/* Persistent back buttons in bottom toolbar — always visible during sim */
+.sim-back-toolbar{
+  display:flex;gap:6px;padding:0 0 6px;
+}
+.sim-back-toolbar-btn{
+  display:flex;align-items:center;gap:3px;
+  padding:4px 10px;border-radius:14px;
+  border:1px solid var(--divider);background:var(--card);
+  color:var(--t3);font-size:11px;font-weight:500;
+  font-family:var(--sans);cursor:pointer;transition:all 0.15s;
+  white-space:nowrap;
+}
+.sim-back-toolbar-btn:hover{border-color:var(--teal);color:var(--teal);}
+.sim-back-toolbar-btn:disabled{opacity:0.35;cursor:default;}
+/* Keep back toolbar visible even when bottom panel is dimmed */
+.bottom-panel.dimmed .sim-back-toolbar{opacity:1;pointer-events:auto;}
+
 </style>
 </head>
 
@@ -594,6 +611,16 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
       <div class="chips-area-scroll" id="chips-area-scroll"></div>
     </div>
     <div class="input-bar">
+      <!-- Persistent simulation back buttons — always visible during sim mode.
+           Clicking scrolls to and triggers the last inline back button of that type. -->
+      <div class="sim-back-toolbar" id="sim-back-toolbar" style="display:none;">
+        <button class="sim-back-toolbar-btn" id="sim-back-response-btn" onclick="triggerLastBack('response')" type="button">
+          <span>← different response</span>
+        </button>
+        <button class="sim-back-toolbar-btn" id="sim-back-assumption-btn" onclick="triggerLastBack('assumption')" type="button">
+          <span>← different assumption</span>
+        </button>
+      </div>
       <div class="input-toolbar" id="input-toolbar" style="display:none;">
         <!-- Mode toggle (segmented): both halves visible at once. The active
              half is filled, the inactive is muted — tap the muted side to
@@ -1412,7 +1439,7 @@ function askContextQuestion(q) {
   const finish = async (savedValue, kind) => {
     SIM_STATE.context[q.key] = savedValue;
     updateContextBadge();
-    logSession('context_added', { key: q.key, kind });
+    logSession('context_added', { key: q.key, kind, value: savedValue });
     await sleep(200);
     await typeCoachBubble("Got it \u2014 I'll factor that into the scenarios.");
     if (priorHandler) {
@@ -1936,7 +1963,22 @@ async function beginSimulationFlow(reasonParam) {
   state.chat_log = [];
   state.current_exchange = 0;
 
-  logSession('sim_start', { blocker_code: blocker.code, landing_ref: reasonParam });
+  logSession('sim_start', {
+    blocker_code: blocker.code,
+    blocker_label: blocker.label,
+    landing_ref: reasonParam,
+    path: 'B',
+  });
+  // Also fire an 'analyze' event (same stage name Path A uses) so the
+  // Google Sheet webhook picks up Path B users in the same pipeline.
+  // Path A sends this after the initial range calc; Path B doesn't have
+  // a range, so we send a placeholder that signals "simulation entry".
+  logSession('analyze', {
+    initial_range: 'sim',
+    landing_ref: reasonParam,
+    path: 'B',
+    blocker_code: blocker.code,
+  });
 
   // Step 1: Coach insight
   const ack = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
@@ -2194,7 +2236,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   simConversation = [{ role: 'manager', text: scenario.text }];
   simTurnElements = [];
 
-  appendUserBubble('My manager\u2019s response theme:\n\u201c' + scenario.type + '\u201d');
+  appendUserBubble('My manager\u2019s response theme:\n' + scenario.type.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, ''));
   await sleep(200);
 
   // If we hit the tap limit on this very tap, show paywall
@@ -2346,6 +2388,7 @@ function pickReply(reply, pill, container, scenario) {
 
   const turnNodes = [userBubble];
   simTurnElements.push(turnNodes);
+  updateSimBackToolbar();
 
   if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(scenario), 800);
@@ -2393,6 +2436,7 @@ async function continueConversation(scenario, turnNodes) {
   turnNodes.push(followupWrap);
 
   enableInput('Tap a response above or type your own\u2026');
+  updateSimBackToolbar();
 }
 
 function getDefaultFollowupScenarios() {
@@ -2473,7 +2517,7 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   assumptionTurnNodes._isAssumptionTurn = true;
   simTurnElements.push(assumptionTurnNodes);
 
-  const userBubble = appendUserBubble('My manager\u2019s response:\n\u201c' + scenario.type + '\u201d');
+  const userBubble = appendUserBubble('My manager\u2019s response:\n' + scenario.type.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, ''));
   assumptionTurnNodes.push(userBubble);
 
   const mgrBubble = renderManagerBubble(scenario);
@@ -2513,6 +2557,7 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   renderReplyPillsFlat(replies, parentScenario);
   const lastMsg = $('messages').lastElementChild;
   if (lastMsg) assumptionTurnNodes.push(lastMsg);
+  updateSimBackToolbar();
 }
 
 // Back button — two variants:
@@ -2569,6 +2614,49 @@ function goBack() {
 
   enableInput('Tap an option or type your own\u2026');
   scrollChatToBottom();
+  updateSimBackToolbar();
+}
+
+// Persistent bottom toolbar back buttons — trigger the last inline
+// back button of the given type by calling goBack(). The toolbar
+// buttons mirror the inline ones so the user doesn't have to scroll up.
+function triggerLastBack(type) {
+  if (simTurnElements.length === 0) return;
+  const lastTurn = simTurnElements[simTurnElements.length - 1];
+  if (type === 'assumption' && lastTurn._isAssumptionTurn) {
+    goBack();
+  } else if (type === 'response' && !lastTurn._isAssumptionTurn) {
+    goBack();
+  } else if (type === 'response' && lastTurn._isAssumptionTurn) {
+    // Go back twice: first undo the assumption, then the response
+    goBack();
+    goBack();
+  } else {
+    goBack();
+  }
+}
+
+// Show/hide and enable/disable the persistent back buttons based on
+// what turns exist in the stack. Called after every turn change.
+function updateSimBackToolbar() {
+  const tb = $('sim-back-toolbar');
+  if (!tb) return;
+  const responseBtn = $('sim-back-response-btn');
+  const assumptionBtn = $('sim-back-assumption-btn');
+
+  // Only show during simulation mode when there are turns to undo
+  if (!SIM_STATE.simMode || simTurnElements.length === 0) {
+    tb.style.display = 'none';
+    return;
+  }
+  tb.style.display = '';
+
+  // Enable/disable based on what's in the stack
+  const hasResponseTurn = simTurnElements.some(t => !t._isAssumptionTurn);
+  const hasAssumptionTurn = simTurnElements.some(t => t._isAssumptionTurn);
+
+  if (responseBtn) responseBtn.disabled = !hasResponseTurn;
+  if (assumptionBtn) assumptionBtn.disabled = !hasAssumptionTurn;
 }
 
 // ── Paywall after N taps of simulation ──
@@ -2582,7 +2670,15 @@ async function showSimulationPaywall(lastScenario) {
   state.current_range = { floor: 45, ceiling: 70 };
   state.initial_floor = 45;
 
-  logSession('paywall', { paywall_seen: true, path: 'simulation', taps: simTapCount });
+  logSession('paywall', {
+    paywall_seen: true,
+    path: 'simulation',
+    taps: simTapCount,
+    blocker_code: SIM_STATE.blocker?.code || '',
+    blocker_label: SIM_STATE.blocker?.label || '',
+    scenarios_explored: SIM_STATE.scenarios_explored.length,
+    branches_practiced: SIM_STATE.branch_history.length,
+  });
 
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
@@ -2604,6 +2700,9 @@ async function showSimulationPaywall(lastScenario) {
 
   enableInput('Ask me anything…');
   awaitFreeText(handlePostPaywallText);
+  // Hide the persistent back toolbar since simulation is over
+  const simBackTb = $('sim-back-toolbar');
+  if (simBackTb) simBackTb.style.display = 'none';
 }
 
 // ── Path A connection: after obstacle step → start simulation ──
