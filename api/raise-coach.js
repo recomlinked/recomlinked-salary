@@ -269,6 +269,8 @@ module.exports = async function handler(req, res) {
   // ── Mode discrimination ─────────────────────────────────
   // NUDGE mode:      explicit { mode: 'nudge', exchange, user_answer, ... }
   // DISCOVERY mode:  explicit { mode: 'discovery', blocker, timing, message, history }
+  // SIMULATE_OPENINGS: generates 3 opening lines from user context
+  // SIMULATE_RESPONSES: generates 3 manager scenarios with replies
   // PAID mode:       { token, message }
   // FREE mode:       { profile, message } (no token)
   if (body.mode === 'nudge') {
@@ -276,6 +278,12 @@ module.exports = async function handler(req, res) {
   }
   if (body.mode === 'discovery') {
     return handleDiscoveryMode(body, res);
+  }
+  if (body.mode === 'simulate_openings') {
+    return handleSimulateOpenings(body, res);
+  }
+  if (body.mode === 'simulate_responses') {
+    return handleSimulateResponses(body, res);
   }
   const isFreeMode = !body.token && !!body.profile;
   if (isFreeMode) {
@@ -680,6 +688,119 @@ async function handleDiscoveryMode(body, res) {
       reply: fallback,
       mode: 'discovery',
       message_number: msgNum,
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE OPENINGS — generate 3 personalized openers   ══
+// ════════════════════════════════════════════════════════════
+async function handleSimulateOpenings(body, res) {
+  const { context, blocker } = body;
+  const role = context?.role || 'professional';
+  const evidence = context?.evidence_label || 'strong performance';
+  const timing = context?.timing || 'upcoming';
+  const company = context?.company_situation || 'stable';
+  const lastRaise = context?.last_raise || 'unknown';
+  const blockerLabel = blocker?.label || '';
+
+  const prompt = `Generate 3 opening lines for a salary negotiation conversation.
+
+CONTEXT:
+- Role: ${role}
+- Strongest evidence: ${evidence}
+- Company situation: ${company}
+- Last raise: ${lastRaise}
+- Timeline: ${timing}
+- Main concern: ${blockerLabel}
+
+Generate exactly 3 opening lines with different approaches:
+1. "Direct" — states the ask clearly upfront
+2. "Collaborative" — frames it as a joint discussion about role growth
+3. "Evidence-led" — leads with data/accomplishments
+
+Each opening should be 1-2 sentences, specific to their role and situation, and should NOT mention a specific dollar amount.
+
+Respond ONLY with valid JSON, no preamble:
+{ "openings": [ { "style": "Direct", "text": "..." }, { "style": "Collaborative", "text": "..." }, { "style": "Evidence-led", "text": "..." } ] }`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({ openings: parsed.openings, mode: 'simulate_openings' });
+  } catch (err) {
+    console.error('[simulate_openings] error:', err);
+    return res.status(200).json({
+      openings: [
+        { style: 'Direct', text: `I've been thinking about my compensation. Based on my contributions and what I'm seeing in the market, I believe there's a gap we should discuss.` },
+        { style: 'Collaborative', text: `I'd like to talk about where my role is heading. My scope has grown significantly and I want to make sure we're aligned.` },
+        { style: 'Evidence-led', text: `I've done some research on market rates for my role and I'd like to walk you through what I found.` },
+      ],
+      mode: 'simulate_openings',
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE RESPONSES — 3 manager scenarios with replies  ══
+// ════════════════════════════════════════════════════════════
+async function handleSimulateResponses(body, res) {
+  const { context, blocker, opening_line } = body;
+  const role = context?.role || 'professional';
+  const evidence = context?.evidence_label || 'strong performance';
+  const company = context?.company_situation || 'stable';
+  const lastRaise = context?.last_raise || 'unknown';
+  const blockerLabel = blocker?.label || '';
+
+  const prompt = `Salary negotiation simulation. The user just opened with: "${opening_line}"
+
+CONTEXT:
+- Role: ${role}
+- Evidence: ${evidence}
+- Company: ${company}
+- Last raise: ${lastRaise}
+- Their worry: ${blockerLabel}
+
+Generate 3 realistic manager responses. For EACH, provide 2 suggested user replies.
+
+Rules:
+- Each scenario should have a different TYPE (choose the most relevant 3 from: Receptive, Pushback, Deflecting, Counter-offer, Fact-checking, Emotional)
+- Manager lines: under 30 words, realistic, specific to their industry
+- Suggested replies: under 35 words each, strategic, specific — not generic coaching advice
+- The scenarios should feel like a REAL manager talking, not a textbook
+
+Respond ONLY with valid JSON, no preamble:
+{
+  "scenarios": [
+    { "type": "Receptive", "text": "...", "replies": ["...", "..."] },
+    { "type": "Pushback", "text": "...", "replies": ["...", "..."] },
+    { "type": "Deflecting", "text": "...", "replies": ["...", "..."] }
+  ]
+}`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 600,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({ scenarios: parsed.scenarios, mode: 'simulate_responses' });
+  } catch (err) {
+    console.error('[simulate_responses] error:', err);
+    return res.status(200).json({
+      scenarios: [
+        { type: 'Receptive', text: "I appreciate you bringing this up. What did you have in mind?", replies: ["Based on my research, I believe an adjustment to reflect my current scope would be appropriate.", "I'd like to discuss what the market shows for my role and responsibilities."] },
+        { type: 'Pushback', text: "This isn't really a good time for that conversation.", replies: ["I understand. Can we schedule a specific time next week? I'd like to be thoughtful about it.", "I'd rather discuss it now while the context is fresh — it'll only take 10 minutes."] },
+        { type: 'Deflecting', text: "Let me check with HR and get back to you.", replies: ["Of course. Would it help if I put together a summary you could share with them?", "When can I expect to hear back? I want to make sure we don't miss the budget cycle."] },
+      ],
+      mode: 'simulate_responses',
     });
   }
 }
