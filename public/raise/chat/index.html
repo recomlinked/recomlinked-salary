@@ -1736,11 +1736,21 @@ function updateModeToggleUI() {
   }
 }
 
-// Insert an inline mode banner so the user sees a clear handoff between
-// "the manager-replies practice mode" and "the coach reviews how you did"
-// mode. Without this the user can be reading a long markdown reflection
-// and not realize the system has changed character on them.
+// Show a mode banner in the chat. Only ONE banner exists at a time —
+// previous banners are removed before inserting a new one. If the same
+// mode is already shown, no new banner is added.
+let currentModeBannerMode = null;
 function insertModeBanner(mode) {
+  // Remove all existing banners
+  $('messages').querySelectorAll('.mode-banner').forEach(b => b.remove());
+
+  // Don't re-insert if same mode (prevents stacking on rapid toggles)
+  if (currentModeBannerMode === mode) {
+    currentModeBannerMode = null; // allow re-inserting next time
+    return;
+  }
+  currentModeBannerMode = mode;
+
   const wrap = el('div', 'mode-banner ' + (mode === 'sim' ? 'sim' : 'coach'), '');
   if (mode === 'sim') {
     wrap.innerHTML = `
@@ -2273,7 +2283,30 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
     replies = getDefaultReplies();
   }
   hideCoachTyping();
+
+  // The initial scenario chip IS an assumption — add "try a different
+  // assumption" so the user can go back to the scenario pills
+  const backWrap = el('div', 'sim-back-wrap', '');
+  const backBtn = el('button', 'sim-back-btn', '');
+  backBtn.innerHTML = '\u2190 Try a different assumption';
+  backBtn.onclick = () => {
+    clearBranchContent();
+    if (simTapCount > 0) simTapCount--;
+    // Re-enable all scenario pills
+    $('messages').querySelectorAll('.sim-pill').forEach(p => {
+      p.disabled = false;
+      p.style.cursor = '';
+      p.classList.remove('active');
+    });
+    enableInput('Tap a scenario above or type your own\u2026');
+    scrollChatToBottom();
+    updateSimBackToolbar();
+  };
+  backWrap.appendChild(backBtn);
+  $('messages').appendChild(backWrap);
+
   renderReplyPillsFlat(replies, scenario);
+  updateSimBackToolbar();
 }
 
 // Render the manager's response as its own coach-style bubble in the flow.
@@ -2613,7 +2646,15 @@ function goBack() {
   });
 
   enableInput('Tap an option or type your own\u2026');
-  scrollChatToBottom();
+
+  // Scroll to the last visible interactive element so the user sees
+  // the pills they can now re-tap (not an empty bottom of the chat)
+  const lastPill = $('messages').querySelector('.sim-reply-pill:last-of-type, .sim-pill:last-of-type');
+  if (lastPill) {
+    lastPill.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    scrollChatToBottom();
+  }
   updateSimBackToolbar();
 }
 
