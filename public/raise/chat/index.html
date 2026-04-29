@@ -2487,6 +2487,93 @@ function routeToExchange(n) {
 /* ── PAYWALL (main) — dynamic, coach-voice                ── */
 /* ───────────────────────────────────────────────────────── */
 
+function fireEnrichment() {
+  const body = {
+    profile:      state.profile,
+    exchanges:    state.accumulated,
+    obstacle:     state.obstacle,
+    timing:       state.timing || 'exploring',
+    final_range:  state.current_range,
+    profile_hash: profileHash(),
+  };
+  try {
+    fetch(API_ENRICH, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+async function startCheckout() {
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'checkout_started', {
+        product: 'raise', value: 39, currency: 'USD', transport_type: 'beacon',
+        final_floor: (state && state.current_range) ? state.current_range.floor : null,
+        final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
+        obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'checkout_started');
+      window.clarity('event', 'checkout_started');
+    }
+  } catch (e) {}
+
+  logSession('checkout', { paywall_action: 'checkout_started' });
+
+  if (!document.getElementById('rl-spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'rl-spin-style';
+    s.textContent = '@keyframes rl-spin{to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
+  }
+
+  const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
+
+  const allCtas = document.querySelectorAll('.btn-pay');
+  allCtas.forEach(el => {
+    if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
+    el.insertAdjacentHTML('beforeend', spinner);
+    el.style.pointerEvents = 'none';
+    el.setAttribute('disabled', 'true');
+  });
+
+  try {
+    const params = new URLSearchParams(location.search);
+    const refSource = params.get('ref') || state.profile.refSource || '';
+    const res = await fetch(API_CHECKOUT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile_hash: profileHash(),
+        profile: state.profile,
+        final_range: state.current_range,
+        obstacle: state.obstacle,
+        refSource,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.url) throw new Error('No checkout URL');
+    window.location.href = data.url;
+  } catch (err) {
+    document.querySelectorAll('.btn-pay').forEach(el => {
+      if (el.dataset.origHtml) {
+        el.innerHTML = el.dataset.origHtml;
+        delete el.dataset.origHtml;
+      } else {
+        el.querySelectorAll('.rl-cta-spinner').forEach(s => s.remove());
+      }
+      el.style.pointerEvents = '';
+      el.removeAttribute('disabled');
+    });
+    showErrorBubble("Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.", null);
+  }
+}
+
 async function showPaywall() {
   clearChips();
   disableInput('Or ask me anything…');
