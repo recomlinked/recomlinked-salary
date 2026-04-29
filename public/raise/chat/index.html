@@ -42,8 +42,14 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .chat-wrap{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding:8px 16px 16px;display:flex;flex-direction:column;
+  transition:background 0.4s ease;
 }
 .chat-wrap::-webkit-scrollbar{display:none;}
+/* Simulation mode: subtle green-tinted background so the environment
+   feels distinct from coaching mode. Mirrors the green accent of the
+   Simulation toggle pill in the toolbar. */
+body.sim-mode .chat-wrap{background:rgba(0,196,160,0.03);}
+body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 
 /* ── Coach message ─────────────────────────────────────── */
 .coach-msg{display:flex;flex-direction:column;gap:4px;padding:14px 0;animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);}
@@ -153,7 +159,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   background:var(--navy);color:#fff;
   border-radius:14px 4px 14px 14px;
   padding:10px 14px;font-size:13px;line-height:1.5;max-width:82%;
-  word-wrap:break-word;
+  word-wrap:break-word;white-space:pre-line;
 }
 
 /* ── Coach typing indicator (FA arc pattern) ────────────── */
@@ -1027,15 +1033,19 @@ async function typeCoachBubble(text, opts) {
 
   const textEl = wrap.querySelector('.typed-text');
   const cursorEl = wrap.querySelector('.cursor');
-  const t = text || '';
-  for (let i = 1; i <= t.length; i++) {
-    textEl.textContent = t.slice(0, i);
-    const ch = t[i-1];
+  // Strip **bold** markers for the typing animation so asterisks don't
+  // flash on screen. We'll render them as <strong> after typing finishes.
+  const plain = (text || '').replace(/\*\*([^*]+?)\*\*/g, '$1');
+  for (let i = 1; i <= plain.length; i++) {
+    textEl.textContent = plain.slice(0, i);
+    const ch = plain[i-1];
     const delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
     if (i % 30 === 0) scrollChatToBottom();
     await sleep(delay);
   }
   if (cursorEl) cursorEl.remove();
+  // Now render **bold** as <strong> for the final display
+  textEl.innerHTML = inlineBold(escapeHtml(text || ''));
   scrollChatToBottom();
 
   if (!opts.skipLog) logEntry('coach_bubble', { text });
@@ -1045,10 +1055,16 @@ async function typeCoachBubble(text, opts) {
 // Non-animated coach bubble — used by rehydrate so refresh is instant.
 function insertCoachBubble(text) {
   const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(text)}</p></div>`;
+  wrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(text))}</p></div>`;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
   return wrap;
+}
+
+// Convert **bold** markers to <strong> tags. Must be called on
+// already-escaped HTML so user content can't inject tags.
+function inlineBold(escapedHtml) {
+  return escapedHtml.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
 }
 
 /** Type plain text into a target element char-by-char, matching the rhythm
@@ -1293,21 +1309,14 @@ const SIM_STATE = {
 // free text. Without these, tapping a context chip dropped the user into
 // a blank text input, which felt jarring next to the chip-driven sim flow.
 const CONTEXT_QUESTIONS = [
-  { key: 'role', q: "What's your role and what kind of company?", options: [
-    { value: 'ic_tech',     label: 'IC at a tech company' },
-    { value: 'manager_tech',label: 'Manager at a tech company' },
-    { value: 'ic_corp',     label: 'IC at a large corporation' },
-    { value: 'manager_corp',label: 'Manager at a large corporation' },
-    { value: 'startup',     label: 'At a startup' },
-    { value: 'agency',      label: 'At an agency or consultancy' },
-  ]},
-  { key: 'evidence', q: "What's your strongest evidence for a raise?", options: [
-    { value: 'market_data',     label: 'Market data shows I\u2019m underpaid' },
-    { value: 'scope_grew',      label: 'My scope has grown a lot' },
-    { value: 'big_wins',        label: 'I\u2019ve had clear, recent wins' },
-    { value: 'outside_offer',   label: 'I have an outside offer' },
-    { value: 'long_no_raise',   label: 'It\u2019s been too long since my last raise' },
-    { value: 'gut_feel',        label: "Honestly \u2014 just a gut feel" },
+  { key: 'role', q: "What's your job title and what kind of company do you work for? Describe it naturally \u2014 like 'Senior FP&A Manager at a mid-stage fintech'.", freeTextOnly: true },
+  { key: 'evidence', q: "What's the strongest evidence in your corner right now?", options: [
+    { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
+    { value: 'competing_offer',    label: 'I have a competing offer' },
+    { value: 'actively_recruited', label: "I'm being actively recruited" },
+    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
+    { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
+    { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
   ]},
   { key: 'company_situation', q: "Is your company growing, stable, or cutting costs?", options: [
     { value: 'growing',    label: 'Growing fast' },
@@ -1362,7 +1371,7 @@ function updateContextBadge() {
 function updateTreeBadge() {
   const badge = $('tree-badge');
   if (badge && SIM_STATE.scenarios_total > 0) {
-    badge.textContent = SIM_STATE.scenarios_explored.length + '/' + SIM_STATE.scenarios_total;
+    badge.textContent = SIM_STATE.scenarios_explored.length + '/\u221e';
     badge.style.display = '';
   }
 }
@@ -1397,22 +1406,28 @@ function askContextQuestion(q) {
     logSession('context_added', { key: q.key, kind });
     await sleep(200);
     await typeCoachBubble("Got it \u2014 I'll factor that into the scenarios.");
-    // Restore prior handler & placeholder so the user can continue the
-    // simulation flow (or whatever was active) with the right behaviour.
     if (priorHandler) {
       enableInput(priorPlaceholder || 'Type your answer\u2026');
       awaitFreeText(priorHandler);
     }
   };
 
+  // Free-text-only questions (like role): no chips, just input.
+  // Matches Path A's "describe it naturally" pattern.
+  if (q.freeTextOnly) {
+    enableInput('Describe your role\u2026');
+    $('chat-input')?.focus();
+    awaitFreeText(async (text) => {
+      if (!text || text.trim().length < 2) return;
+      appendUserBubble(text);
+      await finish(text, 'freetext');
+    });
+    return;
+  }
+
   const chips = (q.options || []).map(o => ({ value: o.value, label: o.label }));
   chips.push({ value: '__free__', label: '+ Something else\u2026', isFreeText: true });
 
-  // While the chips are showing, the input also accepts the answer —
-  // typing & submitting is equivalent to picking the "+ Something else…"
-  // chip. Without this, a user who types into the active input would
-  // trigger whatever prior handler was armed (e.g. custom-scenario gen),
-  // which would be the wrong behaviour.
   enableInput('Type your answer or tap a chip\u2026');
   awaitFreeText(async (text) => {
     if (!text || text.trim().length < 2) return;
@@ -1552,7 +1567,7 @@ function toggleTreePanel() {
       const ue = document.createElement('div');
       ue.className = 'tree-item';
       ue.style.paddingLeft = '16px';
-      ue.innerHTML = `<div class="tree-dot unexplored"></div><span class="tree-label" style="color:var(--t3);">${unexplored} unexplored scenario${unexplored > 1 ? 's' : ''}</span>`;
+      ue.innerHTML = `<div class="tree-dot unexplored"></div><span class="tree-label" style="color:var(--t3);">Many more scenarios to explore</span>`;
       tree.appendChild(ue);
     }
 
@@ -1561,7 +1576,7 @@ function toggleTreePanel() {
     // Count
     const count = document.createElement('div');
     count.className = 'tree-count';
-    count.textContent = `${SIM_STATE.scenarios_explored.length} of ${SIM_STATE.scenarios_total} explored`;
+    count.textContent = `${SIM_STATE.scenarios_explored.length} explored \u2014 dozens more available in the full plan`;
     panel.appendChild(count);
 
     // Export button
@@ -1675,11 +1690,13 @@ function updateModeToggleUI() {
     simBtn.setAttribute('aria-selected', 'true');
     coachBtn.classList.remove('active');
     coachBtn.setAttribute('aria-selected', 'false');
+    document.body.classList.add('sim-mode');
   } else {
     coachBtn.classList.add('active');
     coachBtn.setAttribute('aria-selected', 'true');
     simBtn.classList.remove('active');
     simBtn.setAttribute('aria-selected', 'false');
+    document.body.classList.remove('sim-mode');
   }
 }
 
@@ -1881,20 +1898,20 @@ const BLOCKER_MAP = {
 };
 
 const ACK_MESSAGES = {
-  underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that you're framing it as a feeling when it needs to be framed as a business case. Those are two completely different conversations.",
-  quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's learning to name your contributions in language your manager already uses to justify budgets.",
-  timing:         "Timing matters more than most people think — but not in the way you'd expect. The best moment isn't when you feel ready. It's when your manager has the budget authority, the political capital, and a recent reminder of your value. Those three things rarely line up by accident. You have to engineer the moment.",
-  no_advocate:    "When your manager doesn't advocate for you, most people try harder to impress them. That almost never works. What works is making your ask so well-structured that your manager can take it upstairs without doing any extra work.",
-  unknown_amount: "Here's why most people get stuck on the number: they think they need to find the 'right' one. There is no right number. There's a number that's high enough to matter and defensible enough that your manager can't dismiss it.",
-  no_script:      "The first sentence of a raise conversation determines whether your manager listens as an ally or defends as a gatekeeper. Most people open with 'I'd like to discuss my compensation' — which immediately puts the manager on guard. The best openers don't mention money at all.",
-  fear_no:        "Here's what nobody tells you about hearing 'no': it's almost never a real no. It's 'not right now,' or 'I need a reason to say yes,' or 'help me justify this.' The people who get raises aren't the ones who avoid 'no' — they're the ones who know what to say after it.",
-  prior_no:       "Getting a no last time actually gives you an advantage most people don't see. You now know exactly what didn't work, and you have a built-in opening: 'Last time we talked about this, you mentioned X. Here's what's changed since then.'",
-  putting_off:    "Procrastinating on asking for a raise isn't about laziness or fear — it's about not having a clear first step. When the whole conversation feels like one giant thing you need to do, of course you put it off.",
-  pushy:          "The fear of seeming pushy comes from imagining the conversation as a demand. But the best raise conversations don't feel like asking at all — they feel like solving a problem together. Your manager doesn't want to lose you.",
-  relationship:   "Worrying about the relationship means you understand something most people miss: the relationship IS the negotiation. A well-framed ask actually strengthens trust. Your manager would rather hear from you directly than find out you're interviewing elsewhere.",
-  budget:         "When a manager says 'there's no budget,' they're almost never telling you the full story. What they're really saying is 'I don't have a strong enough reason to go find budget.'",
-  justify:        "The mistake most people make when justifying a raise is listing everything they've done. Managers don't give raises for past work — they give raises to keep people who will deliver future value.",
-  other:          "Every raise situation has a specific blocker, even if it's hard to name. Let's find yours.",
+  underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that **you're framing it as a feeling when it needs to be framed as a business case.** Those are two completely different conversations.",
+  quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's **learning to name your contributions in language your manager already uses to justify budgets.**",
+  timing:         "Timing matters more than most people think — but not in the way you'd expect. The best moment isn't when you feel ready. It's when your manager has **the budget authority, the political capital, and a recent reminder of your value.** Those three things rarely line up by accident.",
+  no_advocate:    "When your manager doesn't advocate for you, most people try harder to impress them. That almost never works. What works is **making your ask so well-structured that your manager can take it upstairs without doing any extra work.**",
+  unknown_amount: "Here's why most people get stuck on the number: they think they need to find the 'right' one. **There is no right number.** There's a number that's high enough to matter and defensible enough that your manager can't dismiss it.",
+  no_script:      "The first sentence of a raise conversation determines whether your manager listens as an ally or defends as a gatekeeper. Most people open with 'I'd like to discuss my compensation' — which immediately puts the manager on guard. **The best openers don't mention money at all.**",
+  fear_no:        "Here's what nobody tells you about hearing 'no': **it's almost never a real no.** It's 'not right now,' or 'I need a reason to say yes,' or 'help me justify this.' The people who get raises aren't the ones who avoid 'no' — they're the ones who know what to say after it.",
+  prior_no:       "Getting a no last time actually gives you **an advantage most people don't see.** You now know exactly what didn't work, and you have a built-in opening: 'Last time we talked about this, you mentioned X. Here's what's changed since then.'",
+  putting_off:    "Procrastinating on asking for a raise isn't about laziness or fear — it's about **not having a clear first step.** When the whole conversation feels like one giant thing you need to do, of course you put it off.",
+  pushy:          "The fear of seeming pushy comes from imagining the conversation as a demand. But **the best raise conversations don't feel like asking at all** — they feel like solving a problem together. Your manager doesn't want to lose you.",
+  relationship:   "Worrying about the relationship means you understand something most people miss: **the relationship IS the negotiation.** A well-framed ask actually strengthens trust. Your manager would rather hear from you directly than find out you're interviewing elsewhere.",
+  budget:         "When a manager says 'there's no budget,' they're almost never telling you the full story. What they're really saying is **'I don't have a strong enough reason to go find budget.'**",
+  justify:        "The mistake most people make when justifying a raise is listing everything they've done. **Managers don't give raises for past work — they give raises to keep people who will deliver future value.**",
+  other:          "Every raise situation has a specific blocker, even if it's hard to name. **Let's find yours.**",
 };
 
 // ── Path B: Chip click → coach insight → timing → simulation at blocker ──
@@ -2139,7 +2156,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   // Step 1: user-bubble showing the picked direction (so the dialog
   // reads naturally — "you chose this; here's what plays out")
-  appendUserBubble('My manager\u2019s response theme: \u201c' + scenario.type + '\u201d');
+  appendUserBubble('My manager\u2019s response theme:\n\u201c' + scenario.type + '\u201d');
   await sleep(200);
 
   // Step 2: thinking indicator while we fetch reply options + render
@@ -2214,12 +2231,19 @@ function renderReplyPillsFlat(replies, scenario) {
   // this handler armed means the user can choose either path freely.
   const submitCustomReply = async (text) => {
     if (!text || text.trim().length < 2) return;
-    appendUserBubble(text);
+    appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
     disableInput('');
     logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
     SIM_STATE.branch_history.push({ scenario: scenario.type, reply: text });
+    const conversationsDone = SIM_STATE.branch_history.length;
     await sleep(500);
-    showSimulationPaywall(scenario);
+    if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+      showSimulationPaywall(scenario);
+    } else {
+      const remaining = SIM_FREE_CONVERSATIONS - conversationsDone;
+      await typeCoachBubble('Good instinct. Try another direction \u2014 ' + remaining + ' more before we wrap up the free preview.');
+      enableInput('Tap a scenario above or type your own\u2026');
+    }
   };
 
   replies.forEach((r, i) => {
@@ -2247,28 +2271,44 @@ function renderReplyPillsFlat(replies, scenario) {
   awaitFreeText(submitCustomReply);
 }
 
+// How many full conversations (scenario → reply) before paywall fires.
+// Previously this was 1 (instant paywall after first reply). User feedback
+// says 4 is better — lets them experience enough value to convert.
+const SIM_FREE_CONVERSATIONS = 4;
+
 // User picked a reply pill: show their full reply as a user bubble,
-// then proceed to the paywall after a beat.
+// then either return to scenario chips or hit paywall.
 function pickReply(reply, pill, container, scenario) {
-  // Lock the row so the user can't double-pick mid-animation
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
     p.disabled = true;
     p.style.cursor = 'default';
   });
 
-  appendUserBubble('I\u2019d respond: \u201c' + reply.text + '\u201d');
+  appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
   scrollChatToBottom();
 
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
 
-  setTimeout(() => showSimulationPaywall(scenario), 800);
+  const conversationsDone = SIM_STATE.branch_history.length;
+
+  if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+    setTimeout(() => showSimulationPaywall(scenario), 800);
+  } else {
+    // Still under limit — coach acknowledges and sends them back to try
+    // another scenario. The scenario chips are already on-screen above.
+    setTimeout(async () => {
+      const remaining = SIM_FREE_CONVERSATIONS - conversationsDone;
+      await typeCoachBubble('Good instinct. Try another direction \u2014 ' + remaining + ' more before we wrap up the free preview.');
+      enableInput('Tap a scenario above or type your own\u2026');
+    }, 600);
+  }
 }
 
 // ── Paywall after 1 level of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  await typeCoachBubble("That's one branch. In the full version, you can explore every scenario — and practice until every response feels natural.");
+  await typeCoachBubble("That's one branch. In the full version, you can **explore every scenario** — and practice until every response feels natural.");
   await sleep(300);
 
   state.obstacle = SIM_STATE.blocker;
