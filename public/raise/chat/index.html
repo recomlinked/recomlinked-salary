@@ -2729,9 +2729,11 @@ async function showSimulationPaywall(lastScenario) {
 
   state.obstacle = SIM_STATE.blocker;
   state.timing = SIM_STATE.timing;
-  state.current_exchange = 5;
-  state.current_range = { floor: 45, ceiling: 70 };
-  state.initial_floor = 45;
+  // Don't overwrite current_exchange — keep it at 10 (simulation mode)
+  // so refresh resumes the simulation transcript correctly.
+  // Set current_range for the paywall bubble rendering.
+  state.current_range = state.current_range || { floor: 45, ceiling: 70 };
+  state.initial_floor = state.initial_floor || 45;
 
   logSession('paywall', {
     paywall_seen: true,
@@ -2800,7 +2802,7 @@ function showHeaderPurchaseButton() {
   const btn = document.createElement('button');
   btn.id = 'header-buy-btn';
   btn.className = 'header-buy-btn';
-  btn.innerHTML = 'Get plan · $' + PRICE_USD;
+  btn.innerHTML = 'Get full plan';
   btn.onclick = startCheckout;
   right.appendChild(btn);
 }
@@ -2984,25 +2986,33 @@ async function resumeFromState() {
   // Resume interaction based on cursor
   const where = state.current_exchange;
   if (where === 10) {
-    // Path B simulation — replay transcript then restart the simulation
-    // from the blocker. The chat_log replay above restores the visible
-    // messages; we just need to re-enter the simulation flow.
+    // Path B simulation
     const reason = state.sim_reason || 'other';
     const blocker = BLOCKER_MAP[reason] || BLOCKER_MAP.other;
     SIM_STATE.blocker = blocker;
     SIM_STATE.context = {};
     SIM_STATE.branch_history = [];
     simTapCount = 0;
-    // Don't call beginSimulationFlow (it clears chat_log). Instead,
-    // re-enter at the simulation-at-blocker step which shows the
-    // toolbar, mode toggle, and scenario chips.
-    startSimulationAtBlocker();
+
+    if (state.paywall_shown) {
+      // Paywall already shown — don't re-enter simulation. Just show
+      // header CTA and enable coaching input.
+      showToolbar();
+      showModeToggle();
+      showHeaderPurchaseButton();
+      enableInput('Ask me anything…');
+      awaitFreeText(handlePostPaywallText);
+    } else {
+      // Still in free preview — re-enter simulation
+      startSimulationAtBlocker();
+    }
   } else if (where === 1)      beginExchange1();
   else if (where === 2) beginExchange2();
   else if (where === 3) beginTimeframeQuestion();
   else if (where === 4) beginObstacle();
   else if (where === 5) {
     // Paywall state — ensure chips + post-paywall input wiring is live
+      showHeaderPurchaseButton();
       enableInput('Ask me anything…');
     awaitFreeText(handlePostPaywallText);
   } else {
@@ -3481,7 +3491,7 @@ async function startCheckout() {
 
   const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
 
-  const allCtas = document.querySelectorAll('.btn-pay');
+  const allCtas = document.querySelectorAll('.btn-pay, .header-buy-btn');
   allCtas.forEach(el => {
     if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
     el.insertAdjacentHTML('beforeend', spinner);
@@ -3508,7 +3518,7 @@ async function startCheckout() {
     if (!data.url) throw new Error('No checkout URL');
     window.location.href = data.url;
   } catch (err) {
-    document.querySelectorAll('.btn-pay').forEach(el => {
+    document.querySelectorAll('.btn-pay, .header-buy-btn').forEach(el => {
       if (el.dataset.origHtml) {
         el.innerHTML = el.dataset.origHtml;
         delete el.dataset.origHtml;
