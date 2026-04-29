@@ -2114,14 +2114,16 @@ let simBranchAnchor = null;
 
 function clearBranchContent() {
   if (!simBranchAnchor) return;
-  const msgs = $('messages');
   // Remove every sibling after the anchor
   while (simBranchAnchor.nextSibling) {
     simBranchAnchor.nextSibling.remove();
   }
-  // Reset multi-turn state
+  // Reset multi-turn state AND tap count — switching to a new branch
+  // gives the user a fresh tap budget so they get a full 4 interactions
+  // per branch, not a depleted budget from the previous one.
   simConversation = [];
   simTurnElements = [];
+  simTapCount = 0;
 }
 
 function renderScenarioLabels(scenarios) {
@@ -2290,8 +2292,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   const backBtn = el('button', 'sim-back-btn', '');
   backBtn.innerHTML = '\u2190 Try a different assumption';
   backBtn.onclick = () => {
-    clearBranchContent();
-    if (simTapCount > 0) simTapCount--;
+    clearBranchContent(); // resets simTapCount to 0
     // Re-enable all scenario pills
     $('messages').querySelectorAll('.sim-pill').forEach(p => {
       p.disabled = false;
