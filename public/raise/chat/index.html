@@ -414,6 +414,19 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   letter-spacing:0.08em;text-transform:uppercase;
   color:var(--t3);padding:2px 0 0;
 }
+/* ── Mode toggle (fixed above input) ─────────────── */
+.mode-toggle-bar{padding:0 0 6px;display:flex;justify-content:center;}
+.mode-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;border:1.5px solid var(--divider);background:var(--card);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.mode-toggle-btn:hover{border-color:var(--teal);}
+.mode-toggle-btn.active{border-color:var(--teal);background:rgba(0,196,160,0.06);}
+.mode-toggle-btn .mode-icon{color:var(--t3);transition:color 0.15s;}
+.mode-toggle-btn.active .mode-icon{color:var(--teal);}
+.mode-label{font-size:11px;font-weight:500;color:var(--t2);}
+.mode-toggle-btn.active .mode-label{color:var(--teal);}
+.mode-status{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;}
+.mode-toggle-btn .mode-status{background:var(--muted);color:var(--t3);}
+.mode-toggle-btn.active .mode-status{background:rgba(0,196,160,0.12);color:var(--teal);}
+
 /* ── Simulation mode UI ──────────────────────────── */
 .sim-banner{background:linear-gradient(135deg,rgba(0,196,160,0.06),rgba(201,168,76,0.06));border:1.5px solid rgba(0,196,160,0.2);border-radius:12px;padding:14px 16px;margin:0;}
 .sim-banner-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
@@ -489,6 +502,13 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
       <div class="chips-area-scroll" id="chips-area-scroll"></div>
     </div>
     <div class="input-bar">
+      <div class="mode-toggle-bar" id="mode-toggle-bar" style="display:none;">
+        <button class="mode-toggle-btn" id="mode-toggle-btn" onclick="toggleSimMode()">
+          <svg class="mode-icon" id="mode-icon" viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M3 7c0-1 1-3 4-3 2 0 3 1 3 2.5S9 9 7 9C5 9 3 8 3 7z" stroke="currentColor" stroke-width="1.3"/><path d="M17 7c0-1-1-3-4-3-2 0-3 1-3 2.5S11 9 13 9c2 0 4-1 4-2z" stroke="currentColor" stroke-width="1.3"/><path d="M4 13c0 0 2 4 6 4s6-4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="6.5" r="0.8" fill="currentColor"/><circle cx="13" cy="6.5" r="0.8" fill="currentColor"/></svg>
+          <span class="mode-label" id="mode-label">Scenario planning</span>
+          <span class="mode-status" id="mode-status">ON</span>
+        </button>
+      </div>
       <div class="input-row">
         <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
         <button class="send-btn" id="send-btn" disabled aria-label="Send">
@@ -1367,9 +1387,10 @@ async function discoveryStep_LastRaise() {
 async function discoveryStep_SimulationBanner() {
   // Simulation banner with working toggle
   const banner = el('div', 'coach-msg', '');
-  banner.innerHTML = `<div class="sim-banner" id="sim-banner"><div class="sim-banner-head"><span class="sim-banner-title">🎭 Practice mode</span><button class="sim-toggle" id="sim-toggle-btn" onclick="toggleSimMode()">ON</button></div><div class="sim-banner-desc">I'll play your manager now. Pick an opening line, then tap any scenario to see how the conversation unfolds.</div></div>`;
+  banner.innerHTML = `<div class="sim-banner" id="sim-banner"><div class="sim-banner-head"><span class="sim-banner-title"><svg viewBox="0 0 20 20" fill="none" width="16" height="16" style="vertical-align:-2px;margin-right:4px;"><path d="M3 7c0-1 1-3 4-3 2 0 3 1 3 2.5S9 9 7 9C5 9 3 8 3 7z" stroke="currentColor" stroke-width="1.3"/><path d="M17 7c0-1-1-3-4-3-2 0-3 1-3 2.5S11 9 13 9c2 0 4-1 4-2z" stroke="currentColor" stroke-width="1.3"/><path d="M4 13c0 0 2 4 6 4s6-4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="6.5" r="0.8" fill="currentColor"/><circle cx="13" cy="6.5" r="0.8" fill="currentColor"/></svg>Scenario planning mode</span><button class="sim-toggle" id="sim-toggle-btn" onclick="toggleSimMode()">ON</button></div><div class="sim-banner-desc">I'll play your manager now. Pick an opening line, then tap any scenario to see how the conversation unfolds.</div></div>`;
   $('messages').appendChild(banner);
   scrollChatToBottom();
+  showModeToggle();
   await sleep(400);
 
   // Generate opening lines
@@ -1612,22 +1633,33 @@ function discoveryRewindToOpenings() {
 
 // ── Toggle simulation mode on/off ──
 function toggleSimMode() {
-  const btn = $('sim-toggle-btn');
-  const banner = $('sim-banner');
-  if (!btn) return;
-  if (btn.textContent === 'ON') {
-    btn.textContent = 'OFF';
-    btn.classList.add('off');
-    // Switch to coaching mode — enable free text input
+  const bannerBtn = $('sim-toggle-btn');
+  const modeBtn = $('mode-toggle-btn');
+  const modeStatus = $('mode-status');
+  const isOn = bannerBtn && bannerBtn.textContent === 'ON';
+
+  if (isOn) {
+    // Turn OFF — switch to coaching
+    if (bannerBtn) { bannerBtn.textContent = 'OFF'; bannerBtn.classList.add('off'); }
+    if (modeBtn) modeBtn.classList.remove('active');
+    if (modeStatus) modeStatus.textContent = 'OFF';
     enableInput('Ask me anything…');
     awaitFreeText(handlePostPaywallText);
   } else {
-    btn.textContent = 'ON';
-    btn.classList.remove('off');
+    // Turn ON — switch to scenario planning
+    if (bannerBtn) { bannerBtn.textContent = 'ON'; bannerBtn.classList.remove('off'); }
+    if (modeBtn) modeBtn.classList.add('active');
+    if (modeStatus) modeStatus.textContent = 'ON';
     disableInput('');
-    // Re-show the simulation flow
-    discoveryStep_SimulationBanner();
   }
+}
+
+// Show the fixed mode toggle bar (called when simulation starts)
+function showModeToggle() {
+  const bar = $('mode-toggle-bar');
+  const btn = $('mode-toggle-btn');
+  if (bar) bar.style.display = '';
+  if (btn) btn.classList.add('active');
 }
 
 // ── Paywall after 1 level of simulation ──
