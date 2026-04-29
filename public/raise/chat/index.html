@@ -1944,6 +1944,21 @@ async function init() {
 
   const saved = loadState();
   const profile = loadProfile();
+  state.profile = profile;
+
+  // Staleness check — if state is older than STALE_AFTER_MS, discard
+  if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
+    try { localStorage.removeItem(LS_STATE); } catch (e) {}
+  } else if (saved && saved.profile && saved.current_exchange > 0) {
+    Object.assign(state, saved);
+    if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
+      state.exchange_messages = { 1: [], 2: [] };
+    }
+    if (!Array.isArray(state.exchange_messages[1])) state.exchange_messages[1] = [];
+    if (!Array.isArray(state.exchange_messages[2])) state.exchange_messages[2] = [];
+    await resumeFromState();
+    return;
+  }
 
   const minDelay = sleep(2800);
 
