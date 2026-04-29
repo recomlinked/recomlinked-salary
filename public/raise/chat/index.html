@@ -2335,23 +2335,30 @@ async function runExchangeCall(exchangeNum, answer) {
 
   let result;
   try {
+    const payload = {
+      exchange:              exchangeNum,
+      answer,
+      messages,
+      profile:               state.profile,
+      profile_hash:          profileHash(),
+      current_range:         state.current_range,
+      initial_floor:         state.initial_floor,
+      accumulated_exchanges: state.accumulated,
+    };
+    console.log('[exchange] sending:', exchangeNum, 'answer:', typeof answer, 'profile:', !!state.profile, 'range:', !!state.current_range);
     const res = await fetch(API_EXCHANGE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        exchange:              exchangeNum,
-        answer,                                    // chip values + Ex3/Ex4 legacy
-        messages,                                  // Ex1/Ex2 conversation history
-        profile:               state.profile,
-        profile_hash:          profileHash(),
-        current_range:         state.current_range,
-        initial_floor:         state.initial_floor,
-        accumulated_exchanges: state.accumulated,
-      }),
+      body: JSON.stringify(payload),
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      let errMsg = 'HTTP ' + res.status;
+      try { const errData = await res.json(); errMsg += ': ' + (errData.error || ''); } catch(e) {}
+      throw new Error(errMsg);
+    }
     result = await res.json();
   } catch (err) {
+    console.error('[exchange] call failed:', err.message);
     hideCoachTyping();
     showErrorBubble(
       "Something failed reaching your coach. Try again?",
