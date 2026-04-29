@@ -294,6 +294,9 @@ module.exports = async function handler(req, res) {
   if (body.mode === 'simulate_custom_scenario') {
     return handleSimulateCustomScenario(body, res);
   }
+  if (body.mode === 'simulate_followup') {
+    return handleSimulateFollowup(body, res);
+  }
   if (body.mode === 'coach_reflection') {
     return handleCoachReflection(body, res);
   }
@@ -920,6 +923,57 @@ JSON only:
   } catch (err) {
     console.error('[simulate_custom_scenario] error:', err);
     return res.status(200).json({ scenario: { type: theme, text: `"I understand your concern, but let me explain where we stand on this."` }, mode: 'simulate_custom_scenario' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE FOLLOWUP — manager responds to user's reply    ══
+// ════════════════════════════════════════════════════════════
+// Multi-turn simulation: after the user picks a reply, the manager
+// reacts to it. Returns the manager's follow-up text + new reply
+// options for the user. This creates a real back-and-forth tree.
+async function handleSimulateFollowup(body, res) {
+  const { conversation_history, blocker, context } = body;
+  const role = context?.role || '';
+  const history = (conversation_history || [])
+    .map(t => `${t.role === 'manager' ? 'Manager' : 'You'}: "${t.text}"`)
+    .join('\n');
+
+  const prompt = `You're simulating a salary negotiation conversation. The employee's concern: "${blocker?.label || 'asking for a raise'}"
+${role ? `Their role: ${role}` : ''}
+
+Conversation so far:
+${history}
+
+Generate the manager's NEXT response to what the employee just said (1-2 sentences, realistic, in character — react specifically to their last statement, don't just give a generic response).
+
+Then generate 4-5 possible reply options the employee could use next. For each:
+- "theme": short plain-English label (3-6 words, first person, like "Ask for specifics", "Stand my ground")
+- "text": full response (1-2 sentences)
+
+JSON only:
+{ "manager_response": "...", "replies": [ { "theme": "...", "text": "..." }, ... ] }`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({
+      manager_response: parsed.manager_response,
+      replies: parsed.replies,
+      mode: 'simulate_followup',
+    });
+  } catch (err) {
+    console.error('[simulate_followup] error:', err);
+    return res.status(200).json({
+      manager_response: "I hear what you're saying. Let me think about how we can approach this.",
+      replies: null,
+      mode: 'simulate_followup',
+    });
   }
 }
 
