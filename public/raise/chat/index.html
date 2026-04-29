@@ -1240,6 +1240,10 @@ function disableInput(placeholder) {
   const input = $('chat-input');
   input.disabled = true;
   if (placeholder) input.placeholder = placeholder;
+  // Clear any partially-typed text — prevents leftover input from being
+  // submitted against a different handler when the input is re-enabled
+  // by a later step (e.g. typed scenario theme submitted as a reply).
+  input.value = '';
   $('send-btn').disabled = true;
 }
 
@@ -1283,14 +1287,63 @@ const SIM_STATE = {
 };
 
 // ── Optional context questions ──
+// Each question carries a small set of predefined options so tapping a
+// context chip in the toolbar panel feels the same as Path A's exchange
+// chips: question → tappable options → optional "+ Something else…" for
+// free text. Without these, tapping a context chip dropped the user into
+// a blank text input, which felt jarring next to the chip-driven sim flow.
 const CONTEXT_QUESTIONS = [
-  { key: 'role',              q: "What's your role and what kind of company?" },
-  { key: 'evidence',          q: "What's your strongest evidence for a raise?" },
-  { key: 'company_situation', q: "Is your company growing, stable, or cutting costs?" },
-  { key: 'company_size',      q: "How big is your company?" },
-  { key: 'last_raise',        q: "When was your last raise?" },
-  { key: 'manager_type',      q: "What's your manager like — supportive, distant, by-the-book?" },
-  { key: 'target_number',     q: "Do you have a specific number in mind?" },
+  { key: 'role', q: "What's your role and what kind of company?", options: [
+    { value: 'ic_tech',     label: 'IC at a tech company' },
+    { value: 'manager_tech',label: 'Manager at a tech company' },
+    { value: 'ic_corp',     label: 'IC at a large corporation' },
+    { value: 'manager_corp',label: 'Manager at a large corporation' },
+    { value: 'startup',     label: 'At a startup' },
+    { value: 'agency',      label: 'At an agency or consultancy' },
+  ]},
+  { key: 'evidence', q: "What's your strongest evidence for a raise?", options: [
+    { value: 'market_data',     label: 'Market data shows I\u2019m underpaid' },
+    { value: 'scope_grew',      label: 'My scope has grown a lot' },
+    { value: 'big_wins',        label: 'I\u2019ve had clear, recent wins' },
+    { value: 'outside_offer',   label: 'I have an outside offer' },
+    { value: 'long_no_raise',   label: 'It\u2019s been too long since my last raise' },
+    { value: 'gut_feel',        label: "Honestly \u2014 just a gut feel" },
+  ]},
+  { key: 'company_situation', q: "Is your company growing, stable, or cutting costs?", options: [
+    { value: 'growing',    label: 'Growing fast' },
+    { value: 'stable',     label: 'Stable' },
+    { value: 'cautious',   label: 'Cautious / hiring frozen' },
+    { value: 'cutting',    label: 'Actively cutting costs' },
+    { value: 'unsure',     label: 'Not sure' },
+  ]},
+  { key: 'company_size', q: "How big is your company?", options: [
+    { value: 'lt_50',       label: 'Under 50' },
+    { value: '50_250',      label: '50\u2013250' },
+    { value: '250_1000',    label: '250\u20131,000' },
+    { value: '1000_plus',   label: '1,000+' },
+  ]},
+  { key: 'last_raise', q: "When was your last raise?", options: [
+    { value: 'lt_6mo',      label: 'In the last 6 months' },
+    { value: '6_12mo',      label: '6\u201312 months ago' },
+    { value: '1_2yr',       label: '1\u20132 years ago' },
+    { value: 'gt_2yr',      label: 'More than 2 years ago' },
+    { value: 'never',       label: "I've never had one here" },
+  ]},
+  { key: 'manager_type', q: "What's your manager like \u2014 supportive, distant, by-the-book?", options: [
+    { value: 'supportive',  label: 'Supportive, advocates for me' },
+    { value: 'neutral',     label: 'Neutral \u2014 fair but not pushing' },
+    { value: 'distant',     label: 'Distant or hands-off' },
+    { value: 'by_book',     label: 'By-the-book, follows process' },
+    { value: 'tough',       label: 'Tough, tends to push back' },
+  ]},
+  { key: 'target_number', q: "Do you have a specific number in mind?", options: [
+    { value: 'lt_5',        label: 'Under 5%' },
+    { value: '5_10',        label: '5\u201310%' },
+    { value: '10_15',       label: '10\u201315%' },
+    { value: '15_20',       label: '15\u201320%' },
+    { value: 'gt_20',       label: '20%+' },
+    { value: 'no_idea',     label: "I don't know yet" },
+  ]},
 ];
 
 function getUnansweredContextCount() {
@@ -1322,6 +1375,69 @@ function showToolbar() {
 
 // ── Context panel ──
 let ctxPanelOpen = false;
+
+// Render a context question's predefined options as user-side chips, with
+// a "+ Something else…" free-text escape. Saves the picked value into
+// SIM_STATE.context[key] and follows up with a brief coach acknowledgment.
+// Pattern matches Path A's exchange chips so context questions feel like
+// the same kind of step.
+//
+// We save the previous pendingSubmitHandler before overriding it, so that
+// after answering a context question the user returns to whatever flow
+// they were in (e.g. simulation chips with "type your own scenario"
+// armed) — without this, typing into the input post-context could get
+// silently dropped.
+function askContextQuestion(q) {
+  const priorHandler = pendingSubmitHandler;
+  const priorPlaceholder = $('chat-input')?.placeholder || '';
+
+  const finish = async (savedValue, kind) => {
+    SIM_STATE.context[q.key] = savedValue;
+    updateContextBadge();
+    logSession('context_added', { key: q.key, kind });
+    await sleep(200);
+    await typeCoachBubble("Got it \u2014 I'll factor that into the scenarios.");
+    // Restore prior handler & placeholder so the user can continue the
+    // simulation flow (or whatever was active) with the right behaviour.
+    if (priorHandler) {
+      enableInput(priorPlaceholder || 'Type your answer\u2026');
+      awaitFreeText(priorHandler);
+    }
+  };
+
+  const chips = (q.options || []).map(o => ({ value: o.value, label: o.label }));
+  chips.push({ value: '__free__', label: '+ Something else\u2026', isFreeText: true });
+
+  // While the chips are showing, the input also accepts the answer —
+  // typing & submitting is equivalent to picking the "+ Something else…"
+  // chip. Without this, a user who types into the active input would
+  // trigger whatever prior handler was armed (e.g. custom-scenario gen),
+  // which would be the wrong behaviour.
+  enableInput('Type your answer or tap a chip\u2026');
+  awaitFreeText(async (text) => {
+    if (!text || text.trim().length < 2) return;
+    appendUserBubble(text);
+    fadeOutChips();
+    await finish(text, 'freetext');
+  });
+
+  renderUserChips(chips, async (c, _btn) => {
+    fadeOutChips();
+
+    if (c.isFreeText) {
+      enableInput('Type your answer\u2026');
+      awaitFreeText(async (text) => {
+        if (!text || text.trim().length < 2) return;
+        appendUserBubble(text);
+        await finish(text, 'freetext');
+      });
+    } else {
+      appendUserBubble(c.label);
+      await finish(c.label, 'chip');
+    }
+  });
+}
+
 function toggleContextPanel() {
   const area = $('chips-area');
   if (!area) return;
@@ -1355,19 +1471,11 @@ function toggleContextPanel() {
       ctxPanelOpen = false;
       area.innerHTML = '';
       if (btn) btn.classList.remove('active');
-      updateContextBadge();
-      // Coach asks this question
+      // Coach asks the question, then offers tappable options.
+      // Free-text fallback ("+ Something else…") is one of the chips so
+      // the user can still type when none of the canned options fit.
       typeCoachBubble(q.q).then(() => {
-        enableInput('Type your answer…');
-        awaitFreeText(async (text) => {
-          if (!text || text.trim().length < 2) return;
-          appendUserBubble(text);
-          disableInput('');
-          SIM_STATE.context[q.key] = text;
-          updateContextBadge();
-          logSession('context_added', { key: q.key });
-          await typeCoachBubble("Got it — I'll factor that into the scenarios.");
-        });
+        askContextQuestion(q);
       });
     };
     panel.appendChild(chip);
@@ -1885,33 +1993,33 @@ async function startSimulationAtBlocker() {
 function getDefaultScenarios(blockerCode) {
   const defaults = {
     budget: [
-      { type: 'Budget freeze', text: "Budgets are locked until next quarter. My hands are tied right now." },
-      { type: 'Not your cycle', text: "Your review isn't until September. Let's revisit it then." },
-      { type: 'Need justification', text: "I'd need something concrete to take to finance. What do you have?" },
-      { type: 'Team-wide', text: "It's not just you — nobody's getting raises right now." },
-      { type: 'Deflecting to HR', text: "Compensation is really HR's domain. I'd suggest talking to them." },
+      { type: '"No budget right now"', text: "Budgets are locked until next quarter. My hands are tied right now." },
+      { type: '"Wait for your review"', text: "Your review isn't until September. Let's revisit it then." },
+      { type: '"Show me the numbers"', text: "I'd need something concrete to take to finance. What do you have?" },
+      { type: '"Nobody is getting raises"', text: "It's not just you — nobody's getting raises right now." },
+      { type: '"Talk to HR about that"', text: "Compensation is really HR's domain. I'd suggest talking to them." },
     ],
     fear_no: [
-      { type: 'Flat no', text: "I don't think we can do that right now." },
-      { type: 'Need to think', text: "Let me think about it and get back to you." },
-      { type: 'Why now?', text: "Why are you bringing this up now?" },
-      { type: 'Counter-question', text: "What makes you think you deserve more?" },
-      { type: 'Redirect', text: "Let's focus on your goals for next quarter first." },
+      { type: '"No, not now"', text: "I don't think we can do that right now." },
+      { type: '"Let me think about it"', text: "Let me think about it and get back to you." },
+      { type: '"Why bring this up now?"', text: "Why are you bringing this up now?" },
+      { type: '"Why do you deserve more?"', text: "What makes you think you deserve more?" },
+      { type: '"Let\u2019s focus on goals first"', text: "Let's focus on your goals for next quarter first." },
     ],
     underpaid: [
-      { type: 'Show me proof', text: "What data are you basing that on?" },
-      { type: 'Dismissive', text: "Everyone thinks they're underpaid." },
-      { type: 'Curious', text: "Walk me through what you've found." },
-      { type: 'Defensive', text: "We pay competitively for this market." },
-      { type: 'Redirect', text: "Let's talk about your career path instead." },
+      { type: '"What\u2019s your proof?"', text: "What data are you basing that on?" },
+      { type: '"Everyone feels that way"', text: "Everyone thinks they're underpaid." },
+      { type: '"Walk me through it"', text: "Walk me through what you've found." },
+      { type: '"We pay fairly here"', text: "We pay competitively for this market." },
+      { type: '"Let\u2019s talk career path"', text: "Let's talk about your career path instead." },
     ],
   };
   return defaults[blockerCode] || [
-    { type: 'Receptive', text: "I appreciate you bringing this up. Tell me more about what you're thinking." },
-    { type: 'Pushback', text: "This isn't really a good time for that conversation." },
-    { type: 'Deflecting', text: "Let me think about it and get back to you." },
-    { type: 'Challenging', text: "What specifically makes you think you deserve more?" },
-    { type: 'Stalling', text: "Let's revisit this at your next review." },
+    { type: '"Tell me more"', text: "I appreciate you bringing this up. Tell me more about what you're thinking." },
+    { type: '"Now isn\u2019t a good time"', text: "This isn't really a good time for that conversation." },
+    { type: '"Let me think about it"', text: "Let me think about it and get back to you." },
+    { type: '"Why do you deserve more?"', text: "What specifically makes you think you deserve more?" },
+    { type: '"Let\u2019s revisit at review"', text: "Let's revisit this at your next review." },
   ];
 }
 
@@ -1929,6 +2037,47 @@ function renderScenarioLabels(scenarios) {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
+  // Handler shared by the "+ Something else…" pill AND the input box.
+  // Both paths feed user-supplied theme text into the same custom-scenario
+  // generation flow, so typing into the input is exactly equivalent to
+  // tapping the custom pill.
+  const submitCustomScenario = async (text) => {
+    if (!text || text.trim().length < 2) return;
+    appendUserBubble(text);
+    disableInput('Generating scenario\u2026');
+    showCoachTyping();
+    try {
+      const res = await fetch('/api/raise-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'simulate_custom_scenario',
+          theme: text,
+          blocker: SIM_STATE.blocker,
+          context: SIM_STATE.context,
+          session_id: profileHash(),
+        }),
+      });
+      const data = await res.json();
+      hideCoachTyping();
+      if (data.scenario) {
+        const newScenario = data.scenario;
+        const newPill = el('button', 'sim-pill', '');
+        newPill.textContent = newScenario.type;
+        row.insertBefore(newPill, custom);
+        newPill.onclick = () => expandScenario(newScenario, scenarios.length, newPill, row, wrap, scenarios);
+        expandScenario(newScenario, scenarios.length, newPill, row, wrap, [...scenarios, newScenario]);
+        scenarios.push(newScenario);
+      }
+    } catch (err) {
+      hideCoachTyping();
+      insertCoachBubble("I couldn't generate that scenario. Try tapping one of the options above.");
+      // Re-arm so the user can try again
+      enableInput('Tap a scenario or type your own\u2026');
+      awaitFreeText(submitCustomScenario);
+    }
+  };
+
   scenarios.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
     pill.textContent = s.type;
@@ -1937,53 +2086,27 @@ function renderScenarioLabels(scenarios) {
     row.appendChild(pill);
   });
 
-  // "Something else" pill — user-defined scenario theme
+  // "Something else" pill — user-defined scenario theme. Tapping this is
+  // a shortcut hint that the input accepts free text; either path runs
+  // the same submitCustomScenario handler.
   const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = '+ Something else\u2026';
   custom.onclick = () => {
-    enableInput('What would your manager say? (a few words)');
-    awaitFreeText(async (text) => {
-      if (!text || text.trim().length < 2) return;
-      appendUserBubble(text);
-      disableInput('Generating scenario\u2026');
-      // Thinking indicator — without it the chat looks idle while we
-      // wait on the API to materialize the custom scenario.
-      showCoachTyping();
-      try {
-        const res = await fetch('/api/raise-coach', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mode: 'simulate_custom_scenario',
-            theme: text,
-            blocker: SIM_STATE.blocker,
-            context: SIM_STATE.context,
-            session_id: profileHash(),
-          }),
-        });
-        const data = await res.json();
-        hideCoachTyping();
-        if (data.scenario) {
-          const newScenario = data.scenario;
-          const newPill = el('button', 'sim-pill', '');
-          newPill.textContent = newScenario.type;
-          row.insertBefore(newPill, custom);
-          expandScenario(newScenario, scenarios.length, newPill, row, wrap, [...scenarios, newScenario]);
-          scenarios.push(newScenario);
-        }
-      } catch (err) {
-        hideCoachTyping();
-        insertCoachBubble("I couldn't generate that scenario. Try tapping one of the options above.");
-      }
-      disableInput('Tap a scenario above\u2026');
-    });
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
   };
   row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
-  disableInput('Tap a scenario above\u2026');
   scrollChatToBottom();
+
+  // Keep the input ACTIVE here. Earlier the input was disabled with
+  // "Tap a scenario above…" which was confusing because there's also a
+  // free-text option. Now: input is active, hint mentions both paths,
+  // text submission feeds the custom-scenario flow.
+  enableInput('Tap a scenario above or type your own\u2026');
+  awaitFreeText(submitCustomScenario);
 
   logSession('sim_scenarios_shown', { count: scenarios.length, blocker: SIM_STATE.blocker.code });
 }
@@ -2016,7 +2139,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   // Step 1: user-bubble showing the picked direction (so the dialog
   // reads naturally — "you chose this; here's what plays out")
-  appendUserBubble(scenario.type);
+  appendUserBubble('My manager\u2019s response theme: \u201c' + scenario.type + '\u201d');
   await sleep(200);
 
   // Step 2: thinking indicator while we fetch reply options + render
@@ -2069,10 +2192,10 @@ function renderManagerBubble(scenario) {
 
 function getDefaultReplies() {
   return [
-    { theme: 'Show data', text: "I've done some research on market rates for my role — can I share what I found?" },
-    { theme: 'Acknowledge + redirect', text: "I understand the constraints. Can we at least discuss what would need to change for this to work?" },
-    { theme: 'Ask for timeline', text: "When would be a better time? I'd like to put something specific on the calendar." },
-    { theme: 'Stand firm', text: "I hear you, but I've been here for X years and my scope has grown significantly. I think it's worth discussing now." },
+    { theme: 'Share my market research', text: "I've done some research on market rates for my role — can I share what I found?" },
+    { theme: 'Ask what it would take', text: "I understand the constraints. Can we at least discuss what would need to change for this to work?" },
+    { theme: 'Pin down a timeline', text: "When would be a better time? I'd like to put something specific on the calendar." },
+    { theme: 'Push back firmly', text: "I hear you, but I've been here for X years and my scope has grown significantly. I think it's worth discussing now." },
   ];
 }
 
@@ -2086,6 +2209,19 @@ function renderReplyPillsFlat(replies, scenario) {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
+  // Shared handler: typing into the input is equivalent to picking the
+  // "+ I'd say something else…" pill. Keeping the input enabled with
+  // this handler armed means the user can choose either path freely.
+  const submitCustomReply = async (text) => {
+    if (!text || text.trim().length < 2) return;
+    appendUserBubble(text);
+    disableInput('');
+    logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
+    SIM_STATE.branch_history.push({ scenario: scenario.type, reply: text });
+    await sleep(500);
+    showSimulationPaywall(scenario);
+  };
+
   replies.forEach((r, i) => {
     const pill = el('button', 'sim-reply-pill', '');
     pill.textContent = r.theme;
@@ -2096,23 +2232,19 @@ function renderReplyPillsFlat(replies, scenario) {
   const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
   custom.textContent = "+ I'd say something else\u2026";
   custom.onclick = () => {
-    enableInput('How would you respond? (a few words)');
-    awaitFreeText(async (text) => {
-      if (!text || text.trim().length < 2) return;
-      appendUserBubble(text);
-      disableInput('');
-      logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
-      // Track for tree (use the user's text as the reply theme)
-      SIM_STATE.branch_history.push({ scenario: scenario.type, reply: text });
-      await sleep(500);
-      showSimulationPaywall(scenario);
-    });
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
   };
   row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
   scrollChatToBottom();
+
+  // Input stays active here — user can tap a reply pill OR type their
+  // own response. Both paths converge on showSimulationPaywall().
+  enableInput('Tap a reply or type your own\u2026');
+  awaitFreeText(submitCustomReply);
 }
 
 // User picked a reply pill: show their full reply as a user bubble,
@@ -2125,7 +2257,7 @@ function pickReply(reply, pill, container, scenario) {
     p.style.cursor = 'default';
   });
 
-  appendUserBubble(`"${reply.text}"`);
+  appendUserBubble('I\u2019d respond: \u201c' + reply.text + '\u201d');
   scrollChatToBottom();
 
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
