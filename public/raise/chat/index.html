@@ -205,48 +205,31 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
    Sits between the middle coach line and the closing paragraph. Green-accented
    to signal positive change from base range. Includes 3 mechanism lines
    that explain WHY the uplift is real (not a bare claim). */
-.uplift-panel{
-  margin:12px 0;
-  background:rgba(0,196,160,0.06);
-  border:1px solid rgba(0,196,160,0.22);
-  border-radius:10px;
-  padding:12px 14px;
+.paywall-guarantee{
+  font-size:12px;font-weight:600;color:var(--teal);
+  margin:10px 0 8px;line-height:1.5;
 }
-.uplift-head{
-  display:flex;align-items:baseline;gap:8px;
-  margin-bottom:8px;flex-wrap:wrap;
+.paywall-pitch{
+  font-size:12.5px;color:rgba(255,255,255,0.72);
+  line-height:1.6;margin:0 0 12px;
 }
-.uplift-label{
-  font-size:10px;font-weight:800;letter-spacing:0.08em;
-  text-transform:uppercase;color:var(--teal);
+.paywall-includes{
+  margin:0 0 14px;padding:0;
 }
-.uplift-range{
-  font-size:18px;font-weight:800;color:var(--teal);
-  letter-spacing:-0.5px;
+.paywall-inc-item{
+  font-size:12.5px;color:rgba(255,255,255,0.75);line-height:1.55;
+  padding:4px 0;
 }
-.uplift-delta{
-  font-size:11px;color:rgba(0,196,160,0.72);font-weight:600;
-}
-.uplift-mechanisms{
-  list-style:none;padding:0;margin:4px 0 0;
-}
-.uplift-mechanisms li{
-  font-size:12px;color:rgba(255,255,255,0.72);line-height:1.55;
-  padding:3px 0 3px 16px;position:relative;
-}
-.uplift-mechanisms li::before{
-  content:'+';position:absolute;left:0;top:2px;
-  color:var(--teal);font-weight:800;font-size:13px;
-}
-.uplift-mechanisms li strong{color:#fff;font-weight:700;}
+.paywall-inc-item:last-child{border-bottom:none;}
 
 /* ── Proof line — rotating single-line claim below CTA.
    Bolds a key phrase (usually the dollar figure or the value statement) to
    anchor the cost-vs-reward asymmetry. Only one shows per card; rotation
    happens on each render. */
 .proof-line{
-  margin-top:8px;text-align:center;
-  font-size:11.5px;color:rgba(201,168,76,0.75);line-height:1.5;
+  margin-top:10px;text-align:center;
+  font-size:12px;color:var(--gold);line-height:1.5;font-weight:700;
+  min-height:18px;
 }
 .proof-line strong{color:var(--gold);font-weight:700;}
 
@@ -425,45 +408,66 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .mode-btn.coach .mode-btn-coach{display:block;}
 .mode-btn.coach{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.06);}
 
-/* ── Simulation mode UI ──────────────────────────── */
-.sim-banner{background:linear-gradient(135deg,rgba(0,196,160,0.06),rgba(201,168,76,0.06));border:1.5px solid rgba(0,196,160,0.2);border-radius:12px;padding:14px 16px;margin:0;}
-.sim-banner-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.sim-banner-title{font-size:13px;font-weight:600;color:var(--teal);}
-.sim-toggle{font-size:10px;padding:3px 10px;border-radius:8px;border:1px solid rgba(0,196,160,0.3);background:rgba(0,196,160,0.08);color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
-.sim-toggle:hover{background:rgba(0,196,160,0.15);}
-.sim-toggle.off{border-color:var(--divider);background:var(--muted);color:var(--t3);}
-.sim-banner-desc{font-size:12px;color:var(--t2);line-height:1.5;}
 
-.sim-card{background:var(--card);border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;position:relative;}
-.sim-card::after{content:'Tap to explore →';position:absolute;bottom:8px;right:12px;font-size:9px;color:var(--t3);opacity:0.6;font-weight:500;transition:opacity 0.15s;}
-.sim-card:hover{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.03);}
-.sim-card:hover::after{opacity:1;color:var(--gold);}
-.sim-card:active{transform:scale(0.99);}
-.sim-card.selected{border-color:var(--gold);background:rgba(201,168,76,0.04);cursor:default;}
-.sim-card.selected::after{display:none;}
-.sim-card.faded{opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;}
-.sim-card-label{font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;}
-.sim-card-text{font-size:13px;color:var(--t1);line-height:1.5;}
+/* ── Input toolbar (context + tree icons above input) ── */
+.input-toolbar{display:flex;gap:6px;padding:0 0 6px;justify-content:flex-start;}
+.toolbar-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:16px;border:1px solid var(--divider);background:var(--card);cursor:pointer;font-family:var(--sans);color:var(--t3);transition:all 0.15s;position:relative;}
+.toolbar-btn:hover{border-color:var(--teal);color:var(--teal);}
+.toolbar-btn.active{border-color:var(--teal);background:rgba(0,196,160,0.06);color:var(--teal);}
+.toolbar-badge{font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;background:var(--gold);color:#fff;min-width:14px;text-align:center;}
+.toolbar-btn.done .toolbar-badge{background:var(--teal);}
 
-.sim-replies{margin-top:8px;padding-left:14px;border-left:2px solid rgba(0,196,160,0.2);animation:msgIn 0.3s ease;}
-.sim-replies-label{font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--teal);margin-bottom:8px;opacity:0.7;}
-.sim-reply{background:rgba(0,196,160,0.04);border:1.5px solid rgba(0,196,160,0.15);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.5;color:var(--t1);cursor:pointer;margin-bottom:6px;transition:all 0.15s;}
-.sim-reply:hover{border-color:rgba(0,196,160,0.35);background:rgba(0,196,160,0.08);}
-.sim-reply.selected{border-color:var(--gold);background:rgba(201,168,76,0.04);cursor:default;}
+/* ── Context panel (slides up above toolbar) ── */
+.ctx-panel{background:var(--card);border:0.5px solid var(--divider);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;animation:msgIn 0.3s ease;}
+.ctx-panel-title{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:8px;}
+.ctx-chip{display:inline-block;background:var(--muted);border:1px solid var(--divider);border-radius:16px;padding:5px 12px;font-size:12px;color:var(--t1);cursor:pointer;margin:0 4px 4px 0;font-family:var(--sans);transition:all 0.15s;}
+.ctx-chip:hover{border-color:var(--teal);color:var(--teal);}
+.ctx-chip.answered{opacity:0.4;text-decoration:line-through;pointer-events:none;}
 
-.sim-rewind{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);cursor:pointer;padding:6px 0;border:none;background:none;font-family:var(--sans);opacity:0.6;transition:opacity 0.15s;}
-.sim-rewind:hover{opacity:1;}
+/* ── Tree panel ── */
+.tree-panel{background:var(--card);border:0.5px solid var(--divider);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;animation:msgIn 0.3s ease;}
+.tree-panel-title{font-size:11px;font-weight:500;color:var(--t2);margin-bottom:6px;}
+.tree-item{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12px;}
+.tree-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.tree-dot.explored{background:var(--teal);}
+.tree-dot.unexplored{background:var(--divider);}
+.tree-label{color:var(--t2);}
+.tree-label.explored{color:var(--t1);}
+.tree-count{font-size:11px;color:var(--t3);margin-top:6px;padding-top:6px;border-top:0.5px solid var(--divider);}
+.tree-export-btn{display:block;width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--divider);background:var(--card);color:var(--t2);font-size:12px;font-weight:500;font-family:var(--sans);cursor:pointer;transition:all 0.15s;}
+.tree-export-btn:hover{border-color:var(--teal);color:var(--teal);}
 
-.sim-own{background:transparent;border:1.5px dashed var(--divider);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:center;transition:all 0.15s;}
-.sim-own:hover{border-color:var(--t3);}
-.sim-own-text{font-size:12px;color:var(--t3);}
+/* ── Mode toggle (inside input row) ── */
+.mode-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--divider);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;color:var(--t3);}
+.mode-btn:hover{border-color:var(--teal);color:var(--teal);}
+.mode-btn.sim-active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
+.mode-btn.coach-active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
+.mode-btn.locked{opacity:0.5;cursor:default;}
+.mode-btn .mode-btn-coach{display:none;}
+.mode-btn.coach-active .mode-btn-icon{display:none;}
+.mode-btn.coach-active .mode-btn-coach{display:block;}
 
-.color-receptive{color:#0a8a6a;}
-.color-pushback{color:#c04040;}
-.color-deflecting{color:#b08a20;}
-.color-counter{color:#5070b0;}
-.color-factcheck{color:#8a7020;}
-.color-emotional{color:#b06030;}
+/* ── Simulation pills ─────────────────────────── */
+.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.sim-pill:hover{border-color:var(--teal);color:var(--teal);}
+.sim-pill:active{transform:scale(0.97);}
+.sim-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
+.sim-pill-custom{border-style:dashed;color:var(--t3);}
+.sim-pill-custom:hover{border-color:var(--gold);color:var(--gold);}
+
+.sim-expanded{margin-top:12px;padding:12px 14px;background:var(--card);border:0.5px solid var(--divider);border-radius:var(--radius);animation:msgIn 0.3s ease;}
+.sim-mgr-text{font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:10px;}
+.sim-mgr-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
+.sim-reply-header{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px;padding-top:8px;border-top:0.5px solid var(--divider);}
+
+.sim-reply-pill{background:var(--card);border:1.5px solid rgba(0,196,160,0.2);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.sim-reply-pill:hover{border-color:var(--teal);background:rgba(0,196,160,0.06);}
+.sim-reply-pill:active{transform:scale(0.97);}
+.sim-reply-pill.active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
+
+.sim-reply-text{font-size:13px;color:var(--t1);line-height:1.6;margin-top:10px;padding:10px 12px;background:rgba(0,196,160,0.04);border-radius:8px;border-left:3px solid var(--teal);}
+.sim-you-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
+
 </style>
 </head>
 
@@ -504,8 +508,18 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
       <div class="chips-area-scroll" id="chips-area-scroll"></div>
     </div>
     <div class="input-bar">
+      <div class="input-toolbar" id="input-toolbar" style="display:none;">
+        <button class="toolbar-btn" id="ctx-btn" onclick="toggleContextPanel()" title="Add context for better scenarios">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 7h6M7 10h4M7 13h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span class="toolbar-badge" id="ctx-badge">4</span>
+        </button>
+        <button class="toolbar-btn" id="tree-btn" onclick="toggleTreePanel()" title="View explored scenarios">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M10 6v3M10 9L5 13M10 9l5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="15" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+          <span class="toolbar-badge" id="tree-badge" style="display:none;">0/0</span>
+        </button>
+      </div>
       <div class="input-row">
-        <button class="mode-btn" id="mode-btn" onclick="toggleSimMode()" title="Switch mode" style="display:none;">
+        <button class="mode-btn" id="mode-btn" onclick="toggleSimMode()" title="Switch between coaching and scenario planning" style="display:none;">
           <svg class="mode-btn-icon" viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 7c0-1 1-3 4-3 2 0 3 1 3 2.5S9 9 7 9C5 9 3 8 3 7z" stroke="currentColor" stroke-width="1.3"/><path d="M17 7c0-1-1-3-4-3-2 0-3 1-3 2.5S11 9 13 9c2 0 4-1 4-2z" stroke="currentColor" stroke-width="1.3"/><path d="M4 13c0 0 2 4 6 4s6-4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="6.5" r="0.8" fill="currentColor"/><circle cx="13" cy="6.5" r="0.8" fill="currentColor"/></svg>
           <svg class="mode-btn-coach" viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M4 5h9v7H7.5L4 14.5V5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h8v6h-2.5L11 17v-2H8V9z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="rgba(201,168,76,0.1)"/></svg>
         </button>
@@ -619,14 +633,17 @@ const VERDICT_BY_COLOR = {
 // signals that were previously collected in the now-removed Ex3.
 // Last chip is the "type yours" free-text escape (visually distinct).
 const OBSTACLE_CHIPS = [
-  { code: 'pushy',          label: "I don't want to seem greedy or pushy" },
-  { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
+  { code: 'underpaid',      label: "I think I'm underpaid but I can't prove it" },
+  { code: 'quiet',          label: "I'm a strong performer but quiet" },
+  { code: 'fear_no',        label: "What if they say no?" },
   { code: 'budget',         label: "My manager will say there's no budget" },
-  { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
-  { code: 'justify',        label: "I'm not sure how to justify my number" },
-  { code: 'timing',         label: "Timing feels off — no review scheduled" },
-  { code: 'prior_no',       label: "I've asked before and got no / delay" },
+  { code: 'unknown_amount', label: "I don't know what number to ask for" },
+  { code: 'no_script',      label: "I don't know how to start the conversation" },
+  { code: 'timing',         label: "I'm not sure if now is the right time" },
+  { code: 'no_advocate',    label: "My manager doesn't advocate for me" },
+  { code: 'prior_no',       label: "I already asked and got nothing" },
   { code: 'putting_off',    label: "I keep putting it off" },
+  { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
   { code: 'other',          label: 'Something else…', isFreeText: true },
 ];
 
@@ -647,36 +664,6 @@ const PLAN_PREVIEW_CHIPS = [
 // that teases what's inside that section. Copy speaks like the coach answering.
 // Obstacle context can be interpolated via {obstacle_hook} — a short line
 // picked from OBSTACLE_HOOKS below based on user's obstacle.
-const SECTION_TEASES = {
-  blockers: {
-    lead: "Three things are keeping your number lower than it could be. {obstacle_hook} I can name each one and give you the fix, but they're specific to your situation — your role, your evidence, your manager's constraints. That's what the plan lays out.",
-    cta:  'Show me my 3 blockers',
-  },
-  script: {
-    lead: "The opening is 80% of the outcome. There's one sentence that reframes the conversation so your manager is no longer deciding whether to give you a raise, they're deciding how to help you get one. I'll give you that sentence plus the full 3-minute opener tailored to your range.",
-    cta:  'Get my opening script',
-  },
-  pushback: {
-    lead: "\"There's no budget.\" \"Let's revisit next cycle.\" \"I need to talk to my boss.\" Every one of these has a specific response that doesn't close the door. {obstacle_hook} The plan maps the three you're most likely to hear and the exact words for each.",
-    cta:  'Get my pushback responses',
-  },
-  timing: {
-    lead: "Timing isn't 'review day or nothing'. There are five windows in a normal year where the ask lands well, and most people only see one of them. I'll tell you which one is nearest for your situation and exactly how to set it up.",
-    cta:  'Show me my best timing',
-  },
-  email: {
-    lead: "The email that gets the meeting booked isn't the one explaining what you want. It's the one that makes it impossible to say no to a 15-minute conversation. I'll draft it for you, subject line and all, specific to your manager and your situation.",
-    cta:  'Get my ready-to-send email',
-  },
-  prep: {
-    lead: "You've got four weeks. Week 1 is intel — what they think about you, what the constraints actually are. Week 2 is positioning. Week 3 is the conversation setup. Week 4 is the ask itself. Each step is concrete, takes under an hour, and stacks.",
-    cta:  'Give me my 30-day plan',
-  },
-  roleplay: {
-    lead: "The only way to not feel rehearsed in the conversation is to actually rehearse it. I'll play your manager — real responses, real pushbacks, real silences. We practise until it feels natural. You walk in with your nervous system already familiar with the room.",
-    cta:  "Let's role-play it",
-  },
-};
 
 // Short obstacle-specific hooks inserted into section teases where {obstacle_hook}
 // appears. Keeps teases feeling personalised without generating custom copy for
@@ -702,11 +689,10 @@ const OBSTACLE_HOOKS = {
 // obstacle-specific weighting. Key phrases use <strong> for visual weight.
 // All lines frame $39 as trivial vs the dollar value or time-value of a raise.
 const PROOF_LINES = [
-  { text: `<strong>A 5% bump on a typical salary is $4,000+ in year one</strong>, and it compounds forever.`,        weight: { all: 2, justify: 2, unknown_amount: 2 } },
-  { text: `<strong>Your first raise pays this back over 60×</strong>.`,                                              weight: { all: 2 } },
-  { text: `<strong>$39 once, for a conversation that adds thousands to your year-one salary</strong>.`,              weight: { all: 2, budget: 2 } },
-  { text: `<strong>A few hours of prep, a raise that lasts years</strong>.`,                                         weight: { all: 1, timing: 2 } },
-  { text: `<strong>Your raise pays this back in week one</strong>.`,                                                 weight: { all: 2 } },
+  { text: `<strong>Your first raise pays this back over 60×.</strong>`,                                    weight: { all: 2 } },
+  { text: `<strong>$39 once, for a conversation that adds thousands to your salary.</strong>`,             weight: { all: 2 } },
+  { text: `<strong>Your raise pays this back in week one.</strong>`,                                       weight: { all: 2 } },
+  { text: `<strong>$39 once, a raise that lasts years.</strong>`,                                          weight: { all: 2 } },
 ];
 
 function pickProofLine(obstacleCode) {
@@ -1187,107 +1173,421 @@ function showErrorBubble(message, onRetry) {
 /* ───────────────────────────────────────────────────────── */
 
 // ═══════════════════════════════════════════════════════════════
-// ══ DISCOVERY FLOW — chip-click path from landing page       ══
 // ═══════════════════════════════════════════════════════════════
-// When a user clicks a blocker chip on the landing page, they arrive
-// here WITHOUT a profile (no assessment). The coach acknowledges their
-// blocker, asks timing, then runs 2 coaching-by-questions exchanges
-// using the discovery mode in raise-coach.js. Paywall appears after.
-//
-// Flow: blocker acknowledged → timing tap → coach question (blocker-specific)
-//       → user types → coach blind-spot question → user types → coach mirrors
-//       → paywall
+// ══ SIMULATION FLOW — V2                                     ══
+// ═══════════════════════════════════════════════════════════════
 
-const DISCOVERY_STATE = {
-  blocker: null,      // { code, label }
-  timing: null,       // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
-  history: [],        // conversation history for Claude
-  message_count: 0,   // how many user messages sent
+// ── Simulation state ──
+const SIM_STATE = {
+  blocker: null,
+  timing: null,
+  context: {},
+  branch_history: [],
+  scenarios_explored: [],
+  scenarios_total: 0,
+  simMode: true,
+  unlocked: false,
 };
 
-// Map landing page reason params to blocker codes + labels
-const REASON_TO_BLOCKER = {
-  underpaid:        { code: 'underpaid',      label: "I think I'm underpaid but I can't prove it" },
-  quiet_performer:  { code: 'quiet',          label: "I'm a strong performer but quiet" },
-  unknown_timing:   { code: 'timing',         label: "I'm not sure if now is the right time" },
-  no_advocate:      { code: 'no_advocate',    label: "My manager doesn't advocate for me" },
-  unknown_number:   { code: 'unknown_amount', label: "I don't know what number to ask for" },
-  no_script:        { code: 'no_script',      label: "I don't know how to start the conversation" },
-  fear_no:          { code: 'fear_no',        label: "What if they say no?" },
-  already_asked:    { code: 'prior_no',       label: "I already asked and got nothing" },
-  other:            { code: 'other',          label: "Something else" },
-  // Direct obstacle codes (from potential future links)
-  pushy:            { code: 'pushy',          label: "I don't want to seem greedy or pushy" },
-  relationship:     { code: 'relationship',   label: "I'm afraid of damaging the relationship" },
-  budget:           { code: 'budget',         label: "My manager will say there's no budget" },
-  unknown_amount:   { code: 'unknown_amount', label: "I don't know what number to actually ask for" },
-  justify:          { code: 'justify',        label: "I'm not sure how to justify my number" },
-  timing:           { code: 'timing',         label: "Timing feels off — no review scheduled" },
-  prior_no:         { code: 'prior_no',       label: "I've asked before and got no / delay" },
-  putting_off:      { code: 'putting_off',    label: "I keep putting it off" },
-};
+// ── Optional context questions ──
+const CONTEXT_QUESTIONS = [
+  { key: 'role',              q: "What's your role and what kind of company?" },
+  { key: 'evidence',          q: "What's your strongest evidence for a raise?" },
+  { key: 'company_situation', q: "Is your company growing, stable, or cutting costs?" },
+  { key: 'company_size',      q: "How big is your company?" },
+  { key: 'last_raise',        q: "When was your last raise?" },
+  { key: 'manager_type',      q: "What's your manager like — supportive, distant, by-the-book?" },
+  { key: 'target_number',     q: "Do you have a specific number in mind?" },
+];
 
-// Blocker-specific opening questions (matches raise-coach.js DISCOVERY_OPENERS)
-const DISCOVERY_OPENERS = {
-  underpaid:      "What makes you think you're underpaid — is it a feeling, or do you have something concrete like a job posting or a colleague's number?",
-  quiet:          "When you think about making your work more visible, what feels hardest — finding the right moment, or finding the right words?",
-  timing:         "What makes the timing feel off — nothing scheduled, or something else?",
-  no_advocate:    "When you need something from your manager, how does that usually go — do they help, or do you have to push?",
-  unknown_amount: "When you think about a number, what stops you — no data, or too many options?",
-  no_script:      "If you had to open the conversation tomorrow, what would your first sentence be — or is it completely blank?",
-  fear_no:        "When you imagine them saying no, what happens next in your head — do you have a response, or does the conversation just end?",
-  prior_no:       "When they said no last time, what reason did they give?",
-  putting_off:    "What happens in your head right before you decide 'not today'?",
-  pushy:          "When you imagine asking, what specifically feels pushy about it?",
-  relationship:   "What specifically are you afraid would change in the relationship?",
-  budget:         "Has your manager actually said 'no budget' before, or are you expecting it?",
-  justify:        "What would you say if your manager asked 'why should I pay you more' right now?",
-  other:          "Tell me what's on your mind — what's the thing that stops you when you think about asking?",
-};
+function getUnansweredContextCount() {
+  return CONTEXT_QUESTIONS.filter(q => !SIM_STATE.context[q.key]).length;
+}
 
-async function beginDiscoveryFlow(reasonParam) {
-  stopThinkingAnimation();
-  const thinkBubble = document.querySelector('.thinking-bubble');
-  if (thinkBubble) thinkBubble.remove();
-  const probCard = document.querySelector('.prob-card');
-  if (probCard) probCard.style.display = 'none';
+function updateContextBadge() {
+  const badge = $('ctx-badge');
+  const count = getUnansweredContextCount();
+  if (badge) {
+    badge.textContent = count;
+    badge.style.display = count > 0 ? '' : 'none';
+  }
+}
+
+function updateTreeBadge() {
+  const badge = $('tree-badge');
+  if (badge && SIM_STATE.scenarios_total > 0) {
+    badge.textContent = SIM_STATE.scenarios_explored.length + '/' + SIM_STATE.scenarios_total;
+    badge.style.display = '';
+  }
+}
+
+function showToolbar() {
+  const tb = $('input-toolbar');
+  if (tb) tb.style.display = '';
+  updateContextBadge();
+}
+
+// ── Context panel ──
+let ctxPanelOpen = false;
+function toggleContextPanel() {
+  const area = $('chips-area');
+  if (!area) return;
+  const btn = $('ctx-btn');
+  
+  if (ctxPanelOpen) {
+    area.innerHTML = '';
+    ctxPanelOpen = false;
+    if (btn) btn.classList.remove('active');
+    return;
+  }
+  
+  // Close tree panel if open
+  if (treePanelOpen) toggleTreePanel();
+  
+  ctxPanelOpen = true;
+  if (btn) btn.classList.add('active');
+  
+  const panel = document.createElement('div');
+  panel.className = 'ctx-panel';
+  panel.innerHTML = '<div class="ctx-panel-title">Add context for better scenarios (tap any):</div>';
+  
+  const unanswered = CONTEXT_QUESTIONS.filter(q => !SIM_STATE.context[q.key]);
+  const showing = unanswered.slice(0, 3);
+  
+  showing.forEach(q => {
+    const chip = document.createElement('span');
+    chip.className = 'ctx-chip';
+    chip.textContent = q.q;
+    chip.onclick = () => {
+      ctxPanelOpen = false;
+      area.innerHTML = '';
+      if (btn) btn.classList.remove('active');
+      updateContextBadge();
+      // Coach asks this question
+      typeCoachBubble(q.q).then(() => {
+        enableInput('Type your answer…');
+        awaitFreeText(async (text) => {
+          if (!text || text.trim().length < 2) return;
+          appendUserBubble(text);
+          disableInput('');
+          SIM_STATE.context[q.key] = text;
+          updateContextBadge();
+          logSession('context_added', { key: q.key });
+          await typeCoachBubble("Got it — I'll factor that into the scenarios.");
+        });
+      });
+    };
+    panel.appendChild(chip);
+  });
+  
+  if (unanswered.length === 0) {
+    panel.innerHTML = '<div class="ctx-panel-title">All context provided — scenarios are fully personalized.</div>';
+  }
+  
+  area.innerHTML = '';
+  area.appendChild(panel);
+}
+
+// ── Tree panel with visual tree + export ──
+let treePanelOpen = false;
+function toggleTreePanel() {
+  const area = $('chips-area');
+  if (!area) return;
+  const btn = $('tree-btn');
+  
+  if (treePanelOpen) {
+    area.innerHTML = '';
+    treePanelOpen = false;
+    if (btn) btn.classList.remove('active');
+    return;
+  }
+  
+  if (ctxPanelOpen) toggleContextPanel();
+  
+  treePanelOpen = true;
+  if (btn) btn.classList.add('active');
+  
+  const panel = document.createElement('div');
+  panel.className = 'tree-panel';
+
+  if (SIM_STATE.branch_history.length === 0 && SIM_STATE.scenarios_explored.length === 0) {
+    panel.innerHTML = '<div class="tree-panel-title">Scenario tree</div><div style="font-size:12px;color:var(--t3);padding:4px 0;">No scenarios explored yet. Tap a scenario pill above to start.</div>';
+  } else {
+    panel.innerHTML = '<div class="tree-panel-title">Your scenario tree</div>';
+
+    const tree = document.createElement('div');
+    tree.className = 'tree-view';
+
+    // Root: the blocker
+    const root = document.createElement('div');
+    root.className = 'tree-item';
+    root.innerHTML = `<div class="tree-dot explored"></div><span class="tree-label explored" style="font-weight:500;">${SIM_STATE.blocker?.label || 'Your scenario'}</span>`;
+    tree.appendChild(root);
+
+    // Explored branches with replies
+    SIM_STATE.branch_history.forEach(b => {
+      const branch = document.createElement('div');
+      branch.className = 'tree-item';
+      branch.style.paddingLeft = '16px';
+      branch.innerHTML = `<div class="tree-dot explored"></div><span class="tree-label explored">${b.scenario} \u2192 <span style="color:var(--teal)">${b.reply}</span></span>`;
+      tree.appendChild(branch);
+    });
+
+    // Explored but no reply yet
+    const repliedTypes = SIM_STATE.branch_history.map(b => b.scenario);
+    SIM_STATE.scenarios_explored.forEach(type => {
+      if (!repliedTypes.includes(type)) {
+        const item = document.createElement('div');
+        item.className = 'tree-item';
+        item.style.paddingLeft = '16px';
+        item.innerHTML = `<div class="tree-dot explored"></div><span class="tree-label explored">${type} <span style="color:var(--t3);">(viewed)</span></span>`;
+        tree.appendChild(item);
+      }
+    });
+
+    // Unexplored
+    const unexplored = SIM_STATE.scenarios_total - SIM_STATE.scenarios_explored.length;
+    if (unexplored > 0) {
+      const ue = document.createElement('div');
+      ue.className = 'tree-item';
+      ue.style.paddingLeft = '16px';
+      ue.innerHTML = `<div class="tree-dot unexplored"></div><span class="tree-label" style="color:var(--t3);">${unexplored} unexplored scenario${unexplored > 1 ? 's' : ''}</span>`;
+      tree.appendChild(ue);
+    }
+
+    panel.appendChild(tree);
+
+    // Count
+    const count = document.createElement('div');
+    count.className = 'tree-count';
+    count.textContent = `${SIM_STATE.scenarios_explored.length} of ${SIM_STATE.scenarios_total} explored`;
+    panel.appendChild(count);
+
+    // Export button
+    const exportBtn = document.createElement('button');
+    exportBtn.className = 'tree-export-btn';
+    exportBtn.textContent = 'Copy my preparation summary';
+    exportBtn.onclick = () => exportTreeSummary(exportBtn);
+    panel.appendChild(exportBtn);
+  }
+  
+  area.innerHTML = '';
+  area.appendChild(panel);
+}
+
+// ── Export tree as copyable text ──
+function exportTreeSummary(btn) {
+  const blocker = SIM_STATE.blocker?.label || 'Negotiation scenario';
+  const lines = [];
+  lines.push('SALARY NEGOTIATION \u2014 SCENARIO PLAN');
+  lines.push('===================================');
+  lines.push('');
+  lines.push('Situation: ' + blocker);
+  if (SIM_STATE.context.role) lines.push('Role: ' + SIM_STATE.context.role);
+  if (SIM_STATE.context.timing) lines.push('Timeline: ' + SIM_STATE.context.timing);
+  lines.push('');
+  lines.push('SCENARIOS PRACTICED:');
+
+  if (SIM_STATE.branch_history.length > 0) {
+    SIM_STATE.branch_history.forEach((b, i) => {
+      lines.push('');
+      lines.push(`${i + 1}. Manager says: "${b.scenario}"`);
+      lines.push(`   Your response: ${b.reply}`);
+    });
+  } else {
+    lines.push('  (none yet)');
+  }
+
+  const unexplored = SIM_STATE.scenarios_total - SIM_STATE.scenarios_explored.length;
+  if (unexplored > 0) {
+    lines.push('');
+    lines.push(`\u26a0 ${unexplored} scenario${unexplored > 1 ? 's' : ''} not yet practiced`);
+  }
+
+  lines.push('');
+  lines.push('---');
+  lines.push('Prepared with salary.recomlinked.com');
+
+  const text = lines.join('\n');
+  
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.color = 'var(--teal)';
+    btn.style.borderColor = 'var(--teal)';
+    setTimeout(() => { btn.textContent = 'Copy my preparation summary'; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:-100px;';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy my preparation summary'; }, 2000);
+  });
+
+  logSession('tree_exported', { paths: SIM_STATE.branch_history.length });
+}
+
+// ── Mode toggle ──
+function toggleSimMode() {
+  if (!SIM_STATE.unlocked) return;
+  
+  const btn = $('mode-btn');
+  if (!btn) return;
+  
+  if (SIM_STATE.simMode) {
+    SIM_STATE.simMode = false;
+    btn.classList.remove('sim-active');
+    btn.classList.add('coach-active');
+    if (SIM_STATE.branch_history.length > 0) {
+      showCoachReflection();
+    } else {
+      enableInput('Ask me anything\u2026');
+      awaitFreeText(handlePostPaywallText);
+    }
+  } else {
+    SIM_STATE.simMode = true;
+    btn.classList.add('sim-active');
+    btn.classList.remove('coach-active');
+    disableInput('Tap a scenario above\u2026');
+  }
+}
+
+function showModeToggle() {
+  const btn = $('mode-btn');
+  if (btn) {
+    btn.style.display = '';
+    btn.classList.add('sim-active');
+    btn.classList.add('locked');
+  }
+}
+
+function unlockModeToggle() {
+  const btn = $('mode-btn');
+  if (btn) btn.classList.remove('locked');
+  SIM_STATE.unlocked = true;
+}
+
+// ── Coach reflection ── reads explored paths and gives feedback ──
+async function showCoachReflection() {
   disableInput('');
+  showCoachTyping();
 
-  const blocker = REASON_TO_BLOCKER[reasonParam] || REASON_TO_BLOCKER.other;
-  DISCOVERY_STATE.blocker = blocker;
-  DISCOVERY_STATE.history = [];
-  DISCOVERY_STATE.message_count = 0;
-  DISCOVERY_STATE.context = {};
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'coach_reflection',
+        blocker: SIM_STATE.blocker,
+        context: SIM_STATE.context,
+        branch_history: SIM_STATE.branch_history,
+        explored_count: SIM_STATE.scenarios_explored.length,
+        total_count: SIM_STATE.scenarios_total,
+        session_id: profileHash(),
+      }),
+    });
+    hideCoachTyping();
+    if (res.ok) {
+      const data = await res.json();
+      if (data.reflection) {
+        await typeCoachBubble(data.reflection);
+      } else {
+        await showDefaultReflection();
+      }
+    } else {
+      await showDefaultReflection();
+    }
+  } catch (err) {
+    hideCoachTyping();
+    await showDefaultReflection();
+  }
+
+  logSession('coach_reflection', { paths_explored: SIM_STATE.scenarios_explored.length, paths_total: SIM_STATE.scenarios_total });
+  enableInput('Ask me anything\u2026');
+  awaitFreeText(handlePostPaywallText);
+}
+
+async function showDefaultReflection() {
+  const history = SIM_STATE.branch_history;
+  const explored = SIM_STATE.scenarios_explored.length;
+  const total = SIM_STATE.scenarios_total;
+  const unexplored = total - explored;
+  let msg = `Looking at what you\u2019ve practiced: you explored ${explored} of ${total} scenarios.`;
+
+  if (history.length === 1) {
+    msg += ` You chose \u201c${history[0].reply}\u201d when your manager said \u201c${history[0].scenario}.\u201d That\u2019s a solid instinct \u2014 but you haven\u2019t tested how you\u2019d handle the other ${unexplored} possibilities.`;
+  } else if (history.length >= 2) {
+    msg += ` Your responses show a pattern. Consider practicing the scenarios you skipped \u2014 those are the ones most likely to catch you off guard.`;
+  }
+
+  if (unexplored > 0) {
+    msg += ` I\u2019d suggest exploring the ${unexplored} untested scenario${unexplored > 1 ? 's' : ''} \u2014 the one you feel least prepared for is the one most worth practicing.`;
+  }
+
+  await typeCoachBubble(msg);
+}
+
+// Map landing page reason params to blocker codes + labels + scene-setting
+const BLOCKER_MAP = {
+  underpaid:        { code: 'underpaid',      label: "I think I'm underpaid but I can't prove it",       scene: "The conversation reaches compensation. Your manager says:" },
+  quiet_performer:  { code: 'quiet',          label: "I'm a strong performer but quiet",                 scene: "You've brought up your contributions. Your manager says:" },
+  unknown_timing:   { code: 'timing',         label: "I'm not sure if now is the right time",            scene: "You're thinking about bringing it up. Your manager says:" },
+  no_advocate:      { code: 'no_advocate',    label: "My manager doesn't advocate for me",               scene: "You've raised the topic. Your manager says:" },
+  unknown_number:   { code: 'unknown_amount', label: "I don't know what number to ask for",              scene: "Your manager asks what number you have in mind:" },
+  no_script:        { code: 'no_script',      label: "I don't know how to start the conversation",       scene: "The meeting starts. You need to bring up compensation. Your manager says:" },
+  fear_no:          { code: 'fear_no',        label: "What if they say no?",                             scene: "You've made your ask. Your manager responds:" },
+  already_asked:    { code: 'prior_no',       label: "I already asked and got nothing",                  scene: "You're reopening the conversation. Your manager says:" },
+  other:            { code: 'other',          label: "Something else",                                   scene: "The conversation reaches compensation. Your manager says:" },
+  pushy:            { code: 'pushy',          label: "I don't want to seem greedy or pushy",             scene: "You've brought up compensation. Your manager says:" },
+  relationship:     { code: 'relationship',   label: "I'm afraid of damaging the relationship",          scene: "You've raised the topic carefully. Your manager says:" },
+  budget:           { code: 'budget',         label: "My manager will say there's no budget",            scene: "You've made your case. Your manager says:" },
+  unknown_amount:   { code: 'unknown_amount', label: "I don't know what number to actually ask for",     scene: "Your manager asks what you're looking for:" },
+  justify:          { code: 'justify',        label: "I'm not sure how to justify my number",            scene: "Your manager asks why you deserve more:" },
+  timing:           { code: 'timing',         label: "Timing feels off — no review scheduled",           scene: "You've brought it up outside the review cycle. Your manager says:" },
+  prior_no:         { code: 'prior_no',       label: "I've asked before and got no / delay",             scene: "You're bringing it up again. Your manager says:" },
+  putting_off:      { code: 'putting_off',    label: "I keep putting it off",                            scene: "You've finally started the conversation. Your manager says:" },
+};
+
+const ACK_MESSAGES = {
+  underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that you're framing it as a feeling when it needs to be framed as a business case. Those are two completely different conversations.",
+  quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's learning to name your contributions in language your manager already uses to justify budgets.",
+  timing:         "Timing matters more than most people think — but not in the way you'd expect. The best moment isn't when you feel ready. It's when your manager has the budget authority, the political capital, and a recent reminder of your value. Those three things rarely line up by accident. You have to engineer the moment.",
+  no_advocate:    "When your manager doesn't advocate for you, most people try harder to impress them. That almost never works. What works is making your ask so well-structured that your manager can take it upstairs without doing any extra work.",
+  unknown_amount: "Here's why most people get stuck on the number: they think they need to find the 'right' one. There is no right number. There's a number that's high enough to matter and defensible enough that your manager can't dismiss it.",
+  no_script:      "The first sentence of a raise conversation determines whether your manager listens as an ally or defends as a gatekeeper. Most people open with 'I'd like to discuss my compensation' — which immediately puts the manager on guard. The best openers don't mention money at all.",
+  fear_no:        "Here's what nobody tells you about hearing 'no': it's almost never a real no. It's 'not right now,' or 'I need a reason to say yes,' or 'help me justify this.' The people who get raises aren't the ones who avoid 'no' — they're the ones who know what to say after it.",
+  prior_no:       "Getting a no last time actually gives you an advantage most people don't see. You now know exactly what didn't work, and you have a built-in opening: 'Last time we talked about this, you mentioned X. Here's what's changed since then.'",
+  putting_off:    "Procrastinating on asking for a raise isn't about laziness or fear — it's about not having a clear first step. When the whole conversation feels like one giant thing you need to do, of course you put it off.",
+  pushy:          "The fear of seeming pushy comes from imagining the conversation as a demand. But the best raise conversations don't feel like asking at all — they feel like solving a problem together. Your manager doesn't want to lose you.",
+  relationship:   "Worrying about the relationship means you understand something most people miss: the relationship IS the negotiation. A well-framed ask actually strengthens trust. Your manager would rather hear from you directly than find out you're interviewing elsewhere.",
+  budget:         "When a manager says 'there's no budget,' they're almost never telling you the full story. What they're really saying is 'I don't have a strong enough reason to go find budget.'",
+  justify:        "The mistake most people make when justifying a raise is listing everything they've done. Managers don't give raises for past work — they give raises to keep people who will deliver future value.",
+  other:          "Every raise situation has a specific blocker, even if it's hard to name. Let's find yours.",
+};
+
+// ── Path B: Chip click → coach insight → timing → simulation at blocker ──
+async function beginSimulationFlow(reasonParam) {
+  const blocker = BLOCKER_MAP[reasonParam] || BLOCKER_MAP.other;
+  SIM_STATE.blocker = blocker;
+  SIM_STATE.context = {};
+  SIM_STATE.branch_history = [];
 
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
   state.chat_log = [];
   state.current_exchange = 0;
 
-  logSession('discovery_start', { blocker_code: blocker.code, blocker_label: blocker.label, landing_ref: reasonParam });
+  logSession('sim_start', { blocker_code: blocker.code, landing_ref: reasonParam });
 
-  // ── Step 1: Coaching insight + timing ──
-  const ACK_MESSAGES = {
-    underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that you're framing it as a feeling when it needs to be framed as a business case. Those are two completely different conversations.",
-    quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's learning to name your contributions in language your manager already uses to justify budgets.",
-    timing:         "Timing matters more than most people think — but not in the way you'd expect. The best moment isn't when you feel ready. It's when your manager has the budget authority, the political capital, and a recent reminder of your value. Those three things rarely line up by accident. You have to engineer the moment.",
-    no_advocate:    "When your manager doesn't advocate for you, most people try harder to impress them. That almost never works. What works is making your ask so well-structured that your manager can take it upstairs without doing any extra work. You're not asking them to fight for you — you're handing them a case that's already won.",
-    unknown_amount: "Here's why most people get stuck on the number: they think they need to find the 'right' one. There is no right number. There's a number that's high enough to matter and defensible enough that your manager can't dismiss it. Those are two criteria, not a research project.",
-    no_script:      "The first sentence of a raise conversation determines whether your manager listens as an ally or defends as a gatekeeper. Most people open with 'I'd like to discuss my compensation' — which immediately puts the manager on guard. The best openers don't mention money at all.",
-    fear_no:        "Here's what nobody tells you about hearing 'no': it's almost never a real no. It's 'not right now,' or 'I need a reason to say yes,' or 'help me justify this.' The people who get raises aren't the ones who avoid 'no' — they're the ones who know what to say after it.",
-    prior_no:       "Getting a no last time actually gives you an advantage most people don't see. You now know exactly what didn't work, and you have a built-in opening: 'Last time we talked about this, you mentioned X. Here's what's changed since then.' That's a stronger position than asking for the first time.",
-    putting_off:    "Procrastinating on asking for a raise isn't about laziness or fear — it's about not having a clear first step. When the whole conversation feels like one giant thing you need to do, of course you put it off. The fix is breaking it into steps small enough that starting feels obvious.",
-    pushy:          "The fear of seeming pushy comes from imagining the conversation as a demand. But the best raise conversations don't feel like asking at all — they feel like solving a problem together. Your manager doesn't want to lose you. You're not demanding — you're helping them keep you.",
-    relationship:   "Worrying about the relationship means you understand something most people miss: the relationship IS the negotiation. The good news is that a well-framed ask actually strengthens trust. Your manager would rather hear from you directly than find out you're interviewing elsewhere.",
-    budget:         "When a manager says 'there's no budget,' they're almost never telling you the full story. What they're really saying is 'I don't have a strong enough reason to go find budget.' Your job isn't to accept the constraint — it's to give them the ammunition to fight for an exception.",
-    justify:        "The mistake most people make when justifying a raise is listing everything they've done. Managers don't give raises for past work — they give raises to keep people who will deliver future value. The justification that works isn't 'look what I did' — it's 'here's what you'd lose.'",
-    other:          "Every raise situation has a specific blocker, even if it's hard to name. Let's find yours.",
-  };
-
-  const ackText = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
-  await typeCoachBubble(ackText + " But first — when are you planning to have the conversation?");
+  // Step 1: Coach insight
+  const ack = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
+  await typeCoachBubble(ack + " But first — when are you planning to have the conversation?");
   await sleep(200);
 
+  // Step 2: Timing chips
   renderChips([
     { value: 'this_week',    label: 'I need to act this week' },
     { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
@@ -1296,451 +1596,355 @@ async function beginDiscoveryFlow(reasonParam) {
   ], async (c) => {
     fadeOutChips();
     appendUserBubble(c.label);
-    DISCOVERY_STATE.timing = c.value;
-    DISCOVERY_STATE.context.timing = c.value;
+    SIM_STATE.timing = c.value;
+    SIM_STATE.context.timing = c.value;
     state.timing = c.value;
-    logSession('discovery_timing', { timing: c.value });
+    logSession('sim_timing', { timing: c.value });
     await sleep(300);
-    discoveryStep_Role();
+
+    // Step 3: Go straight to simulation at blocker moment
+    startSimulationAtBlocker();
   });
 }
 
-// ── Step 2: Role (typed) ──
-async function discoveryStep_Role() {
-  await typeCoachBubble("Tell me about your role — your title and what kind of company.");
-  enableInput('e.g. Senior Marketing Coordinator at a SaaS company');
-  awaitFreeText(async (text) => {
-    if (!text || text.trim().length < 3) return;
-    appendUserBubble(text);
-    disableInput('');
-    DISCOVERY_STATE.context.role = text;
-    logSession('discovery_ex1', { role: text });
-    await sleep(300);
-    discoveryStep_Evidence();
-  });
-}
+// ── Start simulation at the specific blocker moment ──
+async function startSimulationAtBlocker() {
+  const blocker = SIM_STATE.blocker;
+  const scene = blocker.scene || "The conversation reaches compensation. Your manager says:";
 
-// ── Step 3: Evidence (chips only) ──
-async function discoveryStep_Evidence() {
-  await typeCoachBubble("What's the strongest thing in your corner right now?");
-  await sleep(150);
-  renderChips([
-    { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
-    { value: 'competing_offer',    label: 'I have a competing offer' },
-    { value: 'actively_recruited', label: "I'm being actively recruited" },
-    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
-    { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
-    { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
-  ], async (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    DISCOVERY_STATE.context.evidence = c.value;
-    DISCOVERY_STATE.context.evidence_label = c.label;
-    logSession('discovery_ex2', { evidence: c.value });
-    await sleep(300);
-    discoveryStep_CompanySituation();
-  });
-}
-
-// ── Step 4: Company situation (chips) ──
-async function discoveryStep_CompanySituation() {
-  await typeCoachBubble("How is your company doing right now?");
-  await sleep(150);
-  renderChips([
-    { value: 'growing', label: 'Growing fast — hiring, expanding, healthy revenue' },
-    { value: 'stable',  label: 'Stable — steady business, no major changes' },
-    { value: 'cutting', label: 'Cutting or restructuring — layoffs, freezes, budget cuts' },
-  ], async (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    DISCOVERY_STATE.context.company_situation = c.value;
-    state.profile.company_situation = c.value;
-    logSession('discovery_company', { company_situation: c.value });
-    await sleep(300);
-    discoveryStep_LastRaise();
-  });
-}
-
-// ── Step 5: Last raise (chips) ──
-async function discoveryStep_LastRaise() {
-  await typeCoachBubble("When was your last raise?");
-  await sleep(150);
-  renderChips([
-    { value: 'under_1_year',           label: 'Under 1 year at this job' },
-    { value: 'annual_raise_want_more', label: 'I get annual raises but want more' },
-    { value: '1_2_years',              label: '1-2 years since my last raise' },
-    { value: '2_plus_years',           label: '2+ years since my last raise' },
-    { value: 'never_asked',            label: 'Never actively asked for one' },
-  ], async (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    DISCOVERY_STATE.context.last_raise = c.value;
-    state.profile.last_raise = c.value;
-    logSession('discovery_last_raise', { last_raise: c.value });
-    await sleep(300);
-    discoveryStep_SimulationBanner();
-  });
-}
-
-// ── Step 6: Simulation mode banner + generate opening lines ──
-async function discoveryStep_SimulationBanner() {
-  // Simulation banner with working toggle
-  const banner = el('div', 'coach-msg', '');
-  banner.innerHTML = `<div class="sim-banner" id="sim-banner"><div class="sim-banner-head"><span class="sim-banner-title"><svg viewBox="0 0 20 20" fill="none" width="16" height="16" style="vertical-align:-2px;margin-right:4px;"><path d="M3 7c0-1 1-3 4-3 2 0 3 1 3 2.5S9 9 7 9C5 9 3 8 3 7z" stroke="currentColor" stroke-width="1.3"/><path d="M17 7c0-1-1-3-4-3-2 0-3 1-3 2.5S11 9 13 9c2 0 4-1 4-2z" stroke="currentColor" stroke-width="1.3"/><path d="M4 13c0 0 2 4 6 4s6-4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="6.5" r="0.8" fill="currentColor"/><circle cx="13" cy="6.5" r="0.8" fill="currentColor"/></svg>Scenario planning mode</span><button class="sim-toggle" id="sim-toggle-btn" onclick="toggleSimMode()">ON</button></div><div class="sim-banner-desc">I'll play your manager now. Pick an opening line, then <b>tap any scenario</b> to see how the conversation unfolds.</div></div>`;
-  $('messages').appendChild(banner);
-  scrollChatToBottom();
+  // Show toolbar + mode toggle
+  showToolbar();
   showModeToggle();
-  await sleep(400);
 
-  // Generate opening lines
-  disableInput('Generating your opening lines…');
+  await typeCoachBubble("Let's plan for that moment. " + scene);
+  await sleep(300);
+
+  // Generate scenario labels for this blocker
+  disableInput('Loading scenarios…');
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        mode: 'simulate_openings',
-        context: DISCOVERY_STATE.context,
-        blocker: DISCOVERY_STATE.blocker,
+        mode: 'simulate_scenarios',
+        blocker: SIM_STATE.blocker,
+        context: SIM_STATE.context,
         session_id: profileHash(),
       }),
     });
     const data = await res.json();
-    if (data.openings && data.openings.length >= 2) {
-      discoveryStep_ShowOpenings(data.openings);
+    if (data.scenarios && data.scenarios.length >= 2) {
+      renderScenarioLabels(data.scenarios);
     } else {
-      discoveryStep_ShowOpenings(discoveryDefaultOpenings());
+      renderScenarioLabels(getDefaultScenarios(blocker.code));
     }
   } catch (err) {
-    console.error('[discovery] opening gen failed:', err);
-    discoveryStep_ShowOpenings(discoveryDefaultOpenings());
+    console.error('[sim] scenario gen failed:', err);
+    renderScenarioLabels(getDefaultScenarios(blocker.code));
   }
 }
 
-function discoveryDefaultOpenings() {
-  return [
-    { style: 'Direct', text: "I've been thinking about my compensation. Based on my contributions this year and what I'm seeing in the market, I believe there's a gap we should discuss." },
-    { style: 'Collaborative', text: "I'd like to talk about where my role is heading. My scope has grown significantly and I want to make sure we're aligned on what that's worth." },
-    { style: 'Evidence-led', text: "I've done some research on market rates for my role and I'd like to walk you through what I found — and how it compares to where I am now." },
+function getDefaultScenarios(blockerCode) {
+  const defaults = {
+    budget: [
+      { type: 'Budget freeze', text: "Budgets are locked until next quarter. My hands are tied right now." },
+      { type: 'Not your cycle', text: "Your review isn't until September. Let's revisit it then." },
+      { type: 'Need justification', text: "I'd need something concrete to take to finance. What do you have?" },
+      { type: 'Team-wide', text: "It's not just you — nobody's getting raises right now." },
+      { type: 'Deflecting to HR', text: "Compensation is really HR's domain. I'd suggest talking to them." },
+    ],
+    fear_no: [
+      { type: 'Flat no', text: "I don't think we can do that right now." },
+      { type: 'Need to think', text: "Let me think about it and get back to you." },
+      { type: 'Why now?', text: "Why are you bringing this up now?" },
+      { type: 'Counter-question', text: "What makes you think you deserve more?" },
+      { type: 'Redirect', text: "Let's focus on your goals for next quarter first." },
+    ],
+    underpaid: [
+      { type: 'Show me proof', text: "What data are you basing that on?" },
+      { type: 'Dismissive', text: "Everyone thinks they're underpaid." },
+      { type: 'Curious', text: "Walk me through what you've found." },
+      { type: 'Defensive', text: "We pay competitively for this market." },
+      { type: 'Redirect', text: "Let's talk about your career path instead." },
+    ],
+  };
+  return defaults[blockerCode] || [
+    { type: 'Receptive', text: "I appreciate you bringing this up. Tell me more about what you're thinking." },
+    { type: 'Pushback', text: "This isn't really a good time for that conversation." },
+    { type: 'Deflecting', text: "Let me think about it and get back to you." },
+    { type: 'Challenging', text: "What specifically makes you think you deserve more?" },
+    { type: 'Stalling', text: "Let's revisit this at your next review." },
   ];
 }
 
-// ── Step 7: Show 3 opening lines as tappable cards ──
-async function discoveryStep_ShowOpenings(openings) {
-  await typeCoachBubble("Here are 3 ways to open the conversation. Pick the one that feels most like you:");
-  await sleep(200);
+// ── Render scenario labels as short tappable pills ──
+function renderScenarioLabels(scenarios) {
+  SIM_STATE.scenarios_total = scenarios.length;
+  updateTreeBadge();
 
-  const styleColorClass = { 'Direct': 'color-pushback', 'Collaborative': 'color-deflecting', 'Evidence-led': 'color-counter' };
-  const wrap = el('div', 'user-msg chips-msg', '');
-  wrap.id = 'opening-cards';
-  const inner = el('div', 'user-chips', '');
-  inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+  const wrap = el('div', 'coach-msg', '');
+  const inner = el('div', '', '');
+  inner.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
 
-  openings.forEach((o, i) => {
-    const card = el('div', 'sim-card', '');
-    const colorCls = styleColorClass[o.style] || 'color-deflecting';
-    card.innerHTML = `<div class="sim-card-label ${colorCls}">${o.style}</div><div class="sim-card-text">"${o.text}"</div>`;
-    card.onclick = () => {
-      Array.from(inner.children).forEach(c => {
-        if (c === card) {
-          c.classList.add('selected');
-          c.onclick = null;
-        } else {
-          c.classList.add('faded');
-        }
-      });
-      DISCOVERY_STATE.context.opening = o.text;
-      DISCOVERY_STATE.context.opening_style = o.style;
-      logSession('opening_selected', { style: o.style });
-      setTimeout(() => discoveryStep_ManagerResponses(o.text), 400);
-    };
-    inner.appendChild(card);
+  scenarios.forEach((s, i) => {
+    const pill = el('button', 'sim-pill', '');
+    pill.textContent = s.type;
+    pill.dataset.index = i;
+    pill.onclick = () => expandScenario(s, i, pill, inner, wrap, scenarios);
+    inner.appendChild(pill);
   });
 
-  // Write your own
-  const own = el('div', 'sim-own', '');
-  own.innerHTML = '<div class="sim-own-text">✎ Write my own opening</div>';
-  own.onclick = () => {
-    wrap.style.display = 'none';
-    enableInput('Type your opening line…');
+  // "Something else" pill
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
+  custom.textContent = '+ Something else…';
+  custom.onclick = () => {
+    enableInput('What would your manager say? (a few words)');
     awaitFreeText(async (text) => {
-      if (!text || text.trim().length < 5) return;
+      if (!text || text.trim().length < 2) return;
       appendUserBubble(text);
-      disableInput('');
-      DISCOVERY_STATE.context.opening = text;
-      logSession('opening_selected', { style: 'custom' });
-      await sleep(300);
-      discoveryStep_ManagerResponses(text);
+      disableInput('Generating scenario…');
+      try {
+        const res = await fetch('/api/raise-coach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'simulate_custom_scenario',
+            theme: text,
+            blocker: SIM_STATE.blocker,
+            context: SIM_STATE.context,
+            session_id: profileHash(),
+          }),
+        });
+        const data = await res.json();
+        if (data.scenario) {
+          const newScenario = data.scenario;
+          const newPill = el('button', 'sim-pill', '');
+          newPill.textContent = newScenario.type;
+          inner.insertBefore(newPill, custom);
+          expandScenario(newScenario, scenarios.length, newPill, inner, wrap, [...scenarios, newScenario]);
+          scenarios.push(newScenario);
+        }
+      } catch (err) {
+        insertCoachBubble("I couldn't generate that scenario. Try tapping one of the options above.");
+      }
+      disableInput('Tap a scenario above…');
     });
   };
-  inner.appendChild(own);
+  inner.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
+  disableInput('Tap a scenario above…');
   scrollChatToBottom();
-  currentChipsWrap = wrap;
+
+  logSession('sim_scenarios_shown', { count: scenarios.length, blocker: SIM_STATE.blocker.code });
 }
 
-// ── Step 8: Manager responds — 3 scenarios with replies ──
-async function discoveryStep_ManagerResponses(openingLine) {
-  disableInput('');
-  appendUserBubble(openingLine);
-  await sleep(300);
+// ── Expand a scenario — show full manager text + reply pills ──
+function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
+  // Remove any existing expanded content
+  parentWrap.querySelectorAll('.sim-expanded').forEach(e => e.remove());
 
-  // Show thinking
-  const typing = showCoachTyping();
+  // Highlight active pill
+  pillContainer.querySelectorAll('.sim-pill').forEach(p => {
+    p.classList.toggle('active', p === pill);
+  });
+
+  logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
+
+  // Track explored scenarios
+  if (!SIM_STATE.scenarios_explored.includes(scenario.type)) {
+    SIM_STATE.scenarios_explored.push(scenario.type);
+    updateTreeBadge();
+  }
+
+  // Create expanded section below the pills
+  const expanded = el('div', 'sim-expanded', '');
+
+  // Manager's full text
+  const mgrText = el('div', 'sim-mgr-text', '');
+  mgrText.innerHTML = `<span class="sim-mgr-label">Manager:</span> "${scenario.text}"`;
+  expanded.appendChild(mgrText);
+
+  // Separator + reply header
+  const replyHeader = el('div', 'sim-reply-header', '');
+  replyHeader.textContent = 'How would you respond?';
+  expanded.appendChild(replyHeader);
+
+  // Fetch reply options from API
+  fetchReplyOptions(scenario, expanded);
+
+  parentWrap.appendChild(expanded);
+  scrollChatToBottom();
+}
+
+async function fetchReplyOptions(scenario, expandedContainer) {
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        mode: 'simulate_responses',
-        context: DISCOVERY_STATE.context,
-        blocker: DISCOVERY_STATE.blocker,
-        opening_line: openingLine,
+        mode: 'simulate_replies',
+        manager_said: scenario.text,
+        scenario_type: scenario.type,
+        blocker: SIM_STATE.blocker,
+        context: SIM_STATE.context,
         session_id: profileHash(),
       }),
     });
     const data = await res.json();
-    hideCoachTyping();
-    const scenarios = data.scenarios && data.scenarios.length >= 2 ? data.scenarios : discoveryDefaultScenarios();
-    discoveryStep_ShowScenarios(scenarios);
+    if (data.replies && data.replies.length >= 2) {
+      renderReplyPills(data.replies, scenario, expandedContainer);
+    } else {
+      renderReplyPills(getDefaultReplies(), scenario, expandedContainer);
+    }
   } catch (err) {
-    console.error('[simulate_responses] failed:', err);
-    hideCoachTyping();
-    discoveryStep_ShowScenarios(discoveryDefaultScenarios());
+    console.error('[sim] reply gen failed:', err);
+    renderReplyPills(getDefaultReplies(), scenario, expandedContainer);
   }
 }
 
-function discoveryDefaultScenarios() {
+function getDefaultReplies() {
   return [
-    { type: 'Receptive', text: "I appreciate you bringing this up. What did you have in mind?", replies: ["Based on my research, I believe an adjustment to reflect my current scope is appropriate.", "I'd like to discuss what the market shows for my role and responsibilities."] },
-    { type: 'Pushback', text: "Everyone had a strong year. What makes your situation different?", replies: ["Two things: my scope has grown beyond my title, and the market data shows a gap for my role specifically.", "I can walk you through three specific contributions that went beyond my job description."] },
-    { type: 'Deflecting', text: "Let me think about it and get back to you.", replies: ["Of course. Can we put a specific date on the calendar — say next Friday?", "Would it help if I put together a one-page summary you could review beforehand?"] },
+    { theme: 'Show data', text: "I've done some research on market rates for my role — can I share what I found?" },
+    { theme: 'Acknowledge + redirect', text: "I understand the constraints. Can we at least discuss what would need to change for this to work?" },
+    { theme: 'Ask for timeline', text: "When would be a better time? I'd like to put something specific on the calendar." },
+    { theme: 'Stand firm', text: "I hear you, but I've been here for X years and my scope has grown significantly. I think it's worth discussing now." },
   ];
 }
 
-function discoveryStep_ShowScenarios(scenarios) {
-  // Rewind button to try different opening
-  const rewindWrap = el('div', 'coach-msg', '');
-  rewindWrap.innerHTML = '<button class="sim-rewind" onclick="discoveryRewindToOpenings()">↩ Try a different opening</button>';
-  $('messages').appendChild(rewindWrap);
+// ── Render reply pills as flat tappable section ──
+function renderReplyPills(replies, scenario, expandedContainer) {
+  const pillWrap = el('div', '', '');
+  pillWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;';
 
-  typeCoachBubble("Your manager might respond in a few ways. Tap any scenario below to see your best replies:").then(() => {
-    const typeColorClass = { Receptive:'color-receptive', Pushback:'color-pushback', Deflecting:'color-deflecting', 'Counter-offer':'color-counter', 'Fact-checking':'color-factcheck', Emotional:'color-emotional' };
-    const wrap = el('div', 'user-msg chips-msg', '');
-    wrap.id = 'scenario-cards';
-    const inner = el('div', 'user-chips', '');
-    inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+  replies.forEach((r, i) => {
+    const pill = el('button', 'sim-reply-pill', '');
+    pill.textContent = r.theme;
+    pill.onclick = () => expandReply(r, i, pill, pillWrap, scenario, expandedContainer);
+    pillWrap.appendChild(pill);
+  });
 
-    scenarios.forEach((s, i) => {
-      const card = el('div', 'sim-card', '');
-      const colorCls = typeColorClass[s.type] || 'color-deflecting';
-      card.innerHTML = `<div class="sim-card-label ${colorCls}">Scenario ${i+1} — ${s.type}</div><div class="sim-card-text">"${s.text}"</div>`;
-      card.dataset.scenarioIndex = i;
-      card.onclick = () => discoveryExpandScenario(s, i, card, inner, scenarios);
-      inner.appendChild(card);
+  // "I'd say something else" pill
+  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
+  custom.textContent = "+ I'd say something else…";
+  custom.onclick = () => {
+    enableInput('How would you respond? (a few words)');
+    awaitFreeText(async (text) => {
+      if (!text || text.trim().length < 2) return;
+      appendUserBubble(text);
+      disableInput('');
+      logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
+      // After custom reply → paywall
+      await sleep(500);
+      showSimulationPaywall(scenario);
     });
+  };
+  pillWrap.appendChild(custom);
 
-    wrap.appendChild(inner);
-    $('messages').appendChild(wrap);
-    disableInput('Tap a scenario above…');
-    scrollChatToBottom();
-  });
-}
-
-function discoveryExpandScenario(scenario, index, card, container, allScenarios) {
-  if (card.classList.contains('selected')) return;
-
-  // Remove old reply sections
-  container.querySelectorAll('.sim-replies').forEach(r => r.remove());
-
-  // Activate this, dim others
-  Array.from(container.children).forEach((c) => {
-    if (c.classList.contains('sim-replies')) return;
-    const idx = parseInt(c.dataset.scenarioIndex);
-    if (idx === index) {
-      c.classList.add('selected');
-      c.style.opacity = '1';
-    } else {
-      c.classList.remove('selected');
-      c.style.opacity = '0.3';
-    }
-  });
-
-  // Show replies
-  const repliesDiv = el('div', 'sim-replies', '');
-  repliesDiv.innerHTML = '<div class="sim-replies-label">Your best responses:</div>';
-
-  scenario.replies.forEach((reply, ri) => {
-    const btn = el('div', 'sim-reply', '');
-    btn.textContent = reply;
-    btn.onclick = () => {
-      btn.classList.add('selected');
-      btn.onclick = null;
-      repliesDiv.querySelectorAll('.sim-reply').forEach(r => {
-        if (r !== btn) r.classList.add('faded');
-      });
-      logSession('simulation_reply_tapped', { scenario: scenario.type, reply_index: ri });
-      setTimeout(() => discoveryShowPaywall(scenario, reply), 500);
-    };
-    repliesDiv.appendChild(btn);
-  });
-
-  card.insertAdjacentElement('afterend', repliesDiv);
-  scrollChatToBottom();
-
-  // Re-enable clicking other scenarios
-  Array.from(container.children).forEach((c) => {
-    if (c.classList.contains('sim-replies')) return;
-    const idx = parseInt(c.dataset.scenarioIndex);
-    if (idx !== index) {
-      c.onclick = () => {
-        Array.from(container.children).forEach(x => {
-          if (!x.classList.contains('sim-replies')) { x.classList.remove('selected'); x.style.opacity = '1'; }
-        });
-        container.querySelectorAll('.sim-replies').forEach(r => r.remove());
-        discoveryExpandScenario(allScenarios[idx], idx, c, container, allScenarios);
-      };
-    }
-  });
-}
-
-// ── Rewind to try different opening ──
-function discoveryRewindToOpenings() {
-  // Remove everything after the opening cards
-  const openingCards = $('opening-cards');
-  if (!openingCards) return;
-  // Remove all siblings after opening-cards
-  let node = openingCards.nextSibling;
-  while (node) {
-    const next = node.nextSibling;
-    node.remove();
-    node = next;
-  }
-  // Reset opening cards — show all, remove selected
-  openingCards.querySelectorAll('.sim-card').forEach(c => {
-    c.classList.remove('selected', 'faded');
-    c.style.cssText = '';
-  });
-  openingCards.querySelectorAll('.sim-own').forEach(c => {
-    c.classList.remove('faded');
-    c.style.cssText = '';
-  });
-  openingCards.style.display = '';
+  expandedContainer.appendChild(pillWrap);
   scrollChatToBottom();
 }
 
-// ── Toggle simulation mode on/off ──
-let simModeUnlocked = false;
+// ── Expand a reply — show full text, then paywall ──
+function expandReply(reply, index, pill, pillContainer, scenario, expandedContainer) {
+  // Highlight active pill
+  pillContainer.querySelectorAll('.sim-reply-pill').forEach(p => {
+    p.classList.toggle('active', p === pill);
+  });
 
-function toggleSimMode() {
-  if (!simModeUnlocked) return;
+  // Remove any existing reply text
+  expandedContainer.querySelectorAll('.sim-reply-text').forEach(e => e.remove());
 
-  const btn = $('mode-btn');
-  const bannerBtn = $('sim-toggle-btn');
-  if (!btn) return;
+  // Show full reply text
+  const replyText = el('div', 'sim-reply-text', '');
+  replyText.innerHTML = `<span class="sim-you-label">You:</span> "${reply.text}"`;
+  expandedContainer.appendChild(replyText);
+  scrollChatToBottom();
 
-  const isScenario = btn.classList.contains('active');
+  logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
 
-  if (isScenario) {
-    // Switch to coach mode
-    btn.classList.remove('active');
-    btn.classList.add('coach');
-    if (bannerBtn) { bannerBtn.textContent = 'OFF'; bannerBtn.classList.add('off'); }
-    enableInput('Ask me anything…');
-    awaitFreeText(handlePostPaywallText);
-  } else {
-    // Switch to scenario mode
-    btn.classList.add('active');
-    btn.classList.remove('coach');
-    if (bannerBtn) { bannerBtn.textContent = 'ON'; bannerBtn.classList.remove('off'); }
-    disableInput('Tap a scenario above…');
-  }
-}
+  // Track branch history for tree
+  SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
 
-function showModeToggle() {
-  const btn = $('mode-btn');
-  if (btn) {
-    btn.style.display = '';
-    btn.classList.add('active');
-    btn.classList.add('locked');
-  }
-}
-
-function unlockModeToggle() {
-  const btn = $('mode-btn');
-  if (btn) btn.classList.remove('locked');
-  simModeUnlocked = true;
+  // After seeing the reply → paywall
+  setTimeout(() => showSimulationPaywall(scenario), 800);
 }
 
 // ── Paywall after 1 level of simulation ──
-async function discoveryShowPaywall(lastScenario, lastReply) {
-  await typeCoachBubble("That's one branch. In the full version, you can explore every scenario — " + lastScenario.type.toLowerCase() + ", pushback, counter-offers — and practice until every response feels natural.");
+async function showSimulationPaywall(lastScenario) {
+  await typeCoachBubble("That's one branch. In the full version, you can explore every scenario — and practice until every response feels natural.");
   await sleep(300);
 
-  state.obstacle = DISCOVERY_STATE.blocker;
-  state.timing = DISCOVERY_STATE.timing;
+  state.obstacle = SIM_STATE.blocker;
+  state.timing = SIM_STATE.timing;
   state.current_exchange = 5;
   state.current_range = { floor: 45, ceiling: 70 };
   state.initial_floor = 45;
 
-  logSession('paywall', { paywall_seen: true, path: 'discovery_simulation' });
+  logSession('paywall', { paywall_seen: true, path: 'simulation' });
 
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
   unlockModeToggle();
 
   try {
-    if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'discovery_simulation' });
-    if (typeof window.clarity === 'function') window.clarity('event', 'discovery_simulation_paywall');
+    if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'simulation' });
+    if (typeof window.clarity === 'function') window.clarity('event', 'simulation_paywall');
   } catch (e) {}
 
-  renderPlanPreviewChips();
   enableInput('Ask me anything…');
   awaitFreeText(handlePostPaywallText);
 }
 
+// ── Path A connection: after obstacle step → start simulation ──
+async function startSimulationFromPathA() {
+  const obstacle = state.obstacle || { code: 'other', label: 'Something else' };
+  
+  // Look up full blocker info from BLOCKER_MAP (match by code)
+  let blocker = null;
+  for (const key in BLOCKER_MAP) {
+    if (BLOCKER_MAP[key].code === obstacle.code) {
+      blocker = BLOCKER_MAP[key];
+      break;
+    }
+  }
+  if (!blocker) blocker = { ...obstacle, scene: "The conversation reaches compensation. Your manager says:" };
+
+  SIM_STATE.blocker = blocker;
+  SIM_STATE.timing = state.timing;
+  SIM_STATE.context = {};
+  SIM_STATE.context.timing = state.timing || 'exploring';
+  SIM_STATE.context.company_situation = state.profile?.company_situation || '';
+  SIM_STATE.context.company_size = state.profile?.company_size || '';
+  SIM_STATE.context.last_raise = state.profile?.last_raise || '';
+  const ex1msgs = (state.exchange_messages && state.exchange_messages[1]) || [];
+  const ex2msgs = (state.exchange_messages && state.exchange_messages[2]) || [];
+  SIM_STATE.context.role = ex1msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
+  SIM_STATE.context.evidence = ex2msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
+
+  await startSimulationAtBlocker();
+}
+
 async function init() {
-  // Check for discovery path FIRST — chip click from landing page
-  // Must happen before saved-state resume, otherwise old session takes over
+  // Check for simulation path FIRST — chip click from landing page
   const params = new URLSearchParams(location.search);
   const reason = params.get('reason');
   if (reason) {
-    // Clear any old state so discovery starts fresh
     try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
-    beginDiscoveryFlow(reason);
+    stopThinkingAnimation();
+    const thinkBubble = document.querySelector('.thinking-bubble');
+    if (thinkBubble) thinkBubble.remove();
+    const probCard = document.querySelector('.prob-card');
+    if (probCard) probCard.style.display = 'none';
+    disableInput('');
+    beginSimulationFlow(reason);
     return;
   }
 
   const saved = loadState();
   const profile = loadProfile();
 
-  // Staleness check — if state is older than STALE_AFTER_MS, discard and start fresh
-  if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
-    try { localStorage.removeItem(LS_STATE); } catch (e) {}
-  } else if (saved && saved.profile && saved.current_exchange > 0) {
-    Object.assign(state, saved);
-    // Ensure exchange_messages exists after loading pre-refactor state
-    if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
-      state.exchange_messages = { 1: [], 2: [] };
-    }
-    if (!Array.isArray(state.exchange_messages[1])) state.exchange_messages[1] = [];
-    if (!Array.isArray(state.exchange_messages[2])) state.exchange_messages[2] = [];
-    await resumeFromState();
-    return;
-  }
-
-  if (!profile) {
-    window.location.replace('/raise/');
-    return;
-  }
-
-  state.profile = profile;
-  state.chat_log = [];
-  saveState();
-
-  const thinkingPromise = runThinkingAnimation();
   const minDelay = sleep(2800);
 
   let result;
@@ -1858,8 +2062,7 @@ async function resumeFromState() {
   else if (where === 4) beginObstacle();
   else if (where === 5) {
     // Paywall state — ensure chips + post-paywall input wiring is live
-    renderPlanPreviewChips();
-    enableInput('Ask me anything…');
+      enableInput('Ask me anything…');
     awaitFreeText(handlePostPaywallText);
   } else {
     beginExchange1();
@@ -1927,7 +2130,7 @@ async function beginTimeframeQuestion() {
   await sleep(150);
 
   const timeChips = [
-    { value: 'this_week',    label: 'I need to act this week · this week' },
+    { value: 'this_week',    label: 'I need to act this week' },
     { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
     { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
     { value: 'exploring',    label: "I'm just exploring · no timeline" },
@@ -2084,32 +2287,15 @@ async function runObstacleCall(answer) {
   // math — the stage-2 card (gold-bordered "Your range") is already the
   // final. Rendering another card here would be a confusing duplicate.
 
-  // Coach bridge line from Claude — acknowledges the obstacle, leads into paywall
+  // Coach bridge line from Claude — acknowledges the obstacle, leads into simulation
   if (result.coach_line) {
     await sleep(200);
     await typeCoachBubble(result.coach_line);
     await sleep(400);
   }
 
-  // Populate DISCOVERY_STATE.context from Path A data so simulation can use it
-  DISCOVERY_STATE.blocker = state.obstacle;
-  DISCOVERY_STATE.timing = state.timing;
-  DISCOVERY_STATE.context = DISCOVERY_STATE.context || {};
-  DISCOVERY_STATE.context.timing = state.timing || 'exploring';
-  DISCOVERY_STATE.context.company_situation = state.profile?.company_situation || 'stable';
-  DISCOVERY_STATE.context.last_raise = state.profile?.last_raise || '1_2_years';
-
-  // Extract role from Ex1 user messages, evidence from Ex2 user messages
-  const ex1msgs = (state.exchange_messages && state.exchange_messages[1]) || [];
-  const ex2msgs = (state.exchange_messages && state.exchange_messages[2]) || [];
-  const ex1user = ex1msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
-  const ex2user = ex2msgs.filter(m => m.role === 'user').map(m => m.text).join(' ');
-  DISCOVERY_STATE.context.role = ex1user || '';
-  DISCOVERY_STATE.context.evidence = ex2user || '';
-  DISCOVERY_STATE.context.evidence_label = ex2user || '';
-
-  // Go to simulation preview instead of static paywall
-  discoveryStep_SimulationBanner();
+  // Go to simulation
+  startSimulationFromPathA();
 }
 
 /* ── Common exchange handling (ex1-3) ────────────────────
@@ -2331,7 +2517,6 @@ async function showPaywall() {
   } catch (e) { /* non-fatal */ }
 
   // Populate plan-preview chips in the bottom panel
-  renderPlanPreviewChips();
 
   // Re-enable input so user can keep asking questions after paywall.
   // Any post-paywall text routes to handlePostPaywallText.
@@ -2345,160 +2530,31 @@ async function showPaywall() {
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
 async function renderPaywallBubble(opts) {
   opts = opts || {};
-  const r   = state.current_range || { floor: 0, ceiling: 0 };
-  const obs = state.obstacle      || { code: 'other' };
-  const role = niceRoleLabel();
-  const timing = state.timing || 'exploring';
+  const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
+  const explored = SIM_STATE.scenarios_explored?.length || 1;
 
-  // Obstacle-keyed middle paragraph. Uses Claude's coach_line if it was
-  // generated, otherwise falls back to a canonical line per obstacle code.
-  const middle = (obs.coach_line && obs.coach_line.length > 10)
-    ? obs.coach_line
-    : fallbackObstacleLine(obs.code);
+  const headline = `You've explored ${explored} of many scenarios. Every scenario you haven't tested is a conversation you're not ready for.`;
 
-  // ── Uplift computation ──────────────────────────────────
-  const UPLIFT_FLOOR = 8;
-  const UPLIFT_CEIL  = 10;
-  const upliftFloor  = Math.min(92 - 5, r.floor + UPLIFT_FLOOR);
-  const upliftCeil   = Math.min(92, r.ceiling + UPLIFT_CEIL);
-  const midDelta     = Math.round(((upliftFloor + upliftCeil) - (r.floor + r.ceiling)) / 2);
-
-  // Obstacle-specific mechanism — the 3rd bullet adapts to their worry
-  const obstacleMechanism = {
-    budget:         "A budget-deflection response that reopens the conversation instead of closing it",
-    justify:        "A justification structure that makes the number feel defensible, not ambitious",
-    timing:         "A timing window designed for your review cycle, not a generic calendar rule",
-    prior_no:       "A reopening script that handles the prior no without looking desperate",
-    unknown_amount: "A specific number anchored to your role, industry, and market position",
-    relationship:   "An approach that actually strengthens the relationship instead of straining it",
-    pushy:          "A professional framing that feels like a business conversation, not a demand",
-    putting_off:    "A step-by-step sequence that turns thinking into doing — starting today",
-    other:          "A response to your specific situation, not a generic template",
-  }[obs.code] || "A response to your specific situation, not a generic template";
-
-  // ── Dynamic headline — coach voice, based on what they NEED ──
-  const rolePrefix = role ? `${role}, ` : '';
-  const ex2data = state.accumulated?.ex2?.extracted || {};
-
-  // Build a strength + gap headline from their actual signals
-  const strengths = [];
-  const needs = [];
-
-  // Strengths from Ex2
-  if (ex2data.performance_rating === 'exceeded' || ex2data.performance_rating === 'specific_win') strengths.push('strong performance');
-  if (ex2data.external_leverage === 'competing_offer') strengths.push('a competing offer');
-  if (ex2data.external_leverage === 'actively_recruited') strengths.push('recruiter interest');
-  if (ex2data.external_leverage === 'underpaid_evidence') strengths.push('evidence you\'re underpaid');
-
-  // Needs from obstacle
-  const needsByObstacle = {
-    budget:         'a response ready for the budget objection',
-    justify:        'a way to frame your value that feels natural',
-    timing:         'clarity on when and how to open the conversation',
-    prior_no:       'a strategy to reopen after a no',
-    unknown_amount: 'a specific number you can say with confidence',
-    relationship:   'an approach that protects the relationship',
-    pushy:          'a framing that feels professional, not aggressive',
-    putting_off:    'a clear first step to stop overthinking and start acting',
-    other:          'a plan tailored to your specific situation',
-  };
-  const mainNeed = needsByObstacle[obs.code] || needsByObstacle.other;
-
-  let headline;
-  if (strengths.length > 0) {
-    headline = `${rolePrefix}you have ${strengths[0]} — but you still need ${mainNeed}. That's what your plan builds.`;
-  } else {
-    headline = `${rolePrefix}your range is ${r.floor}–${r.ceiling}%. What you need now is ${mainNeed}. That's what your plan builds.`;
-  }
-
-  // ── Uplift bullets — what the plan DOES for them, not generic deliverables ──
-  const upliftBullets = {
-    budget:         [
-      "<strong>The exact words</strong> for when they say 'there's no budget' — turns a no into a next step.",
-      "<strong>Your value framed</strong> so your manager can sell it upstairs, not just hear it.",
-      "<strong>A follow-up sequence</strong> that keeps the conversation alive without being annoying.",
-    ],
-    justify:        [
-      "<strong>Your value in one sentence</strong> — clear, specific, impossible to dismiss.",
-      "<strong>Your specific number</strong> anchored to your role so it feels earned, not invented.",
-      "<strong>The opening line</strong> that frames the ask as a business conversation, not a favour.",
-    ],
-    timing:         [
-      "<strong>The right moment</strong> mapped to your specific situation — not a generic rule.",
-      "<strong>Your opening line</strong> that makes any moment feel like the right one.",
-      "<strong>A fallback plan</strong> if they say 'not now' — so 'not now' becomes 'when.'",
-    ],
-    prior_no:       [
-      "<strong>A reopening script</strong> that references the prior conversation without sounding bitter.",
-      "<strong>New evidence framing</strong> that gives your manager a reason to say yes this time.",
-      "<strong>The exact follow-up</strong> if they hesitate again — this time you don't leave empty-handed.",
-    ],
-    unknown_amount: [
-      "<strong>Your specific number</strong> — one number, defensible, anchored to your role.",
-      "<strong>The sentence that delivers it</strong> so it lands as confident, not greedy.",
-      "<strong>Pushback responses</strong> for the three things they're most likely to say back.",
-    ],
-    relationship:   [
-      "<strong>An approach designed to strengthen</strong> the relationship, not strain it.",
-      "<strong>Language that signals respect</strong> while still making a clear, professional ask.",
-      "<strong>A safety net</strong> — what to say if the conversation gets uncomfortable.",
-    ],
-    pushy:          [
-      "<strong>A professional framing</strong> that turns 'asking for money' into 'having a business conversation.'",
-      "<strong>The exact words</strong> that feel like you — not a script that sounds rehearsed.",
-      "<strong>Confidence anchors</strong> — facts about your role that make the ask feel obvious, not bold.",
-    ],
-    putting_off:    [
-      "<strong>A step-by-step sequence</strong> — day 1 to conversation day. No ambiguity.",
-      "<strong>Your opening line written</strong> so the hardest part (starting) is already done.",
-      "<strong>A deadline that works for you</strong> — turns 'someday' into a specific date.",
-    ],
-    other:          [
-      "<strong>Your opening script</strong> written for your exact situation.",
-      "<strong>Pushback responses</strong> for the three most likely objections you'll face.",
-      "<strong>A follow-up plan</strong> so the conversation doesn't end without a next step.",
-    ],
-  };
-  const bullets = upliftBullets[obs.code] || upliftBullets.other;
-
-  const upliftHtml = `
-    <div class="uplift-panel paywall-uplift">
-      <div class="uplift-head">
-        <span class="uplift-label">With your plan</span>
-        <span class="uplift-range">${upliftFloor}–${upliftCeil}%</span>
-        <span class="uplift-delta">+${midDelta}pp on average</span>
-      </div>
-      <ul class="uplift-mechanisms">
-        <li>${bullets[0]}</li>
-        <li>${bullets[1]}</li>
-        <li>${bullets[2]}</li>
-      </ul>
-    </div>
-  `;
-
-  // ── Closing — coach voice, not a feature list ──
-  const closing = `Instantly available. Improves every time you add context.`;
-
-  // Proof line
   const proof = pickProofLine(obs.code);
 
-  // ── Build HTML — conversational style, lighter than the old dark card ──
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      ${upliftHtml}
-      <p class="paywall-closing">${escapeHtml(closing)}</p>
+      <div class="paywall-guarantee">We trust in prepared salary negotiation. If it doesn't work, we refund you.</div>
+      <div class="paywall-pitch">If you've thought through every possible response, you win the negotiation before it starts. You can explore all of them in less than an hour — just tapping through possibilities until nothing can surprise you.</div>
+      <div class="paywall-includes">
+        <div class="paywall-inc-item">+ Unlimited scenario branches — practice every possibility</div>
+        <div class="paywall-inc-item">+ Fully customized to your situation</div>
+        <div class="paywall-inc-item">+ 30 days of coaching — ask anything, anytime</div>
+      </div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <button class="btn-deep-dive paywall-deep-dive" id="btn-deep-dive">
-        Not yet — let's deep dive more
+        Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>30-day coaching included</span>
+        <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
       </div>
-      <div class="proof-line paywall-proof">${proof}</div>
+      <div class="proof-line paywall-proof"><strong class="proof-typed"></strong></div>
     </div>
   `;
   $('messages').appendChild(wrap);
@@ -2506,445 +2562,100 @@ async function renderPaywallBubble(opts) {
   const btn = wrap.querySelector('[id="btn-pay-cta"]');
   if (btn) btn.onclick = startCheckout;
 
-  const deepDiveBtn = wrap.querySelector('[id="btn-deep-dive"]');
-  if (deepDiveBtn) deepDiveBtn.onclick = beginDeepDive;
-
   if (!opts.animated) {
-    // Instant render (transcript replay) — fill headline, no middle (coach said it above)
-    wrap.querySelector('.paywall-typed-head').textContent   = headline;
+    wrap.querySelector('.paywall-typed-head').textContent = headline;
     wrap.querySelector('.paywall-head-cursor')?.remove();
+    wrap.querySelector('.proof-typed').textContent = proof;
     scrollChatToBottom();
+    startProofRotation(wrap.querySelector('.proof-typed'));
     return wrap;
   }
 
-  // Animated render — type headline, rest fades in
-  const upliftEl  = wrap.querySelector('.paywall-uplift');
-  const closingEl = wrap.querySelector('.paywall-closing');
-  const ctaEl     = wrap.querySelector('.paywall-cta');
-  const deepEl    = wrap.querySelector('.paywall-deep-dive');
-  const trustEl   = wrap.querySelector('.paywall-trust');
-  const proofEl   = wrap.querySelector('.paywall-proof');
-  upliftEl.style.opacity  = '0';
-  closingEl.style.opacity = '0';
-  ctaEl.style.opacity     = '0';
-  deepEl.style.opacity    = '0';
-  trustEl.style.opacity   = '0';
-  proofEl.style.opacity   = '0';
+  // Animated render
+  const guaranteeEl = wrap.querySelector('.paywall-guarantee');
+  const pitchEl    = wrap.querySelector('.paywall-pitch');
+  const includesEl = wrap.querySelector('.paywall-includes');
+  const ctaEl      = wrap.querySelector('.paywall-cta');
+  const trustEl    = wrap.querySelector('.paywall-trust');
+  const proofEl    = wrap.querySelector('.paywall-proof');
+  guaranteeEl.style.opacity = '0';
+  pitchEl.style.opacity    = '0';
+  includesEl.style.opacity = '0';
+  ctaEl.style.opacity      = '0';
+  trustEl.style.opacity    = '0';
+  proofEl.style.opacity    = '0';
   scrollChatToBottom();
 
-  // Type the headline
+  // Type headline
   const headSpan   = wrap.querySelector('.paywall-typed-head');
   const headCursor = wrap.querySelector('.paywall-head-cursor');
   await typeIntoElement(headSpan, headline);
   if (headCursor) headCursor.remove();
 
-  // Uplift panel reveals
-  await sleep(350);
-  fadeInElement(upliftEl);
-
-  // Closing + CTA + deep dive + trust + proof
-  await sleep(400);
-  fadeInElement(closingEl);
-  await sleep(150);
+  // Fade in sections
+  await sleep(300);
+  fadeInElement(guaranteeEl);
+  await sleep(200);
+  fadeInElement(pitchEl);
+  await sleep(300);
+  fadeInElement(includesEl);
+  await sleep(300);
   fadeInElement(ctaEl);
   await sleep(100);
-  fadeInElement(deepEl);
   fadeInElement(trustEl);
+  await sleep(150);
   fadeInElement(proofEl);
 
+  // Start proof line type/untype rotation
+  const proofTyped = wrap.querySelector('.proof-typed');
+  proofTyped.textContent = proof;
+  startProofRotation(proofTyped);
+
   return wrap;
+}
+
+// ── Proof line rotation — type and untype for attention ──
+function startProofRotation(el) {
+  if (!el) return;
+  let currentIndex = 0;
+  const lines = PROOF_LINES.map(l => l.text.replace(/<\/?strong>/g, ''));
+  
+  async function rotateProof() {
+    // Wait 4 seconds showing current line
+    await sleep(4000);
+    
+    // Untype current text
+    const currentText = el.textContent;
+    for (let i = currentText.length; i >= 0; i--) {
+      el.textContent = currentText.slice(0, i);
+      await sleep(15);
+    }
+    
+    await sleep(300);
+    
+    // Move to next line
+    currentIndex = (currentIndex + 1) % lines.length;
+    const nextText = lines[currentIndex];
+    
+    // Type new text
+    for (let i = 1; i <= nextText.length; i++) {
+      el.textContent = nextText.slice(0, i);
+      await sleep(20);
+    }
+    
+    // Continue rotation
+    rotateProof();
+  }
+  
+  rotateProof();
 }
 
 // Deep dive handler — user chose "Not yet" at the paywall.
 // Structured question chain that reveals readiness gaps and builds
 // personalized re-offers. 3 questions, re-offer after Q2 and Q3.
-const DEEP_DIVE_STATE = { step: 0, gaps: [] };
 
-const DEEP_DIVE_CHAIN = [
-  {
-    question: "If your manager asked 'why should I pay you more?' right now — could you answer in one sentence?",
-    chips: [
-      { value: 'yes_know',       label: "Yes, I know exactly what I'd say" },
-      { value: 'wins_not_clean', label: "I have wins but couldn't say it cleanly" },
-      { value: 'tenure_bills',   label: "I'd talk about how long I've been here" },
-    ],
-    reactions: {
-      yes_know:       "That's rare. Most people ramble or default to 'I've been here a long time.' You're ahead.",
-      wins_not_clean: "That's the gap. Your wins exist but they're not packaged — managers don't dig for your value, you have to hand it to them.",
-      tenure_bills:   "That's the most expensive mistake in negotiation. Employers pay for value delivered, not time served.",
-    },
-    gap_if: ['wins_not_clean', 'tenure_bills'],
-    gap_label: 'a clear value statement',
-  },
-  {
-    question: "Do you have a specific number you'd say out loud — not a range, one number?",
-    chips: [
-      { value: 'yes_number',  label: "Yes, I know my number" },
-      { value: 'range_mind',  label: "I have a range in mind" },
-      { value: 'say_more',    label: "I was going to say 'more' and see what happens" },
-    ],
-    reactions: {
-      yes_number: "Good. Most people don't — they walk in with 'more' and hope the manager fills the gap.",
-      range_mind: "A range gives your manager permission to pick the bottom. One anchored number changes the whole dynamic.",
-      say_more:   "That's what 80% of people do. And 80% of people leave money on the table.",
-    },
-    gap_if: ['range_mind', 'say_more'],
-    gap_label: 'a specific number',
-    reoffer_after: true,
-  },
-  {
-    question: "If your manager says 'there's no budget' or 'let's revisit next quarter' — do you know what to say next?",
-    chips: [
-      { value: 'planned',   label: "I have a response planned" },
-      { value: 'accept_it', label: "I'd probably just accept it" },
-      { value: 'freeze',    label: "I'd freeze" },
-    ],
-    reactions: {
-      planned:   "Smart. Most people accept the first no. Having a response doubles your chances.",
-      accept_it: "Most people do. 'No budget' is almost never the real answer — it's a test. The right response reopens the door.",
-      freeze:    "That's human. But freezing is what kills most negotiations — not the manager's answer, your reaction to it.",
-    },
-    gap_if: ['accept_it', 'freeze'],
-    gap_label: 'pushback responses',
-    reoffer_after: true,
-    is_final: true,
-  },
-];
 
-function beginDeepDive() {
-  // GA4 + Clarity
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'deep_dive_started', { product: 'raise' });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('event', 'deep_dive_started');
-    }
-  } catch (e) {}
 
-  DEEP_DIVE_STATE.step = 0;
-  DEEP_DIVE_STATE.gaps = [];
-  logEntry('coach_msg', { text: 'deep_dive_started', stage: 'deep_dive' });
-  logSession('deep_dive', { paywall_action: 'deep_dive' });
-  runDeepDiveStep(0);
-}
-
-async function runDeepDiveStep(stepIndex) {
-  if (stepIndex >= DEEP_DIVE_CHAIN.length) {
-    // All questions done — final offer
-    renderFinalDeepDiveOffer();
-    return;
-  }
-
-  const step = DEEP_DIVE_CHAIN[stepIndex];
-  clearChips();
-  disableInput('');
-
-  await typeCoachBubble(step.question);
-  await sleep(150);
-
-  renderChips(step.chips, async (c, btn) => {
-    btn.classList.add('selected');
-    fadeOutChips();
-    appendUserBubble(c.label);
-
-    // Track gap
-    if (step.gap_if.includes(c.value)) {
-      DEEP_DIVE_STATE.gaps.push(step.gap_label);
-    }
-    DEEP_DIVE_STATE.step = stepIndex + 1;
-
-    // Coach reaction
-    const reaction = step.reactions[c.value] || "Got it.";
-    await sleep(300);
-    await typeCoachBubble(reaction);
-
-    logEntry('deep_dive_answer', { step: stepIndex, value: c.value, gaps: [...DEEP_DIVE_STATE.gaps] });
-    logSession('deep_dive', {
-      deep_dive_gaps: DEEP_DIVE_STATE.gaps.join(', '),
-      deep_dive_qs: DEEP_DIVE_STATE.step,
-    });
-
-    // Re-offer after this step?
-    if (step.reoffer_after && DEEP_DIVE_STATE.gaps.length > 0) {
-      await sleep(400);
-      renderDeepDiveReoffer(stepIndex);
-    } else {
-      await sleep(400);
-      runDeepDiveStep(stepIndex + 1);
-    }
-  });
-}
-
-async function renderDeepDiveReoffer(afterStep) {
-  const gaps = DEEP_DIVE_STATE.gaps;
-  const isFinal = DEEP_DIVE_CHAIN[afterStep].is_final;
-
-  let offerText;
-  if (gaps.length === 1) {
-    offerText = `You're missing ${gaps[0]} — your plan builds the best version of it, written for your situation.`;
-  } else {
-    const last = gaps[gaps.length - 1];
-    const rest = gaps.slice(0, -1).join(', ');
-    offerText = `You're going in without ${rest} and ${last}. Your plan has all of them — written for you.`;
-  }
-
-  // Render offer text + CTA together in one paywall-style block
-  const wrap = el('div', 'coach-msg', '');
-  const continueHtml = isFinal ? '' : `
-    <button class="btn-deep-dive" onclick="this.closest('.coach-msg').querySelector('.btn-pay').style.display='none';this.style.display='none';runDeepDiveStep(${afterStep + 1});">
-      Not yet — keep going
-    </button>`;
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:14px;">${offerText}</p>
-      <button class="btn-pay" onclick="startCheckout();">
-        Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      ${continueHtml}
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Instantly available · Improves every time you add context</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-
-  // If final — also enable free text input for post-paywall questions
-  if (isFinal) {
-    await sleep(300);
-    renderPlanPreviewChips();
-    enableInput('Ask me anything…');
-    awaitFreeText(handlePostPaywallText);
-  }
-}
-
-// Edge case: user answered all 3 questions with no gaps (rare — means they're prepared)
-async function renderFinalDeepDiveOffer() {
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p style="font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:14px;">You're more prepared than most. The plan adds your personalized scripts, email templates, and ongoing coaching — but you've already got the foundation.</p>
-      <button class="btn-pay" onclick="startCheckout();">
-        Build mine · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:8px;">Instantly available · Improves every time you add context</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
-
-  await sleep(300);
-  renderPlanPreviewChips();
-  enableInput('Ask me anything…');
-  awaitFreeText(handlePostPaywallText);
-}
-
-// Fallback middle line per obstacle code — used if Claude didn't provide one
-function fallbackObstacleLine(code) {
-  const map = {
-    budget:         "The 'no budget' line is the single most common deflection, and it almost always means 'help me make the case upstairs'. We can fix that.",
-    justify:        "Justifying the number is the easiest part once you see the framing. There are three moves that do the work for you.",
-    timing:         "Timing feels like a constraint but it's usually a variable you can move. There are specific windows that work.",
-    prior_no:       "A prior no is not the end of the conversation, it's information. Reopening it correctly is teachable.",
-    unknown_amount: "Not knowing the number is the most solvable blocker on this list. There's a specific formula for your situation.",
-    relationship:   "Worrying about the relationship is a sign you care about doing this right. The best approach actually strengthens it.",
-    pushy:          "The fear of seeming pushy is the single biggest reason people leave money on the table. There's a way to ask that feels professional.",
-    putting_off:    "The fact that you're here means you're closer than you think. Let's turn this into a plan.",
-    other:          "That's a real concern, and the plan has a specific answer for it.",
-  };
-  return map[code] || map.other;
-}
-
-// Extracts a short role label like "Senior FP&A Manager" if available
-function niceRoleLabel() {
-  const ex1 = state.accumulated?.ex1?.extracted || {};
-  const title = (ex1.job_title_normalised || '').trim();
-  return title || '';
-}
-
-function fireEnrichment() {
-  const body = {
-    profile:      state.profile,
-    exchanges:    state.accumulated,
-    obstacle:     state.obstacle,
-    timing:       state.timing || 'exploring',
-    final_range:  state.current_range,
-    profile_hash: profileHash(),
-  };
-  try {
-    fetch(API_ENRICH, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      keepalive: true,
-    }).catch(() => {});
-  } catch (e) { /* non-fatal */ }
-}
-
-async function startCheckout() {
-  // ── Track checkout intent BEFORE redirect to Stripe ──
-  // Fires to GA4 (G-C5GQLC5FHP) and Clarity (wfantc4i14), both loaded in shared.js.
-  // Use transport:'beacon' so the event survives the page unload when we redirect.
-  try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'checkout_started', {
-        product:        'raise',
-        value:          39,
-        currency:       'USD',
-        transport_type: 'beacon',
-        final_floor:    (state && state.current_range) ? state.current_range.floor   : null,
-        final_ceiling:  (state && state.current_range) ? state.current_range.ceiling : null,
-        obstacle_code:  (state && state.obstacle && state.obstacle.code) || '',
-      });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('set', 'funnel_stage', 'checkout_started');
-      window.clarity('event', 'checkout_started');
-    }
-  } catch (e) { /* tracking must never break checkout */ }
-
-  logSession('checkout', { paywall_action: 'checkout_started' });
-
-  // Inject keyframes once, globally. Matches FA's pattern so the spinner
-  // starts spinning the moment the user clicks, even on a slow network.
-  if (!document.getElementById('rl-spin-style')) {
-    const s = document.createElement('style');
-    s.id = 'rl-spin-style';
-    s.textContent = '@keyframes rl-spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
-  }
-
-  // Small spinning circle, inline SVG — appended inside every .btn-pay on
-  // screen (main paywall, section-tease paywalls, post-paywall replies). All
-  // share the same checkout destination, all should feel clicked simultaneously.
-  const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
-
-  const allCtas = document.querySelectorAll('.btn-pay');
-  allCtas.forEach(el => {
-    // Save original HTML so we can restore if the request fails
-    if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
-    el.insertAdjacentHTML('beforeend', spinner);
-    el.style.pointerEvents = 'none';
-    el.setAttribute('disabled', 'true');
-  });
-
-  try {
-    const params = new URLSearchParams(location.search);
-    const refSource = params.get('ref') || state.profile.refSource || '';
-    const res = await fetch(API_CHECKOUT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile_hash: profileHash(),
-        profile:      state.profile,
-        final_range:  state.current_range,
-        obstacle:     state.obstacle,
-        refSource,
-      }),
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data.url) throw new Error('No checkout URL');
-    // Redirect — spinners stay visible until Stripe's page loads, which
-    // matches user expectation ("it's loading, not broken").
-    window.location.href = data.url;
-  } catch (err) {
-    // Restore all CTAs to clickable state and show an error bubble
-    document.querySelectorAll('.btn-pay').forEach(el => {
-      if (el.dataset.origHtml) {
-        el.innerHTML = el.dataset.origHtml;
-        delete el.dataset.origHtml;
-      } else {
-        // Fallback: strip any spinner SVGs we added
-        el.querySelectorAll('.rl-cta-spinner').forEach(s => s.remove());
-      }
-      el.style.pointerEvents = '';
-      el.removeAttribute('disabled');
-    });
-    showErrorBubble(
-      "Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.",
-      null
-    );
-  }
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Plan-preview chips (bottom panel, after paywall)     ── */
-/* ───────────────────────────────────────────────────────── */
-
-function renderPlanPreviewChips() {
-  const scroll = $('chips-area-scroll');
-  if (!scroll) return;
-  scroll.innerHTML = '';
-  PLAN_PREVIEW_CHIPS.forEach(c => {
-    const chip = el('button', 'plan-chip' + (c.gold ? ' plan-chip-gold' : ''), '');
-    chip.type = 'button';
-    chip.innerHTML = `${escapeHtml(c.label)} <span class="lock">🔒</span>`;
-    chip.onclick = () => onSectionChipTap(c.section, c.label);
-    scroll.appendChild(chip);
-  });
-  // Reset scroll position to the start so gold flagship chip is visible first
-  scroll.scrollLeft = 0;
-}
-
-async function onSectionChipTap(section, label) {
-  // Echo the chip label as a user bubble
-  appendUserBubble(label);
-
-  // Brief coach typing, then the section-tease paywall bubble
-  await sleep(250);
-  showCoachTyping();
-  await sleep(900);
-  hideCoachTyping();
-
-  renderSectionTeaseBubble(section);
-}
-
-async function renderSectionTeaseBubble(section) {
-  const tease = SECTION_TEASES[section] || SECTION_TEASES.blockers;
-  const obs = state.obstacle || { code: 'other' };
-  const hook = OBSTACLE_HOOKS[obs.code] || '';
-  const leadWithHook = tease.lead.replace('{obstacle_hook}', hook).replace(/\s{2,}/g, ' ').trim();
-  const proof = pickProofLine(obs.code);
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="tease-lead"><span class="tease-typed"></span><span class="tease-cursor"></span></p>
-      <button class="btn-pay tease-cta" data-tease-cta>
-        ${escapeHtml(tease.cta)} · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row tease-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line tease-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[data-tease-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  // Hide CTA + trust + proof until typing completes
-  const ctaEl   = wrap.querySelector('.tease-cta');
-  const trustEl = wrap.querySelector('.tease-trust');
-  const proofEl = wrap.querySelector('.tease-proof');
-  ctaEl.style.opacity   = '0';
-  trustEl.style.opacity = '0';
-  proofEl.style.opacity = '0';
-  scrollChatToBottom();
-
-  // Type the lead
-  const leadSpan   = wrap.querySelector('.tease-typed');
-  const leadCursor = wrap.querySelector('.tease-cursor');
-  await typeIntoElement(leadSpan, leadWithHook);
-  if (leadCursor) leadCursor.remove();
-
-  // Fade the rest in
-  await sleep(300);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-}
 
 /* ───────────────────────────────────────────────────────── */
 /* ── Post-paywall text: useful answer + dynamic CTA tail  ── */
