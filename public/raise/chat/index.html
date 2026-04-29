@@ -1545,6 +1545,7 @@ function discoveryStep_ShowScenarios(scenarios) {
 
     wrap.appendChild(inner);
     $('messages').appendChild(wrap);
+    disableInput('Tap a scenario above…');
     scrollChatToBottom();
   });
 }
@@ -1632,21 +1633,23 @@ function discoveryRewindToOpenings() {
 }
 
 // ── Toggle simulation mode on/off ──
+let simModeUnlocked = false; // Only true after paywall
+
 function toggleSimMode() {
+  if (!simModeUnlocked) return; // Can't toggle before paywall
+
   const bannerBtn = $('sim-toggle-btn');
   const modeBtn = $('mode-toggle-btn');
   const modeStatus = $('mode-status');
   const isOn = bannerBtn && bannerBtn.textContent === 'ON';
 
   if (isOn) {
-    // Turn OFF — switch to coaching
     if (bannerBtn) { bannerBtn.textContent = 'OFF'; bannerBtn.classList.add('off'); }
     if (modeBtn) modeBtn.classList.remove('active');
     if (modeStatus) modeStatus.textContent = 'OFF';
     enableInput('Ask me anything…');
     awaitFreeText(handlePostPaywallText);
   } else {
-    // Turn ON — switch to scenario planning
     if (bannerBtn) { bannerBtn.textContent = 'ON'; bannerBtn.classList.remove('off'); }
     if (modeBtn) modeBtn.classList.add('active');
     if (modeStatus) modeStatus.textContent = 'ON';
@@ -1677,6 +1680,7 @@ async function discoveryShowPaywall(lastScenario, lastReply) {
 
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
+  simModeUnlocked = true;
 
   try {
     if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'discovery_simulation' });
@@ -2299,6 +2303,7 @@ async function showPaywall() {
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
   logSession('paywall', { paywall_seen: true });
+  simModeUnlocked = true;
 
   // GA4 + Clarity — paywall_viewed
   try {
