@@ -1192,35 +1192,27 @@ const DISCOVERY_OPENERS = {
 };
 
 async function beginDiscoveryFlow(reasonParam) {
-  // Stop any thinking animation + clear the spinner bubble
   stopThinkingAnimation();
   const thinkBubble = document.querySelector('.thinking-bubble');
   if (thinkBubble) thinkBubble.remove();
-  // Hide the probability card — discovery path doesn't calculate range
   const probCard = document.querySelector('.prob-card');
   if (probCard) probCard.style.display = 'none';
-  // Disable input during chip selection phase
   disableInput('');
 
   const blocker = REASON_TO_BLOCKER[reasonParam] || REASON_TO_BLOCKER.other;
   DISCOVERY_STATE.blocker = blocker;
   DISCOVERY_STATE.history = [];
   DISCOVERY_STATE.message_count = 0;
+  DISCOVERY_STATE.context = {};
 
-  // Set minimal state so profileHash doesn't crash
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
   state.chat_log = [];
   state.current_exchange = 0;
 
-  logSession('discovery_start', {
-    blocker_code: blocker.code,
-    blocker_label: blocker.label,
-    landing_ref: reasonParam,
-  });
+  logSession('discovery_start', { blocker_code: blocker.code, blocker_label: blocker.label, landing_ref: reasonParam });
 
-  // Blocker-specific coaching insights — each one reframes the user's problem
-  // in a way they haven't considered. NOT acknowledgment. Real coaching.
+  // ── Step 1: Coaching insight + timing ──
   const ACK_MESSAGES = {
     underpaid:      "Most people who feel underpaid ARE underpaid. The problem isn't the gap — it's that you're framing it as a feeling when it needs to be framed as a business case. Those are two completely different conversations.",
     quiet:          "Quiet performers get overlooked not because they lack results, but because they let other people define what 'impact' looks like. The fix isn't getting louder — it's learning to name your contributions in language your manager already uses to justify budgets.",
@@ -1239,133 +1231,357 @@ async function beginDiscoveryFlow(reasonParam) {
   };
 
   const ackText = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
-  const ack = `${ackText} But first — when are you planning to have the conversation?`;
-  await typeCoachBubble(ack);
-  logEntry('coach_msg', { text: ack, stage: 'discovery' });
-
+  await typeCoachBubble(ackText + " But first — when are you planning to have the conversation?");
   await sleep(200);
 
-  // Show timing chips
-  const timeChips = [
-    { value: 'this_week',    label: 'I need to act this week · this week' },
+  renderChips([
+    { value: 'this_week',    label: 'I need to act this week' },
     { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
     { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
     { value: 'exploring',    label: "I'm just exploring · no timeline" },
-  ];
-
-  renderChips(timeChips, async (c, btn) => {
-    btn.classList.add('selected');
+  ], async (c) => {
     fadeOutChips();
     appendUserBubble(c.label);
     DISCOVERY_STATE.timing = c.value;
+    DISCOVERY_STATE.context.timing = c.value;
     state.timing = c.value;
-
     logSession('discovery_timing', { timing: c.value });
-
-    // Now ask the blocker-specific opening question
     await sleep(300);
-    const opener = DISCOVERY_OPENERS[blocker.code] || DISCOVERY_OPENERS.other;
-    await typeCoachBubble(opener);
-    logEntry('coach_msg', { text: opener, stage: 'discovery' });
-
-    // Track in history for Claude
-    DISCOVERY_STATE.history.push(
-      { role: 'assistant', content: ack },
-      { role: 'user', content: c.label },
-      { role: 'assistant', content: opener }
-    );
-
-    // Enable text input for user's first typed answer
-    enableInput('Type your answer…');
-    awaitFreeText(handleDiscoveryAnswer);
+    discoveryStep_Role();
   });
 }
 
-async function handleDiscoveryAnswer(text) {
-  if (!text || text.trim().length < 3) return;
-
-  appendUserBubble(text);
-  disableInput('Thinking…');
-
-  DISCOVERY_STATE.message_count++;
-  DISCOVERY_STATE.history.push({ role: 'user', content: text });
-
-  logSession('discovery_msg', {
-    message_number: DISCOVERY_STATE.message_count,
-    blocker_code: DISCOVERY_STATE.blocker.code,
+// ── Step 2: Role (typed) ──
+async function discoveryStep_Role() {
+  await typeCoachBubble("Tell me about your role — your title and what kind of company.");
+  enableInput('e.g. Senior Marketing Coordinator at a SaaS company');
+  awaitFreeText(async (text) => {
+    if (!text || text.trim().length < 3) return;
+    appendUserBubble(text);
+    disableInput('');
+    DISCOVERY_STATE.context.role = text;
+    logSession('discovery_ex1', { role: text });
+    await sleep(300);
+    discoveryStep_Evidence();
   });
+}
 
-  // Call raise-coach.js in discovery mode
+// ── Step 3: Evidence (chips only) ──
+async function discoveryStep_Evidence() {
+  await typeCoachBubble("What's the strongest thing in your corner right now?");
+  await sleep(150);
+  renderChips([
+    { value: 'exceeded',           label: 'I exceeded expectations / had a strong win' },
+    { value: 'competing_offer',    label: 'I have a competing offer' },
+    { value: 'actively_recruited', label: "I'm being actively recruited" },
+    { value: 'underpaid',          label: "I know I'm underpaid for my role" },
+    { value: 'met_but_overdue',    label: "I met expectations and it's been a while" },
+    { value: 'no_strong_evidence', label: "I don't have strong evidence right now" },
+  ], async (c) => {
+    fadeOutChips();
+    appendUserBubble(c.label);
+    DISCOVERY_STATE.context.evidence = c.value;
+    DISCOVERY_STATE.context.evidence_label = c.label;
+    logSession('discovery_ex2', { evidence: c.value });
+    await sleep(300);
+    discoveryStep_CompanySituation();
+  });
+}
+
+// ── Step 4: Company situation (chips) ──
+async function discoveryStep_CompanySituation() {
+  await typeCoachBubble("How is your company doing right now?");
+  await sleep(150);
+  renderChips([
+    { value: 'growing', label: 'Growing fast — hiring, expanding, healthy revenue' },
+    { value: 'stable',  label: 'Stable — steady business, no major changes' },
+    { value: 'cutting', label: 'Cutting or restructuring — layoffs, freezes, budget cuts' },
+  ], async (c) => {
+    fadeOutChips();
+    appendUserBubble(c.label);
+    DISCOVERY_STATE.context.company_situation = c.value;
+    state.profile.company_situation = c.value;
+    logSession('discovery_company', { company_situation: c.value });
+    await sleep(300);
+    discoveryStep_LastRaise();
+  });
+}
+
+// ── Step 5: Last raise (chips) ──
+async function discoveryStep_LastRaise() {
+  await typeCoachBubble("When was your last raise?");
+  await sleep(150);
+  renderChips([
+    { value: 'under_1_year',           label: 'Under 1 year at this job' },
+    { value: 'annual_raise_want_more', label: 'I get annual raises but want more' },
+    { value: '1_2_years',              label: '1-2 years since my last raise' },
+    { value: '2_plus_years',           label: '2+ years since my last raise' },
+    { value: 'never_asked',            label: 'Never actively asked for one' },
+  ], async (c) => {
+    fadeOutChips();
+    appendUserBubble(c.label);
+    DISCOVERY_STATE.context.last_raise = c.value;
+    state.profile.last_raise = c.value;
+    logSession('discovery_last_raise', { last_raise: c.value });
+    await sleep(300);
+    discoveryStep_SimulationBanner();
+  });
+}
+
+// ── Step 6: Simulation mode banner + generate opening lines ──
+async function discoveryStep_SimulationBanner() {
+  // Simulation banner
+  const banner = el('div', 'coach-msg', '');
+  banner.innerHTML = `<div style="background:linear-gradient(135deg,rgba(45,212,168,0.08),rgba(201,168,76,0.08));border:1px solid rgba(45,212,168,0.2);border-radius:12px;padding:14px 16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;font-weight:600;color:#2dd4a8;">🎭 Practice mode</span><span style="font-size:10px;padding:3px 10px;border-radius:8px;border:1px solid rgba(45,212,168,0.3);background:rgba(45,212,168,0.1);color:#2dd4a8;">ON</span></div><div style="font-size:12px;color:var(--t2);line-height:1.5;">I'll play your manager now. Pick an opening line, then tap any scenario to see how the conversation unfolds. You can switch back to coaching anytime.</div></div>`;
+  $('messages').appendChild(banner);
+  scrollChatToBottom();
+  await sleep(400);
+
+  // Generate opening lines
+  disableInput('Generating your opening lines…');
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        mode: 'discovery',
+        mode: 'simulate_openings',
+        context: DISCOVERY_STATE.context,
         blocker: DISCOVERY_STATE.blocker,
-        timing: DISCOVERY_STATE.timing,
-        message: text,
-        history: DISCOVERY_STATE.history,
-        message_number: DISCOVERY_STATE.message_count,
         session_id: profileHash(),
       }),
     });
     const data = await res.json();
-    const reply = data.reply || "Tell me more about your situation.";
-
-    await sleep(300);
-    await typeCoachBubble(reply);
-    logEntry('coach_msg', { text: reply, stage: 'discovery' });
-
-    DISCOVERY_STATE.history.push({ role: 'assistant', content: reply });
-
-    // After 2 user messages → show paywall
-    if (DISCOVERY_STATE.message_count >= 2) {
-      await sleep(500);
-      showDiscoveryPaywall();
-      return;
+    if (data.openings && data.openings.length >= 2) {
+      discoveryStep_ShowOpenings(data.openings);
+    } else {
+      discoveryStep_ShowOpenings(discoveryDefaultOpenings());
     }
-
-    // Otherwise, re-arm for next answer
-    enableInput('Type your answer…');
-    awaitFreeText(handleDiscoveryAnswer);
-
   } catch (err) {
-    console.error('[discovery] coach call failed:', err);
-    await sleep(300);
-    await typeCoachBubble("That's helpful context. Let me think about the best approach for your situation.");
-    enableInput('Type your answer…');
-    awaitFreeText(handleDiscoveryAnswer);
+    console.error('[discovery] opening gen failed:', err);
+    discoveryStep_ShowOpenings(discoveryDefaultOpenings());
   }
 }
 
-async function showDiscoveryPaywall() {
-  // Set obstacle in state so paywall can use it
+function discoveryDefaultOpenings() {
+  return [
+    { style: 'Direct', text: "I've been thinking about my compensation. Based on my contributions this year and what I'm seeing in the market, I believe there's a gap we should discuss." },
+    { style: 'Collaborative', text: "I'd like to talk about where my role is heading. My scope has grown significantly and I want to make sure we're aligned on what that's worth." },
+    { style: 'Evidence-led', text: "I've done some research on market rates for my role and I'd like to walk you through what I found — and how it compares to where I am now." },
+  ];
+}
+
+// ── Step 7: Show 3 opening lines as tappable cards ──
+async function discoveryStep_ShowOpenings(openings) {
+  await typeCoachBubble("Here are 3 ways to open the conversation. Pick the one that feels most like you:");
+  await sleep(200);
+
+  const styleColors = { 'Direct': '#e05a7a', 'Collaborative': '#c9a84c', 'Evidence-led': '#8ba0e0' };
+  const wrap = el('div', 'user-msg chips-msg', '');
+  const inner = el('div', '', '');
+  inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+
+  openings.forEach((o, i) => {
+    const card = el('div', '', '');
+    const color = styleColors[o.style] || '#c9a84c';
+    card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;';
+    card.innerHTML = `<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;color:${color};">${o.style}</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">"${o.text}"</div>`;
+    card.onmouseenter = () => { card.style.borderColor = 'rgba(201,168,76,0.3)'; card.style.background = 'var(--bg3)'; };
+    card.onmouseleave = () => { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--bg2)'; };
+    card.onclick = () => {
+      // Fade others, highlight selected
+      Array.from(inner.children).forEach(c => {
+        if (c === card) {
+          c.style.borderColor = 'rgba(201,168,76,0.4)';
+          c.style.background = 'rgba(201,168,76,0.06)';
+          c.onclick = null; c.onmouseenter = null; c.onmouseleave = null;
+        } else {
+          c.style.cssText = 'opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;';
+        }
+      });
+      DISCOVERY_STATE.context.opening = o.text;
+      DISCOVERY_STATE.context.opening_style = o.style;
+      logSession('opening_selected', { style: o.style });
+      setTimeout(() => discoveryStep_ManagerResponses(o.text), 400);
+    };
+    inner.appendChild(card);
+  });
+
+  // Write your own
+  const own = el('div', '', '');
+  own.style.cssText = 'background:transparent;border:1px dashed rgba(255,255,255,0.1);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:center;';
+  own.innerHTML = '<div style="font-size:12px;color:var(--t3);">✎ Write my own opening</div>';
+  own.onclick = () => {
+    wrap.style.display = 'none';
+    enableInput('Type your opening line…');
+    awaitFreeText(async (text) => {
+      if (!text || text.trim().length < 5) return;
+      appendUserBubble(text);
+      disableInput('');
+      DISCOVERY_STATE.context.opening = text;
+      logSession('opening_selected', { style: 'custom' });
+      await sleep(300);
+      discoveryStep_ManagerResponses(text);
+    });
+  };
+  inner.appendChild(own);
+
+  wrap.appendChild(inner);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  currentChipsWrap = wrap;
+}
+
+// ── Step 8: Manager responds — 3 scenarios with replies ──
+async function discoveryStep_ManagerResponses(openingLine) {
+  disableInput('');
+  appendUserBubble(openingLine);
+  await sleep(300);
+
+  // Show thinking
+  const typing = showCoachTyping();
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'simulate_responses',
+        context: DISCOVERY_STATE.context,
+        blocker: DISCOVERY_STATE.blocker,
+        opening_line: openingLine,
+        session_id: profileHash(),
+      }),
+    });
+    const data = await res.json();
+    hideCoachTyping();
+    const scenarios = data.scenarios && data.scenarios.length >= 2 ? data.scenarios : discoveryDefaultScenarios();
+    discoveryStep_ShowScenarios(scenarios);
+  } catch (err) {
+    console.error('[simulate_responses] failed:', err);
+    hideCoachTyping();
+    discoveryStep_ShowScenarios(discoveryDefaultScenarios());
+  }
+}
+
+function discoveryDefaultScenarios() {
+  return [
+    { type: 'Receptive', text: "I appreciate you bringing this up. What did you have in mind?", replies: ["Based on my research, I believe an adjustment to reflect my current scope is appropriate.", "I'd like to discuss what the market shows for my role and responsibilities."] },
+    { type: 'Pushback', text: "Everyone had a strong year. What makes your situation different?", replies: ["Two things: my scope has grown beyond my title, and the market data shows a gap for my role specifically.", "I can walk you through three specific contributions that went beyond my job description."] },
+    { type: 'Deflecting', text: "Let me think about it and get back to you.", replies: ["Of course. Can we put a specific date on the calendar — say next Friday?", "Would it help if I put together a one-page summary you could review beforehand?"] },
+  ];
+}
+
+function discoveryStep_ShowScenarios(scenarios) {
+  typeCoachBubble("Your manager might respond in a few ways. Tap any scenario to see your best replies:").then(() => {
+    const typeColors = { Receptive:'rgba(94,201,154,0.6)', Pushback:'rgba(224,90,122,0.6)', Deflecting:'rgba(201,168,76,0.6)', 'Counter-offer':'rgba(139,160,224,0.6)', 'Fact-checking':'rgba(212,196,74,0.6)', Emotional:'rgba(224,160,90,0.6)' };
+    const wrap = el('div', 'user-msg chips-msg', '');
+    const inner = el('div', '', '');
+    inner.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+
+    scenarios.forEach((s, i) => {
+      const card = el('div', '', '');
+      const color = typeColors[s.type] || 'rgba(201,168,76,0.6)';
+      card.style.cssText = 'background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;';
+      card.innerHTML = `<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;font-weight:600;color:${color};">Scenario ${i+1} — ${s.type}</div><div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5;">"${s.text}"</div>`;
+      card.dataset.scenarioIndex = i;
+      card.onmouseenter = () => { if (!card.dataset.expanded) { card.style.borderColor = 'rgba(255,255,255,0.2)'; card.style.background = 'var(--bg3)'; }};
+      card.onmouseleave = () => { if (!card.dataset.expanded) { card.style.borderColor = 'var(--border)'; card.style.background = 'var(--bg2)'; }};
+      card.onclick = () => discoveryExpandScenario(s, i, card, inner, scenarios, typeColors);
+      inner.appendChild(card);
+    });
+
+    wrap.appendChild(inner);
+    $('messages').appendChild(wrap);
+    scrollChatToBottom();
+  });
+}
+
+function discoveryExpandScenario(scenario, index, card, container, allScenarios, typeColors) {
+  if (card.dataset.expanded) return;
+
+  // Remove old reply sections
+  container.querySelectorAll('.disc-replies').forEach(r => r.remove());
+
+  // Dim others, activate this
+  Array.from(container.children).forEach((c, i) => {
+    if (c.classList && c.classList.contains('disc-replies')) return;
+    if (parseInt(c.dataset.scenarioIndex) === index) {
+      c.dataset.expanded = '1';
+      c.style.borderColor = 'rgba(201,168,76,0.4)';
+      c.style.background = 'rgba(201,168,76,0.06)';
+    } else {
+      c.dataset.expanded = '';
+      c.style.opacity = '0.3';
+      c.style.borderColor = 'var(--border)';
+      c.style.background = 'var(--bg2)';
+    }
+  });
+
+  // Show replies
+  const repliesDiv = el('div', 'disc-replies', '');
+  repliesDiv.style.cssText = 'margin-top:8px;padding-left:14px;border-left:2px solid rgba(45,212,168,0.15);';
+  repliesDiv.innerHTML = '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(45,212,168,0.5);margin-bottom:8px;">Your best responses:</div>';
+
+  scenario.replies.forEach((reply, ri) => {
+    const btn = el('div', '', '');
+    btn.style.cssText = 'background:rgba(45,212,168,0.04);border:1px solid rgba(45,212,168,0.15);border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.5;color:rgba(45,212,168,0.8);cursor:pointer;margin-bottom:6px;transition:all 0.15s;';
+    btn.textContent = reply;
+    btn.onmouseenter = () => { btn.style.borderColor = 'rgba(45,212,168,0.35)'; btn.style.background = 'rgba(45,212,168,0.08)'; };
+    btn.onmouseleave = () => { if (!btn.dataset.selected) { btn.style.borderColor = 'rgba(45,212,168,0.15)'; btn.style.background = 'rgba(45,212,168,0.04)'; }};
+    btn.onclick = () => {
+      btn.dataset.selected = '1';
+      btn.style.borderColor = 'rgba(201,168,76,0.4)';
+      btn.style.background = 'rgba(201,168,76,0.06)';
+      btn.style.color = 'rgba(255,255,255,0.8)';
+      btn.onclick = null;
+      // Fade other replies
+      repliesDiv.querySelectorAll('div[style*="cursor:pointer"]').forEach(r => {
+        if (r !== btn && !r.dataset.selected) {
+          r.style.cssText = 'opacity:0;max-height:0;padding:0;margin:0;overflow:hidden;border:none;transition:all 0.3s;';
+        }
+      });
+      logSession('simulation_reply_tapped', { scenario: scenario.type, reply_index: ri });
+      setTimeout(() => discoveryShowPaywall(scenario, reply), 500);
+    };
+    repliesDiv.appendChild(btn);
+  });
+
+  card.insertAdjacentElement('afterend', repliesDiv);
+  scrollChatToBottom();
+
+  // Allow clicking other scenarios
+  Array.from(container.children).forEach((c, i) => {
+    if (c.classList && c.classList.contains('disc-replies')) return;
+    if (parseInt(c.dataset.scenarioIndex) !== index) {
+      c.onclick = () => {
+        Array.from(container.children).forEach(x => { x.dataset.expanded = ''; x.style.opacity = '1'; x.style.borderColor = 'var(--border)'; x.style.background = 'var(--bg2)'; });
+        container.querySelectorAll('.disc-replies').forEach(r => r.remove());
+        discoveryExpandScenario(allScenarios[parseInt(c.dataset.scenarioIndex)], parseInt(c.dataset.scenarioIndex), c, container, allScenarios, typeColors);
+      };
+    }
+  });
+}
+
+// ── Paywall after 1 level of simulation ──
+async function discoveryShowPaywall(lastScenario, lastReply) {
+  await typeCoachBubble("That's one branch. In the full version, you can explore every scenario — " + lastScenario.type.toLowerCase() + ", pushback, counter-offers — and practice until every response feels natural.");
+  await sleep(300);
+
   state.obstacle = DISCOVERY_STATE.blocker;
   state.timing = DISCOVERY_STATE.timing;
-  state.current_exchange = 5; // paywall state
+  state.current_exchange = 5;
+  state.current_range = { floor: 45, ceiling: 70 };
+  state.initial_floor = 45;
 
-  logSession('paywall', { paywall_seen: true });
-
-  // Render paywall — uses the existing renderPaywallBubble which reads state.obstacle + state.timing
-  // Since there's no range data, we need to set a default
-  state.current_range = state.current_range || { floor: 45, ceiling: 70 };
-  state.initial_floor = state.initial_floor || 45;
+  logSession('paywall', { paywall_seen: true, path: 'discovery_simulation' });
 
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
 
-  // GA4 + Clarity
   try {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'discovery' });
-    }
-    if (typeof window.clarity === 'function') {
-      window.clarity('event', 'discovery_paywall');
-    }
+    if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'discovery_simulation' });
+    if (typeof window.clarity === 'function') window.clarity('event', 'discovery_simulation_paywall');
   } catch (e) {}
 
-  // Enable deep dive + free text after paywall
   renderPlanPreviewChips();
   enableInput('Ask me anything…');
   awaitFreeText(handlePostPaywallText);
