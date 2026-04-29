@@ -2351,12 +2351,15 @@ function pickReply(reply, pill, container, scenario) {
   }
 }
 
-// Generate the manager's follow-up response and new reply options.
-// This creates the real multi-turn tree the user expects.
+// After the user picks a reply, show multiple possible manager follow-up
+// responses as tappable scenario chips — same branching pattern as the
+// initial scenario selection. Picking one shows the manager's full text,
+// then new reply options, continuing the tree.
 async function continueConversation(scenario, turnNodes) {
   disableInput('');
   showCoachTyping();
 
+  let scenarios;
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
@@ -2370,34 +2373,127 @@ async function continueConversation(scenario, turnNodes) {
       }),
     });
     const data = await res.json();
-    hideCoachTyping();
-
-    const mgrText = data.manager_response || "I hear what you're saying. Let me think about how we can approach this.";
-    const replies = (data.replies && data.replies.length >= 2) ? data.replies : getDefaultReplies();
-
-    // Track manager's response in conversation history
-    simConversation.push({ role: 'manager', text: mgrText });
-
-    // Render manager follow-up bubble
-    const mgrBubble = renderManagerBubble({ type: scenario.type, text: mgrText });
-    turnNodes.push(mgrBubble);
-    await sleep(300);
-
-    // Render back button + reply pills
-    const backBtn = renderBackButton();
-    turnNodes.push(backBtn);
-
-    renderReplyPillsFlat(replies, scenario);
-    // The reply pills wrap is the last thing added to #messages
-    const lastMsg = $('messages').lastElementChild;
-    if (lastMsg) turnNodes.push(lastMsg);
-
+    scenarios = (data.scenarios && data.scenarios.length >= 2) ? data.scenarios : getDefaultFollowupScenarios();
   } catch (err) {
-    hideCoachTyping();
     console.error('[sim] followup failed:', err);
-    insertCoachBubble("Something went wrong generating the manager's response. Try another scenario.");
-    enableInput('Tap a scenario above or type your own\u2026');
+    scenarios = getDefaultFollowupScenarios();
   }
+  hideCoachTyping();
+
+  // Render back button
+  const backBtn = renderBackButton();
+  turnNodes.push(backBtn);
+
+  // Render follow-up scenario chips (same pattern as initial scenarios)
+  const followupWrap = renderFollowupScenarios(scenarios, scenario, turnNodes);
+  turnNodes.push(followupWrap);
+
+  enableInput('Tap a response above or type your own\u2026');
+}
+
+function getDefaultFollowupScenarios() {
+  return [
+    { type: '"Let me think about it"', text: "Let me think about it and get back to you by end of week." },
+    { type: '"That\'s not how it works"', text: "I appreciate the effort, but that's not really how compensation decisions get made here." },
+    { type: '"Help me make the case"', text: "You're making fair points. Help me build something I can take to leadership." },
+    { type: '"What exactly do you want?"', text: "OK, so what number are we actually talking about here?" },
+  ];
+}
+
+// Render manager follow-up scenarios as tappable chips — mirrors
+// renderScenarioLabels but for deeper tree levels. Picking one shows
+// the manager's full response, then new reply options appear.
+function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
+  const wrap = el('div', 'coach-msg', '');
+  const inner = el('div', '', '');
+  inner.innerHTML = '<div class="sim-pills-hint">Your manager could respond several ways. Tap one:</div>';
+  const row = el('div', 'sim-pills-row', '');
+  inner.appendChild(row);
+
+  // Track which sub-anchor we need for clearing deeper branches
+  let followupSubAnchor = wrap;
+
+  scenarios.forEach((s, i) => {
+    const pill = el('button', 'sim-pill', '');
+    pill.textContent = s.type;
+    pill.onclick = () => expandFollowupScenario(s, pill, row, parentScenario, wrap, turnNodes);
+    row.appendChild(pill);
+  });
+
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
+  custom.textContent = '+ Something else\u2026';
+  custom.onclick = () => {
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
+  };
+  row.appendChild(custom);
+
+  wrap.appendChild(inner);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  return wrap;
+}
+
+// User tapped a follow-up manager response chip — show the full text,
+// then generate reply options for the user.
+async function expandFollowupScenario(scenario, pill, pillContainer, parentScenario, followupWrap, turnNodes) {
+  // Clear any previous expansion below the followup chips
+  while (followupWrap.nextSibling) {
+    const node = followupWrap.nextSibling;
+    // Remove from turnNodes tracking too
+    const idx = turnNodes.indexOf(node);
+    if (idx > -1) turnNodes.splice(idx, 1);
+    node.remove();
+  }
+
+  pillContainer.querySelectorAll('.sim-pill').forEach(p => {
+    p.classList.toggle('active', p === pill);
+  });
+
+  // Track in conversation
+  simConversation.push({ role: 'manager', text: scenario.text });
+
+  // User bubble showing the chosen manager response theme
+  const userBubble = appendUserBubble('My manager\u2019s response:\n\u201c' + scenario.type + '\u201d');
+  turnNodes.push(userBubble);
+
+  // Manager bubble with full text
+  const mgrBubble = renderManagerBubble(scenario);
+  turnNodes.push(mgrBubble);
+  await sleep(300);
+
+  // Now show reply options for the user
+  const conversationsDone = SIM_STATE.branch_history.length;
+  if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+    setTimeout(() => showSimulationPaywall(parentScenario), 600);
+    return;
+  }
+
+  showCoachTyping();
+  let replies;
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'simulate_replies',
+        manager_said: scenario.text,
+        scenario_type: scenario.type,
+        blocker: SIM_STATE.blocker,
+        context: SIM_STATE.context,
+        session_id: profileHash(),
+      }),
+    });
+    const data = await res.json();
+    replies = (data.replies && data.replies.length >= 2) ? data.replies : getDefaultReplies();
+  } catch (err) {
+    replies = getDefaultReplies();
+  }
+  hideCoachTyping();
+
+  renderReplyPillsFlat(replies, parentScenario);
+  const lastMsg = $('messages').lastElementChild;
+  if (lastMsg) turnNodes.push(lastMsg);
 }
 
 // Render a back button that removes the current turn and restores the
