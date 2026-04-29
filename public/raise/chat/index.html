@@ -543,6 +543,17 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill:active{transform:scale(0.97);}
 .sim-reply-pill.active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
 
+/* Back button — lets user undo the last turn and try a different reply */
+.sim-back-wrap{padding:4px 0;animation:msgIn 0.3s ease;}
+.sim-back-btn{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:5px 12px;border-radius:14px;
+  border:1px solid var(--divider);background:var(--card);
+  color:var(--t3);font-size:11.5px;font-weight:500;
+  font-family:var(--sans);cursor:pointer;transition:all 0.15s;
+}
+.sim-back-btn:hover{border-color:var(--t2);color:var(--t1);}
+
 </style>
 </head>
 
@@ -1959,6 +1970,10 @@ async function startSimulationAtBlocker() {
   showToolbar();
   showModeToggle();
 
+  // Show the simulation mode banner so the user knows they've entered
+  // simulation mode (same banner that shows when manually switching)
+  insertModeBanner('sim');
+
   // Reframe the scene so the user understands the chips below it represent
   // *different ways the dialog could go* — not ranking options, not
   // categories of timing, but actual directions the manager could take.
@@ -2038,6 +2053,23 @@ function getDefaultScenarios(blockerCode) {
 }
 
 // ── Render scenario labels as short tappable pills ──
+// simBranchAnchor: reference to the scenario pills wrapper. Everything
+// in #messages AFTER this node = current branch content. Cleared when
+// user picks a different scenario.
+let simBranchAnchor = null;
+
+function clearBranchContent() {
+  if (!simBranchAnchor) return;
+  const msgs = $('messages');
+  // Remove every sibling after the anchor
+  while (simBranchAnchor.nextSibling) {
+    simBranchAnchor.nextSibling.remove();
+  }
+  // Reset multi-turn state
+  simConversation = [];
+  simTurnElements = [];
+}
+
 function renderScenarioLabels(scenarios) {
   SIM_STATE.scenarios_total = scenarios.length;
   updateTreeBadge();
@@ -2113,6 +2145,7 @@ function renderScenarioLabels(scenarios) {
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
+  simBranchAnchor = wrap; // anchor: everything after this = branch content
   scrollChatToBottom();
 
   // Keep the input ACTIVE here. Earlier the input was disabled with
@@ -2137,8 +2170,11 @@ function renderScenarioLabels(scenarios) {
 //   4. user-bubble: the chosen reply (full text)
 //   5. paywall
 async function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
-  // Highlight the picked scenario chip + lock the others to make the
-  // branching feel intentional. (User can still scroll up to see.)
+  // Clear any existing branch content (previous scenario's messages)
+  // so switching scenarios gives a clean slate below the pills.
+  clearBranchContent();
+
+  // Highlight the picked scenario chip
   pillContainer.querySelectorAll('.sim-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
   });
@@ -2150,6 +2186,10 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
     SIM_STATE.scenarios_explored.push(scenario.type);
     updateTreeBadge();
   }
+
+  // Reset multi-turn conversation history for this new scenario branch
+  simConversation = [{ role: 'manager', text: scenario.text }];
+  simTurnElements = [];
 
   // Step 1: user-bubble showing the picked direction (so the dialog
   // reads naturally — "you chose this; here's what plays out")
@@ -2202,6 +2242,7 @@ function renderManagerBubble(scenario) {
   `;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
+  return wrap;
 }
 
 function getDefaultReplies() {
@@ -2228,18 +2269,19 @@ function renderReplyPillsFlat(replies, scenario) {
   // this handler armed means the user can choose either path freely.
   const submitCustomReply = async (text) => {
     if (!text || text.trim().length < 2) return;
-    appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
+    const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
     disableInput('');
     logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
     SIM_STATE.branch_history.push({ scenario: scenario.type, reply: text });
+    simConversation.push({ role: 'user', text });
+    const turnNodes = [userBubble];
+    simTurnElements.push(turnNodes);
     const conversationsDone = SIM_STATE.branch_history.length;
     await sleep(500);
     if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
       showSimulationPaywall(scenario);
     } else {
-      const remaining = SIM_FREE_CONVERSATIONS - conversationsDone;
-      await typeCoachBubble('Good instinct. Try another direction \u2014 ' + remaining + ' more before we wrap up the free preview.');
-      enableInput('Tap a scenario above or type your own\u2026');
+      continueConversation(scenario, turnNodes);
     }
   };
 
@@ -2268,13 +2310,17 @@ function renderReplyPillsFlat(replies, scenario) {
   awaitFreeText(submitCustomReply);
 }
 
-// How many full conversations (scenario → reply) before paywall fires.
-// Previously this was 1 (instant paywall after first reply). User feedback
-// says 4 is better — lets them experience enough value to convert.
+// How many turns (user replies) before paywall fires.
 const SIM_FREE_CONVERSATIONS = 4;
 
-// User picked a reply pill: show their full reply as a user bubble,
-// then either return to scenario chips or hit paywall.
+// Track conversation history for multi-turn simulation
+// Each entry: { role: 'manager'|'user', text: '...' }
+// Also track DOM elements per turn so the back button can remove them.
+let simConversation = [];
+let simTurnElements = []; // array of arrays — each sub-array is the DOM nodes for that turn
+
+// User picked a reply pill: show their reply, then continue the
+// conversation with the manager's follow-up response.
 function pickReply(reply, pill, container, scenario) {
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
@@ -2282,25 +2328,125 @@ function pickReply(reply, pill, container, scenario) {
     p.style.cursor = 'default';
   });
 
-  appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
+  const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
   scrollChatToBottom();
 
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
+
+  // Track in conversation history
+  simConversation.push({ role: 'user', text: reply.text });
+
+  // Track DOM elements for this turn (user bubble + whatever comes next)
+  const turnNodes = [userBubble];
+  simTurnElements.push(turnNodes);
 
   const conversationsDone = SIM_STATE.branch_history.length;
 
   if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
     setTimeout(() => showSimulationPaywall(scenario), 800);
   } else {
-    // Still under limit — coach acknowledges and sends them back to try
-    // another scenario. The scenario chips are already on-screen above.
-    setTimeout(async () => {
-      const remaining = SIM_FREE_CONVERSATIONS - conversationsDone;
-      await typeCoachBubble('Good instinct. Try another direction \u2014 ' + remaining + ' more before we wrap up the free preview.');
-      enableInput('Tap a scenario above or type your own\u2026');
-    }, 600);
+    // Continue the conversation — manager responds to the user's reply
+    setTimeout(() => continueConversation(scenario, turnNodes), 400);
   }
+}
+
+// Generate the manager's follow-up response and new reply options.
+// This creates the real multi-turn tree the user expects.
+async function continueConversation(scenario, turnNodes) {
+  disableInput('');
+  showCoachTyping();
+
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'simulate_followup',
+        conversation_history: simConversation,
+        blocker: SIM_STATE.blocker,
+        context: SIM_STATE.context,
+        session_id: profileHash(),
+      }),
+    });
+    const data = await res.json();
+    hideCoachTyping();
+
+    const mgrText = data.manager_response || "I hear what you're saying. Let me think about how we can approach this.";
+    const replies = (data.replies && data.replies.length >= 2) ? data.replies : getDefaultReplies();
+
+    // Track manager's response in conversation history
+    simConversation.push({ role: 'manager', text: mgrText });
+
+    // Render manager follow-up bubble
+    const mgrBubble = renderManagerBubble({ type: scenario.type, text: mgrText });
+    turnNodes.push(mgrBubble);
+    await sleep(300);
+
+    // Render back button + reply pills
+    const backBtn = renderBackButton();
+    turnNodes.push(backBtn);
+
+    renderReplyPillsFlat(replies, scenario);
+    // The reply pills wrap is the last thing added to #messages
+    const lastMsg = $('messages').lastElementChild;
+    if (lastMsg) turnNodes.push(lastMsg);
+
+  } catch (err) {
+    hideCoachTyping();
+    console.error('[sim] followup failed:', err);
+    insertCoachBubble("Something went wrong generating the manager's response. Try another scenario.");
+    enableInput('Tap a scenario above or type your own\u2026');
+  }
+}
+
+// Render a back button that removes the current turn and restores the
+// previous step's reply options. Gives users a way to explore different
+// branches without restarting the whole simulation.
+function renderBackButton() {
+  const wrap = el('div', 'sim-back-wrap', '');
+  const btn = el('button', 'sim-back-btn', '');
+  btn.innerHTML = '\u2190 Try a different response';
+  btn.onclick = () => goBack();
+  wrap.appendChild(btn);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  return wrap;
+}
+
+// Remove the last turn's DOM elements, pop conversation history,
+// and re-enable the previous reply pills.
+function goBack() {
+  if (simTurnElements.length === 0) return;
+
+  // Remove all DOM nodes from the last turn
+  const lastTurn = simTurnElements.pop();
+  lastTurn.forEach(node => { if (node && node.parentNode) node.remove(); });
+
+  // Pop the corresponding conversation entries (user + manager)
+  if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
+    simConversation.pop();
+  }
+  if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'user') {
+    simConversation.pop();
+  }
+
+  // Pop branch history
+  if (SIM_STATE.branch_history.length > 0) {
+    SIM_STATE.branch_history.pop();
+  }
+  updateTreeBadge();
+
+  // Re-enable the previous reply pills (find the last .sim-reply-pill set)
+  const allPills = $('messages').querySelectorAll('.sim-reply-pill');
+  allPills.forEach(p => {
+    p.disabled = false;
+    p.style.cursor = '';
+    p.classList.remove('active');
+  });
+
+  enableInput('Tap a reply or type your own\u2026');
+  scrollChatToBottom();
 }
 
 // ── Paywall after 1 level of simulation ──
