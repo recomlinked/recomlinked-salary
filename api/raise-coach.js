@@ -939,13 +939,19 @@ They explored ${explored_count} of ${total_count} scenarios.
 Paths they practiced:
 ${paths || '(none yet)'}
 
-Give a brief coaching reflection (3-4 sentences max):
-1. What their choices reveal about their preparation style
-2. One specific strength in their approach
-3. One gap or blind spot they should address
-4. Which unexplored scenario they should try next and why
+Write a brief coaching reflection in this EXACT format. Keep each section to 1-2 sentences max. Do not use headings or markdown other than the bold labels shown.
 
-Be direct, specific, and encouraging. Don't be generic — reference their actual choices.`;
+Start with one short paragraph (no label) about what their choices reveal — be specific, reference their actual picks.
+
+Then three labeled sections, each as its own paragraph, exactly in this order and with these exact bold labels:
+
+**Strength:** [one specific thing they did well]
+
+**Blind spot:** [one specific gap or risk in their approach]
+
+**Try next:** [name one unexplored scenario type they should practice and why — be concrete]
+
+Be direct, encouraging, and specific. No filler. No generic advice. Reference their actual choices.`;
 
   try {
     const response = await client.messages.create({
