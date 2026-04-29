@@ -705,7 +705,8 @@ const state = {
   timing: null,                 // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
   obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
   saved_at: null,               // ms timestamp — used for 24h staleness check
-  free_dialog_count: 0,         // count of post-paywall free-text messages (caps at FREE_DIALOG_LIMIT)
+  free_dialog_count: 0,         // count of free-text messages (caps at FREE_DIALOG_LIMIT)
+  paywall_shown: false,         // whether the main paywall bubble has been rendered
   // Turn-by-turn conversation history for Ex1/Ex2 only. Each value is an
   // array of {role: 'user'|'assistant', text: string} for the CURRENT exchange.
   // Sent to /api/raise-exchange so the classifier sees history and decides
@@ -1928,6 +1929,7 @@ async function beginSimulationFlow(reasonParam) {
   SIM_STATE.blocker = blocker;
   SIM_STATE.context = {};
   SIM_STATE.branch_history = [];
+  simTapCount = 0;
 
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
@@ -2171,7 +2173,6 @@ function renderScenarioLabels(scenarios) {
 //   5. paywall
 async function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
   // Clear any existing branch content (previous scenario's messages)
-  // so switching scenarios gives a clean slate below the pills.
   clearBranchContent();
 
   // Highlight the picked scenario chip
@@ -2181,7 +2182,9 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
 
-  // Track explored scenarios for the tree badge / coach reflection
+  // Every chip tap counts toward the paywall limit
+  const hitLimit = incrementSimTaps();
+
   if (!SIM_STATE.scenarios_explored.includes(scenario.type)) {
     SIM_STATE.scenarios_explored.push(scenario.type);
     updateTreeBadge();
@@ -2191,14 +2194,16 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   simConversation = [{ role: 'manager', text: scenario.text }];
   simTurnElements = [];
 
-  // Step 1: user-bubble showing the picked direction (so the dialog
-  // reads naturally — "you chose this; here's what plays out")
   appendUserBubble('My manager\u2019s response theme:\n\u201c' + scenario.type + '\u201d');
   await sleep(200);
 
-  // Step 2: thinking indicator while we fetch reply options + render
-  // manager bubble. The fetch is async; we want the manager line on
-  // screen quickly, so render it now and fetch replies in parallel.
+  // If we hit the tap limit on this very tap, show paywall
+  if (hitLimit) {
+    await sleep(300);
+    showSimulationPaywall(scenario);
+    return;
+  }
+
   disableInput('');
   renderManagerBubble(scenario);
   await sleep(300);
@@ -2276,9 +2281,8 @@ function renderReplyPillsFlat(replies, scenario) {
     simConversation.push({ role: 'user', text });
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
-    const conversationsDone = SIM_STATE.branch_history.length;
     await sleep(500);
-    if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+    if (incrementSimTaps()) {
       showSimulationPaywall(scenario);
     } else {
       continueConversation(scenario, turnNodes);
@@ -2310,17 +2314,22 @@ function renderReplyPillsFlat(replies, scenario) {
   awaitFreeText(submitCustomReply);
 }
 
-// How many turns (user replies) before paywall fires.
-const SIM_FREE_CONVERSATIONS = 4;
+// How many chip taps (any type — scenario or reply) before paywall.
+// Covers both simulation mode taps uniformly.
+const SIM_FREE_TAPS = 4;
+let simTapCount = 0;
+
+function incrementSimTaps() {
+  simTapCount++;
+  return simTapCount >= SIM_FREE_TAPS;
+}
 
 // Track conversation history for multi-turn simulation
-// Each entry: { role: 'manager'|'user', text: '...' }
-// Also track DOM elements per turn so the back button can remove them.
 let simConversation = [];
-let simTurnElements = []; // array of arrays — each sub-array is the DOM nodes for that turn
+let simTurnElements = [];
 
 // User picked a reply pill: show their reply, then continue the
-// conversation with the manager's follow-up response.
+// conversation with the manager's follow-up responses.
 function pickReply(reply, pill, container, scenario) {
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
@@ -2333,20 +2342,14 @@ function pickReply(reply, pill, container, scenario) {
 
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
-
-  // Track in conversation history
   simConversation.push({ role: 'user', text: reply.text });
 
-  // Track DOM elements for this turn (user bubble + whatever comes next)
   const turnNodes = [userBubble];
   simTurnElements.push(turnNodes);
 
-  const conversationsDone = SIM_STATE.branch_history.length;
-
-  if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+  if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(scenario), 800);
   } else {
-    // Continue the conversation — manager responds to the user's reply
     setTimeout(() => continueConversation(scenario, turnNodes), 400);
   }
 }
@@ -2380,8 +2383,9 @@ async function continueConversation(scenario, turnNodes) {
   }
   hideCoachTyping();
 
-  // Render back button
-  const backBtn = renderBackButton();
+  // Render back button — "try a different response" since we're after
+  // the user's reply and before manager's follow-up options
+  const backBtn = renderBackButton('response');
   turnNodes.push(backBtn);
 
   // Render follow-up scenario chips (same pattern as initial scenarios)
@@ -2440,7 +2444,6 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   // Clear any previous expansion below the followup chips
   while (followupWrap.nextSibling) {
     const node = followupWrap.nextSibling;
-    // Remove from turnNodes tracking too
     const idx = turnNodes.indexOf(node);
     if (idx > -1) turnNodes.splice(idx, 1);
     node.remove();
@@ -2450,21 +2453,17 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
     p.classList.toggle('active', p === pill);
   });
 
-  // Track in conversation
   simConversation.push({ role: 'manager', text: scenario.text });
 
-  // User bubble showing the chosen manager response theme
   const userBubble = appendUserBubble('My manager\u2019s response:\n\u201c' + scenario.type + '\u201d');
   turnNodes.push(userBubble);
 
-  // Manager bubble with full text
   const mgrBubble = renderManagerBubble(scenario);
   turnNodes.push(mgrBubble);
   await sleep(300);
 
-  // Now show reply options for the user
-  const conversationsDone = SIM_STATE.branch_history.length;
-  if (conversationsDone >= SIM_FREE_CONVERSATIONS) {
+  // Count this tap toward the paywall limit
+  if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(parentScenario), 600);
     return;
   }
@@ -2491,18 +2490,25 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   }
   hideCoachTyping();
 
+  // "Try a different assumption" back button — lets user go back to the
+  // manager follow-up chips and pick a different manager reaction
+  const assumptionBack = renderBackButton('assumption');
+  turnNodes.push(assumptionBack);
+
   renderReplyPillsFlat(replies, parentScenario);
   const lastMsg = $('messages').lastElementChild;
   if (lastMsg) turnNodes.push(lastMsg);
 }
 
-// Render a back button that removes the current turn and restores the
-// previous step's reply options. Gives users a way to explore different
-// branches without restarting the whole simulation.
-function renderBackButton() {
+// Back button — two variants:
+// 'response' (default): "← Try a different response" — after reply nodes
+// 'assumption': "← Try a different assumption" — after manager option nodes
+function renderBackButton(variant) {
   const wrap = el('div', 'sim-back-wrap', '');
   const btn = el('button', 'sim-back-btn', '');
-  btn.innerHTML = '\u2190 Try a different response';
+  btn.innerHTML = variant === 'assumption'
+    ? '\u2190 Try a different assumption'
+    : '\u2190 Try a different response';
   btn.onclick = () => goBack();
   wrap.appendChild(btn);
   $('messages').appendChild(wrap);
@@ -2515,11 +2521,9 @@ function renderBackButton() {
 function goBack() {
   if (simTurnElements.length === 0) return;
 
-  // Remove all DOM nodes from the last turn
   const lastTurn = simTurnElements.pop();
   lastTurn.forEach(node => { if (node && node.parentNode) node.remove(); });
 
-  // Pop the corresponding conversation entries (user + manager)
   if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
     simConversation.pop();
   }
@@ -2527,15 +2531,22 @@ function goBack() {
     simConversation.pop();
   }
 
-  // Pop branch history
   if (SIM_STATE.branch_history.length > 0) {
     SIM_STATE.branch_history.pop();
   }
+  // Give back the tap so retrying doesn't waste the user's budget
+  if (simTapCount > 0) simTapCount--;
   updateTreeBadge();
 
-  // Re-enable the previous reply pills (find the last .sim-reply-pill set)
-  const allPills = $('messages').querySelectorAll('.sim-reply-pill');
-  allPills.forEach(p => {
+  // Re-enable all pills (both scenario and reply) so the user can pick again
+  const allSimPills = $('messages').querySelectorAll('.sim-pill');
+  allSimPills.forEach(p => {
+    p.disabled = false;
+    p.style.cursor = '';
+    p.classList.remove('active');
+  });
+  const allReplyPills = $('messages').querySelectorAll('.sim-reply-pill');
+  allReplyPills.forEach(p => {
     p.disabled = false;
     p.style.cursor = '';
     p.classList.remove('active');
@@ -2545,9 +2556,9 @@ function goBack() {
   scrollChatToBottom();
 }
 
-// ── Paywall after 1 level of simulation ──
+// ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  await typeCoachBubble("That's one branch. In the full version, you can **explore every scenario** — and practice until every response feels natural.");
+  await typeCoachBubble("You've explored the free preview. In the full plan, you can **practice every scenario and every response** until nothing surprises you.");
   await sleep(300);
 
   state.obstacle = SIM_STATE.blocker;
@@ -2556,11 +2567,20 @@ async function showSimulationPaywall(lastScenario) {
   state.current_range = { floor: 45, ceiling: 70 };
   state.initial_floor = 45;
 
-  logSession('paywall', { paywall_seen: true, path: 'simulation' });
+  logSession('paywall', { paywall_seen: true, path: 'simulation', taps: simTapCount });
 
   await renderPaywallBubble({ animated: true });
   logEntry('paywall', {});
+  state.paywall_shown = true;
+  saveState();
   unlockModeToggle();
+
+  // Disable all simulation pills so the user can't keep exploring for free
+  $('messages').querySelectorAll('.sim-pill, .sim-reply-pill').forEach(p => {
+    p.disabled = true;
+    p.style.opacity = '0.4';
+    p.style.cursor = 'default';
+  });
 
   try {
     if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'simulation' });
@@ -3313,6 +3333,8 @@ async function showPaywall() {
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
 async function renderPaywallBubble(opts) {
   opts = opts || {};
+  state.paywall_shown = true;
+  saveState();
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
 
@@ -3479,6 +3501,17 @@ async function handlePostPaywallText(text) {
   if (state.free_dialog_count > FREE_DIALOG_LIMIT) {
     await sleep(800);
     hideCoachTyping();
+    // If the main paywall hasn't been shown yet (user hit the cap in
+    // coaching mode before exploring enough simulation chips), show it now.
+    if (!state.paywall_shown) {
+      state.obstacle = state.obstacle || SIM_STATE.blocker || { code: 'other' };
+      state.current_range = state.current_range || { floor: 45, ceiling: 70 };
+      await renderPaywallBubble({ animated: true });
+      logEntry('paywall', {});
+      enableInput('Ask me anything\u2026');
+      awaitFreeText(handlePostPaywallText);
+      return;
+    }
     renderLockedReply(text);
     return;
   }
