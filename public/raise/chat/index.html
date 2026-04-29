@@ -702,6 +702,16 @@ const API_ENRICH   = '/api/raise-enrich';
 const API_CHECKOUT = '/api/raise-checkout';
 const API_LOG      = '/api/raise-webhook';
 
+// Fetch with a timeout — prevents API calls from hanging indefinitely.
+// Falls through to catch block if the request takes too long.
+function fetchWithTimeout(url, opts, timeoutMs) {
+  timeoutMs = timeoutMs || 15000;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...opts, signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+}
+
 // ── Session logger — one row per user, updated at each step ──
 const SESSION_START_TIME = Date.now();
 function logSession(stage, extra) {
@@ -1902,7 +1912,7 @@ async function showCoachReflection() {
   showCoachTyping();
 
   try {
-    const res = await fetch('/api/raise-coach', {
+    const res = await fetchWithTimeout('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1914,7 +1924,7 @@ async function showCoachReflection() {
         total_count: SIM_STATE.scenarios_total,
         session_id: profileHash(),
       }),
-    });
+    }, 15000);
     hideCoachTyping();
     if (res.ok) {
       const data = await res.json();
