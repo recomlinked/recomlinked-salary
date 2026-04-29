@@ -35,6 +35,14 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
 .logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
 .header-right{display:flex;align-items:center;gap:10px;}
+.header-buy-btn{
+  background:var(--gold);color:#07090f;
+  border:none;border-radius:8px;padding:6px 14px;
+  font-size:12px;font-weight:700;font-family:var(--sans);
+  cursor:pointer;transition:background 0.12s;
+  white-space:nowrap;
+}
+.header-buy-btn:hover{background:var(--gold2);}
 
 /* ── Chat area ─────────────────────────────────────────── */
 /* No flex gap — each message wrapper owns its own top/bottom padding,
@@ -715,7 +723,11 @@ function logSession(stage, extra) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
     keepalive: true,
-  }).catch(() => {});
+  }).then(r => {
+    if (!r.ok) console.warn('[logSession] webhook returned', r.status, 'for stage:', stage);
+  }).catch(err => {
+    console.warn('[logSession] webhook failed for stage:', stage, err.message);
+  });
 }
 
 // Freshness — if saved state is older than this, start from scratch.
@@ -2737,12 +2749,31 @@ async function showSimulationPaywall(lastScenario) {
   saveState();
   unlockModeToggle();
 
-  // Disable all simulation pills so the user can't keep exploring for free
+  // ── FULL LOCKDOWN: disable everything simulation-related ──
+  // 1. All scenario + reply pills
   $('messages').querySelectorAll('.sim-pill, .sim-reply-pill').forEach(p => {
     p.disabled = true;
     p.style.opacity = '0.4';
     p.style.cursor = 'default';
+    p.onclick = null;
   });
+  // 2. All inline back buttons ("try a different response/assumption")
+  $('messages').querySelectorAll('.sim-back-btn').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '0.3';
+    b.style.cursor = 'default';
+    b.onclick = null;
+  });
+  // 3. Bottom toolbar back buttons
+  const simBackTb = $('sim-back-toolbar');
+  if (simBackTb) simBackTb.style.display = 'none';
+  // 4. Mode toggle — lock it so user can't switch back to simulation
+  const modeToggle = $('mode-toggle');
+  if (modeToggle) modeToggle.classList.add('locked');
+  SIM_STATE.unlocked = false;
+
+  // ── Add purchase button to header — always visible from now on ──
+  showHeaderPurchaseButton();
 
   try {
     if (typeof window.gtag === 'function') window.gtag('event', 'paywall_viewed', { product: 'raise', path: 'simulation' });
@@ -2751,9 +2782,27 @@ async function showSimulationPaywall(lastScenario) {
 
   enableInput('Ask me anything…');
   awaitFreeText(handlePostPaywallText);
-  // Hide the persistent back toolbar since simulation is over
-  const simBackTb = $('sim-back-toolbar');
-  if (simBackTb) simBackTb.style.display = 'none';
+}
+
+// Add a compact purchase button to the site header so it's always
+// reachable after the paywall has been shown, even as the user scrolls.
+function showHeaderPurchaseButton() {
+  if ($('header-buy-btn')) return; // already added
+  const header = document.querySelector('.site-header');
+  if (!header) return;
+  // Ensure header-right container exists
+  let right = header.querySelector('.header-right');
+  if (!right) {
+    right = document.createElement('div');
+    right.className = 'header-right';
+    header.appendChild(right);
+  }
+  const btn = document.createElement('button');
+  btn.id = 'header-buy-btn';
+  btn.className = 'header-buy-btn';
+  btn.innerHTML = 'Get plan · $' + PRICE_USD;
+  btn.onclick = startCheckout;
+  right.appendChild(btn);
 }
 
 // ── Path A connection: after obstacle step → start simulation ──
