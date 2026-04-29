@@ -285,6 +285,18 @@ module.exports = async function handler(req, res) {
   if (body.mode === 'simulate_responses') {
     return handleSimulateResponses(body, res);
   }
+  if (body.mode === 'simulate_scenarios') {
+    return handleSimulateScenarios(body, res);
+  }
+  if (body.mode === 'simulate_replies') {
+    return handleSimulateReplies(body, res);
+  }
+  if (body.mode === 'simulate_custom_scenario') {
+    return handleSimulateCustomScenario(body, res);
+  }
+  if (body.mode === 'coach_reflection') {
+    return handleCoachReflection(body, res);
+  }
   const isFreeMode = !body.token && !!body.profile;
   if (isFreeMode) {
     return handleFreeMode(body, res);
@@ -802,5 +814,149 @@ Respond ONLY with valid JSON, no preamble:
       ],
       mode: 'simulate_responses',
     });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE SCENARIOS — 5-6 scenario labels for a blocker ══
+// ════════════════════════════════════════════════════════════
+async function handleSimulateScenarios(body, res) {
+  const { blocker, context } = body;
+  const blockerCode = blocker?.code || 'other';
+  const blockerLabel = blocker?.label || '';
+  const role = context?.role || '';
+  const timing = context?.timing || '';
+
+  const prompt = `Generate 5-6 realistic manager response THEMES for a salary negotiation.
+
+SITUATION: An employee is negotiating a raise. Their main concern: "${blockerLabel}"
+${role ? `Role: ${role}` : ''}
+${timing ? `Timeline: ${timing}` : ''}
+
+Generate 5-6 short labels (2-4 words each) representing different ways the manager might respond at this moment. For each, provide the full text of what the manager would say (1-2 sentences, realistic, specific).
+
+The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person, not a textbook.
+
+JSON only, no preamble:
+{ "scenarios": [ { "type": "Budget freeze", "text": "Budgets are locked until..." }, ... ] }`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 500,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({ scenarios: parsed.scenarios, mode: 'simulate_scenarios' });
+  } catch (err) {
+    console.error('[simulate_scenarios] error:', err);
+    return res.status(200).json({ scenarios: null, mode: 'simulate_scenarios' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE REPLIES — reply pills for a specific scenario ══
+// ════════════════════════════════════════════════════════════
+async function handleSimulateReplies(body, res) {
+  const { manager_said, scenario_type, blocker, context } = body;
+  const role = context?.role || '';
+
+  const prompt = `A manager just said: "${manager_said}" (scenario type: ${scenario_type})
+
+The employee's concern was: "${blocker?.label || 'asking for a raise'}"
+${role ? `Their role: ${role}` : ''}
+
+Generate 4-5 possible REPLY THEMES the employee could use. For each, provide:
+- A short theme label (2-3 words)
+- The full response text (1-2 sentences, specific, strategic)
+
+Make the replies varied — some direct, some diplomatic, some data-driven, some emotional. Each should be a genuinely different approach, not variations of the same thing.
+
+JSON only:
+{ "replies": [ { "theme": "Show data", "text": "I've done some research..." }, ... ] }`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 400,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({ replies: parsed.replies, mode: 'simulate_replies' });
+  } catch (err) {
+    console.error('[simulate_replies] error:', err);
+    return res.status(200).json({ replies: null, mode: 'simulate_replies' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ SIMULATE CUSTOM SCENARIO — from user's theme words     ══
+// ════════════════════════════════════════════════════════════
+async function handleSimulateCustomScenario(body, res) {
+  const { theme, blocker, context } = body;
+
+  const prompt = `A user is practicing a salary negotiation. Their concern: "${blocker?.label || 'asking for a raise'}"
+
+They want to practice a scenario where the manager responds in this way: "${theme}"
+
+Generate a realistic manager response matching that theme. Keep it to 1-2 sentences. Make it sound like a real person.
+
+JSON only:
+{ "scenario": { "type": "${theme}", "text": "..." } }`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 150,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const raw = response.content[0]?.text || '';
+    const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    return res.status(200).json({ scenario: parsed.scenario, mode: 'simulate_custom_scenario' });
+  } catch (err) {
+    console.error('[simulate_custom_scenario] error:', err);
+    return res.status(200).json({ scenario: { type: theme, text: `"I understand your concern, but let me explain where we stand on this."` }, mode: 'simulate_custom_scenario' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ COACH REFLECTION — analyze explored paths, give feedback ══
+// ════════════════════════════════════════════════════════════
+async function handleCoachReflection(body, res) {
+  const { blocker, context, branch_history, explored_count, total_count } = body;
+  const blockerLabel = blocker?.label || 'asking for a raise';
+  const role = context?.role || '';
+  const paths = (branch_history || []).map(b => `Manager scenario: "${b.scenario}" → User chose: "${b.reply}"`).join('\n');
+
+  const prompt = `You're a salary negotiation coach reviewing someone's preparation.
+
+Their concern: "${blockerLabel}"
+${role ? `Role: ${role}` : ''}
+They explored ${explored_count} of ${total_count} scenarios.
+
+Paths they practiced:
+${paths || '(none yet)'}
+
+Give a brief coaching reflection (3-4 sentences max):
+1. What their choices reveal about their preparation style
+2. One specific strength in their approach
+3. One gap or blind spot they should address
+4. Which unexplored scenario they should try next and why
+
+Be direct, specific, and encouraging. Don't be generic — reference their actual choices.`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 250,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = response.content[0]?.text || '';
+    return res.status(200).json({ reflection: text, mode: 'coach_reflection' });
+  } catch (err) {
+    console.error('[coach_reflection] error:', err);
+    return res.status(200).json({ reflection: null, mode: 'coach_reflection' });
   }
 }
