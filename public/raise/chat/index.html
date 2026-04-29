@@ -50,7 +50,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 @keyframes msgIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .bubble-label{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;}
 .bubble{background:var(--card);border-radius:4px 14px 14px 14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,0.04);}
-.bubble p{font-size:13.5px;color:var(--t1);line-height:1.6;}
+.bubble p{font-size:13.5px;color:var(--t1);line-height:1.6;white-space:pre-line;}
 .bubble p + p{margin-top:8px;}
 .bubble.card-bubble{padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
 .coach-msg .cursor{display:inline-block;width:1.5px;height:14px;background:var(--t2);margin-left:1px;vertical-align:middle;animation:blink 0.9s infinite;}
@@ -207,18 +207,41 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
    that explain WHY the uplift is real (not a bare claim). */
 .paywall-guarantee{
   font-size:12px;font-weight:600;color:var(--teal);
-  margin:10px 0 8px;line-height:1.5;
+  margin:10px 0 10px;line-height:1.5;
 }
+/* Pitch: now a bolded headline + short detail line. The strong tag is
+   the eye-catching promise; the rest is a one-line proof of practicality. */
 .paywall-pitch{
-  font-size:12.5px;color:rgba(255,255,255,0.72);
-  line-height:1.6;margin:0 0 12px;
+  font-size:12.5px;color:rgba(255,255,255,0.8);
+  line-height:1.55;margin:0 0 14px;
+}
+.paywall-pitch strong{
+  display:block;color:#fff;font-weight:700;
+  font-size:13.5px;margin-bottom:3px;letter-spacing:-0.005em;
 }
 .paywall-includes{
-  margin:0 0 14px;padding:0;
+  margin:0 0 14px;padding:10px 12px;
+  background:rgba(255,255,255,0.04);border-radius:8px;
+  display:flex;flex-direction:column;gap:9px;
 }
+/* Each "what you get" line: bold benefit headline + muted sub-line.
+   This gives the eye scannable anchors instead of three identical
+   paragraphs running together. */
 .paywall-inc-item{
-  font-size:12.5px;color:rgba(255,255,255,0.75);line-height:1.55;
-  padding:4px 0;
+  font-size:12.5px;line-height:1.5;
+  display:flex;flex-direction:column;gap:1px;
+  position:relative;padding-left:16px;
+}
+.paywall-inc-item::before{
+  content:'';position:absolute;left:0;top:6px;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+}
+.paywall-inc-item strong{
+  color:#fff;font-weight:700;font-size:12.5px;
+}
+.paywall-inc-item .paywall-inc-sub{
+  color:rgba(255,255,255,0.55);font-size:11.5px;line-height:1.45;
 }
 .paywall-inc-item:last-child{border-bottom:none;}
 
@@ -398,19 +421,72 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   letter-spacing:0.08em;text-transform:uppercase;
   color:var(--t3);padding:2px 0 0;
 }
-/* ── Mode toggle (icon inside input row) ─────────── */
-.mode-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--divider);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;color:var(--t3);position:relative;}
-.mode-btn:hover{border-color:var(--teal);color:var(--teal);}
-.mode-btn.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
-.mode-btn.locked{opacity:0.5;cursor:default;}
-.mode-btn .mode-btn-coach{display:none;}
-.mode-btn.coach .mode-btn-icon{display:none;}
-.mode-btn.coach .mode-btn-coach{display:block;}
-.mode-btn.coach{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,0.06);}
+/* ── Mode toggle (segmented: Coaching | Simulation) ─────────── */
+/* Both halves are always visible — one is active (filled), the other is muted.
+   Tapping the muted side switches modes. This makes it obvious there are
+   two modes and which one you're in right now. */
+.mode-toggle{display:inline-flex;border:1px solid var(--divider);border-radius:18px;background:var(--card);padding:2px;gap:2px;flex-shrink:0;}
+.mode-toggle-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:14px;border:none;background:transparent;cursor:pointer;font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--t3);transition:all 0.15s;white-space:nowrap;}
+.mode-toggle-btn:hover{color:var(--t1);}
+.mode-toggle-btn.active{color:#07090f;}
+.mode-toggle-btn.active.sim{background:rgba(0,196,160,0.16);color:#008970;}
+.mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
+.mode-toggle-btn svg{flex-shrink:0;}
+.mode-toggle.locked{opacity:0.5;pointer-events:none;}
 
+/* ── Mode banner ── shown in chat when user switches mode, makes the
+   current mode crystal clear. Inline message that says what's happening. */
+.mode-banner{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;margin:10px 0 4px;
+  border-radius:10px;
+  font-size:12px;font-weight:600;
+  animation:msgIn 0.35s ease;
+}
+.mode-banner.sim{background:rgba(0,196,160,0.08);color:#008970;border:1px solid rgba(0,196,160,0.2);}
+.mode-banner.coach{background:rgba(201,168,76,0.1);color:#7a6428;border:1px solid rgba(201,168,76,0.25);}
+.mode-banner svg{flex-shrink:0;}
+.mode-banner-sub{font-weight:400;opacity:0.78;margin-left:auto;font-size:11px;}
+
+/* ── Coach-reflection bubble (renders markdown: bold, italic, headers) ── */
+.bubble.coach-reflection h2,
+.bubble.coach-reflection h3{
+  font-size:12px;font-weight:700;color:var(--gold);
+  letter-spacing:0.04em;text-transform:uppercase;
+  margin:14px 0 6px;
+}
+.bubble.coach-reflection h2:first-child,
+.bubble.coach-reflection h3:first-child{margin-top:0;}
+.bubble.coach-reflection p{margin-bottom:10px;}
+.bubble.coach-reflection p:last-child{margin-bottom:0;}
+.bubble.coach-reflection strong{color:var(--t1);font-weight:700;}
+.bubble.coach-reflection em{color:var(--t2);font-style:italic;}
+.bubble.coach-reflection .reflect-section{
+  margin-top:10px;padding-top:10px;
+  border-top:0.5px solid var(--divider);
+}
+.bubble.coach-reflection .reflect-label{
+  font-size:10px;font-weight:700;
+  letter-spacing:0.06em;text-transform:uppercase;
+  margin-bottom:4px;display:block;
+}
+.bubble.coach-reflection .reflect-label.strength{color:var(--teal);}
+.bubble.coach-reflection .reflect-label.gap{color:var(--red);}
+.bubble.coach-reflection .reflect-label.next{color:var(--gold);}
 
 /* ── Input toolbar (context + tree icons above input) ── */
+/* IMPORTANT: this row sits ABOVE the input row inside .bottom-panel.
+   Earlier the whole bottom-panel got `dimmed` (opacity + pointer-events:none)
+   when input was disabled, which also disabled the toolbar buttons. Now the
+   toolbar lives in .bottom-panel but is excluded from `.dimmed` (see rule
+   below) so context + tree are always interactive once unlocked. */
 .input-toolbar{display:flex;gap:6px;padding:0 0 6px;justify-content:flex-start;}
+/* When the bottom panel is dimmed (input disabled), keep the toolbar AND
+   the chips-area (which hosts context + tree popovers) fully live — the
+   user can still review explored scenarios or add context while the
+   coach is rendering or simulation is in pill-mode. */
+.bottom-panel.dimmed .input-toolbar,
+.bottom-panel.dimmed .chips-area{opacity:1;pointer-events:auto;}
 .toolbar-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:16px;border:1px solid var(--divider);background:var(--card);cursor:pointer;font-family:var(--sans);color:var(--t3);transition:all 0.15s;position:relative;}
 .toolbar-btn:hover{border-color:var(--teal);color:var(--teal);}
 .toolbar-btn.active{border-color:var(--teal);background:rgba(0,196,160,0.06);color:var(--teal);}
@@ -437,17 +513,12 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .tree-export-btn{display:block;width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid var(--divider);background:var(--card);color:var(--t2);font-size:12px;font-weight:500;font-family:var(--sans);cursor:pointer;transition:all 0.15s;}
 .tree-export-btn:hover{border-color:var(--teal);color:var(--teal);}
 
-/* ── Mode toggle (inside input row) ── */
-.mode-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--divider);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;color:var(--t3);}
-.mode-btn:hover{border-color:var(--teal);color:var(--teal);}
-.mode-btn.sim-active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
-.mode-btn.coach-active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
-.mode-btn.locked{opacity:0.5;cursor:default;}
-.mode-btn .mode-btn-coach{display:none;}
-.mode-btn.coach-active .mode-btn-icon{display:none;}
-.mode-btn.coach-active .mode-btn-coach{display:block;}
-
-/* ── Simulation pills ─────────────────────────── */
+/* ── Scenario pills (flat layout — sit in their own coach-msg row) ── */
+/* "Tap one to explore what your manager might say" — chips are dialog
+   directions, not separate options nested under a card. They render as
+   their own message bubble in the flow. */
+.sim-pills-row{display:flex;flex-wrap:wrap;gap:6px;}
+.sim-pills-hint{font-size:11px;color:var(--t3);margin-bottom:8px;font-weight:500;}
 .sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
 .sim-pill:hover{border-color:var(--teal);color:var(--teal);}
 .sim-pill:active{transform:scale(0.97);}
@@ -455,18 +526,16 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .sim-pill-custom{border-style:dashed;color:var(--t3);}
 .sim-pill-custom:hover{border-color:var(--gold);color:var(--gold);}
 
-.sim-expanded{margin-top:12px;padding:12px 14px;background:var(--card);border:0.5px solid var(--divider);border-radius:var(--radius);animation:msgIn 0.3s ease;}
-.sim-mgr-text{font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:10px;}
-.sim-mgr-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
-.sim-reply-header{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:8px;padding-top:8px;border-top:0.5px solid var(--divider);}
+/* Manager + reply now flow as separate coach bubbles in the main stream
+   (flat structure) rather than nested inside one card. The label still
+   identifies who's speaking. */
+.sim-mgr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
+.sim-you-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
 .sim-reply-pill{background:var(--card);border:1.5px solid rgba(0,196,160,0.2);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
 .sim-reply-pill:hover{border-color:var(--teal);background:rgba(0,196,160,0.06);}
 .sim-reply-pill:active{transform:scale(0.97);}
 .sim-reply-pill.active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
-
-.sim-reply-text{font-size:13px;color:var(--t1);line-height:1.6;margin-top:10px;padding:10px 12px;background:rgba(0,196,160,0.04);border-radius:8px;border-left:3px solid var(--teal);}
-.sim-you-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
 </style>
 </head>
@@ -509,6 +578,34 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
     </div>
     <div class="input-bar">
       <div class="input-toolbar" id="input-toolbar" style="display:none;">
+        <!-- Mode toggle (segmented): both halves visible at once. The active
+             half is filled, the inactive is muted — tap the muted side to
+             switch modes. Replaces the older single-button toggle which
+             made it unclear whether you were in coach or simulation mode. -->
+        <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
+          <button class="mode-toggle-btn sim active" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="true" title="Practice scenarios — tap manager replies and your responses">
+            <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+              <rect x="7.5" y="2" width="5" height="2.5" rx="0.6" stroke="currentColor" stroke-width="1.4" fill="currentColor" fill-opacity="0.18"/>
+              <path d="M7 9l2 2M9 9l-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M11 13.5c1-1.4 2.2-1.4 2.6 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+              <path d="M13.6 13.5l-0.5-0.6M13.6 13.5l0.6-0.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
+            </svg>
+            <span>Simulation</span>
+          </button>
+          <button class="mode-toggle-btn coach" id="mode-btn-coach" type="button" onclick="setMode('coach')" role="tab" aria-selected="false" title="Get coaching feedback on the scenarios you've explored">
+            <!-- Coach: chat bubble with insight dot -->
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              <circle cx="7.5" cy="8.5" r="0.9" fill="currentColor"/>
+              <circle cx="10.5" cy="8.5" r="0.9" fill="currentColor"/>
+              <circle cx="13.5" cy="8.5" r="0.9" fill="currentColor"/>
+            </svg>
+            <span>Coaching</span>
+          </button>
+        </div>
         <button class="toolbar-btn" id="ctx-btn" onclick="toggleContextPanel()" title="Add context for better scenarios">
           <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 7h6M7 10h4M7 13h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           <span class="toolbar-badge" id="ctx-badge">4</span>
@@ -519,10 +616,6 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
         </button>
       </div>
       <div class="input-row">
-        <button class="mode-btn" id="mode-btn" onclick="toggleSimMode()" title="Switch between coaching and scenario planning" style="display:none;">
-          <svg class="mode-btn-icon" viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M3 7c0-1 1-3 4-3 2 0 3 1 3 2.5S9 9 7 9C5 9 3 8 3 7z" stroke="currentColor" stroke-width="1.3"/><path d="M17 7c0-1-1-3-4-3-2 0-3 1-3 2.5S11 9 13 9c2 0 4-1 4-2z" stroke="currentColor" stroke-width="1.3"/><path d="M4 13c0 0 2 4 6 4s6-4 6-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="6.5" r="0.8" fill="currentColor"/><circle cx="13" cy="6.5" r="0.8" fill="currentColor"/></svg>
-          <svg class="mode-btn-coach" viewBox="0 0 20 20" fill="none" width="18" height="18"><path d="M4 5h9v7H7.5L4 14.5V5z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 9h8v6h-2.5L11 17v-2H8V9z" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="rgba(201,168,76,0.1)"/></svg>
-        </button>
         <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
         <button class="send-btn" id="send-btn" disabled aria-label="Send">
           <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -1430,44 +1523,171 @@ function exportTreeSummary(btn) {
   logSession('tree_exported', { paths: SIM_STATE.branch_history.length });
 }
 
-// ── Mode toggle ──
-function toggleSimMode() {
+// ── Mode toggle (segmented) ──
+// `setMode('sim'|'coach')` is called from the toolbar pill clicks. It
+// updates the visual selected state, inserts a mode banner in the chat
+// stream so the user clearly sees they switched, and triggers the
+// appropriate flow (simulation pills stay tappable / coach-reflection runs).
+function setMode(target) {
   if (!SIM_STATE.unlocked) return;
-  
-  const btn = $('mode-btn');
-  if (!btn) return;
-  
-  if (SIM_STATE.simMode) {
-    SIM_STATE.simMode = false;
-    btn.classList.remove('sim-active');
-    btn.classList.add('coach-active');
+  if (target !== 'sim' && target !== 'coach') return;
+
+  const wantSim = target === 'sim';
+  // No-op if we're already in this mode
+  if (wantSim && SIM_STATE.simMode) return;
+  if (!wantSim && !SIM_STATE.simMode) return;
+
+  SIM_STATE.simMode = wantSim;
+  updateModeToggleUI();
+
+  if (wantSim) {
+    // Switching back to simulation — show banner, re-enable pill mode
+    insertModeBanner('sim');
+    disableInput('Tap a scenario above\u2026');
+  } else {
+    // Switching to coaching — show banner, run reflection (or open chat
+    // input if nothing's been explored yet)
+    insertModeBanner('coach');
     if (SIM_STATE.branch_history.length > 0) {
       showCoachReflection();
     } else {
       enableInput('Ask me anything\u2026');
       awaitFreeText(handlePostPaywallText);
     }
-  } else {
-    SIM_STATE.simMode = true;
-    btn.classList.add('sim-active');
-    btn.classList.remove('coach-active');
-    disableInput('Tap a scenario above\u2026');
   }
 }
 
-function showModeToggle() {
-  const btn = $('mode-btn');
-  if (btn) {
-    btn.style.display = '';
-    btn.classList.add('sim-active');
-    btn.classList.add('locked');
+// Sync the toggle UI with SIM_STATE.simMode
+function updateModeToggleUI() {
+  const simBtn   = $('mode-btn-sim');
+  const coachBtn = $('mode-btn-coach');
+  if (!simBtn || !coachBtn) return;
+  if (SIM_STATE.simMode) {
+    simBtn.classList.add('active');
+    simBtn.setAttribute('aria-selected', 'true');
+    coachBtn.classList.remove('active');
+    coachBtn.setAttribute('aria-selected', 'false');
+  } else {
+    coachBtn.classList.add('active');
+    coachBtn.setAttribute('aria-selected', 'true');
+    simBtn.classList.remove('active');
+    simBtn.setAttribute('aria-selected', 'false');
   }
+}
+
+// Insert an inline mode banner so the user sees a clear handoff between
+// "the manager-replies practice mode" and "the coach reviews how you did"
+// mode. Without this the user can be reading a long markdown reflection
+// and not realize the system has changed character on them.
+function insertModeBanner(mode) {
+  const wrap = el('div', 'mode-banner ' + (mode === 'sim' ? 'sim' : 'coach'), '');
+  if (mode === 'sim') {
+    wrap.innerHTML = `
+      <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true">
+        <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+        <rect x="7.5" y="2" width="5" height="2.5" rx="0.6" stroke="currentColor" stroke-width="1.4" fill="currentColor" fill-opacity="0.18"/>
+        <path d="M7 9l2 2M9 9l-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
+      </svg>
+      <span>Simulation mode</span>
+      <span class="mode-banner-sub">Practicing manager replies</span>
+    `;
+  } else {
+    wrap.innerHTML = `
+      <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true">
+        <path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        <circle cx="7.5" cy="8.5" r="0.9" fill="currentColor"/>
+        <circle cx="10.5" cy="8.5" r="0.9" fill="currentColor"/>
+        <circle cx="13.5" cy="8.5" r="0.9" fill="currentColor"/>
+      </svg>
+      <span>Coaching mode</span>
+      <span class="mode-banner-sub">Reflecting on your choices</span>
+    `;
+  }
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+}
+
+// Reveal the toggle (unlocked + visible) once the simulation flow starts.
+// Before this point both halves are visible but locked (greyed) so the
+// user knows the modes exist without being able to break the flow.
+function showModeToggle() {
+  const toggle = $('mode-toggle');
+  if (toggle) {
+    toggle.style.display = '';
+  }
+  SIM_STATE.simMode = true;
+  updateModeToggleUI();
 }
 
 function unlockModeToggle() {
-  const btn = $('mode-btn');
-  if (btn) btn.classList.remove('locked');
+  const toggle = $('mode-toggle');
+  if (toggle) toggle.classList.remove('locked');
   SIM_STATE.unlocked = true;
+}
+
+// ── Markdown rendering for coach output ──
+// The coach API returns Markdown ( **bold**, *italic*, ## headers,
+// paragraph breaks). We render a safe subset. Without this, raw asterisks
+// and hashes appear in the chat — which is what made the coaching message
+// look like a wall of text in earlier screenshots.
+function renderMarkdownToHtml(md) {
+  if (!md) return '';
+  // Escape HTML first so user/model output can't inject tags
+  let s = md.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+
+  // Headers (## or ###) become <h3>
+  s = s.replace(/^#{2,3}\s+(.+)$/gm, '<h3>$1</h3>');
+  // Bold **text** → <strong> (process before italic so *bold* doesn't conflict)
+  s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  // Italic *text* → <em>
+  s = s.replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, '$1<em>$2</em>');
+  // Paragraph breaks: split on blank lines, wrap each block in <p>
+  // (skip wrapping if the block is already an <h3>)
+  const blocks = s.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+  return blocks.map(b => /^<h3>/.test(b) ? b : `<p>${b.replace(/\n/g, ' ')}</p>`).join('');
+}
+
+// Try to extract semantic sections from the coach's reflection prose.
+// The reflection prompt asks for: strength, blind spot, try-next. If the
+// model labels them clearly we render colored section headers; otherwise
+// we just render the markdown as-is.
+function renderReflectionBubble(rawMd) {
+  const wrap = el('div', 'coach-msg', '');
+  const bubble = el('div', 'bubble coach-reflection', '');
+
+  // Pull out labeled sections — case-insensitive, allow markdown emphasis
+  // around the label. Splits the text into "intro" + tagged sections.
+  // Matches things like **Strength:**, "Blind spot —", "Try next:" etc.
+  const labelRx = /(\*\*?)?(strength|blind\s*spot|try\s*next)(\*\*?)?\s*[:\u2014\-]\s*/i;
+  // Render intro first
+  const introHtml = renderMarkdownToHtml(rawMd);
+  bubble.innerHTML = introHtml;
+
+  // Post-process: find <strong>Strength:</strong> etc. inline and turn
+  // them into clearly styled section blocks. We do this after markdown
+  // rendering so the bold tags are already present.
+  const transformed = bubble.innerHTML
+    .replace(/<strong>\s*Strength:?\s*<\/strong>/gi,
+      '</p><div class="reflect-section"><span class="reflect-label strength">Strength</span><p>')
+    .replace(/<strong>\s*Blind\s*spot:?\s*<\/strong>/gi,
+      '</p></div><div class="reflect-section"><span class="reflect-label gap">Blind spot</span><p>')
+    .replace(/<strong>\s*Try\s*next:?\s*<\/strong>/gi,
+      '</p></div><div class="reflect-section"><span class="reflect-label next">Try next</span><p>');
+  // If we made any replacements, close the final section. Test: the
+  // transformed string contains "reflect-section" but the intro didn't.
+  if (transformed !== bubble.innerHTML && /reflect-section/.test(transformed)) {
+    bubble.innerHTML = transformed + '</div>';
+    // Clean up empty paragraphs produced by the splits
+    bubble.innerHTML = bubble.innerHTML.replace(/<p>\s*<\/p>/g, '');
+  }
+
+  wrap.appendChild(bubble);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+  return wrap;
 }
 
 // ── Coach reflection ── reads explored paths and gives feedback ──
@@ -1493,7 +1713,8 @@ async function showCoachReflection() {
     if (res.ok) {
       const data = await res.json();
       if (data.reflection) {
-        await typeCoachBubble(data.reflection);
+        renderReflectionBubble(data.reflection);
+        logEntry('coach_bubble', { text: data.reflection, kind: 'reflection' });
       } else {
         await showDefaultReflection();
       }
@@ -1616,11 +1837,22 @@ async function startSimulationAtBlocker() {
   showToolbar();
   showModeToggle();
 
-  await typeCoachBubble("Let's plan for that moment. " + scene);
+  // Reframe the scene so the user understands the chips below it represent
+  // *different ways the dialog could go* — not ranking options, not
+  // categories of timing, but actual directions the manager could take.
+  // The earlier copy ("Let's plan for that moment. <scene>") read as a
+  // single statement and made the chips look unrelated.
+  await typeCoachBubble(
+    "Let's plan for that moment. " + scene +
+    "\n\nThere are several directions this could go. Tap one to explore that scenario."
+  );
   await sleep(300);
 
-  // Generate scenario labels for this blocker
-  disableInput('Loading scenarios…');
+  // Thinking indicator while we generate scenarios — without this the user
+  // sees a static "Loading scenarios…" placeholder and thinks the system
+  // is idle.
+  disableInput('Loading scenarios\u2026');
+  showCoachTyping();
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
@@ -1633,15 +1865,21 @@ async function startSimulationAtBlocker() {
       }),
     });
     const data = await res.json();
+    hideCoachTyping();
     if (data.scenarios && data.scenarios.length >= 2) {
       renderScenarioLabels(data.scenarios);
     } else {
       renderScenarioLabels(getDefaultScenarios(blocker.code));
     }
   } catch (err) {
+    hideCoachTyping();
     console.error('[sim] scenario gen failed:', err);
     renderScenarioLabels(getDefaultScenarios(blocker.code));
   }
+
+  // Now that the simulation flow is live, allow the user to flip to
+  // coaching mode whenever they want.
+  unlockModeToggle();
 }
 
 function getDefaultScenarios(blockerCode) {
@@ -1684,25 +1922,33 @@ function renderScenarioLabels(scenarios) {
 
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
-  inner.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;';
+  // Tiny hint above the pills makes the chips' role obvious — without
+  // this, users in earlier screenshots read the chips as ranking options
+  // or unrelated UI rather than as alternative manager-replies.
+  inner.innerHTML = '<div class="sim-pills-hint">Tap one to see what your manager says \u2014 then how you\'d respond.</div>';
+  const row = el('div', 'sim-pills-row', '');
+  inner.appendChild(row);
 
   scenarios.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
     pill.textContent = s.type;
     pill.dataset.index = i;
-    pill.onclick = () => expandScenario(s, i, pill, inner, wrap, scenarios);
-    inner.appendChild(pill);
+    pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
+    row.appendChild(pill);
   });
 
-  // "Something else" pill
+  // "Something else" pill — user-defined scenario theme
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = '+ Something else…';
+  custom.textContent = '+ Something else\u2026';
   custom.onclick = () => {
     enableInput('What would your manager say? (a few words)');
     awaitFreeText(async (text) => {
       if (!text || text.trim().length < 2) return;
       appendUserBubble(text);
-      disableInput('Generating scenario…');
+      disableInput('Generating scenario\u2026');
+      // Thinking indicator — without it the chat looks idle while we
+      // wait on the API to materialize the custom scenario.
+      showCoachTyping();
       try {
         const res = await fetch('/api/raise-coach', {
           method: 'POST',
@@ -1716,69 +1962,73 @@ function renderScenarioLabels(scenarios) {
           }),
         });
         const data = await res.json();
+        hideCoachTyping();
         if (data.scenario) {
           const newScenario = data.scenario;
           const newPill = el('button', 'sim-pill', '');
           newPill.textContent = newScenario.type;
-          inner.insertBefore(newPill, custom);
-          expandScenario(newScenario, scenarios.length, newPill, inner, wrap, [...scenarios, newScenario]);
+          row.insertBefore(newPill, custom);
+          expandScenario(newScenario, scenarios.length, newPill, row, wrap, [...scenarios, newScenario]);
           scenarios.push(newScenario);
         }
       } catch (err) {
+        hideCoachTyping();
         insertCoachBubble("I couldn't generate that scenario. Try tapping one of the options above.");
       }
-      disableInput('Tap a scenario above…');
+      disableInput('Tap a scenario above\u2026');
     });
   };
-  inner.appendChild(custom);
+  row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
-  disableInput('Tap a scenario above…');
+  disableInput('Tap a scenario above\u2026');
   scrollChatToBottom();
 
   logSession('sim_scenarios_shown', { count: scenarios.length, blocker: SIM_STATE.blocker.code });
 }
 
-// ── Expand a scenario — show full manager text + reply pills ──
-function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
-  // Remove any existing expanded content
-  parentWrap.querySelectorAll('.sim-expanded').forEach(e => e.remove());
-
-  // Highlight active pill
+// ── Tap a scenario → manager bubble + reply pills as flat messages ──
+// Earlier this flow was nested: tapping a scenario chip expanded a card
+// underneath the chips containing the manager line + reply chips. That
+// hid the reply chips inside a sub-thread and made it unclear that
+// picking a different reply branches the conversation. Now each step is
+// a separate coach message in the main flow:
+//   1. user-bubble: "Validating the hesitation"  (the chosen scenario type)
+//   2. coach-bubble with MANAGER label: the full scenario text
+//   3. coach-bubble: "How would you respond?" + reply pills
+//   4. user-bubble: the chosen reply (full text)
+//   5. paywall
+async function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
+  // Highlight the picked scenario chip + lock the others to make the
+  // branching feel intentional. (User can still scroll up to see.)
   pillContainer.querySelectorAll('.sim-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
   });
 
   logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
 
-  // Track explored scenarios
+  // Track explored scenarios for the tree badge / coach reflection
   if (!SIM_STATE.scenarios_explored.includes(scenario.type)) {
     SIM_STATE.scenarios_explored.push(scenario.type);
     updateTreeBadge();
   }
 
-  // Create expanded section below the pills
-  const expanded = el('div', 'sim-expanded', '');
+  // Step 1: user-bubble showing the picked direction (so the dialog
+  // reads naturally — "you chose this; here's what plays out")
+  appendUserBubble(scenario.type);
+  await sleep(200);
 
-  // Manager's full text
-  const mgrText = el('div', 'sim-mgr-text', '');
-  mgrText.innerHTML = `<span class="sim-mgr-label">Manager:</span> "${scenario.text}"`;
-  expanded.appendChild(mgrText);
+  // Step 2: thinking indicator while we fetch reply options + render
+  // manager bubble. The fetch is async; we want the manager line on
+  // screen quickly, so render it now and fetch replies in parallel.
+  disableInput('');
+  renderManagerBubble(scenario);
+  await sleep(300);
 
-  // Separator + reply header
-  const replyHeader = el('div', 'sim-reply-header', '');
-  replyHeader.textContent = 'How would you respond?';
-  expanded.appendChild(replyHeader);
-
-  // Fetch reply options from API
-  fetchReplyOptions(scenario, expanded);
-
-  parentWrap.appendChild(expanded);
-  scrollChatToBottom();
-}
-
-async function fetchReplyOptions(scenario, expandedContainer) {
+  // Step 3: thinking indicator → reply pills
+  showCoachTyping();
+  let replies;
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
@@ -1793,15 +2043,28 @@ async function fetchReplyOptions(scenario, expandedContainer) {
       }),
     });
     const data = await res.json();
-    if (data.replies && data.replies.length >= 2) {
-      renderReplyPills(data.replies, scenario, expandedContainer);
-    } else {
-      renderReplyPills(getDefaultReplies(), scenario, expandedContainer);
-    }
+    replies = (data.replies && data.replies.length >= 2) ? data.replies : getDefaultReplies();
   } catch (err) {
     console.error('[sim] reply gen failed:', err);
-    renderReplyPills(getDefaultReplies(), scenario, expandedContainer);
+    replies = getDefaultReplies();
   }
+  hideCoachTyping();
+  renderReplyPillsFlat(replies, scenario);
+}
+
+// Render the manager's response as its own coach-style bubble in the flow.
+// Uses the standard bubble shape so it visually matches other coach output,
+// but with a MANAGER label so the user knows it's roleplay, not coaching.
+function renderManagerBubble(scenario) {
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble">
+      <span class="sim-mgr-label">Manager</span>
+      <p>"${escapeHtml(scenario.text)}"</p>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
 }
 
 function getDefaultReplies() {
@@ -1813,21 +2076,25 @@ function getDefaultReplies() {
   ];
 }
 
-// ── Render reply pills as flat tappable section ──
-function renderReplyPills(replies, scenario, expandedContainer) {
-  const pillWrap = el('div', '', '');
-  pillWrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;';
+// Render the reply choices as a separate coach message — flat, in the
+// main thread. Each pill is a possible response; tapping one shows the
+// full text as a user bubble and proceeds to the paywall.
+function renderReplyPillsFlat(replies, scenario) {
+  const wrap = el('div', 'coach-msg', '');
+  const inner = el('div', '', '');
+  inner.innerHTML = '<div class="sim-pills-hint">How would you respond?</div>';
+  const row = el('div', 'sim-pills-row', '');
+  inner.appendChild(row);
 
   replies.forEach((r, i) => {
     const pill = el('button', 'sim-reply-pill', '');
     pill.textContent = r.theme;
-    pill.onclick = () => expandReply(r, i, pill, pillWrap, scenario, expandedContainer);
-    pillWrap.appendChild(pill);
+    pill.onclick = () => pickReply(r, pill, row, scenario);
+    row.appendChild(pill);
   });
 
-  // "I'd say something else" pill
   const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else…";
+  custom.textContent = "+ I'd say something else\u2026";
   custom.onclick = () => {
     enableInput('How would you respond? (a few words)');
     awaitFreeText(async (text) => {
@@ -1835,39 +2102,35 @@ function renderReplyPills(replies, scenario, expandedContainer) {
       appendUserBubble(text);
       disableInput('');
       logSession('sim_custom_reply', { theme: text, scenario: scenario.type });
-      // After custom reply → paywall
+      // Track for tree (use the user's text as the reply theme)
+      SIM_STATE.branch_history.push({ scenario: scenario.type, reply: text });
       await sleep(500);
       showSimulationPaywall(scenario);
     });
   };
-  pillWrap.appendChild(custom);
+  row.appendChild(custom);
 
-  expandedContainer.appendChild(pillWrap);
+  wrap.appendChild(inner);
+  $('messages').appendChild(wrap);
   scrollChatToBottom();
 }
 
-// ── Expand a reply — show full text, then paywall ──
-function expandReply(reply, index, pill, pillContainer, scenario, expandedContainer) {
-  // Highlight active pill
-  pillContainer.querySelectorAll('.sim-reply-pill').forEach(p => {
+// User picked a reply pill: show their full reply as a user bubble,
+// then proceed to the paywall after a beat.
+function pickReply(reply, pill, container, scenario) {
+  // Lock the row so the user can't double-pick mid-animation
+  container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
+    p.disabled = true;
+    p.style.cursor = 'default';
   });
 
-  // Remove any existing reply text
-  expandedContainer.querySelectorAll('.sim-reply-text').forEach(e => e.remove());
-
-  // Show full reply text
-  const replyText = el('div', 'sim-reply-text', '');
-  replyText.innerHTML = `<span class="sim-you-label">You:</span> "${reply.text}"`;
-  expandedContainer.appendChild(replyText);
+  appendUserBubble(`"${reply.text}"`);
   scrollChatToBottom();
 
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
-
-  // Track branch history for tree
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
 
-  // After seeing the reply → paywall
   setTimeout(() => showSimulationPaywall(scenario), 800);
 }
 
@@ -2646,16 +2909,31 @@ async function renderPaywallBubble(opts) {
 
   const proof = pickProofLine(obs.code);
 
+  // Restructured paywall body for scannability — earlier copy was a wall
+  // of text. Now: short bolded pitch lead + 3 benefits with bold-then-
+  // detail format so the eye can skim. CTA below.
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
       <div class="paywall-guarantee">We trust in prepared salary negotiation. If it doesn't work, we refund you.</div>
-      <div class="paywall-pitch">If you've thought through every possible response, you win the negotiation before it starts. You can explore all of them in less than an hour — just tapping through possibilities until nothing can surprise you.</div>
+      <div class="paywall-pitch">
+        <strong>Win the conversation before it starts.</strong>
+        Tap through every possibility in under an hour — until nothing can surprise you.
+      </div>
       <div class="paywall-includes">
-        <div class="paywall-inc-item">+ Unlimited scenario branches — practice every possibility</div>
-        <div class="paywall-inc-item">+ Fully customized to your situation</div>
-        <div class="paywall-inc-item">+ 30 days of coaching — ask anything, anytime</div>
+        <div class="paywall-inc-item">
+          <strong>Unlimited scenario branches</strong>
+          <span class="paywall-inc-sub">Practice every direction the conversation could go</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>Fully customized to your situation</strong>
+          <span class="paywall-inc-sub">Your role, your manager, your blocker — not a template</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>30 days of coaching</strong>
+          <span class="paywall-inc-sub">Ask anything, anytime, until the conversation is done</span>
+        </div>
       </div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
         Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
