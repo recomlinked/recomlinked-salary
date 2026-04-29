@@ -2410,7 +2410,7 @@ function getDefaultFollowupScenarios() {
 function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
-  inner.innerHTML = '<div class="sim-pills-hint">Your manager could respond several ways. Tap one:</div>';
+  inner.innerHTML = '<div class="sim-pills-hint">Your manager could respond several ways. Tap one to see the full response and choose how to react:</div>';
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
