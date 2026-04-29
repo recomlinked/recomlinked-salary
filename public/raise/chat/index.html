@@ -698,11 +698,16 @@ const API_LOG      = '/api/raise-webhook';
 const SESSION_START_TIME = Date.now();
 function logSession(stage, extra) {
   const payload = {
+    timestamp: new Date().toISOString(),
     event: 'RAISE_SESSION',
+    product: 'raise',
     session_id: profileHash(),
     stage,
     duration_s: Math.round((Date.now() - SESSION_START_TIME) / 1000),
     source: document.referrer || window.location.href,
+    url: window.location.href,
+    user_agent: navigator.userAgent.slice(0, 200),
+    screen: window.innerWidth + 'x' + window.innerHeight,
     ...(extra || {}),
   };
   fetch(API_LOG, {
@@ -1971,23 +1976,27 @@ async function beginSimulationFlow(reasonParam) {
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
   state.chat_log = [];
-  state.current_exchange = 0;
+  state.current_exchange = 10; // 10 = simulation mode (Path B)
+  state.sim_reason = reasonParam; // preserve for resume
+  saveState();
 
   logSession('sim_start', {
     blocker_code: blocker.code,
     blocker_label: blocker.label,
+    obstacle_code: blocker.code,
     landing_ref: reasonParam,
     path: 'B',
+    country: 'unknown',
+    seniority: 'unknown',
   });
   // Also fire an 'analyze' event (same stage name Path A uses) so the
   // Google Sheet webhook picks up Path B users in the same pipeline.
-  // Path A sends this after the initial range calc; Path B doesn't have
-  // a range, so we send a placeholder that signals "simulation entry".
   logSession('analyze', {
     initial_range: 'sim',
     landing_ref: reasonParam,
     path: 'B',
     blocker_code: blocker.code,
+    obstacle_code: blocker.code,
   });
 
   // Step 1: Coach insight
@@ -2788,6 +2797,9 @@ async function init() {
     const probCard = document.querySelector('.prob-card');
     if (probCard) probCard.style.display = 'none';
     disableInput('');
+    // Strip the ?reason= param from the URL so that refreshing the page
+    // resumes from saved state instead of re-triggering a fresh start.
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
     beginSimulationFlow(reason);
     return;
   }
@@ -2884,7 +2896,8 @@ function firstCoachMessageFor(range) {
 async function resumeFromState() {
   stopThinkingAnimation();
 
-  if (!state.current_range) {
+  // Path A requires current_range; Path B (simulation, exchange=10) doesn't
+  if (!state.current_range && state.current_exchange !== 10) {
     clearAll();
     window.location.replace('/raise/');
     return;
@@ -2921,7 +2934,21 @@ async function resumeFromState() {
 
   // Resume interaction based on cursor
   const where = state.current_exchange;
-  if (where === 1)      beginExchange1();
+  if (where === 10) {
+    // Path B simulation — replay transcript then restart the simulation
+    // from the blocker. The chat_log replay above restores the visible
+    // messages; we just need to re-enter the simulation flow.
+    const reason = state.sim_reason || 'other';
+    const blocker = BLOCKER_MAP[reason] || BLOCKER_MAP.other;
+    SIM_STATE.blocker = blocker;
+    SIM_STATE.context = {};
+    SIM_STATE.branch_history = [];
+    simTapCount = 0;
+    // Don't call beginSimulationFlow (it clears chat_log). Instead,
+    // re-enter at the simulation-at-blocker step which shows the
+    // toolbar, mode toggle, and scenario chips.
+    startSimulationAtBlocker();
+  } else if (where === 1)      beginExchange1();
   else if (where === 2) beginExchange2();
   else if (where === 3) beginTimeframeQuestion();
   else if (where === 4) beginObstacle();
