@@ -2444,9 +2444,20 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   // Clear any previous expansion below the followup chips
   while (followupWrap.nextSibling) {
     const node = followupWrap.nextSibling;
-    const idx = turnNodes.indexOf(node);
-    if (idx > -1) turnNodes.splice(idx, 1);
     node.remove();
+  }
+  // Also pop the last assumption turn if one exists (user picked a
+  // different follow-up chip, so the old assumption turn is stale)
+  if (simTurnElements.length > 0) {
+    const lastTurn = simTurnElements[simTurnElements.length - 1];
+    if (lastTurn._isAssumptionTurn) {
+      simTurnElements.pop();
+      // Pop the manager entry from conversation history
+      if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
+        simConversation.pop();
+      }
+      if (simTapCount > 0) simTapCount--;
+    }
   }
 
   pillContainer.querySelectorAll('.sim-pill').forEach(p => {
@@ -2455,14 +2466,20 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
 
   simConversation.push({ role: 'manager', text: scenario.text });
 
+  // Create a NEW turn entry for this assumption pick — separate from the
+  // reply turn, so goBack can undo just the assumption without undoing
+  // the user's reply that led to the follow-up chips.
+  const assumptionTurnNodes = [];
+  assumptionTurnNodes._isAssumptionTurn = true;
+  simTurnElements.push(assumptionTurnNodes);
+
   const userBubble = appendUserBubble('My manager\u2019s response:\n\u201c' + scenario.type + '\u201d');
-  turnNodes.push(userBubble);
+  assumptionTurnNodes.push(userBubble);
 
   const mgrBubble = renderManagerBubble(scenario);
-  turnNodes.push(mgrBubble);
+  assumptionTurnNodes.push(mgrBubble);
   await sleep(300);
 
-  // Count this tap toward the paywall limit
   if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(parentScenario), 600);
     return;
@@ -2490,14 +2507,12 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   }
   hideCoachTyping();
 
-  // "Try a different assumption" back button — lets user go back to the
-  // manager follow-up chips and pick a different manager reaction
   const assumptionBack = renderBackButton('assumption');
-  turnNodes.push(assumptionBack);
+  assumptionTurnNodes.push(assumptionBack);
 
   renderReplyPillsFlat(replies, parentScenario);
   const lastMsg = $('messages').lastElementChild;
-  if (lastMsg) turnNodes.push(lastMsg);
+  if (lastMsg) assumptionTurnNodes.push(lastMsg);
 }
 
 // Back button — two variants:
@@ -2524,35 +2539,35 @@ function goBack() {
   const lastTurn = simTurnElements.pop();
   lastTurn.forEach(node => { if (node && node.parentNode) node.remove(); });
 
-  if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
-    simConversation.pop();
-  }
-  if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'user') {
-    simConversation.pop();
+  if (lastTurn._isAssumptionTurn) {
+    // Assumption turn: only the manager's follow-up was added to conversation
+    if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
+      simConversation.pop();
+    }
+  } else {
+    // Reply turn: pop both user reply and any manager follow-up
+    if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'manager') {
+      simConversation.pop();
+    }
+    if (simConversation.length > 0 && simConversation[simConversation.length - 1].role === 'user') {
+      simConversation.pop();
+    }
+    if (SIM_STATE.branch_history.length > 0) {
+      SIM_STATE.branch_history.pop();
+    }
   }
 
-  if (SIM_STATE.branch_history.length > 0) {
-    SIM_STATE.branch_history.pop();
-  }
-  // Give back the tap so retrying doesn't waste the user's budget
   if (simTapCount > 0) simTapCount--;
   updateTreeBadge();
 
-  // Re-enable all pills (both scenario and reply) so the user can pick again
-  const allSimPills = $('messages').querySelectorAll('.sim-pill');
-  allSimPills.forEach(p => {
-    p.disabled = false;
-    p.style.cursor = '';
-    p.classList.remove('active');
-  });
-  const allReplyPills = $('messages').querySelectorAll('.sim-reply-pill');
-  allReplyPills.forEach(p => {
+  // Re-enable all pills so the user can pick again
+  $('messages').querySelectorAll('.sim-pill, .sim-reply-pill').forEach(p => {
     p.disabled = false;
     p.style.cursor = '';
     p.classList.remove('active');
   });
 
-  enableInput('Tap a reply or type your own\u2026');
+  enableInput('Tap an option or type your own\u2026');
   scrollChatToBottom();
 }
 
