@@ -929,9 +929,12 @@ JSON only:
 // ════════════════════════════════════════════════════════════
 // ══ SIMULATE FOLLOWUP — manager responds to user's reply    ══
 // ════════════════════════════════════════════════════════════
-// Multi-turn simulation: after the user picks a reply, the manager
-// reacts to it. Returns the manager's follow-up text + new reply
-// options for the user. This creates a real back-and-forth tree.
+// ══ SIMULATE FOLLOWUP — multiple possible manager reactions  ══
+// ════════════════════════════════════════════════════════════
+// After the user picks a reply, the manager could react in several ways.
+// This returns 4-5 possible manager follow-up responses as scenario chips
+// (same pattern as the initial scenario selection), keeping the tree
+// branching at every level.
 async function handleSimulateFollowup(body, res) {
   const { conversation_history, blocker, context } = body;
   const role = context?.role || '';
@@ -939,20 +942,20 @@ async function handleSimulateFollowup(body, res) {
     .map(t => `${t.role === 'manager' ? 'Manager' : 'You'}: "${t.text}"`)
     .join('\n');
 
-  const prompt = `You're simulating a salary negotiation conversation. The employee's concern: "${blocker?.label || 'asking for a raise'}"
+  const prompt = `You're simulating a salary negotiation. The employee's concern: "${blocker?.label || 'asking for a raise'}"
 ${role ? `Their role: ${role}` : ''}
 
 Conversation so far:
 ${history}
 
-Generate the manager's NEXT response to what the employee just said (1-2 sentences, realistic, in character — react specifically to their last statement, don't just give a generic response).
+The employee just said their last line. Now generate 4-5 DIFFERENT ways the manager could respond next. Each should be a genuinely different reaction — some supportive, some resistant, some deflecting, some curious.
 
-Then generate 4-5 possible reply options the employee could use next. For each:
-- "theme": short plain-English label (3-6 words, first person, like "Ask for specifics", "Stand my ground")
-- "text": full response (1-2 sentences)
+For each scenario:
+- "type": a short quote (3-7 words) showing what the manager says — a mini-quote in the manager's voice like: "That's fair, let me check", "I need to loop in HR", "What exactly are you asking for?"
+- "text": the full 1-2 sentence version
 
 JSON only:
-{ "manager_response": "...", "replies": [ { "theme": "...", "text": "..." }, ... ] }`;
+{ "scenarios": [ { "type": "\\"That's fair, let me check\\"", "text": "..." }, ... ] }`;
 
   try {
     const response = await client.messages.create({
@@ -963,15 +966,13 @@ JSON only:
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
     return res.status(200).json({
-      manager_response: parsed.manager_response,
-      replies: parsed.replies,
+      scenarios: parsed.scenarios,
       mode: 'simulate_followup',
     });
   } catch (err) {
     console.error('[simulate_followup] error:', err);
     return res.status(200).json({
-      manager_response: "I hear what you're saying. Let me think about how we can approach this.",
-      replies: null,
+      scenarios: null,
       mode: 'simulate_followup',
     });
   }
