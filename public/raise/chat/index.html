@@ -225,8 +225,17 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
   line-height:1.55;margin:0 0 14px;
 }
 .paywall-refund{
-  display:block;color:var(--teal);font-weight:700;
-  margin:4px 0;
+  color:var(--teal);font-weight:700;
+}
+.paywall-headline{margin-bottom:10px !important;}
+.paywall-headline strong{
+  font-size:17px;font-weight:800;color:#fff;
+  letter-spacing:-0.02em;line-height:1.3;
+}
+.paywall-includes-title{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.08em;color:rgba(255,255,255,0.4);
+  margin:12px 0 6px;
 }
 .paywall-includes{
   margin:0 0 14px;padding:10px 12px;
@@ -3623,7 +3632,7 @@ async function renderPaywallBubble(opts) {
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
 
-  const headline = `Prepare for every scenario — and nothing will surprise you.`;
+  const headline = `Prepare for every scenario.`;
 
   const proof = pickProofLine(obs.code);
 
@@ -3631,11 +3640,15 @@ async function renderPaywallBubble(opts) {
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <div class="paywall-pitch">
-        Win the negotiation before it starts.
-        <span class="paywall-refund">If it doesn't work, we refund you.</span>
-        Tap through every possibility in under an hour — until nothing can surprise you.
+      <div class="paywall-pitch">Win the negotiation before it starts. We're confident this works — <span class="paywall-refund">if not, we'll give you a full refund.</span> Tap through every possibility in under an hour so nothing surprises you.</div>
+      <button class="btn-pay paywall-cta" id="btn-pay-cta">
+        Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      </button>
+      <div class="trust-row paywall-trust">
+        <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
       </div>
+      <div class="proof-line paywall-proof"><strong class="proof-typed"></strong></div>
+      <div class="paywall-includes-title">Includes</div>
       <div class="paywall-includes">
         <div class="paywall-inc-item">
           <strong>Unlimited scenario branches</strong>
@@ -3650,13 +3663,6 @@ async function renderPaywallBubble(opts) {
           <span class="paywall-inc-sub">Ask anything, anytime, until the conversation is done</span>
         </div>
       </div>
-      <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row paywall-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
-      </div>
-      <div class="proof-line paywall-proof"><strong class="proof-typed"></strong></div>
     </div>
   `;
   $('messages').appendChild(wrap);
@@ -3674,16 +3680,18 @@ async function renderPaywallBubble(opts) {
   }
 
   // Animated render
-  const pitchEl    = wrap.querySelector('.paywall-pitch');
-  const includesEl = wrap.querySelector('.paywall-includes');
-  const ctaEl      = wrap.querySelector('.paywall-cta');
-  const trustEl    = wrap.querySelector('.paywall-trust');
-  const proofEl    = wrap.querySelector('.paywall-proof');
-  pitchEl.style.opacity    = '0';
-  includesEl.style.opacity = '0';
-  ctaEl.style.opacity      = '0';
-  trustEl.style.opacity    = '0';
-  proofEl.style.opacity    = '0';
+  const pitchEl       = wrap.querySelector('.paywall-pitch');
+  const ctaEl         = wrap.querySelector('.paywall-cta');
+  const trustEl       = wrap.querySelector('.paywall-trust');
+  const proofEl       = wrap.querySelector('.paywall-proof');
+  const incTitleEl    = wrap.querySelector('.paywall-includes-title');
+  const includesEl    = wrap.querySelector('.paywall-includes');
+  pitchEl.style.opacity       = '0';
+  ctaEl.style.opacity         = '0';
+  trustEl.style.opacity       = '0';
+  proofEl.style.opacity       = '0';
+  incTitleEl.style.opacity    = '0';
+  includesEl.style.opacity    = '0';
   scrollChatToBottom();
 
   // Type headline
@@ -3696,12 +3704,15 @@ async function renderPaywallBubble(opts) {
   await sleep(300);
   fadeInElement(pitchEl);
   await sleep(300);
-  fadeInElement(includesEl);
-  await sleep(300);
   fadeInElement(ctaEl);
   await sleep(100);
   fadeInElement(trustEl);
   await sleep(150);
+  fadeInElement(proofEl);
+  await sleep(300);
+  fadeInElement(incTitleEl);
+  await sleep(100);
+  fadeInElement(includesEl);
   fadeInElement(proofEl);
 
   // Start proof line type/untype rotation
