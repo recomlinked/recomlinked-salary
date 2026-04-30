@@ -171,8 +171,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 
 /* ── Coach typing indicator (FA arc pattern) ────────────── */
-.typing-bubble{padding:8px 12px;}
-.typing-indicator{display:inline-flex;align-items:center;padding:2px 0;}
+.typing-bubble{padding:8px 14px;}
+.typing-indicator{display:inline-flex;align-items:center;gap:10px;padding:2px 0;}
+.typing-phrase{font-size:12px;color:var(--t3);font-style:italic;min-width:140px;}
 
 /* ── Paywall bubble (coach-voice, natural) ─────────────── */
 /* Rendered as a coach bubble, not a product surface. Dark background
@@ -1200,6 +1201,17 @@ function escapeHtml(s) {
 
 /* ── Coach typing placeholder while awaiting exchange API (FA arc pattern) ─ */
 let currentTypingWrap = null;
+// Thinking phrases — rotated inside the typing bubble so the user
+// sees activity, not just a silent spinner.
+const TYPING_PHRASES = [
+  'Thinking through scenarios…',
+  'Considering your options…',
+  'Weighing the angles…',
+  'Building the response…',
+  'Mapping out possibilities…',
+  'Analyzing the situation…',
+];
+
 function showCoachTyping() {
   if (currentTypingWrap) return;
   const wrap = el('div', 'coach-msg', '');
@@ -1210,6 +1222,7 @@ function showCoachTyping() {
           <circle class="rl-arc-track" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="2.5" stroke-linecap="round" transform="rotate(-210 16 16)"/>
           <circle class="rl-arc-fill"  cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="35" transform="rotate(-210 16 16)"/>
         </svg>
+        <span class="typing-phrase"></span>
       </div>
     </div>
   `;
@@ -1217,13 +1230,46 @@ function showCoachTyping() {
   scrollChatToBottom();
   currentTypingWrap = wrap;
   startTypingArcAnimation(wrap);
+  startTypingPhraseRotation(wrap);
 }
 function hideCoachTyping() {
   if (currentTypingWrap) {
     if (currentTypingWrap._arcStop) currentTypingWrap._arcStop();
+    if (currentTypingWrap._phraseStop) currentTypingWrap._phraseStop();
     currentTypingWrap.remove();
     currentTypingWrap = null;
   }
+}
+
+// Type in → pause → type out → next phrase, looping until hideCoachTyping
+function startTypingPhraseRotation(wrap) {
+  const phraseEl = wrap.querySelector('.typing-phrase');
+  if (!phraseEl) return;
+  let running = true;
+  let idx = Math.floor(Math.random() * TYPING_PHRASES.length);
+
+  async function loop() {
+    while (running) {
+      const phrase = TYPING_PHRASES[idx % TYPING_PHRASES.length];
+      idx++;
+      // Type in
+      for (let i = 1; i <= phrase.length && running; i++) {
+        phraseEl.textContent = phrase.slice(0, i);
+        await sleep(20);
+      }
+      // Pause
+      await sleep(2000);
+      if (!running) break;
+      // Type out
+      for (let i = phrase.length; i >= 0 && running; i--) {
+        phraseEl.textContent = phrase.slice(0, i);
+        await sleep(12);
+      }
+      await sleep(300);
+    }
+  }
+  loop();
+  wrap._phraseStop = () => { running = false; };
 }
 
 /**
@@ -1909,8 +1955,14 @@ function renderReflectionBubble(rawMd) {
 // ── Coach reflection ── reads explored paths and gives feedback ──
 async function showCoachReflection() {
   disableInput('');
-  showCoachTyping();
 
+  // Show the local reflection IMMEDIATELY — no spinner, no waiting.
+  // The user sees coaching feedback within 1 second of switching modes.
+  const instantBubble = await showDefaultReflection();
+
+  // Fire the API call in the background. If it returns a richer
+  // reflection, replace the instant one. If it fails or times out,
+  // the user already has the local version — no harm done.
   try {
     const res = await fetchWithTimeout('/api/raise-coach', {
       method: 'POST',
@@ -1925,21 +1977,19 @@ async function showCoachReflection() {
         session_id: profileHash(),
       }),
     }, 15000);
-    hideCoachTyping();
     if (res.ok) {
       const data = await res.json();
       if (data.reflection) {
+        // Replace the instant bubble with the richer API version
+        if (instantBubble && instantBubble.parentNode) {
+          instantBubble.remove();
+        }
         renderReflectionBubble(data.reflection);
         logEntry('coach_bubble', { text: data.reflection, kind: 'reflection' });
-      } else {
-        await showDefaultReflection();
       }
-    } else {
-      await showDefaultReflection();
     }
   } catch (err) {
-    hideCoachTyping();
-    await showDefaultReflection();
+    // API failed — the instant reflection is already showing, nothing to do
   }
 
   logSession('coach_reflection', { paths_explored: SIM_STATE.scenarios_explored.length, paths_total: SIM_STATE.scenarios_total });
@@ -1955,16 +2005,17 @@ async function showDefaultReflection() {
   let msg = `Looking at what you\u2019ve practiced: you explored ${explored} of ${total} scenarios.`;
 
   if (history.length === 1) {
-    msg += ` You chose \u201c${history[0].reply}\u201d when your manager said \u201c${history[0].scenario}.\u201d That\u2019s a solid instinct \u2014 but you haven\u2019t tested how you\u2019d handle the other ${unexplored} possibilities.`;
+    msg += ` You chose \u201c${history[0].reply}\u201d when your manager said \u201c${history[0].scenario}.\u201d That\u2019s a **solid instinct** \u2014 but you haven\u2019t tested how you\u2019d handle the other ${unexplored} possibilities.`;
   } else if (history.length >= 2) {
-    msg += ` Your responses show a pattern. Consider practicing the scenarios you skipped \u2014 those are the ones most likely to catch you off guard.`;
+    const replies = history.map(h => h.reply).join('\u201d, \u201c');
+    msg += ` Your replies \u2014 \u201c${replies}\u201d \u2014 show **a consistent approach**. Consider practicing the scenarios you skipped \u2014 those are the ones most likely to catch you off guard.`;
   }
 
   if (unexplored > 0) {
-    msg += ` I\u2019d suggest exploring the ${unexplored} untested scenario${unexplored > 1 ? 's' : ''} \u2014 the one you feel least prepared for is the one most worth practicing.`;
+    msg += ` I\u2019d suggest exploring the ${unexplored} untested scenario${unexplored > 1 ? 's' : ''} \u2014 **the one you feel least prepared for** is the one most worth practicing.`;
   }
 
-  await typeCoachBubble(msg);
+  return await typeCoachBubble(msg);
 }
 
 // Map landing page reason params to blocker codes + labels + scene-setting
@@ -3825,8 +3876,9 @@ async function handlePostPaywallText(text) {
     return;
   }
 
-  // Call the real coach API in free mode. Include session_id and
-  // free_dialog_count so the backend can log them into the Raise Leads sheet.
+  // Call the real coach API in free mode. Include simulation context
+  // so the coach knows what the user practiced and can give advice based
+  // on their specific scenario choices and responses.
   let reply = null;
   try {
     const res = await fetch('/api/raise-coach', {
@@ -3841,6 +3893,14 @@ async function handlePostPaywallText(text) {
         message:               text,
         session_id:            profileHash(),
         free_dialog_count:     state.free_dialog_count,
+        // Simulation context — so the coach can reference what the user practiced
+        sim_context: SIM_STATE.blocker ? {
+          blocker: SIM_STATE.blocker,
+          branch_history: SIM_STATE.branch_history || [],
+          scenarios_explored: SIM_STATE.scenarios_explored || [],
+          conversation_history: simConversation || [],
+          user_context: SIM_STATE.context || {},
+        } : undefined,
       }),
     });
     if (res.ok) {
