@@ -533,7 +533,6 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    directions, not separate options nested under a card. They render as
    their own message bubble in the flow. */
 .sim-pills-row{display:flex;flex-wrap:wrap;gap:6px;}
-.sim-pills-hint{font-size:11px;color:var(--t3);margin-bottom:8px;font-weight:500;}
 .sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
 .sim-pill:hover{border-color:var(--teal);color:var(--teal);}
 .sim-pill:active{transform:scale(0.97);}
@@ -2211,10 +2210,6 @@ function renderScenarioLabels(scenarios) {
 
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
-  // Tiny hint above the pills makes the chips' role obvious — without
-  // this, users in earlier screenshots read the chips as ranking options
-  // or unrelated UI rather than as alternative manager-replies.
-  inner.innerHTML = '<div class="sim-pills-hint">Tap one to see what your manager says \u2014 then how you\'d respond.</div>';
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
@@ -2279,6 +2274,8 @@ function renderScenarioLabels(scenarios) {
   row.appendChild(custom);
 
   wrap.appendChild(inner);
+  // Coach bubble before the pills — short and clear
+  insertCoachBubble("Pick a direction your manager might take:");
   $('messages').appendChild(wrap);
   simBranchAnchor = wrap; // anchor: everything after this = branch content
   scrollChatToBottom();
@@ -2420,9 +2417,10 @@ function getDefaultReplies() {
 // main thread. Each pill is a possible response; tapping one shows the
 // full text as a user bubble and proceeds to the paywall.
 function renderReplyPillsFlat(replies, scenario) {
+  // Coach bubble before reply pills
+  insertCoachBubble("How would you respond?");
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
-  inner.innerHTML = '<div class="sim-pills-hint">How would you respond?</div>';
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
@@ -2567,9 +2565,10 @@ function getDefaultFollowupScenarios() {
 // renderScenarioLabels but for deeper tree levels. Picking one shows
 // the manager's full response, then new reply options appear.
 function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
+  // Coach bubble before follow-up pills
+  insertCoachBubble("Your manager could respond several ways:");
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
-  inner.innerHTML = '<div class="sim-pills-hint">Your manager could respond several ways. Tap one to see the full response and choose how to react:</div>';
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
