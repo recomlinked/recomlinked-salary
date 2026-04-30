@@ -563,22 +563,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .sim-back-btn:hover{border-color:var(--t2);color:var(--t1);}
 
-/* Persistent back buttons in bottom toolbar — always visible during sim */
-.sim-back-toolbar{
-  display:flex;gap:6px;padding:0 0 6px;
-}
-.sim-back-toolbar-btn{
-  display:flex;align-items:center;gap:3px;
-  padding:4px 10px;border-radius:14px;
-  border:1px solid var(--divider);background:var(--card);
-  color:var(--t3);font-size:11px;font-weight:500;
-  font-family:var(--sans);cursor:pointer;transition:all 0.15s;
-  white-space:nowrap;
-}
-.sim-back-toolbar-btn:hover{border-color:var(--teal);color:var(--teal);}
-.sim-back-toolbar-btn:disabled{opacity:0.35;cursor:default;}
 /* Keep back toolbar visible even when bottom panel is dimmed */
-.bottom-panel.dimmed .sim-back-toolbar{opacity:1;pointer-events:auto;}
 
 </style>
 </head>
@@ -620,16 +605,6 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
       <div class="chips-area-scroll" id="chips-area-scroll"></div>
     </div>
     <div class="input-bar">
-      <!-- Persistent simulation back buttons — always visible during sim mode.
-           Clicking scrolls to and triggers the last inline back button of that type. -->
-      <div class="sim-back-toolbar" id="sim-back-toolbar" style="display:none;">
-        <button class="sim-back-toolbar-btn" id="sim-back-response-btn" onclick="triggerLastBack('response')" type="button">
-          <span>← different response</span>
-        </button>
-        <button class="sim-back-toolbar-btn" id="sim-back-assumption-btn" onclick="triggerLastBack('assumption')" type="button">
-          <span>← different assumption</span>
-        </button>
-      </div>
       <div class="input-toolbar" id="input-toolbar" style="display:none;">
         <!-- Mode toggle (segmented): both halves visible at once. The active
              half is filled, the inactive is muted — tap the muted side to
@@ -2405,13 +2380,13 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
     });
     enableInput('Tap a scenario above or type your own\u2026');
     scrollChatToBottom();
-    updateSimBackToolbar();
+  
   };
   backWrap.appendChild(backBtn);
   $('messages').appendChild(backWrap);
 
   renderReplyPillsFlat(replies, scenario);
-  updateSimBackToolbar();
+
 }
 
 // Render the manager's response as its own coach-style bubble in the flow.
@@ -2528,7 +2503,7 @@ function pickReply(reply, pill, container, scenario) {
 
   const turnNodes = [userBubble];
   simTurnElements.push(turnNodes);
-  updateSimBackToolbar();
+
 
   if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(scenario), 800);
@@ -2576,7 +2551,7 @@ async function continueConversation(scenario, turnNodes) {
   turnNodes.push(followupWrap);
 
   enableInput('Tap a response above or type your own\u2026');
-  updateSimBackToolbar();
+
 }
 
 function getDefaultFollowupScenarios() {
@@ -2697,7 +2672,7 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   renderReplyPillsFlat(replies, parentScenario);
   const lastMsg = $('messages').lastElementChild;
   if (lastMsg) assumptionTurnNodes.push(lastMsg);
-  updateSimBackToolbar();
+
 }
 
 // Back button — two variants:
@@ -2762,51 +2737,12 @@ function goBack() {
   } else {
     scrollChatToBottom();
   }
-  updateSimBackToolbar();
+
 }
 
 // Persistent bottom toolbar back buttons — trigger the last inline
 // back button of the given type by calling goBack(). The toolbar
 // buttons mirror the inline ones so the user doesn't have to scroll up.
-function triggerLastBack(type) {
-  if (simTurnElements.length === 0) return;
-  const lastTurn = simTurnElements[simTurnElements.length - 1];
-  if (type === 'assumption' && lastTurn._isAssumptionTurn) {
-    goBack();
-  } else if (type === 'response' && !lastTurn._isAssumptionTurn) {
-    goBack();
-  } else if (type === 'response' && lastTurn._isAssumptionTurn) {
-    // Go back twice: first undo the assumption, then the response
-    goBack();
-    goBack();
-  } else {
-    goBack();
-  }
-}
-
-// Show/hide and enable/disable the persistent back buttons based on
-// what turns exist in the stack. Called after every turn change.
-function updateSimBackToolbar() {
-  const tb = $('sim-back-toolbar');
-  if (!tb) return;
-  const responseBtn = $('sim-back-response-btn');
-  const assumptionBtn = $('sim-back-assumption-btn');
-
-  // Only show during simulation mode when there are turns to undo
-  if (!SIM_STATE.simMode || simTurnElements.length === 0) {
-    tb.style.display = 'none';
-    return;
-  }
-  tb.style.display = '';
-
-  // Enable/disable based on what's in the stack
-  const hasResponseTurn = simTurnElements.some(t => !t._isAssumptionTurn);
-  const hasAssumptionTurn = simTurnElements.some(t => t._isAssumptionTurn);
-
-  if (responseBtn) responseBtn.disabled = !hasResponseTurn;
-  if (assumptionBtn) assumptionBtn.disabled = !hasAssumptionTurn;
-}
-
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
   await typeCoachBubble("You've explored the free preview. In the full plan, you can **practice every scenario and every response** until nothing surprises you.");
@@ -2851,10 +2787,7 @@ async function showSimulationPaywall(lastScenario) {
     b.style.cursor = 'default';
     b.onclick = null;
   });
-  // 3. Bottom toolbar back buttons
-  const simBackTb = $('sim-back-toolbar');
-  if (simBackTb) simBackTb.style.display = 'none';
-  // 4. Mode toggle — lock it so user can't switch back to simulation
+  // 3. Mode toggle — lock it so user can't switch back to simulation
   const modeToggle = $('mode-toggle');
   if (modeToggle) modeToggle.classList.add('locked');
   SIM_STATE.unlocked = false;
