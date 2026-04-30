@@ -1174,6 +1174,72 @@ h2.section-title {
 }
 .calc-cta-hook .gold { color: var(--gold); }
 
+/* ── Scenario Tree Widget ─────────────────────────────── */
+.scenario-tree-widget{
+  background:linear-gradient(175deg,#0c0e15 0%,#090b10 50%,#0b0d14 100%);
+  border-radius:20px;max-width:460px;margin:0 auto;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.05);
+  box-shadow:0 32px 100px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.04);
+  font-family:var(--sans);
+}
+.st-header{
+  padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.st-badge{display:flex;align-items:center;gap:6px;margin-bottom:6px;
+  font-size:10px;font-weight:700;color:rgba(0,196,160,0.6);text-transform:uppercase;letter-spacing:0.12em;}
+.st-badge-dot{width:6px;height:6px;border-radius:50%;background:#00c4a0;box-shadow:0 0 8px rgba(0,196,160,0.4);}
+.st-title{font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1.2;}
+.st-counters{display:flex;gap:6px;}
+.st-counter{border-radius:10px;padding:6px 10px;text-align:center;min-width:42px;}
+.st-counter-g{background:rgba(0,196,160,0.06);border:1px solid rgba(0,196,160,0.1);}
+.st-counter-y{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);}
+.st-counter-n{display:block;font-size:18px;font-weight:800;line-height:1;}
+.st-counter-g .st-counter-n{color:#00c4a0;}
+.st-counter-y .st-counter-n{color:#c9a84c;}
+.st-counter-l{font-size:7px;color:rgba(255,255,255,0.3);margin-top:1px;}
+.st-tree-wrap{position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 20%,rgba(0,196,160,0.02) 0%,transparent 60%);}
+.st-fade-l,.st-fade-r,.st-fade-b{position:absolute;z-index:2;pointer-events:none;}
+.st-fade-l{left:0;top:0;bottom:0;width:30px;background:linear-gradient(90deg,#0b0d14,transparent);}
+.st-fade-r{right:0;top:0;bottom:0;width:30px;background:linear-gradient(270deg,#0b0d14,transparent);}
+.st-fade-b{left:0;right:0;bottom:0;height:20px;background:linear-gradient(0deg,#0b0d14,transparent);}
+.st-chat-section{border-top:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.2);}
+.st-chat-header{padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center;
+  font-size:9px;font-weight:700;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.1em;}
+.st-chat-header-left{display:flex;align-items:center;gap:6px;}
+.st-chat-dot{width:5px;height:5px;border-radius:50%;background:#00c4a0;
+  animation:stPulse 1.5s ease infinite;}
+.st-chat-depth{font-size:9px;color:rgba(255,255,255,0.1);text-transform:none;font-weight:400;}
+.st-chat-body{padding:4px 20px 14px;height:155px;overflow-y:auto;
+  display:flex;flex-direction:column;gap:5px;justify-content:flex-end;}
+.st-chat-body::-webkit-scrollbar{display:none;}
+.st-chat-placeholder{text-align:center;padding:14px 0;font-size:10px;color:rgba(255,255,255,0.1);font-style:italic;}
+.st-msg{display:flex;animation:stFadeUp 0.3s ease;}
+.st-msg.mgr{justify-content:flex-start;}
+.st-msg.you{justify-content:flex-end;}
+.st-msg-bubble{max-width:84%;padding:8px 12px;}
+.st-msg.mgr .st-msg-bubble{border-radius:3px 14px 14px 14px;background:rgba(0,196,160,0.04);border:1px solid rgba(0,196,160,0.1);}
+.st-msg.you .st-msg-bubble{border-radius:14px 3px 14px 14px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);}
+.st-msg-role{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;display:flex;align-items:center;gap:4px;}
+.st-msg.mgr .st-msg-role{color:rgba(0,196,160,0.47);}
+.st-msg.you .st-msg-role{color:rgba(201,168,76,0.47);}
+.st-msg-role-dot{width:4px;height:4px;border-radius:50%;opacity:0.6;}
+.st-msg.mgr .st-msg-role-dot{background:#00c4a0;}
+.st-msg.you .st-msg-role-dot{background:#c9a84c;}
+.st-msg-text{font-size:11.5px;font-weight:500;line-height:1.5;}
+.st-msg.mgr .st-msg-text{color:rgba(0,196,160,0.8);}
+.st-msg.you .st-msg-text{color:rgba(201,168,76,0.8);}
+.st-sys{display:flex;align-items:center;gap:8px;padding:6px 0;animation:stFadeUp 0.3s ease;}
+.st-sys-line{flex:1;height:1px;background:rgba(255,255,255,0.04);}
+.st-sys-text{font-size:9px;color:rgba(255,255,255,0.18);white-space:nowrap;}
+.st-typing-cursor{display:inline-block;width:1.5px;height:13px;margin-left:1px;
+  vertical-align:text-bottom;animation:stBlink 0.6s steps(1) infinite;}
+.st-msg.mgr .st-typing-cursor{background:#00c4a0;}
+.st-msg.you .st-typing-cursor{background:#c9a84c;}
+@keyframes stPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.7);}}
+@keyframes stFadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes stBlink{0%,100%{opacity:1;}50%{opacity:0;}}
 </style>
 </head>
 
@@ -1234,7 +1300,7 @@ h2.section-title {
       <div class="hiw-body">
         <div class="hiw-title">Plan for every scenario</div>
         <div class="hiw-desc">Tap through every manager response. See your <b>prepared answer</b> for each — then go back and <b>test other paths</b> until nothing can surprise you.</div>
-        <div class="hiw-cta">Start with your biggest blocker <span class="hiw-cta-arrow">↓</span></div>
+        <div class="hiw-cta">Start with your biggest blocker <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
@@ -1284,70 +1350,44 @@ h2.section-title {
 
   <!-- Sample report card — probability + factors + checklist, rotates through personas ─── -->
   <div class="rep-section" id="rep-section">
-    <a href="/raise/?start=1#assessment-top" class="rep-link">
-    <div class="rep-card" id="rep-card">
-      <div class="rep-header">
-        <div class="rep-dot"></div>
-        <span class="rep-hlabel">Find out how strong your raise case really is</span>
-        <span class="rep-example-tag">Example</span>
-      </div>
-
-      <div class="rep-prob">
-        <div class="rep-prob-row">
-          <span class="rep-range amber show" id="rep-range">54–68%</span>
-          <span class="rep-verdict-lbl amber show" id="rep-verdict-lbl">Moderate chance</span>
+    <a href="#blockers" style="text-decoration:none;color:inherit;display:block;cursor:pointer;">
+    <div class="scenario-tree-widget" id="scenario-tree" style="pointer-events:none;">
+      <!-- Header -->
+      <div class="st-header">
+        <div>
+          <div class="st-badge"><span class="st-badge-dot"></span>Scenario Planning</div>
+          <div class="st-title">Tap Through Every Scenario</div>
         </div>
-        <div class="rep-track"><div class="rep-fill amber" id="rep-fill" style="width:68%"></div></div>
-        <div class="rep-persona-label show" id="rep-persona-label"><span class="rep-prole">Senior Nurse · Hospital System</span><br>Covers extra shifts without a pay bump. Union contract helps.</div>
-      </div>
-
-      <div class="rep-section-head">
-        <span>Your preparation plan</span>
-        <span class="rep-section-count" id="rep-cl-count">3 of 10 done</span>
-      </div>
-      <div class="rep-checklist" id="rep-checklist">
-        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Top 3 blockers identified</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Your specific raise number set</span><span class="rep-clpill">Draft →</span></div>
-        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Opening script drafted</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Pushback responses prepared</span><span class="rep-clpill">Draft →</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Manager objections mapped</span><span class="rep-clpill">Draft →</span></div>
-        <div class="rep-clitem pending show"><span class="rep-clmark pending">○</span><span class="rep-cltext">Counteroffer scenarios ready</span><span class="rep-clpill">Draft →</span></div>
-        <div class="rep-clitem done show"><span class="rep-clmark done">✓</span><span class="rep-cltext">Email follow-up drafted</span></div>
-      </div>
-      <div class="rep-show-more show" id="rep-checklist-more"><span class="plus">+</span>3 more in your plan</div>
-
-      <div class="rep-chat-row show" id="rep-chat-row">
-        <div class="rep-chat-icon" aria-hidden="true">
-          <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 5h10v7H6l-3 2.5V5z"/>
-            <path d="M7 9h11v6h-3l-2 2v-2h-6V9z" fill="rgba(0,196,160,0.06)"/>
-          </svg>
+        <div class="st-counters">
+          <div class="st-counter st-counter-g"><span class="st-counter-n" id="st-explored">0</span><span class="st-counter-l">explored</span></div>
+          <div class="st-counter st-counter-y"><span class="st-counter-n" id="st-paths">0</span><span class="st-counter-l">paths</span></div>
         </div>
-        <div class="rep-chat-text">
-          <div class="rep-chat-title">Chat with your AI coach</div>
-          <div class="rep-chat-sub">Ongoing coaching</div>
-        </div>
-        <span class="rep-chat-pill">30 days</span>
       </div>
-
-      <div class="rep-cta">
-        <div class="rep-cta-text">Get your plan →</div>
+      <!-- Tree SVG -->
+      <div class="st-tree-wrap">
+        <div class="st-fade-l"></div><div class="st-fade-r"></div><div class="st-fade-b"></div>
+        <svg id="st-svg" width="100%" height="320" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="stg6"><feGaussianBlur stdDeviation="6"/></filter>
+          </defs>
+        </svg>
+      </div>
+      <!-- Chat panel -->
+      <div class="st-chat-section">
+        <div class="st-chat-header">
+          <div class="st-chat-header-left"><span class="st-chat-dot"></span><span>Your prepared responses</span></div>
+          <span class="st-chat-depth" id="st-depth">depth 0</span>
+        </div>
+        <div class="st-chat-body" id="st-chat-body">
+          <div class="st-chat-placeholder">The conversation unfolds as paths are explored...</div>
+        </div>
       </div>
     </div>
     </a>
-    <div class="rep-indicator" id="rep-indicator">
-      <div class="rep-pi-dot active"></div>
-      <div class="rep-pi-dot"></div>
-      <div class="rep-pi-dot"></div>
-      <div class="rep-pi-dot"></div>
-    </div>
   </div>
-
-
-  <!-- CTA after sample card -->
   <div class="calc-cta">
-    <a href="/raise/?start=1#assessment-top" class="cta-btn">
-      <span>Get my plan</span>
+    <a href="#blockers" class="cta-btn">
+      <span>Start with your biggest raise blocker</span>
       <span class="cta-arrow">→</span>
     </a>
   </div>
@@ -2308,6 +2348,294 @@ function submitAssessment() {
     revealObs.observe(barsWrapEl);
   } else {
     barsWrapEl.classList.add('revealed');
+  }
+})();
+</script>
+
+<!-- Scenario tree auto-animation ─────────────────────── -->
+<script>
+(function(){
+  const MGR='#00c4a0',YOU='#c9a84c';
+  const TREE={id:"root",label:"You bring up compensation",short:"You bring it up",role:"start",children:[
+    {id:"m1",role:"mgr",short:"Budget's frozen",label:"I hear you, but budgets are locked until Q2",children:[
+      {id:"y1a",role:"you",short:"Lock in Q2 date",label:"Can we put a specific date on the calendar for Q2?",children:[
+        {id:"m2a",role:"mgr",short:"Can't promise",label:"I can't promise anything will be different by then",children:[
+          {id:"y3a",role:"you",short:"What needs to change?",label:"What specifically would need to change for this to be a yes?",children:[
+            {id:"m4x",role:"mgr",short:"Hit Q1 targets",label:"Hit your Q1 targets and I'll have ammunition to take upstairs",children:[]}
+          ]},{id:"y3b",role:"you",short:"Share market data",label:"I have market data I think is relevant",children:[]}
+        ]},{id:"m2b",role:"mgr",short:"OK, calendared",label:"Sure, let me send you an invite for early April",children:[
+          {id:"y3c",role:"you",short:"Make it formal",label:"Can we frame that as a formal comp review?",children:[]}
+        ]}
+      ]},{id:"y1b",role:"you",short:"Show market data",label:"I'd like to share what I've found about market rates",children:[
+        {id:"m2c",role:"mgr",short:"Sites aren't accurate",label:"Those salary sites aren't always reliable for our market",children:[
+          {id:"y3d",role:"you",short:"3 sources checked",label:"I cross-referenced three sources — can I walk you through?",children:[]},
+          {id:"y3e",role:"you",short:"What does HR use?",label:"What benchmarking source does HR use?",children:[]}
+        ]}
+      ]},{id:"y1c",role:"you",short:"Title change?",label:"Would a title adjustment be possible in the meantime?",children:[
+        {id:"m2d",role:"mgr",short:"I can look into that",label:"Title changes don't need budget — let me look into it",children:[]}
+      ]}
+    ]},{id:"m2",role:"mgr",short:"What number?",label:"What number did you have in mind?",children:[
+      {id:"y2a",role:"you",short:"12-15% to market",label:"Based on my research, 12-15% would bring me to market",children:[
+        {id:"m3a",role:"mgr",short:"Higher than expected",label:"That's significantly higher than what I was expecting",children:[
+          {id:"y4a",role:"you",short:"Walk through evidence",label:"I can walk you through exactly how I got there",children:[
+            {id:"m5a",role:"mgr",short:"Show me",label:"Walk me through it — I need something for my director",children:[]}
+          ]},{id:"y4b",role:"you",short:"What works for you?",label:"What range would you feel comfortable approving?",children:[]}
+        ]}
+      ]},{id:"y2b",role:"you",short:"What's realistic?",label:"Before I anchor — what range is realistic on your end?",children:[
+        {id:"m3b",role:"mgr",short:"Check with HR",label:"I'd need to check with HR on the band",children:[
+          {id:"y4c",role:"you",short:"Send case in writing",label:"Can I send my case in writing for that conversation?",children:[]}
+        ]}
+      ]}
+    ]},{id:"m3",role:"mgr",short:"Appreciates it",label:"I appreciate you being direct about this",children:[
+      {id:"y5a",role:"you",short:"Set follow-up",label:"Can we set a specific follow-up date?",children:[]},
+      {id:"y5b",role:"you",short:"What do you need?",label:"What would you need from me to make this happen?",children:[]}
+    ]},{id:"m4",role:"mgr",short:"Not now",label:"This really isn't a good time — we're mid-reorg",children:[
+      {id:"y6a",role:"you",short:"When then?",label:"When do you think would be the right time?",children:[]},
+      {id:"y6b",role:"you",short:"Being recruited",label:"I want to be transparent — I've been approached by a recruiter",children:[
+        {id:"m7b",role:"mgr",short:"Let me act fast",label:"I didn't realize that. Let me see what I can do this week",children:[]}
+      ]}
+    ]}
+  ]};
+
+  const SCRIPT=[
+    {act:'reveal',ids:['root'],ms:500},{act:'pause',ms:500},
+    {act:'stagger',ids:['m1','m2','m3','m4'],ms:180},{act:'pause',ms:900},
+    {act:'walk',id:'m1',ms:1300},{act:'stagger',ids:['y1a','y1b','y1c'],ms:180},{act:'pause',ms:500},
+    {act:'walk',id:'y1a',ms:1100},{act:'stagger',ids:['m2a','m2b'],ms:200},{act:'pause',ms:400},
+    {act:'walk',id:'m2a',ms:1000},{act:'stagger',ids:['y3a','y3b'],ms:200},{act:'pause',ms:400},
+    {act:'walk',id:'y3a',ms:900},{act:'reveal',ids:['m4x'],ms:300},{act:'walk',id:'m4x',ms:1600},
+    {act:'backto',id:'m1',ms:900},
+    {act:'walk',id:'y1c',ms:800},{act:'reveal',ids:['m2d'],ms:300},{act:'walk',id:'m2d',ms:1400},
+    {act:'backto',id:'root',ms:900},
+    {act:'walk',id:'m2',ms:1100},{act:'stagger',ids:['y2a','y2b'],ms:200},{act:'pause',ms:400},
+    {act:'walk',id:'y2a',ms:900},{act:'reveal',ids:['m3a'],ms:300},{act:'walk',id:'m3a',ms:900},
+    {act:'stagger',ids:['y4a','y4b'],ms:200},{act:'pause',ms:400},
+    {act:'walk',id:'y4a',ms:900},{act:'reveal',ids:['m5a'],ms:300},{act:'walk',id:'m5a',ms:1800},
+    {act:'backto',id:'root',ms:900},
+    {act:'walk',id:'m4',ms:1100},{act:'stagger',ids:['y6a','y6b'],ms:200},{act:'pause',ms:400},
+    {act:'walk',id:'y6b',ms:1000},{act:'reveal',ids:['m7b'],ms:300},{act:'walk',id:'m7b',ms:2200},
+    {act:'reset',ms:3000}
+  ];
+
+  // Utils
+  var nodeMap={}, allNodes=[];
+  function findParent(t,id,p){if(t.id===id)return p||null;for(var i=0;i<(t.children||[]).length;i++){var f=findParent(t.children[i],id,t.id);if(f)return f;}return null;}
+  function ancestors(id){var p=[],c=id;while(c){p.unshift(c);c=findParent(TREE,c);}return p;}
+
+  function layoutTree(node,depth,xMin,xMax){
+    var x=(xMin+xMax)/2, y=depth*62+35;
+    var r=[{id:node.id,short:node.short,label:node.label,role:node.role,x:x,y:y,depth:depth,kids:node.children||[]}];
+    var kids=node.children||[];
+    if(!kids.length)return r;
+    for(var i=0;i<kids.length;i++){
+      var w=(xMax-xMin)/kids.length;
+      r=r.concat(layoutTree(kids[i],depth+1,xMin+w*i+2,xMin+w*(i+1)-2));
+    }
+    return r;
+  }
+
+  allNodes=layoutTree(TREE,0,0,800);
+  allNodes.forEach(function(n){nodeMap[n.id]=n;});
+
+  // State
+  var revealed=new Set(), explored=new Set(), activeId=null, pathCount=0;
+  var convoMsgs=[], scriptIdx=0, timer=null;
+  var vbx=0,vby=0,vbw=800,vbh=300; // current viewBox
+  var tvbx=0,tvby=0,tvbw=800,tvbh=300; // target viewBox
+
+  var svg=document.getElementById('st-svg');
+  var chatBody=document.getElementById('st-chat-body');
+  var exploredEl=document.getElementById('st-explored');
+  var pathsEl=document.getElementById('st-paths');
+  var depthEl=document.getElementById('st-depth');
+
+  function updateCounters(){
+    exploredEl.textContent=explored.size;
+    pathsEl.textContent=pathCount;
+    var d=activeId?ancestors(activeId).length-1:0;
+    depthEl.textContent='depth '+d;
+  }
+
+  function computeViewBox(){
+    if(!activeId||!nodeMap[activeId]){tvbx=0;tvby=0;tvbw=800;tvbh=300;return;}
+    var pathIds=ancestors(activeId);
+    var nodes=pathIds.map(function(id){return nodeMap[id];}).filter(Boolean);
+    // Add siblings
+    var pid=findParent(TREE,activeId);
+    if(pid){
+      var pTree=null;
+      (function find(t){if(t.id===pid){pTree=t;return;}(t.children||[]).forEach(find);})(TREE);
+      if(pTree)(pTree.children||[]).forEach(function(c){if(nodeMap[c.id])nodes.push(nodeMap[c.id]);});
+    }
+    // Add children of current
+    var cur=nodeMap[activeId];
+    if(cur)cur.kids.forEach(function(c){if(nodeMap[c.id])nodes.push(nodeMap[c.id]);});
+    if(!nodes.length)return;
+    var xs=nodes.map(function(n){return n.x;}),ys=nodes.map(function(n){return n.y;});
+    var pad=100,pady=40;
+    tvbw=Math.max(Math.max.apply(null,xs)-Math.min.apply(null,xs)+pad*2,300);
+    tvbh=Math.max(Math.max.apply(null,ys)-Math.min.apply(null,ys)+pady*2,180);
+    tvbx=Math.min.apply(null,xs)-pad;
+    tvby=Math.min.apply(null,ys)-pady;
+  }
+
+  // Smooth viewBox animation
+  var vbAnim=null;
+  function animateViewBox(){
+    if(vbAnim)cancelAnimationFrame(vbAnim);
+    var sx=vbx,sy=vby,sw=vbw,sh=vbh,start=performance.now(),dur=600;
+    function tick(now){
+      var t=Math.min((now-start)/dur,1);
+      var e=t<0.5?2*t*t:-1+(4-2*t)*t;
+      vbx=sx+(tvbx-sx)*e;vby=sy+(tvby-sy)*e;vbw=sw+(tvbw-sw)*e;vbh=sh+(tvbh-sh)*e;
+      svg.setAttribute('viewBox',Math.round(vbx)+' '+Math.round(vby)+' '+Math.round(vbw)+' '+Math.round(vbh));
+      if(t<1)vbAnim=requestAnimationFrame(tick);
+    }
+    vbAnim=requestAnimationFrame(tick);
+  }
+
+  function renderTree(){
+    var ap=activeId?new Set(ancestors(activeId)):new Set();
+    var svgContent='<defs><filter id="stg6"><feGaussianBlur stdDeviation="6"/></filter></defs>';
+
+    // Grid dots
+    for(var gx=0;gx<40;gx++)for(var gy=0;gy<Math.ceil(400/22);gy++){
+      svgContent+='<circle cx="'+(gx*22+10)+'" cy="'+(gy*22+8)+'" r="0.25" fill="rgba(255,255,255,0.025)"/>';
+    }
+
+    // Edges
+    allNodes.forEach(function(n){
+      if(n.id==='root'||!revealed.has(n.id))return;
+      var pid=findParent(TREE,n.id);var pn=nodeMap[pid];
+      if(!pn||!revealed.has(pid))return;
+      var isAct=ap.has(n.id)&&ap.has(pid);
+      var isExp=explored.has(n.id)&&!isAct;
+      var col=n.role==='mgr'?MGR:YOU;
+      var y1=pn.y+12,y2=n.y-10,cp1y=pn.y+30,cp2y=n.y-30;
+      var path='M'+pn.x+','+y1+' C'+pn.x+','+cp1y+' '+n.x+','+cp2y+' '+n.x+','+y2;
+      if(isAct)svgContent+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="10" opacity="0.1" filter="url(#stg6)"/>';
+      svgContent+='<path d="'+path+'" fill="none" stroke="'+(isAct?col:isExp?col+'40':'rgba(255,255,255,0.12)')+'" stroke-width="'+(isAct?2.5:isExp?1.2:0.9)+'"'+(isAct||isExp?'':' stroke-dasharray="3,6"')+'/>';
+      if(isAct)svgContent+='<circle r="2" fill="'+col+'" opacity="0.8"><animateMotion dur="1.8s" repeatCount="indefinite" path="'+path+'"/></circle>';
+    });
+
+    // Nodes
+    allNodes.forEach(function(n){
+      if(!revealed.has(n.id))return;
+      var isAct=ap.has(n.id);var isCur=activeId===n.id;
+      var isExp=explored.has(n.id)&&!isAct;var isRoot=n.id==='root';
+      var isMgr=n.role==='mgr';var col=isRoot?'#fff':isMgr?MGR:YOU;
+      var op=isCur?1:isAct?1:isExp?0.6:0.65;
+      var bw=isRoot?120:isCur?86:72, bh=isRoot?24:20;
+
+      svgContent+='<g opacity="'+op+'">';
+      if(isCur){
+        svgContent+='<ellipse cx="'+n.x+'" cy="'+n.y+'" rx="'+(bw/2+18)+'" ry="'+(bh/2+14)+'" fill="'+col+'" opacity="0.03" filter="url(#stg6)"><animate attributeName="opacity" values="0.04;0.01;0.04" dur="3s" repeatCount="indefinite"/></ellipse>';
+      }
+      // Shadow
+      svgContent+='<rect x="'+(n.x-bw/2+1)+'" y="'+(n.y-bh/2+1.5)+'" width="'+bw+'" height="'+bh+'" rx="6" fill="rgba(0,0,0,0.3)" opacity="'+(isCur?0.5:0.15)+'"/>';
+      // Card
+      var fill=isCur?(isMgr?'rgba(0,196,160,0.18)':isRoot?'rgba(255,255,255,0.12)':'rgba(201,168,76,0.18)')
+        :isAct?(isMgr?'rgba(0,196,160,0.1)':'rgba(201,168,76,0.1)')
+        :isExp?(isMgr?'rgba(0,196,160,0.06)':'rgba(201,168,76,0.06)')
+        :'rgba(255,255,255,0.04)';
+      var stroke=isCur?col:isAct?col+'aa':isExp?col+'22':'rgba(255,255,255,0.08)';
+      var sw2=isCur?1.5:isAct?1:0.5;
+      svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="'+bw+'" height="'+bh+'" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw2+'"/>';
+      // Accent bar
+      if(!isRoot&&(isAct||isCur||isExp)){
+        svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="2.5" height="'+bh+'" rx="1.2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.7:0.2)+'"/>';
+      }
+      // Role dot
+      if(!isRoot)svgContent+='<circle cx="'+(n.x-bw/2+9)+'" cy="'+n.y+'" r="2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.8:0.6)+'"/>';
+      // Label
+      var txtFill=isCur?'#fff':isAct?'#ddd':isExp?'#999':'#888';
+      var fs=isRoot?7:5.2, fw=isCur?700:isAct?600:500;
+      var anchor=isRoot?'middle':'start', tx=isRoot?n.x:(n.x-bw/2+16);
+      var label=(n.short||'').substring(0,22);
+      svgContent+='<text x="'+tx+'" y="'+(n.y+1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="'+txtFill+'" font-size="'+fs+'" font-weight="'+fw+'" font-family="DM Sans,system-ui,sans-serif">'+label+'</text>';
+      // Children badge
+      if(isCur&&n.kids.length>0&&!isRoot){
+        svgContent+='<rect x="'+(n.x+bw/2-16)+'" y="'+(n.y-bh/2-4)+'" width="14" height="10" rx="5" fill="'+col+'" opacity="0.85"/>';
+        svgContent+='<text x="'+(n.x+bw/2-9)+'" y="'+(n.y-bh/2+2)+'" text-anchor="middle" dominant-baseline="middle" fill="#000" font-size="5" font-weight="800" font-family="DM Sans,system-ui,sans-serif">'+n.kids.length+'</text>';
+      }
+      // Pulse ring
+      if(isCur&&!isRoot){
+        svgContent+='<rect x="'+(n.x-bw/2-2)+'" y="'+(n.y-bh/2-2)+'" width="'+(bw+4)+'" height="'+(bh+4)+'" rx="8" fill="none" stroke="'+col+'" stroke-width="0.6"><animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/></rect>';
+      }
+      svgContent+='</g>';
+    });
+
+    svg.innerHTML=svgContent;
+    computeViewBox();
+    animateViewBox();
+    updateCounters();
+  }
+
+  function addChatMsg(role,label){
+    // Remove placeholder
+    var ph=chatBody.querySelector('.st-chat-placeholder');if(ph)ph.remove();
+    // Keep last 5
+    while(chatBody.children.length>5)chatBody.removeChild(chatBody.firstChild);
+    if(role==='system'){
+      var d=document.createElement('div');d.className='st-sys';
+      d.innerHTML='<div class="st-sys-line"></div><span class="st-sys-text">'+label+'</span><div class="st-sys-line"></div>';
+      chatBody.appendChild(d);
+    }else{
+      var isMgr=role==='mgr';
+      var d=document.createElement('div');d.className='st-msg '+(isMgr?'mgr':'you');
+      d.innerHTML='<div class="st-msg-bubble"><div class="st-msg-role"><span class="st-msg-role-dot"></span>'+(isMgr?'Manager':'You')+'</div><div class="st-msg-text"></div></div>';
+      chatBody.appendChild(d);
+      // Type text
+      var txtEl=d.querySelector('.st-msg-text');
+      var clean=label.replace(/^"|"$/g,'');
+      var i=0,speed=Math.max(12,Math.min(25,500/clean.length));
+      var cursor=document.createElement('span');cursor.className='st-typing-cursor';
+      txtEl.appendChild(cursor);
+      var iv=setInterval(function(){
+        i++;txtEl.textContent=clean.substring(0,i);txtEl.appendChild(cursor);
+        if(i>=clean.length){clearInterval(iv);if(cursor.parentNode)cursor.remove();}
+      },speed);
+    }
+    chatBody.scrollTop=chatBody.scrollHeight;
+  }
+
+  // Animation runner
+  function runScript(){
+    var idx=scriptIdx%SCRIPT.length;
+    var a=SCRIPT[idx];scriptIdx++;
+    if(a.act==='pause'){timer=setTimeout(runScript,a.ms);}
+    else if(a.act==='reveal'){a.ids.forEach(function(id){revealed.add(id);});renderTree();timer=setTimeout(runScript,a.ms);}
+    else if(a.act==='stagger'){
+      var i=0;
+      function next(){if(i>=a.ids.length){timer=setTimeout(runScript,150);return;}
+        revealed.add(a.ids[i]);renderTree();i++;timer=setTimeout(next,a.ms);}
+      next();
+    }
+    else if(a.act==='walk'){
+      activeId=a.id;explored.add(a.id);renderTree();
+      var n=nodeMap[a.id];if(n)addChatMsg(n.role,n.label);
+      timer=setTimeout(runScript,a.ms);
+    }
+    else if(a.act==='backto'){
+      activeId=a.id;pathCount++;renderTree();
+      addChatMsg('system','← trying a different path');
+      timer=setTimeout(runScript,a.ms);
+    }
+    else if(a.act==='reset'){
+      revealed=new Set();explored=new Set();activeId=null;pathCount=0;
+      chatBody.innerHTML='<div class="st-chat-placeholder">The conversation unfolds as paths are explored...</div>';
+      renderTree();timer=setTimeout(runScript,a.ms);
+    }
+  }
+
+  // Start when visible
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting){obs.disconnect();renderTree();timer=setTimeout(runScript,600);}
+    },{threshold:0.2});
+    obs.observe(document.getElementById('scenario-tree'));
+  }else{
+    renderTree();timer=setTimeout(runScript,600);
   }
 })();
 </script>
