@@ -220,19 +220,13 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    Sits between the middle coach line and the closing paragraph. Green-accented
    to signal positive change from base range. Includes 3 mechanism lines
    that explain WHY the uplift is real (not a bare claim). */
-.paywall-guarantee{
-  font-size:12px;font-weight:600;color:var(--teal);
-  margin:10px 0 10px;line-height:1.5;
-}
-/* Pitch: now a bolded headline + short detail line. The strong tag is
-   the eye-catching promise; the rest is a one-line proof of practicality. */
 .paywall-pitch{
   font-size:12.5px;color:rgba(255,255,255,0.8);
   line-height:1.55;margin:0 0 14px;
 }
-.paywall-pitch strong{
-  display:block;color:#fff;font-weight:700;
-  font-size:13.5px;margin-bottom:3px;letter-spacing:-0.005em;
+.paywall-refund{
+  display:block;color:var(--teal);font-weight:700;
+  margin:4px 0;
 }
 .paywall-includes{
   margin:0 0 14px;padding:10px 12px;
@@ -2744,7 +2738,7 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  await typeCoachBubble("You've explored the free preview. In the full plan, you can **practice every scenario and every response** until nothing surprises you.");
+  await typeCoachBubble("You've explored the free preview. In the full plan, you can **practice every scenario and every response.**");
   await sleep(300);
 
   state.obstacle = SIM_STATE.blocker;
@@ -3629,20 +3623,17 @@ async function renderPaywallBubble(opts) {
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
 
-  const headline = `You've explored ${explored} of many scenarios. Every scenario you haven't tested is a conversation you're not ready for.`;
+  const headline = `Prepare for every scenario — and nothing will surprise you.`;
 
   const proof = pickProofLine(obs.code);
 
-  // Restructured paywall body for scannability — earlier copy was a wall
-  // of text. Now: short bolded pitch lead + 3 benefits with bold-then-
-  // detail format so the eye can skim. CTA below.
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <div class="paywall-guarantee">We trust in prepared salary negotiation. If it doesn't work, we refund you.</div>
       <div class="paywall-pitch">
-        <strong>Win the conversation before it starts.</strong>
+        Win the negotiation before it starts.
+        <span class="paywall-refund">If it doesn't work, we refund you.</span>
         Tap through every possibility in under an hour — until nothing can surprise you.
       </div>
       <div class="paywall-includes">
@@ -3683,13 +3674,11 @@ async function renderPaywallBubble(opts) {
   }
 
   // Animated render
-  const guaranteeEl = wrap.querySelector('.paywall-guarantee');
   const pitchEl    = wrap.querySelector('.paywall-pitch');
   const includesEl = wrap.querySelector('.paywall-includes');
   const ctaEl      = wrap.querySelector('.paywall-cta');
   const trustEl    = wrap.querySelector('.paywall-trust');
   const proofEl    = wrap.querySelector('.paywall-proof');
-  guaranteeEl.style.opacity = '0';
   pitchEl.style.opacity    = '0';
   includesEl.style.opacity = '0';
   ctaEl.style.opacity      = '0';
@@ -3705,8 +3694,6 @@ async function renderPaywallBubble(opts) {
 
   // Fade in sections
   await sleep(300);
-  fadeInElement(guaranteeEl);
-  await sleep(200);
   fadeInElement(pitchEl);
   await sleep(300);
   fadeInElement(includesEl);
