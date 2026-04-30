@@ -181,7 +181,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    the regular coach bubble. CTA is the only inline UI element. */
 .paywall-bubble{
   background:#000;border-radius:4px 14px 14px 14px;
-  padding:16px 16px 14px;color:#fff;
+  padding:20px 18px 18px;color:#fff;
 }
 .paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:10px;}
 .paywall-bubble p:last-of-type{margin-bottom:12px;}
@@ -192,7 +192,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .btn-pay{
   width:100%;background:var(--gold);color:var(--bg);
-  border:none;border-radius:10px;padding:14px;margin-top:6px;
+  border:none;border-radius:10px;padding:14px;margin-top:10px;
   font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
   display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background 0.12s,transform 0.1s;
@@ -203,7 +203,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .btn-pay-arrow{display:inline-block;animation:ap 1.8s ease-in-out infinite;}
 @keyframes ap{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
 .trust-row{
-  display:flex;justify-content:center;gap:8px;margin-top:10px;
+  display:flex;justify-content:center;gap:8px;margin-top:14px;
   font-size:10px;color:rgba(255,255,255,0.32);letter-spacing:0.03em;
   flex-wrap:wrap;
 }
@@ -216,18 +216,14 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .btn-deep-dive:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.25);}
 
-/* ── Uplift panel — "with the coaching plan, your range is X-Y%" ──
-   Sits between the middle coach line and the closing paragraph. Green-accented
-   to signal positive change from base range. Includes 3 mechanism lines
-   that explain WHY the uplift is real (not a bare claim). */
 .paywall-pitch{
   font-size:12.5px;color:rgba(255,255,255,0.8);
-  line-height:1.55;margin:0 0 14px;
+  line-height:1.6;margin:0 0 18px;
 }
 .paywall-refund{
   color:var(--teal);font-weight:700;
 }
-.paywall-headline{margin-bottom:10px !important;}
+.paywall-headline{margin-bottom:14px !important;}
 .paywall-headline strong{
   font-size:17px;font-weight:800;color:#fff;
   letter-spacing:-0.02em;line-height:1.3;
@@ -235,19 +231,16 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .paywall-includes-title{
   font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:0.08em;color:rgba(255,255,255,0.4);
-  margin:12px 0 6px;
+  margin:18px 0 8px;
 }
 .paywall-includes{
-  margin:0 0 14px;padding:10px 12px;
+  margin:0;padding:12px 14px;
   background:rgba(255,255,255,0.04);border-radius:8px;
-  display:flex;flex-direction:column;gap:9px;
+  display:flex;flex-direction:column;gap:12px;
 }
-/* Each "what you get" line: bold benefit headline + muted sub-line.
-   This gives the eye scannable anchors instead of three identical
-   paragraphs running together. */
 .paywall-inc-item{
   font-size:12.5px;line-height:1.5;
-  display:flex;flex-direction:column;gap:1px;
+  display:flex;flex-direction:column;gap:2px;
   position:relative;padding-left:16px;
 }
 .paywall-inc-item::before{
@@ -263,12 +256,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .paywall-inc-item:last-child{border-bottom:none;}
 
-/* ── Proof line — rotating single-line claim below CTA.
-   Bolds a key phrase (usually the dollar figure or the value statement) to
-   anchor the cost-vs-reward asymmetry. Only one shows per card; rotation
-   happens on each render. */
 .proof-line{
-  margin-top:10px;text-align:center;
+  margin-top:14px;text-align:center;
   font-size:12px;color:var(--gold);line-height:1.5;font-weight:700;
   min-height:18px;
 }
