@@ -1197,7 +1197,7 @@ h2.section-title {
 .st-counter-n{display:block;font-size:18px;font-weight:800;line-height:1;}
 .st-counter-g .st-counter-n{color:#00c4a0;}
 .st-counter-y .st-counter-n{color:#c9a84c;}
-.st-counter-l{font-size:7px;color:rgba(255,255,255,0.3);margin-top:1px;}
+.st-counter-l{font-size:7px;color:rgba(255,255,255,0.5);margin-top:1px;}
 .st-tree-wrap{position:relative;overflow:hidden;
   background:radial-gradient(ellipse at 50% 20%,rgba(0,196,160,0.02) 0%,transparent 60%);}
 .st-fade-l,.st-fade-r,.st-fade-b{position:absolute;z-index:2;pointer-events:none;}
@@ -1206,33 +1206,33 @@ h2.section-title {
 .st-fade-b{left:0;right:0;bottom:0;height:20px;background:linear-gradient(0deg,#0b0d14,transparent);}
 .st-chat-section{border-top:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.2);}
 .st-chat-header{padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center;
-  font-size:9px;font-weight:700;color:rgba(255,255,255,0.18);text-transform:uppercase;letter-spacing:0.1em;}
+  font-size:9px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;}
 .st-chat-header-left{display:flex;align-items:center;gap:6px;}
 .st-chat-dot{width:5px;height:5px;border-radius:50%;background:#00c4a0;
   animation:stPulse 1.5s ease infinite;}
-.st-chat-depth{font-size:9px;color:rgba(255,255,255,0.1);text-transform:none;font-weight:400;}
+.st-chat-depth{font-size:9px;color:rgba(255,255,255,0.3);text-transform:none;font-weight:400;}
 .st-chat-body{padding:4px 20px 14px;height:155px;overflow-y:auto;
   display:flex;flex-direction:column;gap:5px;justify-content:flex-end;}
 .st-chat-body::-webkit-scrollbar{display:none;}
-.st-chat-placeholder{text-align:center;padding:14px 0;font-size:10px;color:rgba(255,255,255,0.1);font-style:italic;}
+.st-chat-placeholder{text-align:center;padding:14px 0;font-size:10px;color:rgba(255,255,255,0.3);font-style:italic;}
 .st-msg{display:flex;animation:stFadeUp 0.3s ease;}
 .st-msg.mgr{justify-content:flex-start;}
 .st-msg.you{justify-content:flex-end;}
 .st-msg-bubble{max-width:84%;padding:8px 12px;}
-.st-msg.mgr .st-msg-bubble{border-radius:3px 14px 14px 14px;background:rgba(0,196,160,0.04);border:1px solid rgba(0,196,160,0.1);}
-.st-msg.you .st-msg-bubble{border-radius:14px 3px 14px 14px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.1);}
+.st-msg.mgr .st-msg-bubble{border-radius:3px 14px 14px 14px;background:rgba(0,196,160,0.03);border:1px solid rgba(0,196,160,0.07);}
+.st-msg.you .st-msg-bubble{border-radius:14px 3px 14px 14px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.07);}
 .st-msg-role{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;display:flex;align-items:center;gap:4px;}
-.st-msg.mgr .st-msg-role{color:rgba(0,196,160,0.47);}
-.st-msg.you .st-msg-role{color:rgba(201,168,76,0.47);}
+.st-msg.mgr .st-msg-role{color:rgba(0,196,160,0.4);}
+.st-msg.you .st-msg-role{color:rgba(201,168,76,0.4);}
 .st-msg-role-dot{width:4px;height:4px;border-radius:50%;opacity:0.6;}
 .st-msg.mgr .st-msg-role-dot{background:#00c4a0;}
 .st-msg.you .st-msg-role-dot{background:#c9a84c;}
 .st-msg-text{font-size:11.5px;font-weight:500;line-height:1.5;}
-.st-msg.mgr .st-msg-text{color:rgba(0,196,160,0.8);}
-.st-msg.you .st-msg-text{color:rgba(201,168,76,0.8);}
+.st-msg.mgr .st-msg-text{color:rgba(0,196,160,0.55);}
+.st-msg.you .st-msg-text{color:rgba(201,168,76,0.55);}
 .st-sys{display:flex;align-items:center;gap:8px;padding:6px 0;animation:stFadeUp 0.3s ease;}
 .st-sys-line{flex:1;height:1px;background:rgba(255,255,255,0.04);}
-.st-sys-text{font-size:9px;color:rgba(255,255,255,0.18);white-space:nowrap;}
+.st-sys-text{font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap;}
 .st-typing-cursor{display:inline-block;width:1.5px;height:13px;margin-left:1px;
   vertical-align:text-bottom;animation:stBlink 0.6s steps(1) infinite;}
 .st-msg.mgr .st-typing-cursor{background:#00c4a0;}
@@ -1348,7 +1348,7 @@ h2.section-title {
 
   <div class="divider"></div>
 
-  <!-- Sample report card — probability + factors + checklist, rotates through personas ─── -->
+  <!-- Sample report card — scenario tree widget ─── -->
   <div class="rep-section" id="rep-section">
     <a href="#blockers" style="text-decoration:none;color:inherit;display:block;cursor:pointer;">
     <div class="scenario-tree-widget" id="scenario-tree" style="pointer-events:none;">
@@ -1393,6 +1393,14 @@ h2.section-title {
   </div>
 
   <div class="divider"></div>
+
+  <!-- Proof bar (cited stats) — research validation -->
+  <div class="proof-bar">
+    <div class="proof-stat">
+      People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+    </div>
+    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+  </div>
 
   <h2 class="section-title" id="calculator">What each 1% raise means for your career</h2>
 
@@ -1463,14 +1471,6 @@ h2.section-title {
     </a>
   </div>
 
-  <!-- Proof bar (cited stats) — research validation after product demo -->
-  <div class="proof-bar">
-    <div class="proof-stat">
-      People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
-    </div>
-    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
-  </div>
-
 
   <!-- Closing CTA (positioning statement lands here) ──────── -->
   <div class="closing-pitch">
@@ -1493,7 +1493,7 @@ h2.section-title {
     <div style="margin-top: 16px;">
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
-        <div class="faq-a">No. ChatGPT can write a generic script if you spend 20 minutes prompting it correctly. This is a structured coaching flow that maps your specific situation to 15+ factors, then gives you a personalized plan and remembers every conversation for 30 days as you prepare.</div>
+        <div class="faq-a">No. ChatGPT gives you one script in one thread. This maps every direction your conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're not typing prompts and hoping for good advice. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning, not a chatbot.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">How much does it cost?<span class="faq-icon">+</span></div>
@@ -1892,7 +1892,7 @@ if (document.getElementById('rep-section')) {
 /* ──  card and How it works                                ── */
 /* ───────────────────────────────────────────────────────── */
 const PROOF_LINES = [
-  'A conversation that adds <span class="emph">thousands to your year-one salary</span>.',
+  'A conversation that adds <span class="emph">thousands to your salary</span>.',
   'A few hours of prep, <span class="emph">a raise that lasts years</span>.'
 ];
 
@@ -2514,7 +2514,7 @@ function submitAssessment() {
       var y1=pn.y+12,y2=n.y-10,cp1y=pn.y+30,cp2y=n.y-30;
       var path='M'+pn.x+','+y1+' C'+pn.x+','+cp1y+' '+n.x+','+cp2y+' '+n.x+','+y2;
       if(isAct)svgContent+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="10" opacity="0.1" filter="url(#stg6)"/>';
-      svgContent+='<path d="'+path+'" fill="none" stroke="'+(isAct?col:isExp?col+'40':'rgba(255,255,255,0.12)')+'" stroke-width="'+(isAct?2.5:isExp?1.2:0.9)+'"'+(isAct||isExp?'':' stroke-dasharray="3,6"')+'/>';
+      svgContent+='<path d="'+path+'" fill="none" stroke="'+(isAct?col:isExp?col+'50':'rgba(255,255,255,0.18)')+'" stroke-width="'+(isAct?2.5:isExp?1.2:1)+'"'+(isAct||isExp?'':' stroke-dasharray="3,6"')+'/>';
       if(isAct)svgContent+='<circle r="2" fill="'+col+'" opacity="0.8"><animateMotion dur="1.8s" repeatCount="indefinite" path="'+path+'"/></circle>';
     });
 
@@ -2524,7 +2524,7 @@ function submitAssessment() {
       var isAct=ap.has(n.id);var isCur=activeId===n.id;
       var isExp=explored.has(n.id)&&!isAct;var isRoot=n.id==='root';
       var isMgr=n.role==='mgr';var col=isRoot?'#fff':isMgr?MGR:YOU;
-      var op=isCur?1:isAct?1:isExp?0.6:0.65;
+      var op=isCur?1:isAct?1:isExp?0.65:0.8;
       var bw=isRoot?120:isCur?86:72, bh=isRoot?24:20;
 
       svgContent+='<g opacity="'+op+'">';
@@ -2537,18 +2537,18 @@ function submitAssessment() {
       var fill=isCur?(isMgr?'rgba(0,196,160,0.18)':isRoot?'rgba(255,255,255,0.12)':'rgba(201,168,76,0.18)')
         :isAct?(isMgr?'rgba(0,196,160,0.1)':'rgba(201,168,76,0.1)')
         :isExp?(isMgr?'rgba(0,196,160,0.06)':'rgba(201,168,76,0.06)')
-        :'rgba(255,255,255,0.04)';
-      var stroke=isCur?col:isAct?col+'aa':isExp?col+'22':'rgba(255,255,255,0.08)';
-      var sw2=isCur?1.5:isAct?1:0.5;
+        :'rgba(255,255,255,0.06)';
+      var stroke=isCur?col:isAct?col+'aa':isExp?col+'33':'rgba(255,255,255,0.12)';
+      var sw2=isCur?1.5:isAct?1:0.6;
       svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="'+bw+'" height="'+bh+'" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw2+'"/>';
       // Accent bar
       if(!isRoot&&(isAct||isCur||isExp)){
         svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="2.5" height="'+bh+'" rx="1.2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.7:0.2)+'"/>';
       }
       // Role dot
-      if(!isRoot)svgContent+='<circle cx="'+(n.x-bw/2+9)+'" cy="'+n.y+'" r="2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.8:0.6)+'"/>';
+      if(!isRoot)svgContent+='<circle cx="'+(n.x-bw/2+9)+'" cy="'+n.y+'" r="2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.8:0.7)+'"/>';
       // Label
-      var txtFill=isCur?'#fff':isAct?'#ddd':isExp?'#999':'#888';
+      var txtFill=isCur?'#fff':isAct?'#ddd':isExp?'#aaa':'#aaa';
       var fs=isRoot?7:5.2, fw=isCur?700:isAct?600:500;
       var anchor=isRoot?'middle':'start', tx=isRoot?n.x:(n.x-bw/2+16);
       var label=(n.short||'').substring(0,22);
