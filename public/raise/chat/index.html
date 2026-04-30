@@ -2036,6 +2036,20 @@ async function beginSimulationFlow(reasonParam) {
   state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   saveState();
 
+  // Pre-fetch scenarios NOW — while the user reads the insight and picks
+  // timing (~10-15s), the API generates scenarios in the background.
+  // By the time they tap a timing chip, results are already waiting.
+  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode: 'simulate_scenarios',
+      blocker: blocker,
+      context: SIM_STATE.context,
+      session_id: state.sim_session_id,
+    }),
+  }).then(r => r.json()).catch(() => null);
+
   logSession('sim_start', {
     blocker_code: blocker.code,
     blocker_label: blocker.label,
@@ -2092,35 +2106,54 @@ async function startSimulationAtBlocker() {
   insertModeBanner('sim');
 
   // Short transition — the ACK_MESSAGE already explained what's coming.
-  // No need to re-explain. Just tell the user to start.
   await typeCoachBubble("**Now pick what your manager might say first.**");
   await sleep(200);
 
-  // Load scenarios
-  disableInput('Loading scenarios\u2026');
-  showCoachTyping();
-  try {
-    const res = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'simulate_scenarios',
-        blocker: SIM_STATE.blocker,
-        context: SIM_STATE.context,
-        session_id: profileHash(),
-      }),
-    });
-    const data = await res.json();
-    hideCoachTyping();
-    if (data.scenarios && data.scenarios.length >= 2) {
-      renderScenarioLabels(data.scenarios);
-    } else {
+  // Use pre-fetched scenarios (fired at the start of beginSimulationFlow).
+  // If the promise resolved while the user was reading + picking timing,
+  // this is instant. If it's still pending, we show a brief spinner.
+  disableInput('');
+  const prefetched = SIM_STATE._scenarioPromise;
+  if (prefetched) {
+    showCoachTyping();
+    try {
+      const data = await prefetched;
+      hideCoachTyping();
+      if (data && data.scenarios && data.scenarios.length >= 2) {
+        renderScenarioLabels(data.scenarios);
+      } else {
+        renderScenarioLabels(getDefaultScenarios(blocker.code));
+      }
+    } catch (err) {
+      hideCoachTyping();
       renderScenarioLabels(getDefaultScenarios(blocker.code));
     }
-  } catch (err) {
-    hideCoachTyping();
-    console.error('[sim] scenario gen failed:', err);
-    renderScenarioLabels(getDefaultScenarios(blocker.code));
+    SIM_STATE._scenarioPromise = null;
+  } else {
+    // Fallback: no pre-fetch (e.g. resume from refresh) — fetch now
+    showCoachTyping();
+    try {
+      const res = await fetch('/api/raise-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'simulate_scenarios',
+          blocker: SIM_STATE.blocker,
+          context: SIM_STATE.context,
+          session_id: profileHash(),
+        }),
+      });
+      const data = await res.json();
+      hideCoachTyping();
+      if (data.scenarios && data.scenarios.length >= 2) {
+        renderScenarioLabels(data.scenarios);
+      } else {
+        renderScenarioLabels(getDefaultScenarios(blocker.code));
+      }
+    } catch (err) {
+      hideCoachTyping();
+      renderScenarioLabels(getDefaultScenarios(blocker.code));
+    }
   }
 
   // Now that the simulation flow is live, allow the user to flip to
