@@ -829,15 +829,20 @@ async function handleSimulateScenarios(body, res) {
   const blockerLabel = blocker?.label || '';
   const role = context?.role || '';
   const timing = context?.timing || '';
+  const userOpening = context?.user_opening || '';
+
+  const situationLine = userOpening
+    ? `The employee just opened the conversation by saying: "${userOpening}"\nTheir underlying concern: "${blockerLabel}"`
+    : `An employee is negotiating a raise. Their main concern: "${blockerLabel}"`;
 
   const prompt = `Generate 5-6 realistic manager response THEMES for a salary negotiation.
 
-SITUATION: An employee is negotiating a raise. Their main concern: "${blockerLabel}"
+SITUATION: ${situationLine}
 ${role ? `Role: ${role}` : ''}
 ${timing ? `Timeline: ${timing}` : ''}
 
 For each scenario, provide:
-- "type": a SHORT quote (3-7 words) showing what the manager says. This is the pill label — it must be instantly understandable. Write it as a direct mini-quote in the manager's voice, like: "No budget right now" or "Why do you deserve more?" or "Let me think about it". Do NOT use abstract labels like "Deflecting upward" or "Passive agreement" — users can't tell what those mean.
+- "type": a SHORT quote (3-7 words) showing what the manager says. This is the pill label — it must be instantly understandable. Write it as a direct mini-quote in the manager's voice, like: "No budget right now" or "Why do you deserve more?" or "Let me think about it". Do NOT use abstract labels like "Deflecting upward" or "Passive agreement" — users can't tell what those mean.${userOpening ? '\n- The manager is responding DIRECTLY to what the employee just said. Each response should feel like a natural reaction to their specific opening.' : ''}
 - "text": the full 1-2 sentence version of what the manager would say.
 
 The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person.
