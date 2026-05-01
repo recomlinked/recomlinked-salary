@@ -525,15 +525,15 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    directions, not separate options nested under a card. They render as
    their own message bubble in the flow. */
 .sim-pills-row{display:flex;flex-wrap:wrap;gap:6px;}
-.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t1);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
-.sim-pill:hover{border-color:var(--teal);color:var(--teal);}
+.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.sim-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-pill:active{transform:scale(0.97);}
 .sim-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
-.sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;}
+.sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;color:inherit;}
 .sim-pill-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
 .sim-pill.active .sim-pill-preview{color:var(--teal);opacity:0.5;}
 .sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;}
-.sim-pill-custom:hover{border-color:var(--gold);color:var(--gold);}
+.sim-pill-custom:hover{border-color:var(--teal);color:var(--teal);}
 
 /* Manager + reply now flow as separate coach bubbles in the main stream
    (flat structure) rather than nested inside one card. The label still
@@ -541,14 +541,14 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-mgr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
 .sim-you-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
-.sim-reply-pill{background:var(--card);border:1.5px solid rgba(0,196,160,0.2);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--teal);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
-.sim-reply-pill:hover{border-color:var(--teal);background:rgba(0,196,160,0.06);}
+.sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.sim-reply-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-reply-pill:active{transform:scale(0.97);}
-.sim-reply-pill.active{border-color:var(--gold);background:rgba(201,168,76,0.06);color:var(--gold);}
-.sim-reply-theme{font-weight:600;color:var(--teal);font-size:12.5px;line-height:1.3;}
-.sim-reply-preview{font-size:11px;color:rgba(0,196,160,0.45);font-style:italic;line-height:1.4;white-space:normal;}
-.sim-reply-pill.active .sim-reply-theme{color:var(--gold);}
-.sim-reply-pill.active .sim-reply-preview{color:rgba(201,168,76,0.4);}
+.sim-reply-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
+.sim-reply-theme{font-weight:600;color:inherit;font-size:12.5px;line-height:1.3;}
+.sim-reply-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
+.sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
+.sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 
 /* Back button — lets user undo the last turn and try a different reply */
 .sim-back-wrap{padding:4px 0;animation:msgIn 0.3s ease;}
@@ -2208,7 +2208,6 @@ const OPENING_LINES = [
 ];
 
 function renderOpeningChips() {
-  insertCoachBubble("How would you open the conversation?");
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
@@ -2220,8 +2219,8 @@ function renderOpeningChips() {
     themeSpan.textContent = opener.theme;
     pill.appendChild(themeSpan);
     const preview = el('span', 'sim-reply-preview', '');
-    preview.textContent = opener.text;
-    preview.style.whiteSpace = 'normal';
+    const clean = opener.text;
+    preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
     pill.appendChild(preview);
     pill.onclick = () => pickOpening(opener, pill, row);
     row.appendChild(pill);
