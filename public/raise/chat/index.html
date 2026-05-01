@@ -2960,12 +2960,12 @@ async function init() {
   await typeCoachBubble(firstMsg);
   await sleep(200);
 
-  beginExchange1();
+  beginExchange2();
 }
 
 /** Constructs the first coach message — references 3 questions (was 4). */
 function firstCoachMessageFor(range) {
-  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. Two quick questions will narrow it and show where your real leverage is.`;
+  return `That's your starting range, ${range.floor}–${range.ceiling}%, based on the structural factors alone. One quick question will narrow it and show where your real leverage is.`;
 }
 
 /* ── Resume from saved state — replay full transcript ────── */
@@ -3063,9 +3063,9 @@ async function resumeFromState() {
       }
       unlockModeToggle();
     }
-  } else if (where === 1)      beginExchange1();
+  } else if (where === 1)      beginExchange2(); // Ex1 removed, go straight to Ex2
   else if (where === 2) beginExchange2();
-  else if (where === 3) beginTimeframeQuestion();
+  else if (where === 3) beginObstacle(); // was timeframe, now goes to blocker
   else if (where === 4) beginObstacle();
   else if (where === 5) {
     // Paywall state — ensure chips + post-paywall input wiring is live
@@ -3193,8 +3193,11 @@ function renderObstacleChips() {
 
 async function handleObstacleChip(code, label) {
   appendUserBubble(label);
-  disableInput('Thinking…');
+  clearChips();
+  disableInput('');
   state.obstacle = { code, label };
+  state.current_exchange = 10; // simulation mode — same as Path B
+  state.sim_reason = code;
   saveState();
   logSession('blocker', { blocker_code: code, blocker_label: label });
 
@@ -3213,7 +3216,54 @@ async function handleObstacleChip(code, label) {
     }
   } catch (e) { /* non-fatal */ }
 
-  await runObstacleCall({ obstacle_code: code, label });
+  // Enter the same flow as Path B from here
+  const blocker = BLOCKER_MAP[code] || BLOCKER_MAP.other;
+  SIM_STATE.blocker = blocker;
+  SIM_STATE.context = {};
+  SIM_STATE.branch_history = [];
+  SIM_STATE.scenarios_explored = [];
+
+  // Carry over Path A context to simulation
+  const ex2 = state.accumulated?.ex2 || {};
+  SIM_STATE.context.evidence = ex2.signal || ex2.answer || '';
+
+  // Pre-fetch scenarios NOW (same as Path B)
+  state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode: 'simulate_scenarios',
+      blocker: blocker,
+      context: SIM_STATE.context,
+      session_id: state.sim_session_id,
+    }),
+  }).then(r => r.json()).catch(() => null);
+
+  // Same ACK_MESSAGE as Path B + timing question
+  const ack = ACK_MESSAGES[code] || ACK_MESSAGES.other;
+  await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
+  await sleep(200);
+
+  // Show timing chips (same as Path B)
+  const timeChips = [
+    { value: 'this_week',    label: "It's happening this week" },
+    { value: 'few_weeks',    label: 'My review is coming up \u00b7 1-4 weeks' },
+    { value: 'this_quarter', label: "I'm planning it this quarter" },
+    { value: 'exploring',    label: 'Just exploring for now' },
+  ];
+  renderChips(timeChips, (c) => {
+    fadeOutChips();
+    appendUserBubble(c.label);
+    state.timing = c.value;
+    SIM_STATE.timing = c.value;
+    saveState();
+    logSession('sim_timing', { timing: c.value });
+
+    // Enter simulation
+    startSimulationAtBlocker();
+  });
+  enableInput('');
 }
 
 async function handleObstacleFreeText(text) {
@@ -3226,26 +3276,64 @@ async function handleObstacleFreeText(text) {
   }
   appendUserBubble(text);
   clearChips();
-  disableInput('Thinking…');
-  state.obstacle = { code: null, label: text, free_text: text };
+  disableInput('');
+  state.obstacle = { code: 'other', label: text, free_text: text };
+  state.current_exchange = 10;
+  state.sim_reason = 'other';
   saveState();
 
-  // GA4 + Clarity — obstacle_answered (free-text path)
   try {
     if (typeof window.gtag === 'function') {
-      window.gtag('event', 'obstacle_answered', {
-        product:       'raise',
-        obstacle_code: 'free_text',
-        source:        'text',
-      });
+      window.gtag('event', 'obstacle_answered', { product: 'raise', obstacle_code: 'free_text', source: 'text' });
     }
     if (typeof window.clarity === 'function') {
       window.clarity('set', 'funnel_stage', 'obstacle_answered');
       window.clarity('event', 'obstacle_answered');
     }
-  } catch (e) { /* non-fatal */ }
+  } catch (e) {}
 
-  await runObstacleCall({ free_text: text });
+  // Enter same flow as Path B with 'other' blocker
+  const blocker = BLOCKER_MAP.other;
+  SIM_STATE.blocker = blocker;
+  SIM_STATE.context = {};
+  SIM_STATE.branch_history = [];
+  SIM_STATE.scenarios_explored = [];
+
+  const ex2 = state.accumulated?.ex2 || {};
+  SIM_STATE.context.evidence = ex2.signal || ex2.answer || '';
+
+  state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode: 'simulate_scenarios',
+      blocker: blocker,
+      context: SIM_STATE.context,
+      session_id: state.sim_session_id,
+    }),
+  }).then(r => r.json()).catch(() => null);
+
+  const ack = ACK_MESSAGES.other;
+  await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
+  await sleep(200);
+
+  const timeChips = [
+    { value: 'this_week',    label: "It's happening this week" },
+    { value: 'few_weeks',    label: 'My review is coming up \u00b7 1-4 weeks' },
+    { value: 'this_quarter', label: "I'm planning it this quarter" },
+    { value: 'exploring',    label: 'Just exploring for now' },
+  ];
+  renderChips(timeChips, (c) => {
+    fadeOutChips();
+    appendUserBubble(c.label);
+    state.timing = c.value;
+    SIM_STATE.timing = c.value;
+    saveState();
+    logSession('sim_timing', { timing: c.value });
+    startSimulationAtBlocker();
+  });
+  enableInput('');
 }
 
 async function runObstacleCall(answer) {
@@ -3464,10 +3552,10 @@ async function runExchangeCall(exchangeNum, answer) {
 
   await sleep(800);
 
-  // Exchange 2 complete (is_final) → timeframe question (no next_question from backend)
+  // Exchange 2 complete (is_final) → blocker selection (timing comes after blocker now)
   if (result.is_final) {
     await sleep(400);
-    beginTimeframeQuestion();
+    beginObstacle();
     return;
   }
 
@@ -3489,12 +3577,10 @@ function routeToExchange(n) {
   if (n === 2) {
     showExchange2Chips();
     enableInput('Or describe it in your own words…');
-    // Re-arm the free-text handler — earlier submit handler was cleared when
-    // Ex1 ran. Without this, the user can click Send but nothing happens.
     awaitFreeText((text) => handleExchangeAnswer(2, text));
   } else if (n === 3) {
-    // Timeframe — handled by beginTimeframeQuestion(), not routeToExchange
-    beginTimeframeQuestion();
+    // After Ex2 → go to blocker (timeframe is asked after blocker now)
+    beginObstacle();
   }
 }
 
