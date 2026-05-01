@@ -549,6 +549,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
+.mini-demo{background:linear-gradient(180deg,rgba(15,17,24,0.95) 0%,rgba(15,17,24,0) 100%);border-radius:14px;padding:14px 16px 10px;margin-bottom:4px;}
+.mini-demo-inner{display:flex;gap:12px;align-items:center;}
+.mini-demo-label{font-size:13px;font-weight:700;color:#fff;line-height:1.3;transition:opacity 0.2s;}
 
 /* Back button — lets user undo the last turn and try a different reply */
 .sim-back-wrap{padding:4px 0;animation:msgIn 0.3s ease;}
@@ -1113,6 +1116,132 @@ function insertCoachBubble(text) {
   wrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(text))}</p></div>`;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
+  return wrap;
+}
+
+// Mini demo animation — shows tap→reply→branch→back mechanic visually
+function insertMiniDemo() {
+  const wrap = el('div', 'coach-msg', '');
+  const demo = el('div', 'mini-demo', '');
+  const inner = el('div', 'mini-demo-inner', '');
+
+  // SVG tree
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', '0 0 240 110');
+  svg.setAttribute('width', '160');
+  svg.setAttribute('height', '74');
+  svg.style.flexShrink = '0';
+
+  const nodes = {
+    root:{x:120,y:12}, m1:{x:60,y:40}, m2:{x:120,y:40}, m3:{x:180,y:40},
+    r1:{x:40,y:68}, r2:{x:80,y:68}, r3:{x:120,y:68},
+    b1:{x:30,y:94}, b2:{x:55,y:94},
+  };
+  const edges = [['root','m1'],['root','m2'],['root','m3'],['m1','r1'],['m1','r2'],['m1','r3'],['r2','b1'],['r2','b2']];
+
+  const steps = [
+    {phase:'tap1', active:'m1', trail:['root','m1'], vis:['root','m1','m2','m3'], label:'You tap a scenario', ms:600},
+    {phase:'tap2', active:'r2', trail:['root','m1','r2'], vis:['root','m1','m2','m3','r1','r2','r3'], label:'You pick a reply', ms:600},
+    {phase:'branch', active:'b1', trail:['root','m1','r2','b1'], vis:['root','m1','m2','m3','r1','r2','r3','b1','b2'], label:'New paths appear', ms:600},
+    {phase:'back', active:'m2', trail:['root','m2'], vis:['root','m1','m2','m3'], label:'Go back, try another', ms:600},
+    {phase:'reset', active:'root', trail:['root'], vis:['root'], label:'', ms:300},
+  ];
+
+  const MGR = '#00c4a0', YOU = '#c9a84c';
+
+  // Label element
+  const labelEl = el('div', 'mini-demo-label', '');
+  inner.appendChild(svg);
+  inner.appendChild(labelEl);
+  demo.appendChild(inner);
+  wrap.appendChild(demo);
+  $('messages').appendChild(wrap);
+
+  let stepIdx = 0;
+  let demoTimer = null;
+
+  function renderStep() {
+    const s = steps[stepIdx];
+    const trailSet = new Set(s.trail);
+    const visSet = new Set(s.vis);
+
+    // Clear SVG
+    svg.innerHTML = '';
+
+    // Draw edges
+    edges.forEach(([from, to]) => {
+      if (!visSet.has(from) || !visSet.has(to)) return;
+      const f = nodes[from], t = nodes[to];
+      const isActive = trailSet.has(from) && trailSet.has(to);
+      const line = document.createElementNS(svgNS, 'line');
+      line.setAttribute('x1', f.x); line.setAttribute('y1', f.y + 5);
+      line.setAttribute('x2', t.x); line.setAttribute('y2', t.y - 5);
+      line.setAttribute('stroke', isActive ? MGR : 'rgba(255,255,255,0.06)');
+      line.setAttribute('stroke-width', isActive ? '1.5' : '0.8');
+      svg.appendChild(line);
+    });
+
+    // Draw nodes
+    Object.entries(nodes).forEach(([id, pos]) => {
+      if (!visSet.has(id)) return;
+      const isAct = id === s.active;
+      const isTrail = trailSet.has(id);
+      const isRoot = id === 'root';
+      const isMgr = id.startsWith('m');
+      const color = isRoot ? '#fff' : isMgr ? MGR : YOU;
+
+      // Glow for active
+      if (isAct) {
+        const glow = document.createElementNS(svgNS, 'circle');
+        glow.setAttribute('cx', pos.x); glow.setAttribute('cy', pos.y);
+        glow.setAttribute('r', '10'); glow.setAttribute('fill', color);
+        glow.setAttribute('opacity', '0.1');
+        svg.appendChild(glow);
+      }
+
+      // Card
+      const rect = document.createElementNS(svgNS, 'rect');
+      rect.setAttribute('x', pos.x - 18); rect.setAttribute('y', pos.y - 6);
+      rect.setAttribute('width', '36'); rect.setAttribute('height', '12');
+      rect.setAttribute('rx', '4');
+      rect.setAttribute('fill', isAct ? (isMgr ? 'rgba(0,196,160,0.2)' : isRoot ? 'rgba(255,255,255,0.1)' : 'rgba(201,168,76,0.2)')
+        : isTrail ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)');
+      rect.setAttribute('stroke', isAct ? color : isTrail ? color + '44' : 'rgba(255,255,255,0.06)');
+      rect.setAttribute('stroke-width', isAct ? '1' : '0.4');
+      svg.appendChild(rect);
+
+      // Dot
+      if (!isRoot) {
+        const dot = document.createElementNS(svgNS, 'circle');
+        dot.setAttribute('cx', pos.x - 14); dot.setAttribute('cy', pos.y);
+        dot.setAttribute('r', '1.5'); dot.setAttribute('fill', color);
+        dot.setAttribute('opacity', isAct ? '1' : '0.4');
+        svg.appendChild(dot);
+      }
+
+      // Label
+      const text = document.createElementNS(svgNS, 'text');
+      text.setAttribute('x', pos.x - 10); text.setAttribute('y', pos.y + 1.2);
+      text.setAttribute('font-size', isRoot ? '4' : '3.5');
+      text.setAttribute('fill', isAct ? '#eee' : isTrail ? '#aaa' : '#555');
+      text.setAttribute('font-weight', isAct ? '700' : '400');
+      text.setAttribute('dominant-baseline', 'middle');
+      text.setAttribute('font-family', 'DM Sans, system-ui, sans-serif');
+      text.textContent = isRoot ? 'You start' : isMgr ? 'Manager' : id.startsWith('r') ? 'Your reply' : 'Next...';
+      svg.appendChild(text);
+    });
+
+    labelEl.textContent = s.label;
+    stepIdx = (stepIdx + 1) % steps.length;
+    demoTimer = setTimeout(renderStep, s.ms);
+  }
+
+  renderStep();
+  scrollChatToBottom();
+
+  // Store timer ref for cleanup if needed
+  wrap._demoTimer = demoTimer;
   return wrap;
 }
 
@@ -2103,7 +2232,11 @@ async function beginSimulationFlow(reasonParam) {
     obstacle_code: blocker.code,
   });
 
-  // Step 1: Coach insight
+  // Step 0: Mini demo animation — shows the mechanic instantly
+  insertMiniDemo();
+  await sleep(300);
+
+  // Step 1: Coach insight (types while user watches the animation)
   const ack = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
   await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
   await sleep(200);
@@ -3490,7 +3623,9 @@ async function handleObstacleChip(code, label) {
     }),
   }).then(r => r.json()).catch(() => null);
 
-  // Same ACK_MESSAGE as Path B + timing question
+  // Mini demo animation + ACK_MESSAGE (same as Path B)
+  insertMiniDemo();
+  await sleep(300);
   const ack = ACK_MESSAGES[code] || ACK_MESSAGES.other;
   await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
   await sleep(200);
