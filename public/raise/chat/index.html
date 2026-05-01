@@ -2112,13 +2112,21 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner
   insertModeBanner('sim');
 
-  // Short transition — the ACK_MESSAGE already explained what's coming.
+  // no_script blocker: user doesn't know how to START — show opening
+  // line options first, then the manager responds to their chosen opening.
+  if (blocker.code === 'no_script') {
+    await typeCoachBubble("**Now pick how you'd open the conversation.**");
+    await sleep(200);
+    renderOpeningChips();
+    unlockModeToggle();
+    return;
+  }
+
+  // All other blockers: manager speaks first
   await typeCoachBubble("**Now pick what your manager might say first.**");
   await sleep(200);
 
   // Use pre-fetched scenarios (fired at the start of beginSimulationFlow).
-  // If the promise resolved while the user was reading + picking timing,
-  // this is instant. If it's still pending, we show a brief spinner.
   disableInput('');
   const prefetched = SIM_STATE._scenarioPromise;
   if (prefetched) {
@@ -2163,9 +2171,153 @@ async function startSimulationAtBlocker() {
     }
   }
 
-  // Now that the simulation flow is live, allow the user to flip to
-  // coaching mode whenever they want.
   unlockModeToggle();
+}
+
+// ── Opening lines for "no_script" blocker ──
+// These are hardcoded, high-quality opening scripts — not API-generated.
+const OPENING_LINES = [
+  {
+    theme: 'Anchor to your results',
+    text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.",
+  },
+  {
+    theme: 'Lead with market data',
+    text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?",
+  },
+  {
+    theme: 'Frame it as retention',
+    text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.",
+  },
+  {
+    theme: 'Make it collaborative',
+    text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.",
+  },
+  {
+    theme: 'Tie it to a milestone',
+    text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.",
+  },
+  {
+    theme: 'Just ask directly',
+    text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.",
+  },
+  {
+    theme: 'Connect to a recent win',
+    text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.",
+  },
+];
+
+function renderOpeningChips() {
+  insertCoachBubble("How would you open the conversation?");
+  const wrap = el('div', 'coach-msg', '');
+  const inner = el('div', '', '');
+  const row = el('div', 'sim-pills-row', '');
+  inner.appendChild(row);
+
+  OPENING_LINES.forEach((opener) => {
+    const pill = el('button', 'sim-reply-pill', '');
+    const themeSpan = el('span', 'sim-reply-theme', '');
+    themeSpan.textContent = opener.theme;
+    pill.appendChild(themeSpan);
+    const preview = el('span', 'sim-reply-preview', '');
+    preview.textContent = opener.text;
+    preview.style.whiteSpace = 'normal';
+    pill.appendChild(preview);
+    pill.onclick = () => pickOpening(opener, pill, row);
+    row.appendChild(pill);
+  });
+
+  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
+  custom.textContent = "+ I'd say something else\u2026";
+  custom.onclick = () => {
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
+  };
+  row.appendChild(custom);
+
+  wrap.appendChild(inner);
+  $('messages').appendChild(wrap);
+  simBranchAnchor = wrap;
+  scrollChatToBottom();
+
+  // Allow typing a custom opening
+  enableInput('Tap an opening or type your own\u2026');
+  awaitFreeText(async (text) => {
+    if (!text || text.trim().length < 4) return;
+    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + text + '\u201d');
+    disableInput('');
+    clearChips();
+    simConversation.push({ role: 'user', text });
+    SIM_STATE.user_opening = text;
+    logSession('sim_opening_typed', { opening: text });
+    if (incrementSimTaps()) {
+      showSimulationPaywall(null);
+    } else {
+      await loadManagerResponseToOpening(text);
+    }
+  });
+}
+
+async function pickOpening(opener, pill, container) {
+  // Disable all pills
+  container.querySelectorAll('.sim-reply-pill').forEach(p => {
+    p.classList.toggle('active', p === pill);
+    p.disabled = true;
+    p.style.cursor = 'default';
+  });
+
+  const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
+  scrollChatToBottom();
+  disableInput('');
+
+  simConversation.push({ role: 'user', text: opener.text });
+  SIM_STATE.user_opening = opener.text;
+  SIM_STATE.branch_history.push({ scenario: 'opening', reply: opener.theme });
+  logSession('sim_opening_picked', { theme: opener.theme });
+
+  const turnNodes = [userBubble];
+  simTurnElements.push(turnNodes);
+
+  if (incrementSimTaps()) {
+    showSimulationPaywall(null);
+  } else {
+    await loadManagerResponseToOpening(opener.text, turnNodes);
+  }
+}
+
+// After the user picks an opening, generate manager responses to it
+async function loadManagerResponseToOpening(openingText, turnNodes) {
+  await sleep(400);
+  showCoachTyping();
+
+  try {
+    const res = await fetchWithTimeout('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'simulate_scenarios',
+        blocker: SIM_STATE.blocker,
+        context: { ...SIM_STATE.context, user_opening: openingText },
+        session_id: profileHash(),
+      }),
+    }, 15000);
+    const data = await res.json();
+    hideCoachTyping();
+
+    // Show "Now pick what your manager might say:" + manager chips
+    await typeCoachBubble("**Now pick what your manager might say to that.**");
+    await sleep(200);
+
+    if (data && data.scenarios && data.scenarios.length >= 2) {
+      renderScenarioLabels(data.scenarios);
+    } else {
+      renderScenarioLabels(getDefaultScenarios('no_script'));
+    }
+  } catch (err) {
+    hideCoachTyping();
+    await typeCoachBubble("**Now pick what your manager might say to that.**");
+    renderScenarioLabels(getDefaultScenarios('no_script'));
+  }
 }
 
 function getDefaultScenarios(blockerCode) {
@@ -2190,6 +2342,13 @@ function getDefaultScenarios(blockerCode) {
       { type: '"Walk me through it"', text: "Walk me through what you've found." },
       { type: '"We pay fairly here"', text: "We pay competitively for this market." },
       { type: '"Let\u2019s talk career path"', text: "Let's talk about your career path instead." },
+    ],
+    no_script: [
+      { type: '"I appreciate you telling me"', text: "I appreciate you bringing this up. I didn't realize this was on your mind." },
+      { type: '"What number are we talking?"', text: "OK, I hear you. What kind of number are we talking about here?" },
+      { type: '"Now isn\u2019t great timing"', text: "I appreciate the honesty, but the timing is tricky with everything going on right now." },
+      { type: '"You\u2019d need to show me more"', text: "I'm open to the conversation, but I'd need to see a stronger case before I can do anything." },
+      { type: '"Let me look into it"', text: "That's fair. Let me look into what's possible and get back to you." },
     ],
   };
   return defaults[blockerCode] || [
