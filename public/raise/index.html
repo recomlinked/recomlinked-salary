@@ -1493,16 +1493,24 @@ h2.section-title {
     <h2>Common questions</h2>
     <div style="margin-top: 16px;">
       <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How does this help me ask for a raise?<span class="faq-icon">+</span></div>
+        <div class="faq-a">You pick your biggest raise blocker — like not knowing what to say, or worrying they'll say no — and the tool lets you tap through every way your manager could respond. For each response, you see a prepared answer. Then you go back and try different paths until you've covered everything. By the time you walk into the real conversation, you've already practiced it.</div>
+      </div>
+      <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
-        <div class="faq-a">No. ChatGPT gives you one script in one thread. This maps every direction your conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're not typing prompts and hoping for good advice. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning, not a chatbot.</div>
+        <div class="faq-a">No. ChatGPT gives you one script in one thread. This maps every direction your raise conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're not typing prompts and hoping for good advice. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning for your pay raise, not a chatbot.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What if I don't know how to start the conversation with my boss?<span class="faq-icon">+</span></div>
+        <div class="faq-a">That's the most common raise blocker — 1 in 4 people who use this tool pick it. Instead of starting with what your manager says, you'll see seven different opening lines you could use to bring up a pay raise with your boss. Pick the one that feels right, and the tool generates your manager's likely responses to that specific opening. You don't need to figure out the words on your own.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Can this help me negotiate a higher salary?<span class="faq-icon">+</span></div>
+        <div class="faq-a">People who prepare for salary negotiations using scenario planning get better outcomes because nothing catches them off guard. When your manager says "budgets are frozen" or "why do you think you deserve more," you already know what to say. The preparation is what makes the difference — not a script you read off a page, but having tested every path the conversation could take before you ask your boss for a raise.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">How much does it cost?<span class="faq-icon">+</span></div>
-        <div class="faq-a">The assessment and coaching chat are free. If you want the full plan, including your specific number, opening script, pushback responses, email template, and 30 days of coach chat, it's $39 one-time. No subscription, no upsells. Backed by a 14-day refund if it's not useful for your situation.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How accurate is the probability score?<span class="faq-icon">+</span></div>
-        <div class="faq-a">The score is an estimate based on your specific situation and market conditions, not a guarantee. It's calibrated on the structural factors that actually drive raise outcomes. It's designed to be directionally accurate so you know whether you're in a strong position, a weak one, or somewhere in between, and exactly what moves it.</div>
+        <div class="faq-a">The scenario planning preview is free. If you want unlimited scenario branches, fully customized to your situation, plus 30 days of coaching, it's $39 one-time. No subscription, no upsells. Backed by a 3-day refund if it's not useful for your situation.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What if I'm not sure about some of the answers?<span class="faq-icon">+</span></div>
@@ -1517,16 +1525,12 @@ h2.section-title {
         <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need. Your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice. You're working through a specific plan with a coach who knows your situation.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Do you store my company name or sensitive info?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Anything you share in the chat is stored only for the 30-day coaching window and is used solely to personalize your coaching. We never sell or share your data. You can export or delete it at any time from inside your paid dashboard.</div>
-      </div>
-      <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">What about a job offer I'm negotiating?<span class="faq-icon">+</span></div>
         <div class="faq-a">Different product, different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/">Join the waitlist</a> and we'll let you know when it's live.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Refund policy?<span class="faq-icon">+</span></div>
-        <div class="faq-a">If the plan isn't useful for your situation, email <a href="mailto:support@recomlinked.com">support@recomlinked.com</a> within 14 days and we'll refund you. We'd rather lose $39 than have an unhappy user.</div>
+        <div class="faq-a">If the plan isn't useful for your situation, email <a href="mailto:support@recomlinked.com">support@recomlinked.com</a> within 3 days and we'll refund you. We'd rather lose $39 than have an unhappy user.</div>
       </div>
     </div>
   </section>
@@ -2639,6 +2643,64 @@ function submitAssessment() {
     renderTree();timer=setTimeout(runScript,600);
   }
 })();
+</script>
+
+<!-- FAQ Schema (structured data for Google) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How does this help me ask for a raise?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You pick your biggest raise blocker — like not knowing what to say, or worrying they'll say no — and the tool lets you tap through every way your manager could respond. For each response, you see a prepared answer. Then you go back and try different paths until you've covered everything. By the time you walk into the real conversation, you've already practiced it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this just ChatGPT?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. ChatGPT gives you one script in one thread. This maps every direction your raise conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning for your pay raise, not a chatbot."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I don't know how to start the conversation with my boss?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "That's the most common raise blocker. Instead of starting with what your manager says, you'll see seven different opening lines you could use to bring up a pay raise with your boss. Pick the one that feels right, and the tool generates your manager's likely responses to that specific opening."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can this help me negotiate a higher salary?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "People who prepare for salary negotiations using scenario planning get better outcomes because nothing catches them off guard. When your manager says 'budgets are frozen' or 'why do you think you deserve more,' you already know what to say. The preparation is what makes the difference."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The scenario planning preview is free. If you want unlimited scenario branches, fully customized to your situation, plus 30 days of coaching, it's $39 one-time. No subscription, no upsells. Backed by a 3-day refund."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will my employer find out I'm using this?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Nothing you type here leaves this site. We don't share data, and we don't sell anything. You can delete everything with one click from your dashboard."
+      }
+    }
+  ]
+}
 </script>
 
 <!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
