@@ -3978,7 +3978,7 @@ async function renderPaywallBubble(opts) {
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
 
-  const headline = `Prepare for every scenario.`;
+  const headline = `Walk in ready.`;
 
   const proof = pickProofLine(obs.code);
 
@@ -3986,7 +3986,7 @@ async function renderPaywallBubble(opts) {
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <div class="paywall-pitch">Win the negotiation before it starts. We're confident this works — <span class="paywall-refund">if not, we'll give you a full refund.</span> Tap through every possibility in under an hour so nothing surprises you.</div>
+      <div class="paywall-pitch">You've seen how it works. Unlock every scenario now. You'll have every response prepared before the conversation starts. We're confident this works <span class="paywall-refund">if not, we'll give you a full refund.</span></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
         Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
