@@ -2031,6 +2031,33 @@ async function beginSimulationFlow(reasonParam) {
   SIM_STATE.branch_history = [];
   simTapCount = 0;
 
+  // If user already hit the paywall in a previous session (tried to
+  // bypass by picking a different blocker), show paywall immediately.
+  if (state.paywall_shown) {
+    state.obstacle = blocker;
+    state.current_exchange = 10;
+    state.sim_reason = reasonParam;
+    state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    state.chat_log = [];
+    saveState();
+    stopThinkingAnimation();
+    const thinkBubble = document.querySelector('.thinking-bubble');
+    if (thinkBubble) thinkBubble.remove();
+
+    await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full plan.");
+    await sleep(300);
+    state.current_range = state.current_range || { floor: 45, ceiling: 70 };
+    state.initial_floor = state.initial_floor || 45;
+    await renderPaywallBubble({ animated: true });
+    logEntry('paywall', {});
+    showToolbar();
+    showModeToggle();
+    showHeaderPurchaseButton();
+    enableInput('Ask me anything\u2026');
+    awaitFreeText(handlePostPaywallText);
+    return;
+  }
+
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
   state.chat_log = [];
@@ -3056,7 +3083,21 @@ async function init() {
   // Check for simulation path FIRST — chip click from landing page
   const params = new URLSearchParams(location.search);
   const reason = params.get('reason');
+  const forceReset = params.get('reset') === '1';
+
   if (reason) {
+    // Check if paywall was already shown in a previous session
+    let previousPaywall = false;
+    if (!forceReset) {
+      try {
+        const prev = localStorage.getItem(LS_STATE);
+        if (prev) {
+          const parsed = JSON.parse(prev);
+          previousPaywall = !!parsed.paywall_shown;
+        }
+      } catch (e) {}
+    }
+
     try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
     stopThinkingAnimation();
     const thinkBubble = document.querySelector('.thinking-bubble');
@@ -3064,11 +3105,24 @@ async function init() {
     const probCard = document.querySelector('.prob-card');
     if (probCard) probCard.style.display = 'none';
     disableInput('');
-    // Strip the ?reason= param from the URL so that refreshing the page
-    // resumes from saved state instead of re-triggering a fresh start.
+    // Strip params from URL
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
+
+    // If paywall was already shown and this isn't a forced reset,
+    // carry the paywall state forward so users can't bypass it
+    // by picking a different blocker.
+    if (previousPaywall) {
+      state.paywall_shown = true;
+    }
+
     beginSimulationFlow(reason);
     return;
+  }
+
+  // ?reset=1 without reason — just clear everything
+  if (forceReset) {
+    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname); } catch (e) {}
   }
 
   const saved = loadState();
