@@ -3223,9 +3223,14 @@ async function handleObstacleChip(code, label) {
   SIM_STATE.branch_history = [];
   SIM_STATE.scenarios_explored = [];
 
-  // Carry over Path A context to simulation
+  // Carry over Path A context to simulation — pre-populate from profile
+  // so context enrichment questions skip what the user already answered
+  const p = state.profile || {};
   const ex2 = state.accumulated?.ex2 || {};
   SIM_STATE.context.evidence = ex2.signal || ex2.answer || '';
+  if (p.company_situation) SIM_STATE.context.company_situation = p.company_situation;
+  if (p.company_size) SIM_STATE.context.company_size = p.company_size;
+  if (p.last_raise) SIM_STATE.context.last_raise = p.last_raise;
 
   // Pre-fetch scenarios NOW (same as Path B)
   state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
@@ -3299,8 +3304,13 @@ async function handleObstacleFreeText(text) {
   SIM_STATE.branch_history = [];
   SIM_STATE.scenarios_explored = [];
 
+  // Carry over Path A context
+  const p = state.profile || {};
   const ex2 = state.accumulated?.ex2 || {};
   SIM_STATE.context.evidence = ex2.signal || ex2.answer || '';
+  if (p.company_situation) SIM_STATE.context.company_situation = p.company_situation;
+  if (p.company_size) SIM_STATE.context.company_size = p.company_size;
+  if (p.last_raise) SIM_STATE.context.last_raise = p.last_raise;
 
   state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
