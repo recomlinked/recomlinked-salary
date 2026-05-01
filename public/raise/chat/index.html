@@ -4016,7 +4016,7 @@ async function renderPaywallBubble(opts) {
   if (!opts.animated) {
     wrap.querySelector('.paywall-typed-head').textContent = headline;
     wrap.querySelector('.paywall-head-cursor')?.remove();
-    wrap.querySelector('.proof-typed').textContent = proof;
+    wrap.querySelector('.proof-typed').textContent = proof.replace(/<\/?strong>/g, '');
     scrollChatToBottom();
     startProofRotation(wrap.querySelector('.proof-typed'));
     return wrap;
@@ -4060,7 +4060,7 @@ async function renderPaywallBubble(opts) {
 
   // Start proof line type/untype rotation
   const proofTyped = wrap.querySelector('.proof-typed');
-  proofTyped.textContent = proof;
+  proofTyped.textContent = proof.replace(/<\/?strong>/g, '');
   startProofRotation(proofTyped);
 
   return wrap;
