@@ -2179,6 +2179,7 @@ async function beginSimulationFlow(reasonParam) {
     state.sim_reason = reasonParam;
     state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
     state.chat_log = [];
+    state.profile = state.profile || { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
     saveState();
     stopThinkingAnimation();
     const thinkBubble = document.querySelector('.thinking-bubble');
@@ -4093,7 +4094,7 @@ async function startCheckout() {
 
   try {
     const params = new URLSearchParams(location.search);
-    const refSource = params.get('ref') || state.profile.refSource || '';
+    const refSource = params.get('ref') || (state.profile && state.profile.refSource) || '';
     const res = await fetch(API_CHECKOUT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
