@@ -877,14 +877,17 @@ async function handleSimulateReplies(body, res) {
 The employee's concern was: "${blocker?.label || 'asking for a raise'}"
 ${role ? `Their role: ${role}` : ''}
 
-Generate 4-5 possible REPLY THEMES the employee could use. For each, provide:
+Generate 4-5 possible REPLY THEMES the employee could use, RANKED from most effective to least effective. For each, provide:
 - "theme": a short plain-English label (3-6 words) that instantly tells the user what they'd say. Write it as a mini-summary in first person, like: "Share my market data", "Ask what it would take", "Push back firmly", "Suggest a timeline". Do NOT use abstract labels like "Data-driven approach" — users can't tell what those mean.
 - "text": the full response (1-2 sentences, specific, strategic)
+- "score": effectiveness rating 1-5 (5 = strongest move that most likely advances toward a raise, 1 = weakest or riskiest move)
+
+Sort the replies from highest score to lowest. The first reply should be the BEST strategic move for this situation.
 
 Make the replies varied — some direct, some diplomatic, some data-driven. Each should be a genuinely different approach.
 
 JSON only:
-{ "replies": [ { "theme": "Share my market data", "text": "I've done some research..." }, ... ] }`;
+{ "replies": [ { "theme": "Share my market data", "text": "I've done some research...", "score": 5 }, ... ] }`;
 
   try {
     const response = await client.messages.create({
