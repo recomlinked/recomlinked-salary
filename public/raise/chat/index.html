@@ -2174,7 +2174,8 @@ async function beginSimulationFlow(reasonParam) {
 
   // If user already hit the paywall in a previous session (tried to
   // bypass by picking a different blocker), show paywall immediately.
-  if (state.paywall_shown) {
+  // But skip this entirely for paid users.
+  if (state.paywall_shown && !state.paid) {
     state.obstacle = blocker;
     state.current_exchange = 10;
     state.sim_reason = reasonParam;
@@ -2877,6 +2878,11 @@ try {
 } catch (e) {}
 
 function incrementSimTaps() {
+  // Paid users never hit the paywall
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
+    if (s.paid) return false;
+  } catch (e) {}
   simTapCount++;
   try { localStorage.setItem(LS_TAP_COUNT, String(simTapCount)); } catch (e) {}
   return simTapCount >= SIM_FREE_TAPS;
@@ -3220,18 +3226,28 @@ function showHeaderPurchaseButton() {
   if ($('header-buy-btn')) return; // already added
   const header = document.querySelector('.site-header');
   if (!header) return;
-  // Ensure header-right container exists
   let right = header.querySelector('.header-right');
   if (!right) {
     right = document.createElement('div');
     right.className = 'header-right';
     header.appendChild(right);
   }
-  const btn = document.createElement('button');
+  
+  // Check if paid
+  let isPaid = false;
+  try { isPaid = JSON.parse(localStorage.getItem(LS_STATE) || '{}').paid === true; } catch (e) {}
+
+  const btn = document.createElement(isPaid ? 'a' : 'button');
   btn.id = 'header-buy-btn';
   btn.className = 'header-buy-btn';
-  btn.innerHTML = 'Practice every scenario';
-  btn.onclick = startCheckout;
+  if (isPaid) {
+    btn.innerHTML = 'Your practice map';
+    btn.href = '/raise/paid/';
+    btn.style.textDecoration = 'none';
+  } else {
+    btn.innerHTML = 'Practice every scenario';
+    btn.onclick = startCheckout;
+  }
   right.appendChild(btn);
 }
 
