@@ -2169,7 +2169,8 @@ async function beginSimulationFlow(reasonParam) {
   SIM_STATE.blocker = blocker;
   SIM_STATE.context = {};
   SIM_STATE.branch_history = [];
-  simTapCount = 0;
+  // Don't reset simTapCount — it's restored from localStorage
+  // so users can't get free taps by switching blockers
 
   // If user already hit the paywall in a previous session (tried to
   // bypass by picking a different blocker), show paywall immediately.
@@ -2502,12 +2503,10 @@ function clearBranchContent() {
   while (simBranchAnchor.nextSibling) {
     simBranchAnchor.nextSibling.remove();
   }
-  // Reset multi-turn state AND tap count — switching to a new branch
-  // gives the user a fresh tap budget so they get a full 4 interactions
-  // per branch, not a depleted budget from the previous one.
+  // Reset multi-turn state but NOT tap count — tap count is global
+  // across all branches to prevent unlimited free exploration.
   simConversation = [];
   simTurnElements = [];
-  simTapCount = 0;
 }
 
 function renderScenarioLabels(scenarios) {
@@ -2853,12 +2852,19 @@ function renderReplyPillsFlat(replies, scenario) {
 }
 
 // How many chip taps (any type — scenario or reply) before paywall.
-// Covers both simulation mode taps uniformly.
 const SIM_FREE_TAPS = 3;
+const LS_TAP_COUNT = 'rl_raise_tap_count';
 let simTapCount = 0;
+
+// Restore tap count from localStorage on load
+try {
+  const saved = parseInt(localStorage.getItem(LS_TAP_COUNT) || '0', 10);
+  if (saved > 0 && saved < SIM_FREE_TAPS) simTapCount = saved;
+} catch (e) {}
 
 function incrementSimTaps() {
   simTapCount++;
+  try { localStorage.setItem(LS_TAP_COUNT, String(simTapCount)); } catch (e) {}
   return simTapCount >= SIM_FREE_TAPS;
 }
 
@@ -3264,6 +3270,10 @@ async function init() {
     }
 
     try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
+    if (forceReset) {
+      try { localStorage.removeItem(LS_TAP_COUNT); } catch (e) {}
+      simTapCount = 0;
+    }
     stopThinkingAnimation();
     const thinkBubble = document.querySelector('.thinking-bubble');
     if (thinkBubble) thinkBubble.remove();
@@ -3286,7 +3296,8 @@ async function init() {
 
   // ?reset=1 without reason — just clear everything
   if (forceReset) {
-    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); } catch (e) {}
+    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); localStorage.removeItem(LS_TAP_COUNT); } catch (e) {}
+    simTapCount = 0;
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
   }
 
@@ -3441,7 +3452,7 @@ async function resumeFromState() {
     SIM_STATE.blocker = blocker;
     SIM_STATE.context = {};
     SIM_STATE.branch_history = [];
-    simTapCount = 0;
+    // Don't reset simTapCount — restored from localStorage
     showToolbar();
     showModeToggle();
 
