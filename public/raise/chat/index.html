@@ -2229,6 +2229,19 @@ async function beginSimulationFlow(reasonParam) {
   startSimulationAtBlocker();
 }
 
+// Bridge lines — acknowledge the blocker then lead to opening chips
+const BRIDGE_LINES = {
+  no_script:      "You said you don't know how to start the conversation. Here's how you could open it. Pick the one that feels right.",
+  underpaid:      "You said you think you're underpaid but can't prove it. Here's how you could bring it up. Pick the one that feels right.",
+  quiet:          "You said you're a strong performer but quiet. Here's how you could start the conversation. Pick the one that feels right.",
+  unknown_amount: "You said you don't know what number to ask for. Here's how you could open the conversation. Pick the one that feels right.",
+  fear_no:        "You said you're worried they'll say no. Here's how you could start. Pick the one that feels right.",
+  no_advocate:    "You said your manager doesn't advocate for you. Here's how you could bring it up. Pick the one that feels right.",
+  prior_no:       "You said you already asked and got nothing. Here's how you could reopen it. Pick the one that feels right.",
+  timing:         "You said you're not sure if now is the right time. Here's how you could test the waters. Pick the one that feels right.",
+  other:          "Here's how you could open the conversation. Pick the one that feels right.",
+};
+
 // ── Start simulation at the specific blocker moment ──
 async function startSimulationAtBlocker() {
   const blocker = SIM_STATE.blocker;
@@ -2240,8 +2253,9 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner
   insertModeBanner('sim');
 
-  // All blockers: show opening lines immediately (no typing, instant)
-  insertCoachBubble("How would you open this conversation?");
+  // Bridge line — acknowledges blocker + leads to chips
+  const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
+  insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
   unlockModeToggle();
