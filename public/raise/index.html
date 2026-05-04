@@ -2711,6 +2711,35 @@ function submitAssessment() {
 }
 </script>
 
+<!-- Pass UTM params through to chat page links -->
+<script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var utm_term = params.get('utm_term');
+  var utm_source = params.get('utm_source');
+  var utm_medium = params.get('utm_medium');
+  var utm_campaign = params.get('utm_campaign');
+  var gclid = params.get('gclid');
+  if (!utm_term && !gclid) return; // no ad params, skip
+
+  // Build the extra params to append
+  var extra = [];
+  if (utm_source) extra.push('utm_source=' + encodeURIComponent(utm_source));
+  if (utm_medium) extra.push('utm_medium=' + encodeURIComponent(utm_medium));
+  if (utm_campaign) extra.push('utm_campaign=' + encodeURIComponent(utm_campaign));
+  if (utm_term) extra.push('utm_term=' + encodeURIComponent(utm_term));
+  if (gclid) extra.push('gclid=' + encodeURIComponent(gclid));
+  var suffix = extra.join('&');
+  if (!suffix) return;
+
+  // Append to all /raise/chat/ links
+  document.querySelectorAll('a[href*="/raise/chat/"]').forEach(function(a) {
+    var href = a.getAttribute('href');
+    a.setAttribute('href', href + (href.indexOf('?') > -1 ? '&' : '?') + suffix);
+  });
+})();
+</script>
+
 <!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
 <script defer src="/shared.js"></script>
 
