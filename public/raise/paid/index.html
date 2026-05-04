@@ -90,7 +90,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 <header class="site-header">
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
   <div class="header-right">
-    <span class="days-pill" id="days-pill" hidden></span>
+    
     <a class="header-cta" id="header-cta" href="/raise/chat/">Continue practicing →</a>
   </div>
 </header>
@@ -292,7 +292,7 @@ async function init(){
 
 function renderPaid(demo){
   const days=demo?27:dash.days_left;
-  $('stat-days').textContent=days;$('days-pill').textContent=`${days} day${days===1?'':'s'} left`;$('days-pill').hidden=false;
+  $('stat-days').textContent=days;
 
   let branches=[],context={};
   if(demo){branches=demo.branches||[];context=demo.context||{};}
