@@ -549,6 +549,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
+.reply-star{flex-shrink:0;padding-top:2px;}
+.reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
 .mini-demo{background:linear-gradient(180deg,rgba(15,17,24,0.95) 0%,rgba(15,17,24,0) 100%);border-radius:14px;padding:14px 16px 10px;margin-bottom:4px;height:120px;overflow:hidden;}
 .mini-demo-inner{display:flex;flex-direction:column;align-items:center;gap:8px;}
 .mini-demo-label{font-size:13px;font-weight:700;color:#fff;line-height:1.3;transition:opacity 0.2s;text-align:center;}
@@ -622,7 +624,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
               <path d="M13.6 13.5l-0.5-0.6M13.6 13.5l0.6-0.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
               <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
             </svg>
-            <span>Scenarios</span>
+            <span>Practice</span>
           </button>
           <button class="mode-toggle-btn coach" id="mode-btn-coach" type="button" onclick="setMode('coach')" role="tab" aria-selected="false" title="Get coaching feedback on the scenarios you've explored">
             <!-- Coach: chat bubble with insight dot -->
@@ -1813,7 +1815,7 @@ function toggleTreePanel() {
     // Count
     const count = document.createElement('div');
     count.className = 'tree-count';
-    count.textContent = `${SIM_STATE.scenarios_explored.length} explored \u2014 dozens more available in the full plan`;
+    count.textContent = `${SIM_STATE.scenarios_explored.length} explored \u2014 dozens more in the full practice session`;
     panel.appendChild(count);
 
     // Export button
@@ -1961,8 +1963,8 @@ function insertModeBanner(mode) {
         <path d="M7 9l2 2M9 9l-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
         <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
       </svg>
-      <span>Scenarios mode</span>
-      <span class="mode-banner-sub">Exploring possible directions</span>
+      <span>Practice mode</span>
+      <span class="mode-banner-sub">Practicing your raise conversation</span>
     `;
   } else {
     wrap.innerHTML = `
@@ -2182,7 +2184,7 @@ async function beginSimulationFlow(reasonParam) {
     const thinkBubble = document.querySelector('.thinking-bubble');
     if (thinkBubble) thinkBubble.remove();
 
-    await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full plan.");
+    await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full practice session.");
     await sleep(300);
     state.current_range = state.current_range || { floor: 45, ceiling: 70 };
     state.initial_floor = state.initial_floor || 45;
@@ -2333,30 +2335,37 @@ const OPENING_LINES = [
   {
     theme: 'Anchor to your results',
     text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.",
+    score: 5,
   },
   {
     theme: 'Lead with market data',
     text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?",
-  },
-  {
-    theme: 'Frame it as retention',
-    text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.",
-  },
-  {
-    theme: 'Make it collaborative',
-    text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.",
+    score: 5,
   },
   {
     theme: 'Tie it to a milestone',
     text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.",
+    score: 4,
   },
   {
-    theme: 'Just ask directly',
-    text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.",
+    theme: 'Make it collaborative',
+    text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.",
+    score: 4,
   },
   {
     theme: 'Connect to a recent win',
     text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.",
+    score: 3,
+  },
+  {
+    theme: 'Frame it as retention',
+    text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.",
+    score: 2,
+  },
+  {
+    theme: 'Just ask directly',
+    text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.",
+    score: 2,
   },
 ];
 
@@ -2366,15 +2375,44 @@ function renderOpeningChips() {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
-  OPENING_LINES.forEach((opener) => {
+  // Already sorted by score in the array
+  const maxScore = Math.max(...OPENING_LINES.map(o => o.score));
+
+  OPENING_LINES.forEach((opener, i) => {
     const pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'flex-start';
+    pill.style.gap = '10px';
+
+    // Star
+    const starWrap = el('div', 'reply-star', '');
+    starWrap.appendChild(createStarSVG(opener.score, 5));
+    pill.appendChild(starWrap);
+
+    // Content
+    const content = el('div', '', '');
+    content.style.flex = '1';
+
+    const themeRow = el('div', '', '');
+    themeRow.style.display = 'flex';
+    themeRow.style.alignItems = 'center';
+    themeRow.style.gap = '6px';
     const themeSpan = el('span', 'sim-reply-theme', '');
     themeSpan.textContent = opener.theme;
-    pill.appendChild(themeSpan);
+    themeRow.appendChild(themeSpan);
+
+    if (i === 0 && opener.score >= 4) {
+      const badge = el('span', 'reply-best-badge', 'Best move');
+      themeRow.appendChild(badge);
+    }
+    content.appendChild(themeRow);
+
     const preview = el('span', 'sim-reply-preview', '');
     const clean = opener.text;
     preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
-    pill.appendChild(preview);
+    content.appendChild(preview);
+
+    pill.appendChild(content);
     pill.onclick = () => pickOpening(opener, pill, row);
     row.appendChild(pill);
   });
@@ -2740,16 +2778,49 @@ function renderManagerBubble(scenario) {
 
 function getDefaultReplies() {
   return [
-    { theme: 'Share my market research', text: "I've done some research on market rates for my role — can I share what I found?" },
-    { theme: 'Ask what it would take', text: "I understand the constraints. Can we at least discuss what would need to change for this to work?" },
-    { theme: 'Pin down a timeline', text: "When would be a better time? I'd like to put something specific on the calendar." },
-    { theme: 'Push back firmly', text: "I hear you, but I've been here for X years and my scope has grown significantly. I think it's worth discussing now." },
+    { theme: 'Share my market research', text: "I've done some research on market rates for my role — can I share what I found?", score: 5 },
+    { theme: 'Ask what it would take', text: "I understand the constraints. Can we at least discuss what would need to change for this to work?", score: 4 },
+    { theme: 'Pin down a timeline', text: "When would be a better time? I'd like to put something specific on the calendar.", score: 3 },
+    { theme: 'Push back firmly', text: "I hear you, but I've been here for X years and my scope has grown significantly. I think it's worth discussing now.", score: 2 },
   ];
 }
 
 // Render the reply choices as a separate coach message — flat, in the
 // main thread. Each pill is a possible response; tapping one shows the
 // full text as a user bubble and proceeds to the paywall.
+// Create a horizontal-fill star SVG for effectiveness rating
+function createStarSVG(score, maxScore) {
+  const fill = (score || 3) / (maxScore || 5);
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('width', '16');
+  svg.setAttribute('height', '16');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.style.flexShrink = '0';
+  svg.style.display = 'block';
+  const gradId = 'sf_' + Math.random().toString(36).slice(2,8);
+  const defs = document.createElementNS(svgNS, 'defs');
+  const grad = document.createElementNS(svgNS, 'linearGradient');
+  grad.setAttribute('id', gradId);
+  grad.setAttribute('x1', '0'); grad.setAttribute('y1', '0');
+  grad.setAttribute('x2', '1'); grad.setAttribute('y2', '0');
+  const s1 = document.createElementNS(svgNS, 'stop');
+  s1.setAttribute('offset', (fill * 100) + '%');
+  s1.setAttribute('stop-color', '#00c4a0');
+  const s2 = document.createElementNS(svgNS, 'stop');
+  s2.setAttribute('offset', (fill * 100) + '%');
+  s2.setAttribute('stop-color', 'rgba(255,255,255,0.06)');
+  grad.appendChild(s1); grad.appendChild(s2);
+  defs.appendChild(grad); svg.appendChild(defs);
+  const path = document.createElementNS(svgNS, 'path');
+  path.setAttribute('d', 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z');
+  path.setAttribute('fill', 'url(#' + gradId + ')');
+  path.setAttribute('stroke', 'rgba(0,196,160,0.25)');
+  path.setAttribute('stroke-width', '0.7');
+  svg.appendChild(path);
+  return svg;
+}
+
 function renderReplyPillsFlat(replies, scenario) {
   // Coach bubble before reply pills
   insertCoachBubble("How would you respond?");
@@ -2758,9 +2829,6 @@ function renderReplyPillsFlat(replies, scenario) {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
-  // Shared handler: typing into the input is equivalent to picking the
-  // "+ I'd say something else…" pill. Keeping the input enabled with
-  // this handler armed means the user can choose either path freely.
   const submitCustomReply = async (text) => {
     if (!text || text.trim().length < 2) return;
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
@@ -2778,19 +2846,50 @@ function renderReplyPillsFlat(replies, scenario) {
     }
   };
 
-  replies.forEach((r, i) => {
+  // Sort replies by score (highest first)
+  const sorted = [...replies].sort((a, b) => (b.score || 3) - (a.score || 3));
+  const maxScore = Math.max(...sorted.map(r => r.score || 3));
+
+  sorted.forEach((r, i) => {
     const pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'flex-start';
+    pill.style.gap = '10px';
+
+    // Star
+    const starWrap = el('div', 'reply-star', '');
+    starWrap.appendChild(createStarSVG(r.score || 3, 5));
+    pill.appendChild(starWrap);
+
+    // Content
+    const content = el('div', '', '');
+    content.style.flex = '1';
+
+    // Theme + badge row
+    const themeRow = el('div', '', '');
+    themeRow.style.display = 'flex';
+    themeRow.style.alignItems = 'center';
+    themeRow.style.gap = '6px';
     const themeSpan = el('span', 'sim-reply-theme', '');
     themeSpan.textContent = r.theme;
-    pill.appendChild(themeSpan);
-    // Show preview of the actual script if available
+    themeRow.appendChild(themeSpan);
+
+    // "Best move" badge on top-scored reply
+    if (i === 0 && (r.score || 3) >= 4) {
+      const badge = el('span', 'reply-best-badge', 'Best move');
+      themeRow.appendChild(badge);
+    }
+    content.appendChild(themeRow);
+
+    // Preview
     if (r.text) {
       const preview = el('span', 'sim-reply-preview', '');
-      // Truncate to ~60 chars and add ellipsis
       const clean = r.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
       preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
-      pill.appendChild(preview);
+      content.appendChild(preview);
     }
+    pill.appendChild(content);
+
     pill.onclick = () => pickReply(r, pill, row, scenario);
     row.appendChild(pill);
   });
@@ -3096,7 +3195,7 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  await typeCoachBubble("You've explored the free preview. In the full plan, you can **practice every scenario and every response.**");
+  await typeCoachBubble("You've explored the free preview. Unlock the full practice session to **cover every scenario and every response.**");
   await sleep(300);
 
   state.obstacle = SIM_STATE.blocker;
@@ -3171,7 +3270,7 @@ function showHeaderPurchaseButton() {
   const btn = document.createElement('button');
   btn.id = 'header-buy-btn';
   btn.className = 'header-buy-btn';
-  btn.innerHTML = 'Get full plan';
+  btn.innerHTML = 'Unlock practice';
   btn.onclick = startCheckout;
   right.appendChild(btn);
 }
@@ -4083,7 +4182,7 @@ async function renderPaywallBubble(opts) {
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
       <div class="paywall-pitch">You've seen how it works. Unlock every scenario now. You'll have every response prepared before the conversation starts. We're confident this works <span class="paywall-refund">if not, we'll give you a full refund.</span></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Get my full plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Unlock full practice · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
