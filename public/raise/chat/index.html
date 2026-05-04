@@ -693,6 +693,18 @@ function fetchWithTimeout(url, opts, timeoutMs) {
 
 // ── Session logger — one row per user, updated at each step ──
 const SESSION_START_TIME = Date.now();
+// Capture UTM params from URL on page load (passed through from landing page)
+const _UTM = (function() {
+  const p = new URLSearchParams(window.location.search);
+  return {
+    utm_source: p.get('utm_source') || '',
+    utm_medium: p.get('utm_medium') || '',
+    utm_campaign: p.get('utm_campaign') || '',
+    utm_term: p.get('utm_term') || '',
+    gclid: p.get('gclid') || '',
+  };
+})();
+
 function logSession(stage, extra) {
   const payload = {
     timestamp: new Date().toISOString(),
@@ -705,6 +717,8 @@ function logSession(stage, extra) {
     url: window.location.href,
     user_agent: navigator.userAgent.slice(0, 200),
     screen: window.innerWidth + 'x' + window.innerHeight,
+    utm_term: _UTM.utm_term,
+    gclid: _UTM.gclid,
     ...(extra || {}),
   };
   console.log('[logSession]', stage, payload);
