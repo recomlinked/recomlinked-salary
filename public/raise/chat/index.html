@@ -2247,27 +2247,11 @@ async function beginSimulationFlow(reasonParam) {
 
   // Step 1: Coach insight (types while user watches the animation)
   const ack = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
-  await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
-  await sleep(200);
+  await typeCoachBubble(ack);
+  await sleep(300);
 
-  // Step 2: Timing chips
-  renderChips([
-    { value: 'this_week',    label: 'I need to act this week' },
-    { value: 'few_weeks',    label: 'My review is coming up · 1-4 weeks' },
-    { value: 'this_quarter', label: "I'm planning for this quarter · 1-3 months" },
-    { value: 'exploring',    label: "I'm just exploring · no timeline" },
-  ], async (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    SIM_STATE.timing = c.value;
-    SIM_STATE.context.timing = c.value;
-    state.timing = c.value;
-    logSession('sim_timing', { timing: c.value });
-    await sleep(300);
-
-    // Step 3: Go straight to simulation at blocker moment
-    startSimulationAtBlocker();
-  });
+  // Step 2: Go straight to simulation (timing question removed)
+  startSimulationAtBlocker();
 }
 
 // ── Start simulation at the specific blocker moment ──
@@ -3636,28 +3620,11 @@ async function handleObstacleChip(code, label) {
   insertMiniDemo();
   await sleep(300);
   const ack = ACK_MESSAGES[code] || ACK_MESSAGES.other;
-  await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
-  await sleep(200);
+  await typeCoachBubble(ack);
+  await sleep(300);
 
-  // Show timing chips (same as Path B)
-  const timeChips = [
-    { value: 'this_week',    label: "It's happening this week" },
-    { value: 'few_weeks',    label: 'My review is coming up \u00b7 1-4 weeks' },
-    { value: 'this_quarter', label: "I'm planning it this quarter" },
-    { value: 'exploring',    label: 'Just exploring for now' },
-  ];
-  renderChips(timeChips, (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    state.timing = c.value;
-    SIM_STATE.timing = c.value;
-    saveState();
-    logSession('sim_timing', { timing: c.value });
-
-    // Enter simulation
-    startSimulationAtBlocker();
-  });
-  enableInput('');
+  // Go straight to simulation (timing question removed)
+  startSimulationAtBlocker();
 }
 
 async function handleObstacleFreeText(text) {
@@ -3714,25 +3681,9 @@ async function handleObstacleFreeText(text) {
   }).then(r => r.json()).catch(() => null);
 
   const ack = ACK_MESSAGES.other;
-  await typeCoachBubble(ack + "\n\nBut first, when are you planning to have the conversation?");
-  await sleep(200);
-
-  const timeChips = [
-    { value: 'this_week',    label: "It's happening this week" },
-    { value: 'few_weeks',    label: 'My review is coming up \u00b7 1-4 weeks' },
-    { value: 'this_quarter', label: "I'm planning it this quarter" },
-    { value: 'exploring',    label: 'Just exploring for now' },
-  ];
-  renderChips(timeChips, (c) => {
-    fadeOutChips();
-    appendUserBubble(c.label);
-    state.timing = c.value;
-    SIM_STATE.timing = c.value;
-    saveState();
-    logSession('sim_timing', { timing: c.value });
-    startSimulationAtBlocker();
-  });
-  enableInput('');
+  await typeCoachBubble(ack);
+  await sleep(300);
+  startSimulationAtBlocker();
 }
 
 async function runObstacleCall(answer) {
