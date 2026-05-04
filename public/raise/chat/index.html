@@ -2202,28 +2202,10 @@ async function beginSimulationFlow(reasonParam) {
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
   state.obstacle = blocker;
   state.chat_log = [];
-  state.current_exchange = 10; // 10 = simulation mode (Path B)
-  state.sim_reason = reasonParam; // preserve for resume
-  // Generate a unique session ID for Path B. The default profileHash()
-  // produces the same hash for all Path B users (dummy profile + same
-  // blocker = identical hash). Adding a timestamp + random suffix ensures
-  // each session gets its own row in the Google Sheet.
+  state.current_exchange = 10;
+  state.sim_reason = reasonParam;
   state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   saveState();
-
-  // Pre-fetch scenarios NOW — while the user reads the insight and picks
-  // timing (~10-15s), the API generates scenarios in the background.
-  // By the time they tap a timing chip, results are already waiting.
-  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: 'simulate_scenarios',
-      blocker: blocker,
-      context: SIM_STATE.context,
-      session_id: state.sim_session_id,
-    }),
-  }).then(r => r.json()).catch(() => null);
 
   logSession('sim_start', {
     blocker_code: blocker.code,
@@ -2234,8 +2216,6 @@ async function beginSimulationFlow(reasonParam) {
     country: 'unknown',
     seniority: 'unknown',
   });
-  // Also fire an 'analyze' event (same stage name Path A uses) so the
-  // Google Sheet webhook picks up Path B users in the same pipeline.
   logSession('analyze', {
     initial_range: 'sim',
     landing_ref: reasonParam,
@@ -2244,16 +2224,7 @@ async function beginSimulationFlow(reasonParam) {
     obstacle_code: blocker.code,
   });
 
-  // Step 0: Mini demo animation — shows the mechanic instantly
-  insertMiniDemo();
-  await sleep(300);
-
-  // Step 1: Coach insight (types while user watches the animation)
-  const ack = ACK_MESSAGES[blocker.code] || ACK_MESSAGES.other;
-  await typeCoachBubble(ack);
-  await sleep(300);
-
-  // Step 2: Go straight to simulation (timing question removed)
+  // Go straight to opening lines — no mini demo, no ACK, no waiting
   startSimulationAtBlocker();
 }
 
@@ -2268,118 +2239,86 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner
   insertModeBanner('sim');
 
-  // no_script blocker: user doesn't know how to START — show opening
-  // line options first, then the manager responds to their chosen opening.
-  if (blocker.code === 'no_script') {
-    await typeCoachBubble("**Now pick how you'd open the conversation.**");
-    await sleep(200);
-    renderOpeningChips();
-    unlockModeToggle();
-    return;
-  }
-
-  // All other blockers: manager speaks first
-  await typeCoachBubble("**Now pick what your manager might say first.**");
-  await sleep(200);
-
-  // Use pre-fetched scenarios (fired at the start of beginSimulationFlow).
-  disableInput('');
-  const prefetched = SIM_STATE._scenarioPromise;
-  if (prefetched) {
-    showCoachTyping();
-    try {
-      const data = await prefetched;
-      hideCoachTyping();
-      if (data && data.scenarios && data.scenarios.length >= 2) {
-        renderScenarioLabels(data.scenarios);
-      } else {
-        renderScenarioLabels(getDefaultScenarios(blocker.code));
-      }
-    } catch (err) {
-      hideCoachTyping();
-      renderScenarioLabels(getDefaultScenarios(blocker.code));
-    }
-    SIM_STATE._scenarioPromise = null;
-  } else {
-    // Fallback: no pre-fetch (e.g. resume from refresh) — fetch now
-    showCoachTyping();
-    try {
-      const res = await fetch('/api/raise-coach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'simulate_scenarios',
-          blocker: SIM_STATE.blocker,
-          context: SIM_STATE.context,
-          session_id: profileHash(),
-        }),
-      });
-      const data = await res.json();
-      hideCoachTyping();
-      if (data.scenarios && data.scenarios.length >= 2) {
-        renderScenarioLabels(data.scenarios);
-      } else {
-        renderScenarioLabels(getDefaultScenarios(blocker.code));
-      }
-    } catch (err) {
-      hideCoachTyping();
-      renderScenarioLabels(getDefaultScenarios(blocker.code));
-    }
-  }
-
+  // All blockers: show opening lines immediately (no typing, instant)
+  insertCoachBubble("How would you open this conversation?");
+  await sleep(100);
+  renderOpeningChips();
   unlockModeToggle();
 }
 
-// ── Opening lines for "no_script" blocker ──
-// These are hardcoded, high-quality opening scripts — not API-generated.
-const OPENING_LINES = [
-  {
-    theme: 'Anchor to your results',
-    text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.",
-    score: 5,
-  },
-  {
-    theme: 'Lead with market data',
-    text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?",
-    score: 5,
-  },
-  {
-    theme: 'Tie it to a milestone',
-    text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.",
-    score: 4,
-  },
-  {
-    theme: 'Make it collaborative',
-    text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.",
-    score: 4,
-  },
-  {
-    theme: 'Connect to a recent win',
-    text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.",
-    score: 3,
-  },
-  {
-    theme: 'Frame it as retention',
-    text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.",
-    score: 2,
-  },
-  {
-    theme: 'Just ask directly',
-    text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.",
-    score: 2,
-  },
-];
+// ── Blocker-specific opening lines ──
+// Each blocker has 5 custom openings ranked by effectiveness.
+const BLOCKER_OPENINGS = {
+  no_script: [
+    { theme: 'Anchor to your results', text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.", score: 5 },
+    { theme: 'Lead with market data', text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?", score: 5 },
+    { theme: 'Tie it to a milestone', text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.", score: 4 },
+    { theme: 'Make it collaborative', text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.", score: 4 },
+    { theme: 'Connect to a recent win', text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.", score: 3 },
+    { theme: 'Frame it as retention', text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.", score: 2 },
+    { theme: 'Just ask directly', text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.", score: 2 },
+  ],
+  underpaid: [
+    { theme: 'Lead with market research', text: "I've been looking at what my role pays in this market — across a few different sources — and I'd like to walk you through what I found.", score: 5 },
+    { theme: 'Anchor to scope growth', text: "When I started this role, the scope was pretty different from what I'm doing now. I want to make sure my compensation reflects the job I'm actually doing today.", score: 5 },
+    { theme: 'Ask for a comp review', text: "I'd like to do a compensation review. I haven't had one in a while and I want to make sure I'm in the right range for the work I'm delivering.", score: 4 },
+    { theme: 'Name the gap directly', text: "I'll be honest — I think there's a gap between what I'm earning and what this role is worth. I'd like to talk about closing it.", score: 3 },
+    { theme: 'Mention external interest', text: "I've had some conversations outside the company recently, and the numbers I'm hearing are quite different from where I am now. I'd rather solve this here.", score: 2 },
+  ],
+  quiet: [
+    { theme: 'Lead with a written summary', text: "I put together a quick summary of what I've contributed this year — specific results, not just tasks. I'd like to share it with you and talk about where that puts me.", score: 5 },
+    { theme: 'Ask for visibility', text: "I know I'm not the loudest person on the team, but I want to make sure my work is visible when compensation decisions happen. Can we talk about that?", score: 5 },
+    { theme: 'Tie to a specific result', text: "I don't usually bring this up, but after delivering on the last project, I want to talk about how that kind of work gets reflected in my pay.", score: 4 },
+    { theme: 'Frame as career growth', text: "I've been thinking about my growth here. I want to make sure my compensation is keeping up with the level of work I'm doing — not just the title I have.", score: 3 },
+    { theme: 'Be direct about being overlooked', text: "I think my work sometimes flies under the radar because I'm not someone who talks about it a lot. I'd like to change that, starting with a conversation about my pay.", score: 2 },
+  ],
+  unknown_amount: [
+    { theme: 'Ask what\'s possible', text: "I'd like to talk about compensation, but honestly I want to hear your perspective first. What range do you think is realistic for someone in my role performing at my level?", score: 5 },
+    { theme: 'Anchor to market data', text: "I've looked at some market data but I'm not sure how it maps to our structure. Can we look at it together and figure out the right number?", score: 4 },
+    { theme: 'Frame as alignment', text: "I want to make sure we're aligned on where my compensation should be. I have some thoughts but I'd rather this be a conversation than a demand.", score: 4 },
+    { theme: 'Start with contributions', text: "Before we talk numbers, I want to walk you through what I've delivered this year. Then I'd like to discuss what that's worth.", score: 3 },
+    { theme: 'Be direct about uncertainty', text: "I want to ask for a raise but I'll be honest — I'm not sure exactly what number to ask for. Can you help me figure out what's fair?", score: 2 },
+  ],
+  fear_no: [
+    { theme: 'Frame as a check-in', text: "I wanted to check in on something — I've been here a while and I want to make sure my pay is in the right place. Can we talk about where I stand?", score: 5 },
+    { theme: 'Make it exploratory', text: "I'm not coming in with a specific demand — I just want to explore where I am relative to the market and what a path forward looks like.", score: 4 },
+    { theme: 'Ask what\'s possible', text: "I know budgets can be tight, but I'd like to understand what's possible for my compensation. Even if it's not right now, I'd like to know the path.", score: 4 },
+    { theme: 'Tie to performance', text: "I feel good about what I've delivered this year and I'd like to talk about whether there's room to reflect that in my pay.", score: 3 },
+    { theme: 'Be direct but soft', text: "This is a little uncomfortable for me to bring up, but I think it's important. I'd like to talk about my compensation.", score: 2 },
+  ],
+  no_advocate: [
+    { theme: 'Make them your ally', text: "I want to build a case for a pay adjustment, and I need your help. What would make it easiest for you to take this to leadership?", score: 5 },
+    { theme: 'Give them the ammo', text: "I've put together the data — market rates, my contributions, the business case. I want to make it easy for you to go to bat for me.", score: 4 },
+    { theme: 'Ask what they need', text: "I know these decisions don't always happen in our 1-on-1s. What information would you need from me to push this forward on your end?", score: 4 },
+    { theme: 'Frame as partnership', text: "I'd like to work together on getting my compensation reviewed. I don't want to go around you — I'd rather we present this as a team.", score: 3 },
+    { theme: 'Be direct about the gap', text: "I've noticed that compensation conversations don't come up naturally between us. I'd like to change that — can we talk about where I stand?", score: 2 },
+  ],
+  prior_no: [
+    { theme: 'Reference the timeline', text: "Last time we talked about compensation, you mentioned revisiting it in a few months. I think now's a good time — here's what's changed since then.", score: 5 },
+    { theme: 'Bring new evidence', text: "I want to revisit the compensation conversation. Since last time, I've taken on more responsibility and I've got some new market data that's relevant.", score: 4 },
+    { theme: 'Ask what changed', text: "When we talked about this before, the answer was not right now. I'd like to understand — has anything changed on your end that would make this a better time?", score: 4 },
+    { theme: 'Reframe the ask', text: "I know I've brought this up before, but I want to approach it differently this time. Instead of a specific number, I'd like to understand what it would take to get there.", score: 3 },
+    { theme: 'Be persistent', text: "I'm bringing this up again because it matters to me. I respect that the timing wasn't right before, but I don't want to let it go.", score: 2 },
+  ],
+  timing: [
+    { theme: 'Frame as forward planning', text: "I want to plan ahead. My goal is to have a compensation conversation before the next review cycle — can we start laying the groundwork now?", score: 5 },
+    { theme: 'Ask about the process', text: "I'd like to understand how compensation decisions work here. When's the best time to have this conversation, and what should I prepare?", score: 4 },
+    { theme: 'Test the waters', text: "I've been thinking about my compensation and I wanted to get your read — is this a good time to have that conversation, or should we plan for a specific date?", score: 4 },
+    { theme: 'Tie to a coming milestone', text: "With reviews coming up, I want to make sure compensation is part of the conversation. Can we set aside time to talk about it before then?", score: 3 },
+    { theme: 'Just start', text: "I keep waiting for the perfect time to bring this up, and I've realized there isn't one. So — I'd like to talk about my pay.", score: 2 },
+  ],
+};
 
 function renderOpeningChips() {
+  const blocker = SIM_STATE.blocker;
+  const openings = BLOCKER_OPENINGS[blocker.code] || BLOCKER_OPENINGS.no_script;
+
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
-  // Already sorted by score in the array
-  const maxScore = Math.max(...OPENING_LINES.map(o => o.score));
-
-  OPENING_LINES.forEach((opener, i) => {
+  openings.forEach((opener, i) => {
     const pill = el('button', 'sim-reply-pill', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'flex-start';
@@ -2502,12 +2441,12 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
     if (data && data.scenarios && data.scenarios.length >= 2) {
       renderScenarioLabels(data.scenarios);
     } else {
-      renderScenarioLabels(getDefaultScenarios('no_script'));
+      renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
     }
   } catch (err) {
     hideCoachTyping();
     await typeCoachBubble("**Now pick what your manager might say to that.**");
-    renderScenarioLabels(getDefaultScenarios('no_script'));
+    renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
   }
 }
 
@@ -3703,27 +3642,10 @@ async function handleObstacleChip(code, label) {
   if (p.company_size) SIM_STATE.context.company_size = p.company_size;
   if (p.last_raise) SIM_STATE.context.last_raise = p.last_raise;
 
-  // Pre-fetch scenarios NOW (same as Path B)
+  // Set session ID for Path A
   state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: 'simulate_scenarios',
-      blocker: blocker,
-      context: SIM_STATE.context,
-      session_id: state.sim_session_id,
-    }),
-  }).then(r => r.json()).catch(() => null);
 
-  // Mini demo animation + ACK_MESSAGE (same as Path B)
-  insertMiniDemo();
-  await sleep(300);
-  const ack = ACK_MESSAGES[code] || ACK_MESSAGES.other;
-  await typeCoachBubble(ack);
-  await sleep(300);
-
-  // Go straight to simulation (timing question removed)
+  // Go straight to opening lines (same as Path B — no mini demo, no ACK)
   startSimulationAtBlocker();
 }
 
@@ -3769,20 +3691,8 @@ async function handleObstacleFreeText(text) {
   if (p.last_raise) SIM_STATE.context.last_raise = p.last_raise;
 
   state.sim_session_id = 'simA_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
-  SIM_STATE._scenarioPromise = fetch('/api/raise-coach', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: 'simulate_scenarios',
-      blocker: blocker,
-      context: SIM_STATE.context,
-      session_id: state.sim_session_id,
-    }),
-  }).then(r => r.json()).catch(() => null);
 
-  const ack = ACK_MESSAGES.other;
-  await typeCoachBubble(ack);
-  await sleep(300);
+  // Go straight to opening lines (no ACK, no pre-fetch)
   startSimulationAtBlocker();
 }
 
