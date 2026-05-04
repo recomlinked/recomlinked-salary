@@ -3270,7 +3270,7 @@ function showHeaderPurchaseButton() {
   const btn = document.createElement('button');
   btn.id = 'header-buy-btn';
   btn.className = 'header-buy-btn';
-  btn.innerHTML = 'Unlock practice';
+  btn.innerHTML = 'Practice every scenario';
   btn.onclick = startCheckout;
   right.appendChild(btn);
 }
@@ -4182,7 +4182,7 @@ async function renderPaywallBubble(opts) {
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
       <div class="paywall-pitch">You've seen how it works. Unlock every scenario now. You'll have every response prepared before the conversation starts. We're confident this works <span class="paywall-refund">if not, we'll give you a full refund.</span></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Unlock full practice · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Practice every scenario · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
