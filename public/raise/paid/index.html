@@ -3,709 +3,152 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Your Coaching Plan · Salary Negotiation Coach</title>
+<title>Your Practice Session · Salary Negotiation Coach</title>
 <meta name="robots" content="noindex"/>
 <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --gold:#c9a84c;--gold2:#d8b75a;
-  --teal:#00c4a0;--red:#e05555;--navy:#1e3d72;
-  --bg:#07090f;--bg2:#0f1117;--bg3:#141722;--bg4:#1c2030;
+  --gold:#c9a84c;--teal:#00c4a0;--red:#e05555;
+  --bg:#07090f;--bg4:#1c2030;
   --page:#f4f5f8;--card:#ffffff;
   --divider:#dde0e8;--muted:#eceef2;
   --t1:#1a1d2e;--t2:#4a5068;--t3:#8a90a8;--t4:#c8ccd8;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --radius:12px;
+  --sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;max-width:100vw;}
-body{
-  background:var(--page);color:var(--t1);
-  font-family:var(--sans);font-size:14px;
-  display:flex;flex-direction:column;height:100dvh;
-}
-button,input,textarea{font-family:var(--sans);}
-
-.page-wrap{max-width:760px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
-
-/* ── Header ────────────────────────────────────────────── */
-.site-header{
-  padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);
-  position:sticky;top:0;z-index:400;flex-shrink:0;gap:12px;
-}
+body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14px;}
+.site-header{padding:12px 20px;display:flex;align-items:center;justify-content:space-between;background:var(--bg);border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;z-index:400;gap:12px;}
 .logo-wrap{display:flex;align-items:center;text-decoration:none;font-size:16px;font-weight:800;}
 .logo-r{background:var(--gold);color:#07090f;padding:2px 6px 2px 5px;border-radius:3px 0 0 3px;}
 .logo-l{color:#e8eaf2;background:var(--bg4);padding:2px 5px 2px 4px;border-radius:0 3px 3px 0;}
-
 .header-right{display:flex;align-items:center;gap:8px;}
-.days-pill{
-  font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
-  color:var(--gold);background:rgba(201,168,76,0.12);
-  border:1px solid rgba(201,168,76,0.28);
-  padding:4px 10px;border-radius:20px;
-}
-.menu-btn{
-  width:34px;height:34px;border-radius:8px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:#e8eaf2;
-}
-.menu-btn:hover{background:rgba(255,255,255,0.08);}
-
-/* Settings dropdown */
-.menu-drop{
-  position:absolute;top:52px;right:12px;z-index:500;
-  background:var(--card);border:1px solid var(--divider);
-  border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.18);
-  min-width:180px;padding:6px;
-}
-.menu-drop[hidden]{display:none;}
-.menu-item{
-  display:block;width:100%;text-align:left;
-  padding:9px 12px;font-size:13px;color:var(--t1);
-  background:transparent;border:none;border-radius:6px;
-  cursor:pointer;text-decoration:none;
-}
-.menu-item:hover{background:var(--muted);}
-.menu-item.danger{color:var(--red);}
-
-/* ── Main scrollable area ──────────────────────────────── */
-.main{
-  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 12px;display:flex;flex-direction:column;gap:12px;
-}
-.main::-webkit-scrollbar{display:none;}
-/* Critical: the [hidden] attribute must override display:flex on .main /
-   .state-screen, otherwise all four states render simultaneously. Plain
-   `hidden` has very low specificity vs an explicit display rule. */
-.main[hidden],
-.state-screen[hidden]{display:none;}
-
-/* ── States: loading / expired / salary ────────────────── */
-.state-screen{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:40px 24px;text-align:center;gap:16px;
-}
-.loader-ring{
-  width:36px;height:36px;
-  border:2.5px solid var(--divider);
-  border-top-color:var(--gold);border-radius:50%;
-  animation:spin 0.85s linear infinite;
-}
+.days-pill{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--gold);background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.28);padding:4px 10px;border-radius:20px;}
+.header-cta{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:var(--gold);color:#07090f;text-decoration:none;white-space:nowrap;}
+.header-cta:hover{opacity:0.9;}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;min-height:60vh;}
+.screen.active{display:flex;}
+.main{max-width:480px;margin:0 auto;padding:20px 16px 40px;display:none;}
+.main.active{display:block;}
+.loader-ring{width:36px;height:36px;border:2.5px solid var(--divider);border-top-color:var(--gold);border-radius:50%;animation:spin 0.85s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.state-title{font-size:16px;font-weight:700;color:var(--t1);}
-.state-body{font-size:13px;color:var(--t2);line-height:1.55;max-width:360px;}
-.state-btn{
-  background:var(--navy);color:#fff;border:none;border-radius:8px;
-  padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;
-  margin-top:6px;
-}
-
-/* Salary modal */
-.salary-modal{
-  background:var(--card);border:1px solid var(--divider);
-  border-radius:var(--radius);padding:24px 22px;
-  max-width:440px;margin:16px auto;
-  box-shadow:0 6px 20px rgba(0,0,0,0.06);
-}
-.salary-label{
-  font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:8px;
-}
-.salary-h{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px;line-height:1.3;}
-.salary-sub{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:16px;}
-.salary-row{display:flex;gap:8px;margin-bottom:12px;}
-.salary-currency{
-  background:var(--card);border:1.5px solid var(--divider);
-  border-radius:8px;padding:10px 12px;font-size:14px;font-weight:600;
-  cursor:pointer;min-width:78px;
-}
-.salary-input{
-  flex:1;background:var(--card);border:1.5px solid var(--divider);
-  border-radius:8px;padding:10px 12px;font-size:14px;
-  outline:none;transition:border-color 0.15s;
-}
-.salary-input:focus{border-color:var(--navy);}
-.salary-actions{display:flex;gap:8px;}
-.salary-btn{
-  flex:1;border:none;border-radius:8px;padding:11px;
-  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
-}
-.salary-btn.primary{background:var(--gold);color:var(--bg);}
-.salary-btn.primary:hover{background:var(--gold2);}
-.salary-btn.skip{background:transparent;color:var(--t3);border:1px solid var(--divider);}
-.salary-btn.skip:hover{background:var(--muted);color:var(--t2);}
-
-/* ── Dashboard sections ────────────────────────────────── */
-.plan-section{
-  background:var(--card);border:1px solid var(--divider);
-  border-radius:var(--radius);overflow:hidden;
-  box-shadow:0 1px 3px rgba(0,0,0,0.03);
-}
-
-/* Summary card (special — dark, headline numbers) */
-.summary-card{
-  background:var(--bg);color:#fff;
-  border-radius:var(--radius);padding:20px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.08);
-}
-.summary-hi{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  margin-bottom:16px;flex-wrap:wrap;
-}
-.summary-block{flex:1;min-width:120px;}
-.summary-block-label{
-  font-size:9px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;
-  color:rgba(255,255,255,0.35);margin-bottom:3px;
-}
-.summary-block-val{
-  font-size:22px;font-weight:800;letter-spacing:-1px;
-  color:#fff;line-height:1.1;
-}
-.summary-block-val.gold{color:var(--gold);}
-.summary-block-val.teal{color:var(--teal);}
-.summary-block-sub{
-  font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px;
-}
-.summary-line{
-  font-size:13px;color:rgba(255,255,255,0.78);line-height:1.65;
-  padding-top:14px;border-top:1px solid rgba(255,255,255,0.08);
-}
-.summary-line strong{color:#fff;}
-.summary-obstacle{
-  margin-top:10px;padding-top:10px;
-  border-top:1px dashed rgba(255,255,255,0.14);
-  font-size:12px;color:rgba(255,255,255,0.62);line-height:1.6;font-style:italic;
-}
-.summary-obstacle strong{color:rgba(255,255,255,0.9);font-style:normal;font-weight:700;}
-
-/* Plan section header (expandable) */
-.section-head{
-  padding:16px 18px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  cursor:pointer;user-select:none;
-  border-bottom:1px solid var(--divider);
-}
-.section-head.collapsed{border-bottom:none;}
-.section-head-left{display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1;}
-.section-idx{
-  font-size:9px;font-weight:800;letter-spacing:0.09em;
-  color:var(--t3);flex-shrink:0;padding-top:2px;
-}
-.section-head-text{min-width:0;flex:1;}
-.section-title{
-  font-size:14px;font-weight:800;color:var(--t1);line-height:1.3;
-  letter-spacing:-0.2px;
-}
-.section-subtitle{
-  font-size:12px;font-weight:500;color:var(--t3);line-height:1.4;margin-top:3px;
-}
-.section-caret{
-  font-size:14px;color:var(--t3);transition:transform 0.2s;flex-shrink:0;
-}
-.section-head.collapsed .section-caret{transform:rotate(-90deg);}
-
-.section-body{padding:4px 18px 18px;}
-.section-body[hidden]{display:none;}
-
-/* Obstacle hook banner — shown at top of section body when plan data has it */
-.obstacle-hook{
-  background:rgba(201,168,76,0.07);
-  border-left:3px solid var(--gold);
-  border-radius:0 6px 6px 0;
-  padding:10px 12px;
-  font-size:12.5px;color:var(--t2);line-height:1.6;
-  margin:2px 0 14px;
-}
-.obstacle-hook::before{
-  content:'';display:inline-block;width:6px;height:6px;border-radius:50%;
-  background:var(--gold);margin-right:8px;vertical-align:middle;transform:translateY(-1px);
-}
-.obstacle-hook strong{color:var(--t1);font-weight:700;}
-
-/* Blockers */
-.blocker-card{
-  background:var(--page);border-radius:8px;padding:14px 16px;
-  margin-bottom:10px;border-left:3px solid var(--red);
-}
-.blocker-card:last-child{margin-bottom:0;}
-.blocker-name{
-  font-size:13px;font-weight:800;color:var(--t1);margin-bottom:4px;
-  letter-spacing:-0.1px;
-}
-.blocker-why{font-size:12.5px;color:var(--t2);line-height:1.55;margin-bottom:8px;}
-.blocker-fix{
-  font-size:12.5px;color:var(--t1);line-height:1.55;
-  padding-top:8px;border-top:1px dashed var(--divider);
-}
-.blocker-fix-label{
-  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--teal);margin-bottom:3px;
-}
-
-/* Opening script */
-.script-card{
-  background:var(--page);border-radius:8px;padding:14px 16px;
-  margin-bottom:10px;
-}
-.script-label{
-  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--t3);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;
-}
-.copy-btn{
-  font-size:10px;font-weight:700;letter-spacing:0.06em;
-  color:var(--navy);background:transparent;border:1px solid var(--divider);
-  border-radius:6px;padding:3px 8px;cursor:pointer;
-  transition:background 0.12s, color 0.12s;
-}
-.copy-btn:hover{background:var(--navy);color:#fff;}
-.copy-btn.copied{background:var(--teal);color:#fff;border-color:var(--teal);}
-.script-text{
-  font-size:13.5px;color:var(--t1);line-height:1.6;
-}
-.script-text.quote{
-  border-left:2.5px solid var(--gold);padding-left:12px;
-  font-style:italic;
-}
-.script-why{
-  font-size:12px;color:var(--t2);line-height:1.55;
-  margin-top:8px;padding-top:8px;border-top:1px dashed var(--divider);
-}
-.script-why strong{color:var(--t1);}
-.roleplay-btn{
-  width:100%;background:var(--navy);color:#fff;
-  border:none;border-radius:8px;padding:11px;
-  font-size:13px;font-weight:700;cursor:pointer;
-  margin-top:4px;transition:background 0.12s;
-}
-.roleplay-btn:hover{background:#162f5c;}
-
-/* Pushback */
-.pushback-card{
-  background:var(--page);border-radius:8px;padding:12px 14px;
-  margin-bottom:10px;
-}
-.pushback-card:last-child{margin-bottom:0;}
-.pushback-q{
-  font-size:12.5px;font-weight:600;color:var(--red);
-  line-height:1.5;margin-bottom:6px;
-}
-.pushback-q::before{content:'"';}
-.pushback-q::after{content:'"';}
-.pushback-a{
-  font-size:12.5px;color:var(--t1);line-height:1.55;
-  padding-top:8px;border-top:1px dashed var(--divider);
-}
-.pushback-a-label{
-  font-size:9px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--teal);margin-bottom:3px;
-}
-
-/* Timing */
-.timing-box{
-  background:rgba(201,168,76,0.06);
-  border:1px solid rgba(201,168,76,0.25);
-  border-radius:8px;padding:14px 16px;
-  font-size:13px;color:var(--t1);line-height:1.6;
-  margin-bottom:10px;
-}
-.timing-windows{display:flex;flex-direction:column;gap:8px;margin-top:10px;}
-.timing-window{
-  background:var(--page);border-radius:6px;padding:10px 12px;
-  display:flex;gap:10px;align-items:flex-start;
-}
-.timing-window-name{
-  font-size:12px;font-weight:700;color:var(--navy);flex-shrink:0;min-width:140px;
-}
-.timing-window-why{font-size:12px;color:var(--t2);line-height:1.5;flex:1;}
-
-/* Email */
-.email-subject-row{
-  background:var(--page);border-radius:8px;padding:10px 14px;margin-bottom:8px;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-}
-.email-subject-row .script-label{margin:0;}
-.email-subject-row .subject-text{
-  flex:1;font-size:13px;font-weight:600;color:var(--t1);
-}
-.email-body-card{
-  background:var(--page);border-radius:8px;padding:14px 16px;
-  font-size:13px;line-height:1.65;color:var(--t1);
-  white-space:pre-wrap;
-}
-.email-body-card .copy-btn{float:right;margin-top:-4px;}
-
-/* 30-day plan */
-.week-card{
-  background:var(--page);border-radius:8px;padding:12px 14px;
-  margin-bottom:8px;
-}
-.week-card:last-child{margin-bottom:0;}
-.week-head{
-  font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:4px;
-  display:flex;justify-content:space-between;align-items:center;gap:8px;
-}
-.week-theme{
-  font-size:11px;font-weight:600;color:var(--t2);
-  text-transform:none;letter-spacing:0;
-}
-.week-actions{list-style:none;padding:0;margin:6px 0 0;}
-.week-actions li{
-  font-size:12.5px;color:var(--t1);line-height:1.55;
-  padding:4px 0 4px 20px;position:relative;
-}
-.week-actions li::before{
-  content:'○';position:absolute;left:0;top:4px;
-  color:var(--navy);font-weight:700;font-size:12px;
-}
-
-/* Role-play card (new section 07 variant) */
-.roleplay-card{
-  background:var(--page);border-radius:8px;padding:14px 16px;
-  margin-bottom:10px;
-}
-.roleplay-scene{
-  font-size:13px;color:var(--t1);line-height:1.6;font-style:italic;
-  padding-left:12px;border-left:2.5px solid var(--gold);
-}
-.roleplay-instructions{
-  font-size:12px;color:var(--t2);line-height:1.55;
-  margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);
-}
-
-/* Coach section */
-.coach-intro{
-  padding:14px 18px 6px;font-size:12.5px;color:var(--t2);line-height:1.55;
-}
-.coach-intro strong{color:var(--t1);}
-.coach-starter-chips{
-  padding:4px 18px 12px;display:flex;flex-wrap:wrap;gap:6px;
-}
-.coach-starter-chip{
-  background:var(--card);color:var(--t2);
-  border:1.5px solid var(--divider);border-radius:20px;
-  padding:7px 12px;font-size:12px;font-weight:500;
-  cursor:pointer;font-family:var(--sans);
-  transition:background 0.12s,color 0.12s,border-color 0.12s,transform 0.1s;
-  line-height:1.3;
-}
-.coach-starter-chip:hover{border-color:var(--navy);color:var(--navy);}
-.coach-starter-chip:active{transform:scale(0.97);}
-.coach-starter-chip.hot{
-  border-color:var(--gold);color:#8a6e1f;background:rgba(201,168,76,0.07);
-}
-.coach-starter-chip.hot:hover{background:rgba(201,168,76,0.16);}
-
-.coach-messages{
-  padding:0 18px 12px;display:flex;flex-direction:column;gap:12px;
-  max-height:none;
-}
-.coach-msg{animation:msgIn 0.3s ease;}
-@keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.coach-bubble{
-  background:var(--page);border-radius:4px 12px 12px 12px;
-  padding:11px 13px;font-size:13px;color:var(--t1);line-height:1.6;
-  white-space:pre-wrap;word-break:break-word;
-}
-.coach-bubble.welcome{
-  background:var(--bg);color:#fff;
-  border-radius:var(--radius);padding:14px 16px;
-}
-.coach-bubble.welcome strong{color:#fff;}
-.user-msg{display:flex;justify-content:flex-end;}
-.user-bubble{
-  background:var(--navy);color:#fff;
-  border-radius:12px 4px 12px 12px;
-  padding:10px 13px;font-size:13px;line-height:1.5;max-width:82%;
-  word-break:break-word;
-}
-.typing-dots{display:inline-flex;gap:3px;align-items:center;padding:4px 2px;}
-.typing-dots .d{width:5px;height:5px;border-radius:50%;background:var(--t3);animation:typD 1.1s infinite;}
-.typing-dots .d:nth-child(2){animation-delay:0.15s;}
-.typing-dots .d:nth-child(3){animation-delay:0.3s;}
-@keyframes typD{0%,100%{opacity:0.25;transform:translateY(0);}40%{opacity:1;transform:translateY(-2px);}}
-
-/* ── Sticky input bar ──────────────────────────────────── */
-.input-bar-wrap{
-  flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
-  padding:10px 12px calc(12px + env(safe-area-inset-bottom)) 12px;
-}
-.input-bar-wrap[hidden]{display:none;}
-.input-row{
-  display:flex;align-items:center;gap:8px;
-  background:var(--card);border:1.5px solid var(--divider);
-  border-radius:24px;padding:6px 6px 6px 16px;
-  transition:border-color 0.15s;
-}
-.input-row:focus-within{border-color:var(--navy);}
-.input-row input{
-  flex:1;border:none;background:transparent;
-  /* 16px minimum to prevent iOS Safari auto-zoom on focus */
-  font-size:16px;color:var(--t1);font-family:var(--sans);outline:none;
-}
-.input-row input::placeholder{color:var(--t4);}
-.send-btn{
-  width:34px;height:34px;border-radius:50%;
-  background:var(--navy);border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;flex-shrink:0;transition:background 0.15s,opacity 0.15s;
-}
-.send-btn:disabled{opacity:0.4;cursor:not-allowed;}
-.send-btn svg{width:14px;height:14px;}
-
-/* ── Confirmation overlay for delete ───────────────────── */
-.confirm-overlay{
-  position:fixed;inset:0;
-  background:rgba(7,9,15,0.66);
-  display:flex;align-items:center;justify-content:center;
-  padding:16px;z-index:600;
-}
+.welcome-card{background:var(--bg);border-radius:16px;padding:24px;color:#fff;margin-bottom:20px;text-align:center;}
+.welcome-title{font-size:22px;font-weight:800;margin-bottom:6px;}
+.welcome-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;}
+.blocker-badge{display:inline-block;font-size:11px;color:var(--teal);background:rgba(0,196,160,0.08);border:1px solid rgba(0,196,160,0.15);padding:3px 10px;border-radius:20px;}
+.stats-row{display:flex;gap:8px;margin-bottom:20px;}
+.stat-card{flex:1;background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:14px;text-align:center;}
+.stat-num{font-size:24px;font-weight:800;}
+.stat-label{font-size:10px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;}
+.section-card{background:var(--card);border:1px solid var(--divider);border-radius:16px;padding:20px;margin-bottom:20px;}
+.section-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px;}
+.section-sub{font-size:12px;color:var(--t3);margin-bottom:14px;}
+.tree-node{position:relative;}
+.tree-node-inner{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:4px;border-radius:10px;transition:all 0.15s;border:1px solid rgba(0,0,0,0.04);background:rgba(0,0,0,0.015);}
+.tree-node-inner.explored.opening{background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.15);}
+.tree-node-inner.explored.manager{background:rgba(0,196,160,0.04);border-color:rgba(0,196,160,0.12);}
+.tree-node-inner.explored.reply{background:rgba(201,168,76,0.04);border-color:rgba(201,168,76,0.1);}
+.tree-node-inner.unexplored{opacity:0.5;}
+.tree-icon{width:18px;height:18px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;}
+.tree-icon.filled{color:#fff;}
+.tree-icon.empty{background:transparent;color:var(--t4);border:1.5px solid var(--divider);}
+.tree-icon.opening-color{background:var(--gold);}
+.tree-icon.manager-color{background:var(--teal);}
+.tree-icon.reply-color{background:var(--gold);}
+.tree-children{padding-left:18px;}
+.tree-connector{position:absolute;left:7px;top:0;bottom:0;width:1px;}
+.legend{display:flex;gap:12px;margin-bottom:14px;font-size:11px;color:var(--t3);}
+.legend-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
+.best-badge{font-size:8px;font-weight:700;color:var(--teal);background:rgba(0,196,160,0.1);padding:1px 4px;border-radius:3px;}
+.ctx-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:12px;margin:3px;}
+.ctx-chip.done{background:rgba(0,196,160,0.04);border:1px solid rgba(0,196,160,0.15);color:var(--teal);font-weight:600;}
+.ctx-chip.pending{background:#fafafa;border:1px solid var(--muted);color:var(--t3);}
+.progress-bar{height:3px;background:var(--muted);border-radius:2px;margin-bottom:14px;}
+.progress-fill{height:3px;border-radius:2px;background:var(--teal);transition:width 0.3s;}
+.cta-btn{display:block;width:100%;padding:16px;border-radius:12px;background:var(--gold);color:#07090f;font-size:15px;font-weight:700;text-align:center;text-decoration:none;border:none;cursor:pointer;margin-bottom:12px;}
+.cta-btn:hover{opacity:0.9;}
+.cta-sub{font-size:11px;color:var(--t3);text-align:center;margin-bottom:20px;}
+.footer-links{text-align:center;padding:20px;font-size:11px;color:var(--t3);}
+.footer-links a{color:var(--t3);text-decoration:underline;margin:0 8px;}
+.footer-links button{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;text-decoration:underline;margin:0 8px;}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
 .confirm-overlay[hidden]{display:none;}
-.confirm-box{
-  background:var(--card);border-radius:12px;
-  padding:22px 20px;max-width:380px;width:100%;
-}
-.confirm-box h3{font-size:15px;font-weight:800;color:var(--t1);margin-bottom:8px;}
-.confirm-box p{font-size:13px;color:var(--t2);line-height:1.55;margin-bottom:14px;}
+.confirm-box{background:var(--card);border-radius:16px;padding:24px;max-width:340px;width:100%;}
+.confirm-box h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+.confirm-box p{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:16px;}
+.confirm-box a{color:var(--teal);}
 .confirm-actions{display:flex;gap:8px;}
-.confirm-actions button{
-  flex:1;padding:10px;border:none;border-radius:8px;
-  font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);
-}
-.confirm-actions .cancel{background:var(--muted);color:var(--t2);}
+.confirm-actions button{flex:1;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.confirm-actions .cancel{background:var(--muted);color:var(--t1);}
 .confirm-actions .danger{background:var(--red);color:#fff;}
-
-/* Utility */
-.mt-8{margin-top:8px;}
-.mt-14{margin-top:14px;}
 </style>
 </head>
-
 <body>
 
 <header class="site-header">
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
   <div class="header-right">
-    <span class="days-pill" id="days-pill" hidden>— days left</span>
-    <button class="menu-btn" id="menu-btn" aria-label="Menu">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
-      </svg>
-    </button>
-    <div class="menu-drop" id="menu-drop" hidden>
-      <button class="menu-item" id="menu-export">Export my data</button>
-      <button class="menu-item" id="menu-salary">Update salary</button>
-      <button class="menu-item danger" id="menu-delete">Delete my data</button>
-    </div>
+    <span class="days-pill" id="days-pill" hidden></span>
+    <a class="header-cta" id="header-cta" href="/raise/chat/">Continue practicing →</a>
   </div>
 </header>
 
-<div class="page-wrap">
-
-  <!-- Loading -->
-  <div class="main state-screen" id="loading-screen">
-    <div class="loader-ring"></div>
-    <div class="state-title" id="loading-title">Loading your coaching plan…</div>
-    <div class="state-body" id="loading-body">Your coach is being briefed on your specific situation.</div>
-  </div>
-
-  <!-- Expired / invalid -->
-  <div class="main state-screen" id="expired-screen" hidden>
-    <div class="state-title">Your access link has expired.</div>
-    <div class="state-body" id="expired-body">If you're still within your 30-day coaching window, enter your email and we'll send you a fresh link.</div>
-    <a class="state-btn" href="/raise/enter/">Get a new link →</a>
-  </div>
-
-  <!-- Pending plan -->
-  <div class="main state-screen" id="pending-screen" hidden>
-    <div class="loader-ring"></div>
-    <div class="state-title">Finalising your plan…</div>
-    <div class="state-body">This usually takes 10–30 seconds after payment. We're writing your coaching plan now.</div>
-  </div>
-
-  <!-- Main dashboard -->
-  <div class="main" id="dashboard" hidden>
-
-    <!-- Salary prompt (first visit) -->
-    <div class="salary-modal" id="salary-prompt" hidden>
-      <div class="salary-label">ONE QUICK THING</div>
-      <div class="salary-h">What's your current annual salary?</div>
-      <div class="salary-sub">This stays on your device. We use it only to show your raise target in real dollars — not just percentages.</div>
-      <div class="salary-row">
-        <select class="salary-currency" id="salary-currency">
-          <option value="USD">USD</option>
-          <option value="CAD">CAD</option>
-          <option value="GBP">GBP</option>
-          <option value="AUD">AUD</option>
-          <option value="EUR">EUR</option>
-        </select>
-        <input class="salary-input" id="salary-input" type="number" inputmode="numeric" min="0" placeholder="e.g. 85000"/>
-      </div>
-      <div class="salary-actions">
-        <button class="salary-btn skip" id="salary-skip">Skip for now</button>
-        <button class="salary-btn primary" id="salary-save">Show my amount →</button>
-      </div>
-    </div>
-
-    <!-- Summary card -->
-    <div class="summary-card" id="summary-card">
-      <div class="summary-hi">
-        <div class="summary-block">
-          <div class="summary-block-label">Your probability</div>
-          <div class="summary-block-val gold" id="summary-range">—</div>
-          <div class="summary-block-sub" id="summary-range-sub">With a prepared negotiation</div>
-        </div>
-        <div class="summary-block">
-          <div class="summary-block-label">Amount to target</div>
-          <div class="summary-block-val teal" id="summary-amount">—</div>
-          <div class="summary-block-sub" id="summary-amount-sub">Enter salary to see dollars</div>
-        </div>
-        <div class="summary-block">
-          <div class="summary-block-label">Days left</div>
-          <div class="summary-block-val" id="summary-days">—</div>
-          <div class="summary-block-sub">Coaching window</div>
-        </div>
-      </div>
-      <div class="summary-line" id="summary-line">—</div>
-      <div class="summary-obstacle" id="summary-obstacle" hidden></div>
-    </div>
-
-    <!-- 01 Blockers -->
-    <div class="plan-section" id="sec-blockers">
-      <div class="section-head" onclick="toggleSection('sec-blockers')">
-        <div class="section-head-left">
-          <div class="section-idx">01</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-blockers">What's actually holding my number back?</div>
-            <div class="section-subtitle" id="sub-blockers">Three specific things, and the fix for each</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="blockers-body"></div>
-    </div>
-
-    <!-- 02 Opening script -->
-    <div class="plan-section" id="sec-script">
-      <div class="section-head" onclick="toggleSection('sec-script')">
-        <div class="section-head-left">
-          <div class="section-idx">02</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-script">How should I open the conversation?</div>
-            <div class="section-subtitle" id="sub-script">The first sentence, the full opener, and why it works</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="script-body"></div>
-    </div>
-
-    <!-- 03 Pushback -->
-    <div class="plan-section" id="sec-pushback">
-      <div class="section-head" onclick="toggleSection('sec-pushback')">
-        <div class="section-head-left">
-          <div class="section-idx">03</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-pushback">What if my manager pushes back?</div>
-            <div class="section-subtitle" id="sub-pushback">The three responses you'll actually hear, and what to say</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="pushback-body"></div>
-    </div>
-
-    <!-- 04 Timing -->
-    <div class="plan-section" id="sec-timing">
-      <div class="section-head" onclick="toggleSection('sec-timing')">
-        <div class="section-head-left">
-          <div class="section-idx">04</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-timing">When's my best moment to ask?</div>
-            <div class="section-subtitle" id="sub-timing">The specific window for your situation</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="timing-body"></div>
-    </div>
-
-    <!-- 05 Email template -->
-    <div class="plan-section" id="sec-email">
-      <div class="section-head" onclick="toggleSection('sec-email')">
-        <div class="section-head-left">
-          <div class="section-idx">05</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-email">Can you draft the email for me?</div>
-            <div class="section-subtitle" id="sub-email">Subject line, body, and the single change that gets the meeting booked</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="email-body"></div>
-    </div>
-
-    <!-- 06 30-day plan -->
-    <div class="plan-section" id="sec-prep">
-      <div class="section-head" onclick="toggleSection('sec-prep')">
-        <div class="section-head-left">
-          <div class="section-idx">06</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-prep">What should I do in the next 30 days?</div>
-            <div class="section-subtitle" id="sub-prep">Week by week — audit, position, set up, ask</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="prep-body"></div>
-    </div>
-
-    <!-- 07 Role-play + Coach chat -->
-    <div class="plan-section" id="sec-coach">
-      <div class="section-head" onclick="toggleSection('sec-coach')">
-        <div class="section-head-left">
-          <div class="section-idx">07</div>
-          <div class="section-head-text">
-            <div class="section-title" id="title-coach">Let's role-play the conversation</div>
-            <div class="section-subtitle" id="sub-coach">Practise until it feels normal, not rehearsed</div>
-          </div>
-        </div>
-        <div class="section-caret">▾</div>
-      </div>
-      <div class="section-body" id="coach-body">
-        <!-- Role-play scene card (if the plan has it) -->
-        <div id="roleplay-scene-wrap"></div>
-        <!-- Coach intro + starter chips -->
-        <div class="coach-intro" id="coach-intro">
-          <strong>Ask me anything.</strong> I remember every conversation in your 30-day window. The fastest way in is to pick one of these:
-        </div>
-        <div class="coach-starter-chips" id="coach-starter-chips"></div>
-        <div class="coach-messages" id="coach-messages"></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Sticky input bar (shown once dashboard loads) -->
-  <div class="input-bar-wrap" id="input-bar-wrap" hidden>
-    <div class="input-row">
-      <input type="text" id="chat-input" placeholder="Ask your coach anything…" autocomplete="off"/>
-      <button class="send-btn" id="send-btn" aria-label="Send">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      </button>
-    </div>
-  </div>
-
+<div class="screen active" id="loading-screen">
+  <div class="loader-ring"></div>
+  <div style="margin-top:16px;font-size:14px;font-weight:600;" id="loading-title">Loading your session...</div>
+  <div style="margin-top:6px;font-size:12px;color:var(--t3);" id="loading-body"></div>
 </div>
 
-<!-- Delete confirmation overlay -->
+<div class="screen" id="expired-screen">
+  <div style="font-size:40px;margin-bottom:12px;">⏰</div>
+  <div style="font-size:16px;font-weight:700;">Your session has expired</div>
+  <div style="font-size:13px;color:var(--t2);margin-top:8px;max-width:300px;">Your 30-day practice session has ended. Email <a href="mailto:support@recomlinked.com" style="color:var(--teal);">support@recomlinked.com</a> if you need anything.</div>
+</div>
+
+<div class="main" id="dashboard">
+  <div class="welcome-card" id="welcome-card">
+    <div class="welcome-title" id="welcome-title">You're all set.</div>
+    <div class="welcome-sub" id="welcome-sub">Your practice session is active. Come back anytime.</div>
+    <span class="blocker-badge" id="blocker-badge" hidden></span>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="stat-days" style="color:var(--gold);">—</div><div class="stat-label">Days left</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-explored" style="color:var(--teal);">0</div><div class="stat-label">Paths explored</div></div>
+  </div>
+  <div class="section-card">
+    <div class="section-title">Your practice map</div>
+    <div class="section-sub">Tap to expand explored paths.</div>
+    <div class="legend">
+      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--gold);"></div> Your moves</div>
+      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--teal);"></div> Manager responses</div>
+      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--divider);"></div> Unexplored</div>
+    </div>
+    <div id="tree-container"></div>
+  </div>
+  <div class="section-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <div class="section-title">Your context</div>
+      <span style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(0,0,0,0.03);padding:2px 8px;border-radius:10px;" id="ctx-count">0/7</span>
+    </div>
+    <div class="section-sub">The more we know, the more realistic your practice. Answer these in the chat.</div>
+    <div class="progress-bar"><div class="progress-fill" id="ctx-progress" style="width:0%;"></div></div>
+    <div id="ctx-chips"></div>
+    <a href="/raise/chat/" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--teal);font-weight:600;text-decoration:none;">Answer in chat →</a>
+  </div>
+  <a href="/raise/chat/" class="cta-btn" id="cta-continue">Continue practicing →</a>
+  <div class="cta-sub">Unlimited scenarios · Fully customized · Coaching mode available</div>
+  <div class="footer-links">
+    <a href="mailto:support@recomlinked.com">Support</a>
+    <button id="delete-btn">Delete my data</button>
+  </div>
+</div>
+
 <div class="confirm-overlay" id="confirm-overlay" hidden>
   <div class="confirm-box">
     <h3>Delete your data?</h3>
-    <p>This permanently removes your plan, chat history, and all notes your coach has taken. This cannot be undone. Your Stripe payment is not refunded automatically — email <a href="mailto:support@recomlinked.com">support</a> if you need that.</p>
+    <p>This permanently removes your practice history and all data. Email <a href="mailto:support@recomlinked.com">support</a> for refund requests.</p>
     <div class="confirm-actions">
       <button class="cancel" id="confirm-cancel">Cancel</button>
       <button class="danger" id="confirm-delete">Delete everything</button>
@@ -714,813 +157,182 @@ button,input,textarea{font-family:var(--sans);}
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════════════ */
-/* ══  PAID DASHBOARD — controller (Pass 3)                  ══ */
-/* ══  Consumes new `sections` object from enrich.js         ══ */
-/* ══  Falls back to flat fields for pre-round-2 plans       ══ */
-/* ═══════════════════════════════════════════════════════════ */
-
-const LS_TOKEN       = 'rl_raise_access_token';
-const LS_SALARY      = 'rl_raise_salary';
-const LS_WELCOMED    = 'rl_raise_welcomed';   // session-scoped: don't re-welcome on every reload
-const API_VERIFY     = '/api/raise-verify';
-const API_COACH      = '/api/raise-coach';
-const API_EXPORT     = '/api/raise-export';
-const API_DELETE     = '/api/raise-delete';
-
-const dash = {
-  token: null,
-  profile: null,
-  plan: null,
-  days_left: 0,
-  chat_history: [],
-  obstacle: null,   // extracted from plan.meta.obstacle_code / userRecord.obstacle
-};
-
-// Labels for obstacle codes — used in the summary card + welcome bubble
-const OBSTACLE_LABELS = {
-  budget:         'your manager saying there\'s no budget',
-  justify:        'how to justify your number',
-  timing:         'timing — no review scheduled',
-  prior_no:       'having asked before and got a no or delay',
-  unknown_amount: 'not knowing what number to ask for',
-  other:          'the thing you flagged',
-};
-
-// Starter chips for the coach section. First is role-play — the flagship.
-// Others are obstacle-shaped but always present (user can always ask them).
-const COACH_STARTER_CHIPS = [
-  { label: "Let's role-play the conversation",  hot: true,  send: "Let's role-play the actual negotiation. You play my manager. Set the scene and start." },
-  { label: "What if they say there's no budget?",           send: "What's the best response if my manager says there's no budget this cycle?" },
-  { label: "How do I reopen after a prior no?",             send: "How do I reopen the conversation with my manager after they said no last time, without looking bitter or desperate?" },
-  { label: "Talk me through my opening again",              send: "Walk me through my opening script again and why it works for my specific situation." },
-  { label: "What should I do in week 1?",                   send: "What's the most important thing for me to focus on in week 1?" },
+const LS_TOKEN='rl_raise_access_token',LS_STATE='rl_raise_sim_state',LS_TAP='rl_raise_tap_count';
+const API_VERIFY='/api/raise-verify',API_DELETE='/api/raise-delete';
+const CTX_KEYS=[
+  {key:'role',label:'Your role'},{key:'evidence',label:'Strongest evidence'},
+  {key:'company_situation',label:'Company situation'},{key:'company_size',label:'Company size'},
+  {key:'last_raise',label:'Last raise'},{key:'manager_type',label:'Manager style'},
+  {key:'target_number',label:'Target number'},
 ];
+const BLOCKER_LABELS={underpaid:"I think I'm underpaid but I can't prove it",quiet:"I'm a strong performer but quiet",no_script:"I don't know how to start the conversation",unknown_amount:"I don't know what number to ask for",fear_no:"What if they say no?",no_advocate:"My manager doesn't advocate for me",prior_no:"I already asked and got nothing",timing:"I'm not sure if now is the right time"};
+const dash={token:null,profile:null,plan:null,days_left:0,obstacle:null};
+function $(id){return document.getElementById(id);}
+function showScreen(id){document.querySelectorAll('.screen,.main').forEach(s=>s.classList.remove('active'));const e=$(id);if(e)e.classList.add('active');}
 
-/* ── Utilities ─────────────────────────────────────────── */
-function $(id) { return document.getElementById(id); }
-function el(tag, cls, html) {
-  const e = document.createElement(tag);
-  if (cls) e.className = cls;
-  if (html != null) e.innerHTML = html;
-  return e;
-}
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-function escapeHtml(s) {
-  return (s || '').replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[c]);
-}
-function showScreen(id) {
-  ['loading-screen','expired-screen','pending-screen','dashboard'].forEach(s => {
-    const n = $(s); if (n) n.hidden = (s !== id);
-  });
-  if (id === 'dashboard') $('input-bar-wrap').hidden = false;
-  else $('input-bar-wrap').hidden = true;
+function createStarSVG(score){
+  const f=(score||3)/5,ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('width','13');svg.setAttribute('height','13');svg.setAttribute('viewBox','0 0 24 24');
+  svg.style.flexShrink='0';const id='s'+Math.random().toString(36).slice(2,8);
+  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="${f*100}%" stop-color="#00c4a0"/><stop offset="${f*100}%" stop-color="rgba(0,0,0,0.06)"/></linearGradient></defs><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="url(#${id})" stroke="rgba(0,196,160,0.25)" stroke-width="0.7"/>`;
+  return svg;
 }
 
-function formatMoney(amount, currency) {
-  try {
-    return new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount);
-  } catch (e) {
-    return `${currency} ${Math.round(amount).toLocaleString()}`;
+function renderTree(branches){
+  const c=$('tree-container');c.innerHTML='';
+  if(!branches||!branches.length){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px;">No paths explored yet. Start practicing to see your map.</div>';return;}
+  branches.forEach(b=>c.appendChild(mkNode(b,0)));
+}
+function mkNode(n,d){
+  const w=document.createElement('div');w.className='tree-node';
+  if(d>0){const cn=document.createElement('div');cn.className='tree-connector';cn.style.background=n.explored?'rgba(0,196,160,0.15)':'rgba(0,0,0,0.05)';w.appendChild(cn);}
+  const inner=document.createElement('div'),t=n.type||'opening';
+  inner.className=`tree-node-inner ${n.explored?'explored':'unexplored'} ${t}`;
+  const colors={opening:'var(--gold)',manager:'var(--teal)',reply:'var(--gold)'},roles={opening:'You',manager:'Manager',reply:'You'};
+  const has=n.children&&n.children.length>0;
+  const icon=document.createElement('div');icon.className=`tree-icon ${n.explored?'filled '+t+'-color':'empty'}`;
+  icon.textContent=has?'▸':(n.explored?'✓':'');inner.appendChild(icon);
+  const content=document.createElement('div');content.style.cssText='flex:1;min-width:0;';
+  const rr=document.createElement('div');rr.style.cssText='display:flex;align-items:center;gap:5px;';
+  const role=document.createElement('span');role.style.cssText=`font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;opacity:0.7;color:${colors[t]||'var(--gold)'}`;
+  role.textContent=roles[t]||'You';rr.appendChild(role);
+  if(n.score){const sw=document.createElement('span');sw.style.cssText='flex-shrink:0;padding-top:2px;';sw.appendChild(createStarSVG(n.score));rr.appendChild(sw);}
+  if(n.score===5&&n.explored){const b=document.createElement('span');b.className='best-badge';b.textContent='Best move';rr.appendChild(b);}
+  content.appendChild(rr);
+  const label=document.createElement('div');label.style.cssText=`font-size:12.5px;font-weight:600;margin-top:2px;color:${n.explored?'var(--t1)':'var(--t3)'}`;
+  label.textContent=n.label||'';content.appendChild(label);
+  if(n.explored&&n.text){const tx=document.createElement('div');tx.style.cssText='font-size:11px;color:var(--t3);font-style:italic;margin-top:3px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';tx.textContent=n.text;content.appendChild(tx);}
+  if(!n.explored&&has){const h=document.createElement('div');h.style.cssText='font-size:10px;color:var(--t4);margin-top:2px;';h.textContent=`${n.children.length} path${n.children.length>1?'s':''} to explore`;content.appendChild(h);}
+  inner.appendChild(content);w.appendChild(inner);
+  if(has){
+    const cw=document.createElement('div');cw.className='tree-children';cw.style.display=n.explored?'block':'none';
+    n.children.forEach(c=>cw.appendChild(mkNode(c,d+1)));w.appendChild(cw);
+    inner.style.cursor='pointer';
+    inner.onclick=()=>{const s=cw.style.display!=='none';cw.style.display=s?'none':'block';icon.textContent=s?'▸':'▾';};
+    if(n.explored)icon.textContent='▾';
   }
+  return w;
 }
 
-/* ── Data access helpers — read new shape, fall back to old ── */
-// Enrich.js now returns plan.sections.{blockers,script,pushback,timing,email,prep,roleplay}
-// Old pre-round-2 plans only have flat fields. These helpers coalesce.
-
-function sect(key) {
-  return dash.plan?.sections?.[key] || null;
+function renderContext(ctx){
+  ctx=ctx||{};const a=CTX_KEYS.filter(q=>ctx[q.key]).length,t=CTX_KEYS.length;
+  $('ctx-count').textContent=`${a}/${t}`;
+  $('ctx-progress').style.width=`${(a/t)*100}%`;
+  if(a===t){$('ctx-count').style.color='var(--teal)';$('ctx-count').style.background='rgba(0,196,160,0.08)';}
+  const ch=$('ctx-chips');ch.innerHTML='';
+  CTX_KEYS.forEach(q=>{const d=!!ctx[q.key],c=document.createElement('span');c.className=`ctx-chip ${d?'done':'pending'}`;c.innerHTML=`<span style="font-size:11px;">${d?'✓':'○'}</span> ${q.label}`;ch.appendChild(c);});
 }
 
-function getBlockers() {
-  return sect('blockers')?.top_3_blockers || dash.plan?.top_3_blockers || [];
-}
-function getScript() {
-  const s = sect('script');
-  if (s) return {
-    one_liner:    s.one_liner    || '',
-    full_opener:  s.full_opener  || '',
-    why_it_works: s.why_it_works || '',
-  };
-  const old = dash.plan?.opening_script || {};
-  return { one_liner: old.one_liner || '', full_opener: old.full_opener || '', why_it_works: '' };
-}
-function getPushbacks() {
-  return sect('pushback')?.pushback_responses || dash.plan?.pushback_responses || [];
-}
-function getTiming() {
-  const s = sect('timing');
-  if (s) return {
-    recommendation: s.timing_recommendation || '',
-    windows:        s.window_options         || [],
-  };
-  return { recommendation: dash.plan?.timing_recommendation || '', windows: [] };
-}
-function getEmail() {
-  return sect('email')?.email_template || dash.plan?.email_template || { subject: '', body: '' };
-}
-function getPrepWeeks() {
-  return sect('prep')?.['30_day_prep_plan']
-    || dash.plan?.['30_day_prep_plan']
-    || dash.plan?.prep_plan_30_day
-    || [];
-}
-function getRolePlay() {
-  const s = sect('roleplay');
-  if (!s) return null;
-  return {
-    opening_scene:       s.opening_scene       || '',
-    coach_instructions:  s.coach_instructions  || '',
-  };
-}
+async function init(){
+  const params=new URLSearchParams(location.search),urlToken=params.get('token'),urlSession=params.get('session_id');
 
-function obstacleHook(key) {
-  return sect(key)?.obstacle_hook || '';
-}
+  // Demo mode
+  if(params.get('demo')==='1'){
+    dash.days_left=27;dash.obstacle={code:'underpaid',label:BLOCKER_LABELS.underpaid};dash.token='demo';
+    showScreen('dashboard');renderPaid({branches:demoBranches(),context:{company_situation:'stable',company_size:'250_1000',last_raise:'1_2yr'}});return;
+  }
 
-/* ── Init ──────────────────────────────────────────────── */
-async function init() {
-  const params = new URLSearchParams(location.search);
-  const urlToken   = params.get('token');
-  const urlSession = params.get('session_id');
+  // Free user (no token, no session) — show tree from localStorage if available
+  let token=urlToken||localStorage.getItem(LS_TOKEN)||null;
+  if(!token&&!urlSession){
+    try{
+      const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');
+      if(cs.sim_branch_history&&cs.sim_branch_history.length>0){
+        showScreen('dashboard');
+        $('welcome-card').style.display='none';$('days-pill').hidden=true;
+        $('header-cta').textContent='Practice every scenario · $39';$('header-cta').href='/raise/chat/';
+        $('cta-continue').textContent='Practice every scenario · $39 →';$('cta-continue').href='/raise/chat/';
+        $('stat-days').textContent='—';$('stat-explored').textContent=(cs.sim_branch_history||[]).length;
+        renderTree(cs.sim_branch_history||[]);renderContext(cs.sim_context||{});
+        document.querySelector('.footer-links').style.display='none';return;
+      }
+    }catch(e){}
+    window.location.replace('/raise/');return;
+  }
 
-  let token = urlToken || localStorage.getItem(LS_TOKEN) || null;
-
+  // Verify
   let verifyUrl;
-  if (urlToken) {
-    verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(urlToken)}`;
-  } else if (urlSession) {
-    verifyUrl = `${API_VERIFY}?session_id=${encodeURIComponent(urlSession)}`;
-  } else if (token) {
-    verifyUrl = `${API_VERIFY}?token=${encodeURIComponent(token)}`;
-  } else {
-    window.location.replace('/raise/enter/');
-    return;
-  }
+  if(urlToken)verifyUrl=`${API_VERIFY}?token=${encodeURIComponent(urlToken)}`;
+  else if(urlSession)verifyUrl=`${API_VERIFY}?session_id=${encodeURIComponent(urlSession)}`;
+  else verifyUrl=`${API_VERIFY}?token=${encodeURIComponent(token)}`;
 
   let data;
-  try {
-    const res = await fetch(verifyUrl);
-    if (!res.ok) {
-      if (res.status === 401) {
-        showScreen('expired-screen');
-        return;
-      }
-      throw new Error('HTTP ' + res.status);
+  try{const res=await fetch(verifyUrl);if(!res.ok){if(res.status===401){showScreen('expired-screen');return;}throw new Error('HTTP '+res.status);}data=await res.json();}
+  catch(err){$('loading-title').textContent='Could not load your session.';$('loading-body').textContent='Check your connection and refresh.';return;}
+  if(!data.valid){showScreen('expired-screen');return;}
+
+  dash.profile=data.profile;dash.plan=data.plan||null;dash.days_left=data.days_left||0;
+  dash.token=data.profile?.access_token||token;
+  const pObs=dash.plan?.meta?.obstacle_code,prObs=dash.profile?.obstacle?.code;
+  dash.obstacle={code:pObs||prObs||'other',label:dash.profile?.obstacle?.label||''};
+
+  // Conversion tracking
+  if(urlSession){try{
+    var pk='raise_paid_tracked_'+urlSession;
+    if(!sessionStorage.getItem(pk)){sessionStorage.setItem(pk,'1');
+      var fire=function(){try{if(typeof window.gtag==='function'){
+        window.gtag('event','RAISE_PAID',{value:39,currency:'USD',transaction_id:urlSession});
+        window.gtag('event','purchase',{transaction_id:urlSession,value:39,currency:'USD',items:[{item_id:'salary_coach_39',item_name:'Salary Negotiation Coach',price:39,quantity:1}]});
+        // Google Ads — uncomment with your IDs:
+        // window.gtag('event','conversion',{send_to:'AW-XXXXXXXXX/YYYYYY',value:39.0,currency:'USD',transaction_id:urlSession});
+      }if(typeof window.clarity==='function'){window.clarity('set','funnel_stage','paid');window.clarity('event','RAISE_PAID');window.clarity('upgrade','paid_user');}}catch(e){}};
+      if(typeof window.gtag==='function')fire();else{var att=0,iv=setInterval(function(){att++;if(typeof window.gtag==='function'||att>20){clearInterval(iv);fire();}},100);}
     }
-    data = await res.json();
-  } catch (err) {
-    $('loading-title').textContent = 'Could not load your plan.';
-    $('loading-body').textContent  = 'Check your connection and refresh.';
-    return;
+  }catch(e){}}
+
+  // Save token + mark paid
+  if(dash.token){
+    try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}
+    try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');cs.paid=true;cs.paid_token=dash.token;cs.paid_at=Date.now();localStorage.setItem(LS_STATE,JSON.stringify(cs));localStorage.removeItem(LS_TAP);}catch(e){}
+    if(urlSession||urlToken)history.replaceState({},'','/raise/paid/');
   }
 
-  if (!data.valid) {
-    showScreen('expired-screen');
-    return;
-  }
-
-  dash.profile   = data.profile;
-  dash.plan      = data.plan || null;
-  dash.days_left = data.days_left || 0;
-  dash.token     = data.profile?.access_token || token;
-
-  // Extract obstacle — look in multiple places for robustness
-  const planMetaObs = dash.plan?.meta?.obstacle_code;
-  const profileObs  = dash.profile?.obstacle?.code;
-  dash.obstacle = {
-    code:  planMetaObs || profileObs || 'other',
-    label: dash.profile?.obstacle?.label     || '',
-    free_text: dash.profile?.obstacle?.free_text || '',
-  };
-
-  // ── Track RAISE_PAID — fires ONLY when arriving fresh from Stripe checkout ──
-  // urlSession is only set when Stripe redirects here with ?session_id=cs_...
-  // Magic-link returns (urlToken) are re-access, not new purchases → no fire.
-  // SessionStorage dedup guards against immediate refresh double-counting.
-  if (urlSession) {
-    try {
-      var paidKey = 'raise_paid_tracked_' + urlSession;
-      if (!sessionStorage.getItem(paidKey)) {
-        sessionStorage.setItem(paidKey, '1');
-
-        var firePaidEvents = function() {
-          try {
-            if (typeof window.gtag === 'function') {
-              window.gtag('event', 'RAISE_PAID', {
-                value: 39,
-                currency: 'USD',
-                transaction_id: urlSession,
-              });
-              // Standard GA4 ecommerce event — powers GA4 Monetization reports
-              window.gtag('event', 'purchase', {
-                transaction_id: urlSession,
-                value: 39,
-                currency: 'USD',
-                items: [{
-                  item_id: 'salary_coach_39',
-                  item_name: 'Salary Negotiation Coach',
-                  price: 39,
-                  quantity: 1,
-                }],
-              });
-            }
-            if (typeof window.clarity === 'function') {
-              window.clarity('set', 'funnel_stage', 'paid');
-              window.clarity('event', 'RAISE_PAID');
-              // Prioritises this session in Clarity's limited recording slots
-              window.clarity('upgrade', 'paid_user');
-            }
-          } catch (e) { /* tracking must never break dashboard */ }
-        };
-
-        // shared.js is deferred, so gtag usually loaded by now (after fetch await),
-        // but retry briefly just in case on slow connections.
-        if (typeof window.gtag === 'function') {
-          firePaidEvents();
-        } else {
-          var attempts = 0;
-          var iv = setInterval(function() {
-            attempts++;
-            if (typeof window.gtag === 'function' || attempts > 20) {
-              clearInterval(iv);
-              firePaidEvents();
-            }
-          }, 100);
-        }
-      }
-    } catch (e) { /* sessionStorage disabled (private mode) — skip silently */ }
-  }
-
-  if (dash.token) {
-    try { localStorage.setItem(LS_TOKEN, dash.token); } catch (e) {}
-    if (urlSession || urlToken) {
-      history.replaceState({}, '', '/raise/paid/');
-    }
-  }
-
-  if (dash.plan && dash.plan.pending) {
-    showScreen('pending-screen');
-    dash.plan = await pollForPlan();
-    if (!dash.plan) {
-      $('loading-title').textContent = 'Plan is taking longer than usual.';
-      $('loading-body').textContent  = 'Email support@recomlinked.com if this persists.';
-      showScreen('loading-screen');
-      return;
-    }
-    // Re-resolve obstacle code after plan lands
-    if (dash.plan?.meta?.obstacle_code) {
-      dash.obstacle.code = dash.plan.meta.obstacle_code;
-    }
-  }
-
-  renderDashboard();
+  showScreen('dashboard');renderPaid();
 }
 
-async function pollForPlan() {
-  const maxAttempts = 15;
-  for (let i = 0; i < maxAttempts; i++) {
-    await sleep(2200);
-    try {
-      const res = await fetch(`${API_VERIFY}?token=${encodeURIComponent(dash.token)}`);
-      if (res.ok) {
-        const d = await res.json();
-        if (d.plan && !d.plan.pending) return d.plan;
-      }
-    } catch (e) { /* continue */ }
-  }
-  return null;
+function renderPaid(demo){
+  const days=demo?27:dash.days_left;
+  $('stat-days').textContent=days;$('days-pill').textContent=`${days} day${days===1?'':'s'} left`;$('days-pill').hidden=false;
+
+  let branches=[],context={};
+  if(demo){branches=demo.branches||[];context=demo.context||{};}
+  else{try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');branches=cs.sim_branch_history||[];context=cs.sim_context||{};}catch(e){}}
+
+  const explored=branches.length;$('stat-explored').textContent=explored;
+  const oc=demo?'underpaid':(dash.obstacle?.code||''),ol=demo?BLOCKER_LABELS.underpaid:(dash.obstacle?.label||BLOCKER_LABELS[oc]||'');
+  if(ol){$('blocker-badge').textContent='Your focus: '+ol;$('blocker-badge').hidden=false;}
+  if(explored>0){$('welcome-title').textContent='Welcome back.';$('welcome-sub').textContent=`You've explored ${explored} path${explored===1?'':'s'}. Pick up where you left off.`;$('cta-continue').textContent='Continue where you left off →';}
+
+  renderTree(branches);renderContext(context);
 }
 
-/* ── Render ────────────────────────────────────────────── */
-function renderDashboard() {
-  showScreen('dashboard');
+function demoBranches(){return[
+  {type:'opening',label:'Lead with market research',text:"I've been looking at what my role pays...",explored:true,score:5,children:[
+    {type:'manager',label:"Budget's frozen",text:"Budgets are locked until next quarter.",explored:true,children:[
+      {type:'reply',label:'Share my research',text:"I've looked at three sources...",explored:true,score:5,children:[
+        {type:'manager',label:'Let me check with finance',text:"That's helpful. Let me take this to my director.",explored:true,children:[]}
+      ]},
+      {type:'reply',label:'Ask about timeline',text:'When would be a better time?',explored:false,score:4,children:[]},
+      {type:'reply',label:'Push back firmly',text:"My scope has grown significantly...",explored:false,score:2,children:[]},
+    ]},
+    {type:'manager',label:'Show me the numbers',text:"What do you have?",explored:true,children:[
+      {type:'reply',label:'Walk through my data',text:"Three data points...",explored:true,score:5,children:[]},
+    ]},
+    {type:'manager',label:"That's fair, let me think",text:"I appreciate you bringing this up.",explored:false,children:[]},
+  ]},
+  {type:'opening',label:'Anchor to scope growth',text:"When I started, the scope was different...",explored:false,score:5,children:[]},
+  {type:'opening',label:'Ask for a comp review',text:"I'd like to do a compensation review...",explored:false,score:4,children:[]},
+];}
 
-  const pill = $('days-pill');
-  pill.textContent = `${dash.days_left} day${dash.days_left === 1 ? '' : 's'} left`;
-  pill.hidden = false;
-
-  const salary = getSalary();
-  if (!salary) {
-    $('salary-prompt').hidden = false;
-  }
-
-  renderSummary();
-  renderSectionTitles();
-  renderBlockers();
-  renderScript();
-  renderPushback();
-  renderTiming();
-  renderEmail();
-  renderPrep();
-  renderRolePlayScene();
-  renderCoachStarterChips();
-  maybeShowWelcomeBubble();
-}
-
-/** If the plan came back with overridden titles (Claude returned its own
-    per-section title), respect them. Otherwise keep the HTML defaults. */
-function renderSectionTitles() {
-  const map = ['blockers','script','pushback','timing','email','prep','roleplay'];
-  // Note: section 07 is 'roleplay' in the data shape but 'coach' as the
-  // plan-section DOM id since it hosts the live chat too.
-  const domKeyMap = { blockers:'blockers', script:'script', pushback:'pushback', timing:'timing', email:'email', prep:'prep', roleplay:'coach' };
-
-  for (const key of map) {
-    const domKey = domKeyMap[key];
-    const t = sect(key)?.title;
-    const s = sect(key)?.subtitle;
-    if (t && $('title-' + domKey)) $('title-' + domKey).textContent = t;
-    if (s && $('sub-'   + domKey)) $('sub-'   + domKey).textContent = s;
-  }
-}
-
-function renderSummary() {
-  const fr   = dash.profile?.final_range || {};
-  const plan = dash.plan || {};
-
-  $('summary-range').textContent = (fr.floor && fr.ceiling) ? `${fr.floor}–${fr.ceiling}%` : '—';
-  $('summary-days').textContent  = String(dash.days_left);
-
-  const salary = getSalary();
-  const ar = plan.amount_range;
-  if (salary && ar?.low_pct != null && ar?.high_pct != null) {
-    const lo = Math.round(salary.amount * ar.low_pct  / 100);
-    const hi = Math.round(salary.amount * ar.high_pct / 100);
-    $('summary-amount').textContent = `${formatMoney(lo, salary.currency)}–${formatMoney(hi, salary.currency)}`;
-    $('summary-amount-sub').textContent = `${ar.low_pct}–${ar.high_pct}% of current`;
-  } else if (ar?.low_pct != null) {
-    $('summary-amount').textContent = `${ar.low_pct}–${ar.high_pct}%`;
-    $('summary-amount-sub').textContent = 'Raise as % of current';
-  } else {
-    $('summary-amount').textContent = '—';
-  }
-
-  const line = plan.headline_summary || 'Your coaching plan is ready.';
-  $('summary-line').innerHTML = escapeHtml(line);
-
-  // Obstacle context — subtle coach-voice line below the main summary
-  const obs = dash.obstacle;
-  if (obs && obs.code && obs.code !== 'other' || (obs && obs.label)) {
-    const phrase = OBSTACLE_LABELS[obs.code] || (obs.label ? `"${obs.label}"` : '');
-    if (phrase) {
-      $('summary-obstacle').innerHTML = `<strong>You flagged:</strong> ${escapeHtml(phrase)}. The plan below addresses it directly.`;
-      $('summary-obstacle').hidden = false;
-    }
-  }
-}
-
-/** Helper to inject an obstacle-hook banner at the top of a section body. */
-function hookBanner(key) {
-  const text = obstacleHook(key);
-  if (!text) return '';
-  return `<div class="obstacle-hook">${escapeHtml(text)}</div>`;
-}
-
-function renderBlockers() {
-  const body = $('blockers-body');
-  body.innerHTML = hookBanner('blockers');
-  const list = getBlockers();
-  if (list.length === 0) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Blockers not loaded yet.</div>';
-    return;
-  }
-  list.forEach(b => {
-    const card = el('div', 'blocker-card', `
-      <div class="blocker-name">${escapeHtml(b.blocker || '')}</div>
-      <div class="blocker-why">${escapeHtml(b.why || '')}</div>
-      <div class="blocker-fix">
-        <div class="blocker-fix-label">Fix</div>
-        ${escapeHtml(b.fix || '')}
-      </div>
-    `);
-    body.appendChild(card);
-  });
-}
-
-function renderScript() {
-  const body = $('script-body');
-  body.innerHTML = hookBanner('script');
-  const s = getScript();
-  if (!s.one_liner && !s.full_opener) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Script not loaded.</div>';
-    return;
-  }
-
-  if (s.one_liner) {
-    const card = el('div', 'script-card', `
-      <div class="script-label">ONE-LINER
-        <button class="copy-btn" data-copy="${escapeHtml(s.one_liner)}">Copy</button>
-      </div>
-      <div class="script-text quote">${escapeHtml(s.one_liner)}</div>
-    `);
-    body.appendChild(card);
-  }
-
-  if (s.full_opener) {
-    const card = el('div', 'script-card', `
-      <div class="script-label">FULL OPENER
-        <button class="copy-btn" data-copy="${escapeHtml(s.full_opener)}">Copy</button>
-      </div>
-      <div class="script-text">${escapeHtml(s.full_opener)}</div>
-      ${s.why_it_works ? `<div class="script-why"><strong>Why this works:</strong> ${escapeHtml(s.why_it_works)}</div>` : ''}
-    `);
-    body.appendChild(card);
-  }
-
-  const btn = el('button', 'roleplay-btn', 'Practise this with your coach →');
-  btn.onclick = startRolePlay;
-  body.appendChild(btn);
-
-  wireCopyButtons(body);
-}
-
-function renderPushback() {
-  const body = $('pushback-body');
-  body.innerHTML = hookBanner('pushback');
-  const list = getPushbacks();
-  if (list.length === 0) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Pushback responses not loaded.</div>';
-    return;
-  }
-  list.forEach(p => {
-    const card = el('div', 'pushback-card', `
-      <div class="pushback-q">${escapeHtml(p.pushback || '')}</div>
-      <div class="pushback-a">
-        <div class="pushback-a-label">What to say</div>
-        ${escapeHtml(p.response || '')}
-      </div>
-    `);
-    body.appendChild(card);
-  });
-}
-
-function renderTiming() {
-  const body = $('timing-body');
-  body.innerHTML = hookBanner('timing');
-  const t = getTiming();
-  if (!t.recommendation && (!t.windows || t.windows.length === 0)) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Timing not loaded.</div>';
-    return;
-  }
-  if (t.recommendation) {
-    const box = el('div', 'timing-box', escapeHtml(t.recommendation));
-    body.appendChild(box);
-  }
-  if (t.windows && t.windows.length > 0) {
-    const wrap = el('div', 'timing-windows', '');
-    t.windows.forEach(w => {
-      const row = el('div', 'timing-window', `
-        <div class="timing-window-name">${escapeHtml(w.window || '')}</div>
-        <div class="timing-window-why">${escapeHtml(w.why || '')}</div>
-      `);
-      wrap.appendChild(row);
-    });
-    body.appendChild(wrap);
-  }
-}
-
-function renderEmail() {
-  const body = $('email-body');
-  body.innerHTML = hookBanner('email');
-  const em = getEmail();
-  if (!em || (!em.subject && !em.body)) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Email template not loaded.</div>';
-    return;
-  }
-
-  if (em.subject) {
-    const row = el('div', 'email-subject-row', `
-      <div style="flex:1;">
-        <div class="script-label" style="margin-bottom:2px;">SUBJECT</div>
-        <div class="subject-text">${escapeHtml(em.subject)}</div>
-      </div>
-      <button class="copy-btn" data-copy="${escapeHtml(em.subject)}">Copy</button>
-    `);
-    body.appendChild(row);
-  }
-
-  if (em.body) {
-    const card = el('div', 'email-body-card', '');
-    card.innerHTML = `<button class="copy-btn" data-copy="${escapeHtml(em.body)}">Copy</button>${escapeHtml(em.body)}`;
-    body.appendChild(card);
-  }
-
-  wireCopyButtons(body);
-}
-
-function renderPrep() {
-  const body = $('prep-body');
-  body.innerHTML = hookBanner('prep');
-  const plan = getPrepWeeks();
-  if (plan.length === 0) {
-    body.innerHTML += '<div style="color:var(--t3);font-size:12.5px;padding:8px 0;">Prep plan not loaded.</div>';
-    return;
-  }
-  plan.forEach(wk => {
-    const actions = (wk.actions || []).map(a => `<li>${escapeHtml(a)}</li>`).join('');
-    const themeHtml = wk.theme ? `<span class="week-theme">${escapeHtml(wk.theme)}</span>` : '';
-    const card = el('div', 'week-card', `
-      <div class="week-head">
-        <span>Week ${wk.week || ''}</span>
-        ${themeHtml}
-      </div>
-      <ul class="week-actions">${actions}</ul>
-    `);
-    body.appendChild(card);
-  });
-}
-
-function renderRolePlayScene() {
-  const wrap = $('roleplay-scene-wrap');
-  if (!wrap) return;
-  const hook = obstacleHook('roleplay');
-  const rp = getRolePlay();
-  if (!rp || !rp.opening_scene) {
-    // Don't render anything — the coach chat alone carries the section
-    wrap.innerHTML = hook ? `<div style="padding:0 18px;">${hookBanner('roleplay')}</div>` : '';
-    return;
-  }
-  wrap.innerHTML = `
-    <div style="padding:0 18px;">
-      ${hookBanner('roleplay')}
-      <div class="roleplay-card">
-        <div class="roleplay-scene">${escapeHtml(rp.opening_scene)}</div>
-        ${rp.coach_instructions ? `<div class="roleplay-instructions">${escapeHtml(rp.coach_instructions)}</div>` : ''}
-      </div>
-      <button class="roleplay-btn" onclick="startRolePlay()">Start the role-play now →</button>
-    </div>
-  `;
-}
-
-function renderCoachStarterChips() {
-  const wrap = $('coach-starter-chips');
-  if (!wrap) return;
-  wrap.innerHTML = '';
-  COACH_STARTER_CHIPS.forEach(c => {
-    const chip = el('button', 'coach-starter-chip' + (c.hot ? ' hot' : ''), escapeHtml(c.label));
-    chip.type = 'button';
-    chip.onclick = () => {
-      // Remove all chips after pick so the area doesn't feel like a static menu
-      wrap.innerHTML = '';
-      sendToCoach(c.send);
-    };
-    wrap.appendChild(chip);
-  });
-}
-
-/* ── Welcome-back bubble ───────────────────────────────── */
-/* Shown once per session (not on every reload). Opens the coaching window
-   warmly — references the user's obstacle + range + days left. Feels like
-   the coach saying hi when you walk into the office. */
-function maybeShowWelcomeBubble() {
-  // Session-scoped flag — clears on tab close. Cap to daily too, so
-  // re-opens within the same day don't re-welcome.
-  const already = sessionStorage.getItem(LS_WELCOMED);
-  if (already) return;
-
-  try { sessionStorage.setItem(LS_WELCOMED, '1'); } catch (e) {}
-
-  const fr = dash.profile?.final_range || {};
-  const obsLabel = OBSTACLE_LABELS[dash.obstacle?.code] || '';
-  const rangeStr = (fr.floor && fr.ceiling) ? `${fr.floor}–${fr.ceiling}%` : 'your range';
-  const dayStr   = dash.days_left === 30
-    ? 'We just started — 30 days of coaching ahead.'
-    : `${dash.days_left} day${dash.days_left === 1 ? '' : 's'} left in your coaching window.`;
-
-  const obsSentence = obsLabel
-    ? ` You flagged ${obsLabel} as your biggest concern — that's what we'll zero in on first.`
-    : '';
-
-  const welcome = `Welcome back. Your range locked at <strong>${rangeStr}</strong>.${obsSentence} ${dayStr} Tap a chip below or ask me anything.`;
-
-  // Insert into coach-messages BEFORE any existing content
-  const msgs = $('coach-messages');
-  if (!msgs) return;
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `<div class="coach-bubble welcome">${welcome}</div>`;
-  msgs.insertBefore(wrap, msgs.firstChild);
-}
-
-/* ── Copy buttons ──────────────────────────────────────── */
-function wireCopyButtons(root) {
-  root.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.onclick = async (e) => {
-      e.stopPropagation();
-      const text = btn.dataset.copy;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch (err) {
-        const ta = document.createElement('textarea');
-        ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-        document.body.appendChild(ta); ta.select();
-        try { document.execCommand('copy'); } catch(e2) {}
-        document.body.removeChild(ta);
-      }
-      btn.classList.add('copied');
-      const orig = btn.textContent;
-      btn.textContent = 'Copied ✓';
-      setTimeout(() => {
-        btn.classList.remove('copied');
-        btn.textContent = orig;
-      }, 1600);
-    };
-  });
-}
-
-/* ── Expandable sections ───────────────────────────────── */
-function toggleSection(id) {
-  const sec = $(id);
-  if (!sec) return;
-  const head = sec.querySelector('.section-head');
-  const body = sec.querySelector('.section-body');
-  const collapsed = head.classList.toggle('collapsed');
-  body.hidden = collapsed;
-}
-
-/* ── Salary handling ───────────────────────────────────── */
-function getSalary() {
-  try {
-    const raw = localStorage.getItem(LS_SALARY);
-    if (!raw) return null;
-    const obj = JSON.parse(raw);
-    if (obj && obj.amount > 0 && obj.currency) return obj;
-  } catch (e) {}
-  return null;
-}
-function saveSalary(amount, currency) {
-  try { localStorage.setItem(LS_SALARY, JSON.stringify({ amount, currency, savedAt: Date.now() })); } catch (e) {}
-}
-function clearSalary() {
-  try { localStorage.removeItem(LS_SALARY); } catch (e) {}
-}
-
-$('salary-save').onclick = () => {
-  const amt = parseInt($('salary-input').value, 10);
-  const cur = $('salary-currency').value;
-  if (!(amt > 0)) return;
-  saveSalary(amt, cur);
-  $('salary-prompt').hidden = true;
-  renderSummary();
-};
-$('salary-skip').onclick = () => {
-  $('salary-prompt').hidden = true;
-};
-
-/* ── Coach chat ────────────────────────────────────────── */
-let coachBusy = false;
-
-function appendUserBubble(text) {
-  const wrap = el('div', 'coach-msg user-msg', `<div class="user-bubble">${escapeHtml(text)}</div>`);
-  $('coach-messages').appendChild(wrap);
-  scrollToCoach(true);
-}
-function appendCoachBubble(text) {
-  const wrap = el('div', 'coach-msg', `<div class="coach-bubble">${escapeHtml(text)}</div>`);
-  $('coach-messages').appendChild(wrap);
-  scrollToCoach(true);
-}
-function appendTypingIndicator() {
-  const wrap = el('div', 'coach-msg', `<div class="coach-bubble"><div class="typing-dots"><span class="d"></span><span class="d"></span><span class="d"></span></div></div>`);
-  wrap.id = 'typing-indicator-wrap';
-  $('coach-messages').appendChild(wrap);
-  scrollToCoach(true);
-}
-function removeTypingIndicator() {
-  const w = $('typing-indicator-wrap');
-  if (w) w.remove();
-}
-
-function scrollToCoach(smooth) {
-  const sec = $('sec-coach');
-  if (!sec) return;
-  const head = sec.querySelector('.section-head');
-  const body = sec.querySelector('.section-body');
-  if (head && head.classList.contains('collapsed')) {
-    head.classList.remove('collapsed');
-    body.hidden = false;
-  }
-  requestAnimationFrame(() => {
-    const messages = $('coach-messages');
-    if (messages && messages.lastElementChild) {
-      messages.lastElementChild.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
-    } else {
-      sec.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
-    }
-  });
-}
-
-async function sendToCoach(text) {
-  if (coachBusy || !text) return;
-  coachBusy = true;
-  $('send-btn').disabled = true;
-
-  appendUserBubble(text);
-  appendTypingIndicator();
-
-  try {
-    const res = await fetch(API_COACH, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: dash.token, message: text }),
-    });
-    const data = await res.json();
-    removeTypingIndicator();
-    if (res.status === 401 || data.error === 'expired') {
-      appendCoachBubble("Your coaching window has ended. If you believe this is a mistake, email support@recomlinked.com.");
-    } else if (data.reply) {
-      appendCoachBubble(data.reply);
-    } else {
-      appendCoachBubble("I couldn't respond just now. Try again?");
-    }
-  } catch (err) {
-    removeTypingIndicator();
-    appendCoachBubble("Something interrupted our connection. Please try again.");
-  } finally {
-    coachBusy = false;
-    $('send-btn').disabled = false;
-    $('chat-input').focus();
-  }
-}
-
-function startRolePlay() {
-  const text = "Let's role-play the actual negotiation conversation. You play my manager. Start by opening the meeting naturally, and I'll respond.";
-  $('chat-input').value = '';
-  sendToCoach(text);
-}
-
-/* ── Input wiring ──────────────────────────────────────── */
-$('send-btn').addEventListener('click', () => {
-  const input = $('chat-input');
-  const v = (input.value || '').trim();
-  if (!v) return;
-  input.value = '';
-  sendToCoach(v);
-});
-$('chat-input').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    $('send-btn').click();
-  }
-});
-
-/* ── Menu ──────────────────────────────────────────────── */
-$('menu-btn').addEventListener('click', (e) => {
-  e.stopPropagation();
-  const d = $('menu-drop');
-  d.hidden = !d.hidden;
-});
-document.addEventListener('click', () => { $('menu-drop').hidden = true; });
-
-$('menu-export').onclick = () => {
-  if (!dash.token) return;
-  window.open(`${API_EXPORT}?token=${encodeURIComponent(dash.token)}`, '_blank');
-};
-
-$('menu-salary').onclick = () => {
-  const s = getSalary();
-  if (s) {
-    $('salary-input').value = s.amount;
-    $('salary-currency').value = s.currency;
-  }
-  $('salary-prompt').hidden = false;
-  $('salary-prompt').scrollIntoView({ behavior: 'smooth' });
-};
-
-$('menu-delete').onclick = () => {
-  $('confirm-overlay').hidden = false;
-};
-$('confirm-cancel').onclick = () => { $('confirm-overlay').hidden = true; };
-$('confirm-delete').onclick = async () => {
-  $('confirm-delete').disabled = true;
-  try {
-    await fetch(API_DELETE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: dash.token, confirm: 'yes' }),
-    });
-  } catch (e) {}
-  try {
-    localStorage.removeItem(LS_TOKEN);
-    localStorage.removeItem(LS_SALARY);
-    localStorage.removeItem('rl_raise_profile');
-    localStorage.removeItem('rl_raise_state');
-    sessionStorage.removeItem(LS_WELCOMED);
-  } catch (e) {}
+$('delete-btn').onclick=()=>{$('confirm-overlay').hidden=false;};
+$('confirm-cancel').onclick=()=>{$('confirm-overlay').hidden=true;};
+$('confirm-delete').onclick=async()=>{
+  try{await fetch(`${API_DELETE}?token=${encodeURIComponent(dash.token)}`,{method:'DELETE'});}catch(e){}
+  try{localStorage.removeItem(LS_TOKEN);localStorage.removeItem(LS_STATE);localStorage.removeItem(LS_TAP);}catch(e){}
   window.location.replace('/raise/');
 };
-
-/* ── Kick off ──────────────────────────────────────────── */
-init().catch(err => {
-  console.error('init failed:', err);
-  $('loading-title').textContent = 'Something went wrong.';
-  $('loading-body').textContent  = 'Refresh to try again.';
-});
+init();
 </script>
-
 <script defer src="/shared.js"></script>
 </body>
 </html>
