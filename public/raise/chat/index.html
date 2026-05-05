@@ -551,6 +551,10 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
 .chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
+.empathy-quotes{display:flex;flex-direction:column;gap:14px;}
+.empathy-quote{border-left:3px solid var(--divider);padding-left:14px;padding-block:2px;}
+.empathy-text{font-size:13.5px;color:var(--t1);line-height:1.55;}
+.empathy-attr{font-size:11px;color:var(--t4);margin-top:4px;}
 .new-msg-indicator{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:20px;background:var(--bg);color:var(--teal);font-size:12px;font-weight:600;border:1px solid rgba(0,196,160,0.2);cursor:pointer;z-index:300;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(0,0,0,0.3);font-family:var(--sans);}
 .chip-rank{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--teal);background:rgba(0,196,160,0.08);margin-top:1px;}
 .reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
@@ -2247,17 +2251,56 @@ async function beginSimulationFlow(reasonParam) {
   startSimulationAtBlocker();
 }
 
-// Bridge lines — acknowledge the blocker then lead to opening chips
+// Empathy quotes — shown before bridge message per blocker
+const EMPATHY_QUOTES = {
+  no_script: [
+    { text: "I\u2019ve rehearsed it a hundred times in my head, and then I sit down and start talking about the schedule.", name: "Denise", role: "Dental Office Manager" },
+    { text: "I\u2019m tired of reading articles. I just need someone to tell me exactly what to say.", name: "Patricia", role: "Insurance Office Manager" },
+  ],
+  underpaid: [
+    { text: "I wasn\u2019t even supposed to see it, but I did. The new hire makes $8K more than me, and I trained him.", name: "Diane", role: "Medical Billing Specialist" },
+    { text: "I googled my job title at 11pm and didn\u2019t sleep after that.", name: "Brian", role: "Claims Adjuster" },
+  ],
+  quiet: [
+    { text: "I do the work. I just don\u2019t make a big speech about it.", name: "Susan", role: "Senior Bookkeeper" },
+    { text: "My manager said I need to be more visible. I\u2019m here every day.", name: "Angela", role: "Dental Hygienist" },
+    { text: "Four years here and I\u2019ve never asked once. I thought they\u2019d just notice.", name: "Robert", role: "Shipping Coordinator" },
+  ],
+  unknown_amount: [
+    { text: "I don\u2019t know if I should say 5% or 15%, so I keep saying nothing.", name: "Patricia", role: "Branch Manager" },
+    { text: "What if I name a number and they would\u2019ve given me more?", name: "Kevin", role: "Dispatcher" },
+  ],
+  fear_no: [
+    { text: "I asked once and got shut down hard. I still remember that car ride home.", name: "Sandra", role: "Insurance Underwriter" },
+    { text: "If she says no, I still have to sit next to her every day.", name: "Stephanie", role: "Paralegal" },
+    { text: "I know I should ask. I just don\u2019t want to make things weird.", name: "Natasha", role: "Dental Hygienist" },
+  ],
+  no_advocate: [
+    { text: "If I don\u2019t bring it up, nobody else is going to.", name: "Linda", role: "Operations Coordinator" },
+    { text: "My manager says the right things, but nothing ever changes.", name: "Diane", role: "Senior Accountant" },
+    { text: "Everyone says my work is great. Somehow that doesn\u2019t show up in my pay.", name: "Janet", role: "HR Generalist" },
+  ],
+  prior_no: [
+    { text: "I brought it up before and got nowhere. Now I\u2019m not even sure how to reopen it.", name: "Janet", role: "Office Manager" },
+    { text: "I asked once and got the classic \u2018not right now.\u2019", name: "Susan", role: "Account Manager" },
+  ],
+  timing: [
+    { text: "There\u2019s always some reason to wait. That\u2019s the problem.", name: "Brenda", role: "Administrative Assistant" },
+    { text: "I keep wondering if I should ask now or wait another month.", name: "Cheryl", role: "Accounts Payable Lead" },
+  ],
+};
+
+// Bridge lines — lead to opening chips
 const BRIDGE_LINES = {
-  no_script:      "Every raise conversation starts with an opening line. It sets the tone for everything that follows. Pick an opening to see how the conversation unfolds.",
-  underpaid:      "You think you're underpaid but can't prove it. How you open this conversation matters. Pick an opening to see how the conversation unfolds.",
-  quiet:          "You're a strong performer but quiet. How you bring this up matters. Pick an opening to see how the conversation unfolds.",
-  unknown_amount: "You don't know what number to ask for. How you open the conversation matters. Pick an opening to see how the conversation unfolds.",
-  fear_no:        "You're worried they'll say no. How you start this conversation matters. Pick an opening to see how the conversation unfolds.",
-  no_advocate:    "Your manager doesn't advocate for you. How you bring this up matters. Pick an opening to see how the conversation unfolds.",
-  prior_no:       "You already asked and got nothing. How you reopen this matters. Pick an opening to see how the conversation unfolds.",
-  timing:         "You're not sure if now is the right time. How you test the waters matters. Pick an opening to see how the conversation unfolds.",
-  other:          "How you open this conversation matters. It sets the tone for everything that follows. Pick an opening to see how the conversation unfolds.",
+  no_script:      "The first sentence is the hardest part. Pick one to see how it plays out.",
+  underpaid:      "Bringing this up is the hard part. Pick an opening to see how it lands.",
+  quiet:          "Asking quietly is still asking. Pick an opening to see how it plays out.",
+  unknown_amount: "You don't need a perfect number to start. Pick an opening to see how it unfolds.",
+  fear_no:        "There's a way to ask that protects you if they say no. Pick an opening to see how.",
+  no_advocate:    "If they won't bring it up, you have to. Pick an opening to see how it lands.",
+  prior_no:       "Reopening it is different from asking the first time. Pick an opening to see how.",
+  timing:         "There's a way to test the waters without committing. Pick an opening to see how.",
+  other:          "How you open it matters. Pick an opening to see how the conversation unfolds.",
 };
 
 // ── Start simulation at the specific blocker moment ──
@@ -2271,14 +2314,41 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner
   insertModeBanner('sim');
 
-  // Bridge line — acknowledges blocker + leads to chips
+  // Empathy quotes — show before bridge
+  const quotes = EMPATHY_QUOTES[blocker.code];
+  if (quotes && quotes.length > 0) {
+    const empathyWrap = el('div', 'coach-msg', '');
+    const inner = el('div', 'empathy-quotes', '');
+    quotes.forEach(q => {
+      const quote = el('div', 'empathy-quote', '');
+      const text = el('div', 'empathy-text', '');
+      text.textContent = '\u201c' + q.text + '\u201d';
+      quote.appendChild(text);
+      const attr = el('div', 'empathy-attr', '');
+      attr.textContent = '\u2014 ' + q.name + ', ' + q.role;
+      quote.appendChild(attr);
+      inner.appendChild(quote);
+    });
+    empathyWrap.appendChild(inner);
+    const chatEl = $('chat');
+    if (chatEl) chatEl.appendChild(empathyWrap);
+  }
+
+  // Bridge line — leads to chips
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
   const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
-  // Scroll to bridge after DOM settles so user sees context at top
+  // Scroll to empathy section after DOM settles
   await sleep(150);
-  if (bridgeBubble) {
+  const empathyEl = document.querySelector('.empathy-quotes');
+  if (empathyEl) {
+    const w = $('chat-wrap');
+    if (w) {
+      const offset = empathyEl.closest('.coach-msg').offsetTop - 10;
+      w.scrollTop = offset;
+    }
+  } else if (bridgeBubble) {
     const w = $('chat-wrap');
     if (w) {
       const offset = bridgeBubble.offsetTop - 10;
@@ -2653,12 +2723,42 @@ function renderScenarioLabels(scenarios) {
     pill.appendChild(chev);
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
-    row.appendChild(pill);
+
+    if (i < 2) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenScenarioPills.push(pill);
+    }
   });
 
-  // "Something else" pill — user-defined scenario theme. Tapping this is
-  // a shortcut hint that the input accepts free text; either path runs
-  // the same submitCustomScenario handler.
+  // Expand/collapse toggle for manager chips
+  const hiddenScenarioPills = [];
+  // Re-collect hidden pills (they were pushed during the loop above)
+  row.querySelectorAll('.sim-pill').forEach((p, i) => {
+    if (i >= 2 && !p.classList.contains('sim-pill-custom')) {
+      if (!hiddenScenarioPills.includes(p)) hiddenScenarioPills.push(p);
+    }
+  });
+
+  if (hiddenScenarioPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more directions';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenScenarioPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more directions';
+      }
+    };
+    row.appendChild(toggle);
+  }
+
+  // "Something else" pill
   const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = '+ Something else\u2026';
   custom.onclick = () => {
