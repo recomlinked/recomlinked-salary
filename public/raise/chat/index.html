@@ -550,6 +550,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
+.new-msg-indicator{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:20px;background:var(--bg);color:var(--teal);font-size:12px;font-weight:600;border:1px solid rgba(0,196,160,0.2);cursor:pointer;z-index:300;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(0,0,0,0.3);font-family:var(--sans);}
 .reply-star{flex-shrink:0;padding-top:2px;}
 .reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
 .mini-demo{background:linear-gradient(180deg,rgba(15,17,24,0.95) 0%,rgba(15,17,24,0) 100%);border-radius:14px;padding:14px 16px 10px;margin-bottom:4px;height:120px;overflow:hidden;}
@@ -671,6 +672,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var wrap = footer.parentElement;
     if (wrap && wrap !== document.body) wrap.style.display = 'none';
     else footer.style.display = 'none';
+  }
+  // Hide new-message indicator when user scrolls near bottom
+  var cw = document.getElementById('chat-wrap');
+  if (cw) {
+    cw.addEventListener('scroll', function() {
+      var nearBottom = (cw.scrollHeight - cw.scrollTop - cw.clientHeight) < 150;
+      if (nearBottom) hideNewMessageIndicator();
+    });
   }
 });
 
@@ -881,7 +890,41 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function scrollChatToBottom() {
   const w = $('chat-wrap');
   if (!w) return;
+  
+  // Check if user is near the bottom (within 150px)
+  const isNearBottom = (w.scrollHeight - w.scrollTop - w.clientHeight) < 150;
+  
+  if (isNearBottom) {
+    requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
+    hideNewMessageIndicator();
+  } else {
+    showNewMessageIndicator();
+  }
+}
+
+// Force scroll (used for initial load and user-initiated actions like tapping a chip)
+function forceScrollToBottom() {
+  const w = $('chat-wrap');
+  if (!w) return;
   requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
+  hideNewMessageIndicator();
+}
+
+function showNewMessageIndicator() {
+  let ind = $('new-msg-indicator');
+  if (ind) { ind.style.display = 'flex'; return; }
+  ind = document.createElement('button');
+  ind.id = 'new-msg-indicator';
+  ind.className = 'new-msg-indicator';
+  ind.innerHTML = '↓ New message';
+  ind.onclick = () => { forceScrollToBottom(); hideNewMessageIndicator(); };
+  const w = $('chat-wrap');
+  if (w) w.parentNode.appendChild(ind);
+}
+
+function hideNewMessageIndicator() {
+  const ind = $('new-msg-indicator');
+  if (ind) ind.style.display = 'none';
 }
 function midpoint(r) { return (r.floor + r.ceiling) / 2; }
 function colorFor(range) {
@@ -1316,7 +1359,7 @@ function appendUserBubble(text, opts) {
   const wrap = el('div', 'user-msg', '');
   wrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
   $('messages').appendChild(wrap);
-  scrollChatToBottom();
+  forceScrollToBottom(); // user action — always scroll to show result
   if (!opts.skipLog) logEntry('user_bubble', { text });
   return wrap;
 }
@@ -2271,9 +2314,11 @@ async function startSimulationAtBlocker() {
 
   // Bridge line — acknowledges blocker + leads to chips
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
-  insertCoachBubble(bridge);
+  const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
+  // Scroll to bridge message (not bottom) so user sees context + top chips
+  if (bridgeBubble) bridgeBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
   unlockModeToggle();
 }
 
