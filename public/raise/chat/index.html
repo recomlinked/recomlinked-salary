@@ -551,6 +551,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
 .chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
+.empathy-section{padding:16px 16px 12px;margin-bottom:4px;}
+.empathy-title{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:14px;letter-spacing:0.01em;}
 .empathy-quotes{display:flex;flex-direction:column;gap:14px;}
 .empathy-quote{border-left:3px solid var(--divider);padding-left:14px;padding-block:2px;}
 .empathy-text{font-size:13.5px;color:var(--t1);line-height:1.55;}
@@ -2292,15 +2294,15 @@ const EMPATHY_QUOTES = {
 
 // Bridge lines — lead to opening chips
 const BRIDGE_LINES = {
-  no_script:      "The first sentence is the hardest part. Pick one to see how it plays out.",
-  underpaid:      "Bringing this up is the hard part. Pick an opening to see how it lands.",
-  quiet:          "Asking quietly is still asking. Pick an opening to see how it plays out.",
-  unknown_amount: "You don't need a perfect number to start. Pick an opening to see how it unfolds.",
-  fear_no:        "There's a way to ask that protects you if they say no. Pick an opening to see how.",
-  no_advocate:    "If they won't bring it up, you have to. Pick an opening to see how it lands.",
-  prior_no:       "Reopening it is different from asking the first time. Pick an opening to see how.",
-  timing:         "There's a way to test the waters without committing. Pick an opening to see how.",
-  other:          "How you open it matters. Pick an opening to see how the conversation unfolds.",
+  no_script:      "The first sentence is the hardest part. Most people rehearse it for months and never say it. Below are the opening lines that actually work \u2014 pick one to see how your manager responds.",
+  underpaid:      "You already know the gap is there. Bringing it up is the hard part. These are the opening lines that work best for this conversation \u2014 pick one to see how it plays out.",
+  quiet:          "Your work speaks for itself \u2014 but right now it needs your voice too. These openings are designed for people who\u2019d rather let results do the talking. Pick one to see how it lands.",
+  unknown_amount: "You don\u2019t need a perfect number to start the conversation. These opening lines let you explore what\u2019s possible without committing to a figure. Pick one to see how it unfolds.",
+  fear_no:        "The fear of \u2018no\u2019 keeps most people from ever asking. These openings are built to protect you if they push back \u2014 pick one to see how the conversation goes.",
+  no_advocate:    "If your manager won\u2019t bring it up, you have to. These openings are designed for exactly that situation \u2014 pick one to see how it lands.",
+  prior_no:       "Reopening this conversation is different from asking the first time. These openings acknowledge the history without starting from scratch \u2014 pick one to see how it goes.",
+  timing:         "There\u2019s never a perfect time, but there are ways to test the waters without fully committing. Pick an opening to see how it plays out.",
+  other:          "How you open this conversation sets the tone for everything after it. Pick an opening below to see how your manager might respond.",
 };
 
 // ── Start simulation at the specific blocker moment ──
@@ -2311,13 +2313,12 @@ async function startSimulationAtBlocker() {
   showToolbar();
   showModeToggle();
 
-  // Show the simulation mode banner
-  insertModeBanner('sim');
-
-  // Empathy quotes — show before bridge
+  // Empathy quotes — show BEFORE mode banner
   const quotes = EMPATHY_QUOTES[blocker.code];
   if (quotes && quotes.length > 0) {
-    const empathyWrap = el('div', 'coach-msg', '');
+    const empathyWrap = el('div', 'empathy-section', '');
+    const title = el('div', 'empathy-title', 'Voice of the Audience');
+    empathyWrap.appendChild(title);
     const inner = el('div', 'empathy-quotes', '');
     quotes.forEach(q => {
       const quote = el('div', 'empathy-quote', '');
@@ -2334,6 +2335,9 @@ async function startSimulationAtBlocker() {
     if (chatEl) chatEl.appendChild(empathyWrap);
   }
 
+  // Show the simulation mode banner
+  insertModeBanner('sim');
+
   // Bridge line — leads to chips
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
   const bridgeBubble = insertCoachBubble(bridge);
@@ -2341,18 +2345,16 @@ async function startSimulationAtBlocker() {
   renderOpeningChips();
   // Scroll to empathy section after DOM settles
   await sleep(150);
-  const empathyEl = document.querySelector('.empathy-quotes');
+  const empathyEl = document.querySelector('.empathy-section');
   if (empathyEl) {
     const w = $('chat-wrap');
     if (w) {
-      const offset = empathyEl.closest('.coach-msg').offsetTop - 10;
-      w.scrollTop = offset;
+      w.scrollTop = empathyEl.offsetTop - 10;
     }
   } else if (bridgeBubble) {
     const w = $('chat-wrap');
     if (w) {
-      const offset = bridgeBubble.offsetTop - 10;
-      w.scrollTop = offset;
+      w.scrollTop = bridgeBubble.offsetTop - 10;
     }
   }
   unlockModeToggle();
