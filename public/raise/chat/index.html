@@ -551,7 +551,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
 .new-msg-indicator{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:20px;background:var(--bg);color:var(--teal);font-size:12px;font-weight:600;border:1px solid rgba(0,196,160,0.2);cursor:pointer;z-index:300;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(0,0,0,0.3);font-family:var(--sans);}
-.reply-star{flex-shrink:0;padding-top:2px;}
+.chip-rank{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--teal);background:rgba(0,196,160,0.08);margin-top:1px;}
 .reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
 .mini-demo{background:linear-gradient(180deg,rgba(15,17,24,0.95) 0%,rgba(15,17,24,0) 100%);border-radius:14px;padding:14px 16px 10px;margin-bottom:4px;height:120px;overflow:hidden;}
 .mini-demo-inner{display:flex;flex-direction:column;align-items:center;gap:8px;}
@@ -2365,10 +2365,9 @@ function renderOpeningChips() {
     pill.style.alignItems = 'flex-start';
     pill.style.gap = '10px';
 
-    // Star
-    const starWrap = el('div', 'reply-star', '');
-    starWrap.appendChild(createStarSVG(opener.score, 5));
-    pill.appendChild(starWrap);
+    // Rank number
+    const rank = el('div', 'chip-rank', `#${i + 1}`);
+    pill.appendChild(rank);
 
     // Content
     const content = el('div', '', '');
@@ -2382,7 +2381,7 @@ function renderOpeningChips() {
     themeSpan.textContent = opener.theme;
     themeRow.appendChild(themeSpan);
 
-    if (i === 0 && opener.score >= 4) {
+    if (i === 0) {
       const badge = el('span', 'reply-best-badge', 'Best move');
       themeRow.appendChild(badge);
     }
@@ -2848,10 +2847,9 @@ function renderReplyPillsFlat(replies, scenario) {
     pill.style.alignItems = 'flex-start';
     pill.style.gap = '10px';
 
-    // Star
-    const starWrap = el('div', 'reply-star', '');
-    starWrap.appendChild(createStarSVG(r.score || 3, 5));
-    pill.appendChild(starWrap);
+    // Rank number
+    const rank = el('div', 'chip-rank', `#${i + 1}`);
+    pill.appendChild(rank);
 
     // Content
     const content = el('div', '', '');
@@ -2866,8 +2864,8 @@ function renderReplyPillsFlat(replies, scenario) {
     themeSpan.textContent = r.theme;
     themeRow.appendChild(themeSpan);
 
-    // "Best move" badge on top-scored reply
-    if (i === 0 && (r.score || 3) >= 4) {
+    // "Best move" badge on top-ranked reply
+    if (i === 0) {
       const badge = el('span', 'reply-best-badge', 'Best move');
       themeRow.appendChild(badge);
     }
