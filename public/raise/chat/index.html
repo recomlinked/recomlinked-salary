@@ -2733,31 +2733,6 @@ function renderScenarioLabels(scenarios) {
     row.appendChild(pill);
   });
 
-  // Collect hidden pills (index >= 2) and hide them
-  const hiddenScenarioPills = [];
-  row.querySelectorAll('.sim-pill').forEach((p, i) => {
-    if (i >= 2 && !p.classList.contains('sim-pill-custom')) {
-      p.style.display = 'none';
-      hiddenScenarioPills.push(p);
-    }
-  });
-
-  if (hiddenScenarioPills.length > 0) {
-    const toggle = el('button', 'chips-expand', '');
-    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more directions';
-    let expanded = false;
-    toggle.onclick = () => {
-      expanded = !expanded;
-      hiddenScenarioPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
-      if (expanded) {
-        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
-      } else {
-        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more directions';
-      }
-    };
-    row.appendChild(toggle);
-  }
-
   // "Something else" pill
   const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = '+ Something else\u2026';
