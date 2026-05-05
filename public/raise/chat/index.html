@@ -2380,7 +2380,7 @@ function renderOpeningChips() {
 
     const preview = el('span', 'sim-reply-preview', '');
     const clean = opener.text;
-    preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
+    preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
     content.appendChild(preview);
 
     pill.appendChild(content);
@@ -2599,7 +2599,7 @@ function renderScenarioLabels(scenarios) {
     if (s.text) {
       const preview = el('span', 'sim-pill-preview', '');
       const clean = s.text.replace(/^["'\u201c]+|["'\u201c\u201d]+$/g, '');
-      preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
+      preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
       pill.appendChild(preview);
     }
     const chev = el('span', 'chip-chevron', '›');
@@ -2858,7 +2858,7 @@ function renderReplyPillsFlat(replies, scenario) {
     if (r.text) {
       const preview = el('span', 'sim-reply-preview', '');
       const clean = r.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
-      preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
+      preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
       content.appendChild(preview);
     }
     pill.appendChild(content);
@@ -3012,7 +3012,7 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
     if (s.text) {
       const preview = el('span', 'sim-pill-preview', '');
       const clean = s.text.replace(/^["'\u201c]+|["'\u201c\u201d]+$/g, '');
-      preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
+      preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
       pill.appendChild(preview);
     }
     pill.onclick = () => expandFollowupScenario(s, pill, row, parentScenario, wrap, turnNodes);
