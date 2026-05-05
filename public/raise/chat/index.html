@@ -2730,22 +2730,15 @@ function renderScenarioLabels(scenarios) {
     pill.appendChild(chev);
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
-
-    if (i < 2) {
-      row.appendChild(pill);
-    } else {
-      pill.style.display = 'none';
-      row.appendChild(pill);
-      hiddenScenarioPills.push(pill);
-    }
+    row.appendChild(pill);
   });
 
-  // Expand/collapse toggle for manager chips
+  // Collect hidden pills (index >= 2) and hide them
   const hiddenScenarioPills = [];
-  // Re-collect hidden pills (they were pushed during the loop above)
   row.querySelectorAll('.sim-pill').forEach((p, i) => {
     if (i >= 2 && !p.classList.contains('sim-pill-custom')) {
-      if (!hiddenScenarioPills.includes(p)) hiddenScenarioPills.push(p);
+      p.style.display = 'none';
+      hiddenScenarioPills.push(p);
     }
   });
 
