@@ -549,6 +549,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
+.chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
 .reply-star{flex-shrink:0;padding-top:2px;}
 .reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
 .mini-demo{background:linear-gradient(180deg,rgba(15,17,24,0.95) 0%,rgba(15,17,24,0) 100%);border-radius:14px;padding:14px 16px 10px;margin-bottom:4px;height:120px;overflow:hidden;}
@@ -2383,6 +2384,8 @@ function renderOpeningChips() {
     content.appendChild(preview);
 
     pill.appendChild(content);
+    const chev = el('span', 'chip-chevron', '›');
+    pill.appendChild(chev);
     pill.onclick = () => pickOpening(opener, pill, row);
     row.appendChild(pill);
   });
@@ -2599,6 +2602,8 @@ function renderScenarioLabels(scenarios) {
       preview.textContent = clean.length > 60 ? clean.slice(0, 57) + '...' : clean;
       pill.appendChild(preview);
     }
+    const chev = el('span', 'chip-chevron', '›');
+    pill.appendChild(chev);
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
     row.appendChild(pill);
@@ -2857,7 +2862,8 @@ function renderReplyPillsFlat(replies, scenario) {
       content.appendChild(preview);
     }
     pill.appendChild(content);
-
+    const chev = el('span', 'chip-chevron', '›');
+    pill.appendChild(chev);
     pill.onclick = () => pickReply(r, pill, row, scenario);
     row.appendChild(pill);
   });
