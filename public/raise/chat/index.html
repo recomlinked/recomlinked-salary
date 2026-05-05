@@ -525,7 +525,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    directions, not separate options nested under a card. They render as
    their own message bubble in the flow. */
 .sim-pills-row{display:flex;flex-wrap:wrap;gap:6px;}
-.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;width:100%;}
+.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
 .sim-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-pill:active{transform:scale(0.97);}
 .sim-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
@@ -541,7 +541,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-mgr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
 .sim-you-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
-.sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;width:100%;}
+.sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
 .sim-reply-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-reply-pill:active{transform:scale(0.97);}
 .sim-reply-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
@@ -550,6 +550,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
+.chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
 .new-msg-indicator{display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:6px 16px;border-radius:20px;background:var(--bg);color:var(--teal);font-size:12px;font-weight:600;border:1px solid rgba(0,196,160,0.2);cursor:pointer;z-index:300;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(0,0,0,0.3);font-family:var(--sans);}
 .chip-rank{flex-shrink:0;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--teal);background:rgba(0,196,160,0.08);margin-top:1px;}
 .reply-best-badge{font-size:9px;font-weight:700;color:var(--teal);padding:1px 5px;border-radius:4px;background:rgba(0,196,160,0.1);white-space:nowrap;}
@@ -2353,11 +2354,15 @@ const BLOCKER_OPENINGS = {
 function renderOpeningChips() {
   const blocker = SIM_STATE.blocker;
   const openings = BLOCKER_OPENINGS[blocker.code] || BLOCKER_OPENINGS.no_script;
+  const INITIAL_SHOW = 2;
 
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
+  row.style.alignItems = 'flex-start';
   inner.appendChild(row);
+
+  const hiddenPills = [];
 
   openings.forEach((opener, i) => {
     const pill = el('button', 'sim-reply-pill', '');
@@ -2396,8 +2401,32 @@ function renderOpeningChips() {
     const chev = el('span', 'chip-chevron', '›');
     pill.appendChild(chev);
     pill.onclick = () => pickOpening(opener, pill, row);
-    row.appendChild(pill);
+
+    if (i < INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenPills.push(pill);
+    }
   });
+
+  // Expand/collapse toggle
+  if (hiddenPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
   custom.textContent = "+ I'd say something else\u2026";
@@ -2839,7 +2868,8 @@ function renderReplyPillsFlat(replies, scenario) {
 
   // Sort replies by score (highest first)
   const sorted = [...replies].sort((a, b) => (b.score || 3) - (a.score || 3));
-  const maxScore = Math.max(...sorted.map(r => r.score || 3));
+  const INITIAL_SHOW = 2;
+  const hiddenReplyPills = [];
 
   sorted.forEach((r, i) => {
     const pill = el('button', 'sim-reply-pill', '');
@@ -2882,8 +2912,32 @@ function renderReplyPillsFlat(replies, scenario) {
     const chev = el('span', 'chip-chevron', '›');
     pill.appendChild(chev);
     pill.onclick = () => pickReply(r, pill, row, scenario);
-    row.appendChild(pill);
+
+    if (i < INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenReplyPills.push(pill);
+    }
   });
+
+  // Expand/collapse toggle
+  if (hiddenReplyPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenReplyPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenReplyPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenReplyPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
   custom.textContent = "+ I'd say something else\u2026";
