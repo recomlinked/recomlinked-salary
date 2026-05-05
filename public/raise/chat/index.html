@@ -529,8 +529,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-pill:active{transform:scale(0.97);}
 .sim-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
-.sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;color:inherit;}
-.sim-pill-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
+.sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;color:inherit;display:block;}
+.sim-pill-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;display:block;margin-top:2px;}
 .sim-pill.active .sim-pill-preview{color:var(--teal);opacity:0.5;}
 .sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;}
 .sim-pill-custom:hover{border-color:var(--teal);color:var(--teal);}
@@ -2275,8 +2275,15 @@ async function startSimulationAtBlocker() {
   const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
-  // Scroll to bridge message (not bottom) so user sees context + top chips
-  if (bridgeBubble) bridgeBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // Scroll to bridge after DOM settles so user sees context at top
+  await sleep(150);
+  if (bridgeBubble) {
+    const w = $('chat-wrap');
+    if (w) {
+      const offset = bridgeBubble.offsetTop - 10;
+      w.scrollTop = offset;
+    }
+  }
   unlockModeToggle();
 }
 
