@@ -2335,8 +2335,8 @@ async function startSimulationAtBlocker() {
     if (chatEl) chatEl.appendChild(empathyWrap);
   }
 
-  // Show the simulation mode banner
-  insertModeBanner('sim');
+  // Show the simulation mode banner AFTER first tap (not here)
+  // insertModeBanner('sim');
 
   // Bridge line — leads to chips
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
@@ -2532,6 +2532,11 @@ function renderOpeningChips() {
 }
 
 async function pickOpening(opener, pill, container) {
+  // Show mode banner on first tap (not before)
+  if (!document.querySelector('.mode-banner')) {
+    insertModeBanner('sim');
+  }
+
   // Disable all pills
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
