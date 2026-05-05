@@ -525,7 +525,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
    directions, not separate options nested under a card. They render as
    their own message bubble in the flow. */
 .sim-pills-row{display:flex;flex-wrap:wrap;gap:6px;}
-.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.sim-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;width:100%;}
 .sim-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-pill:active{transform:scale(0.97);}
 .sim-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
@@ -541,7 +541,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-mgr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
 .sim-you-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
-.sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
+.sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;width:100%;}
 .sim-reply-pill:hover{border-color:var(--teal);color:var(--t1);background:rgba(0,196,160,0.04);}
 .sim-reply-pill:active{transform:scale(0.97);}
 .sim-reply-pill.active{border-color:var(--teal);background:rgba(0,196,160,0.08);color:var(--teal);}
@@ -672,14 +672,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var wrap = footer.parentElement;
     if (wrap && wrap !== document.body) wrap.style.display = 'none';
     else footer.style.display = 'none';
-  }
-  // Hide new-message indicator when user scrolls near bottom
-  var cw = document.getElementById('chat-wrap');
-  if (cw) {
-    cw.addEventListener('scroll', function() {
-      var nearBottom = (cw.scrollHeight - cw.scrollTop - cw.clientHeight) < 150;
-      if (nearBottom) hideNewMessageIndicator();
-    });
   }
 });
 
@@ -890,41 +882,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 function scrollChatToBottom() {
   const w = $('chat-wrap');
   if (!w) return;
-  
-  // Check if user is near the bottom (within 150px)
-  const isNearBottom = (w.scrollHeight - w.scrollTop - w.clientHeight) < 150;
-  
-  if (isNearBottom) {
-    requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
-    hideNewMessageIndicator();
-  } else {
-    showNewMessageIndicator();
-  }
-}
-
-// Force scroll (used for initial load and user-initiated actions like tapping a chip)
-function forceScrollToBottom() {
-  const w = $('chat-wrap');
-  if (!w) return;
   requestAnimationFrame(() => { w.scrollTop = w.scrollHeight; });
-  hideNewMessageIndicator();
-}
-
-function showNewMessageIndicator() {
-  let ind = $('new-msg-indicator');
-  if (ind) { ind.style.display = 'flex'; return; }
-  ind = document.createElement('button');
-  ind.id = 'new-msg-indicator';
-  ind.className = 'new-msg-indicator';
-  ind.innerHTML = '↓ New message';
-  ind.onclick = () => { forceScrollToBottom(); hideNewMessageIndicator(); };
-  const w = $('chat-wrap');
-  if (w) w.parentNode.appendChild(ind);
-}
-
-function hideNewMessageIndicator() {
-  const ind = $('new-msg-indicator');
-  if (ind) ind.style.display = 'none';
 }
 function midpoint(r) { return (r.floor + r.ceiling) / 2; }
 function colorFor(range) {
@@ -1359,7 +1317,7 @@ function appendUserBubble(text, opts) {
   const wrap = el('div', 'user-msg', '');
   wrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
   $('messages').appendChild(wrap);
-  forceScrollToBottom(); // user action — always scroll to show result
+  scrollChatToBottom();
   if (!opts.skipLog) logEntry('user_bubble', { text });
   return wrap;
 }
@@ -2638,15 +2596,24 @@ function renderScenarioLabels(scenarios) {
 
   scenarios.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '8px';
+
+    const content = el('div', '', '');
+    content.style.flex = '1';
+    content.style.minWidth = '0';
+
     const themeSpan = el('span', 'sim-pill-theme', '');
     themeSpan.textContent = s.type.replace(/^["'\u201c]+|["'\u201c\u201d]+$/g, '');
-    pill.appendChild(themeSpan);
+    content.appendChild(themeSpan);
     if (s.text) {
       const preview = el('span', 'sim-pill-preview', '');
       const clean = s.text.replace(/^["'\u201c]+|["'\u201c\u201d]+$/g, '');
       preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
-      pill.appendChild(preview);
+      content.appendChild(preview);
     }
+    pill.appendChild(content);
     const chev = el('span', 'chip-chevron', '›');
     pill.appendChild(chev);
     pill.dataset.index = i;
