@@ -271,6 +271,23 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .paywall-ticker-name{font-size:12px;font-weight:500;color:rgba(255,255,255,0.5);white-space:nowrap;}
 .paywall-ticker-dot{color:rgba(255,255,255,0.2);font-size:22px;flex-shrink:0;margin:0 8px;}
 
+/* ── Promo discount banner (second paywall view) ── */
+.promo-banner{border:1px solid rgba(0,196,160,0.25);border-radius:10px;padding:16px;text-align:center;background:rgba(0,196,160,0.06);margin-bottom:0;}
+.promo-badge{display:inline-block;font-size:11px;font-weight:700;color:#04342C;background:#5DCAA5;padding:3px 10px;border-radius:12px;margin-bottom:10px;}
+.promo-text{font-size:13px;color:rgba(255,255,255,0.88);line-height:1.6;margin-bottom:12px;}
+.promo-price{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-bottom:10px;}
+.promo-old{font-size:16px;color:rgba(255,255,255,0.3);text-decoration:line-through;font-weight:500;}
+.promo-arrow{font-size:14px;color:rgba(255,255,255,0.2);}
+.promo-new{font-size:28px;font-weight:800;color:#00c4a0;}
+.promo-code-wrap{margin-bottom:6px;}
+.promo-code{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:#fff;background:rgba(255,255,255,0.08);padding:8px 20px;border-radius:6px;letter-spacing:0.1em;border:1px dashed rgba(0,196,160,0.35);cursor:pointer;transition:background 0.15s;}
+.promo-code:active{background:rgba(0,196,160,0.15);}
+.promo-copy-icon{width:14px;height:14px;opacity:0.4;}
+.promo-tap{font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;transition:color 0.2s;}
+.promo-timer{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#EF9F27;padding:4px 12px;background:rgba(239,159,39,0.1);border-radius:6px;}
+.promo-timer-icon{width:14px;height:14px;}
+.promo-timer-num{font-variant-numeric:tabular-nums;}
+
 /* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
   flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
@@ -761,6 +778,12 @@ const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 // Price — single source of truth. Change here to retest.
 const PRICE_USD = 39;
+
+// Promo discount — shown on second paywall view (returning users)
+const PROMO_CODE       = 'RAISE2026';
+const PROMO_PRICE_USD  = 19;
+const PROMO_DURATION_S = 30 * 60; // 30 minutes
+const LS_PROMO_START   = 'rl_promo_start'; // localStorage key for timer start
 
 // Canonical state shape. Persists in localStorage between reloads.
 const state = {
@@ -2220,13 +2243,18 @@ async function beginSimulationFlow(reasonParam) {
 
     await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full practice session.");
     await sleep(300);
+
+    // Show promo discount banner for returning users
+    renderPromoBanner();
+    await sleep(200);
+
     state.current_range = state.current_range || { floor: 45, ceiling: 70 };
     state.initial_floor = state.initial_floor || 45;
-    await renderPaywallBubble({ animated: true });
-    logEntry('paywall', {});
+    await renderPaywallBubble({ animated: true, discounted: true });
+    logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null });
     showToolbar();
     showModeToggle();
-    showHeaderPurchaseButton();
+    showHeaderPurchaseButton({ discounted: true });
     enableInput('Ask me anything\u2026');
     awaitFreeText(handlePostPaywallText);
     return;
@@ -3390,8 +3418,16 @@ async function showSimulationPaywall(lastScenario) {
 
 // Add a compact purchase button to the site header so it's always
 // reachable after the paywall has been shown, even as the user scrolls.
-function showHeaderPurchaseButton() {
-  if ($('header-buy-btn')) return; // already added
+function showHeaderPurchaseButton(opts) {
+  opts = opts || {};
+  if ($('header-buy-btn')) {
+    // Update existing button text if discount changed
+    const existing = $('header-buy-btn');
+    if (opts.discounted && isPromoActive() && existing.tagName === 'BUTTON') {
+      existing.innerHTML = 'Unlock · $' + PROMO_PRICE_USD;
+    }
+    return;
+  }
   const header = document.querySelector('.site-header');
   if (!header) return;
   let right = header.querySelector('.header-right');
@@ -3413,7 +3449,8 @@ function showHeaderPurchaseButton() {
     btn.href = '/raise/paid/';
     btn.style.textDecoration = 'none';
   } else {
-    btn.innerHTML = 'Practice every scenario';
+    const showDiscount = opts.discounted && isPromoActive();
+    btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Practice every scenario';
     btn.onclick = startCheckout;
   }
   right.appendChild(btn);
@@ -3600,7 +3637,7 @@ async function resumeFromState() {
 
   // If paywall was already shown, restore the header CTA immediately
   if (state.paywall_shown) {
-    showHeaderPurchaseButton();
+    showHeaderPurchaseButton({ discounted: isPromoActive() });
   }
 
   // Replay the transcript from chat_log instantly (no animation) so refresh
@@ -3635,7 +3672,8 @@ async function resumeFromState() {
       // Ignore silently during replay; the card above will already show it.
     } else if (entry.type === 'paywall') {
       // Paywall rendered from state.obstacle + state.current_range
-      renderPaywallBubble();
+      if (isPromoActive()) renderPromoBanner();
+      renderPaywallBubble({ discounted: isPromoActive() });
     }
   }
 
@@ -3655,7 +3693,7 @@ async function resumeFromState() {
     showModeToggle();
 
     if (state.paywall_shown) {
-      showHeaderPurchaseButton();
+      showHeaderPurchaseButton({ discounted: isPromoActive() });
       enableInput('Ask me anything…');
       awaitFreeText(handlePostPaywallText);
     } else {
@@ -4180,10 +4218,11 @@ async function startCheckout() {
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'checkout_started', {
-        product: 'raise', value: 39, currency: 'USD', transport_type: 'beacon',
+        product: 'raise', value: isPromoActive() ? PROMO_PRICE_USD : PRICE_USD, currency: 'USD', transport_type: 'beacon',
         final_floor: (state && state.current_range) ? state.current_range.floor : null,
         final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
         obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
+        promo_code: isPromoActive() ? PROMO_CODE : '',
       });
     }
     if (typeof window.clarity === 'function') {
@@ -4223,6 +4262,7 @@ async function startCheckout() {
         final_range: state.current_range,
         obstacle: state.obstacle,
         refSource,
+        promo_code: isPromoActive() ? PROMO_CODE : undefined,
       }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -4281,16 +4321,112 @@ async function showPaywall() {
   awaitFreeText(handlePostPaywallText);
 }
 
+// Composes and renders the promo discount banner for returning users.
+// Inserted as a coach-msg element BEFORE the paywall bubble.
+// Returns the banner element (or null if promo has expired).
+function renderPromoBanner() {
+  // Start or resume the 30-minute countdown
+  let promoStart = null;
+  try { promoStart = parseInt(localStorage.getItem(LS_PROMO_START), 10); } catch (e) {}
+  if (!promoStart || isNaN(promoStart)) {
+    promoStart = Date.now();
+    try { localStorage.setItem(LS_PROMO_START, String(promoStart)); } catch (e) {}
+  }
+  const elapsed = Math.floor((Date.now() - promoStart) / 1000);
+  const remaining = PROMO_DURATION_S - elapsed;
+  if (remaining <= 0) return null; // expired
+
+  const wrap = el('div', 'coach-msg', '');
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  wrap.innerHTML = `
+    <div class="promo-banner">
+      <div class="promo-badge">Welcome back</div>
+      <div class="promo-text">That tells us your raise actually matters to you. Here\u2019s 50% off to start working on it now. Your win is the goal.</div>
+      <div class="promo-price">
+        <span class="promo-old">$${PRICE_USD}</span>
+        <span class="promo-arrow">\u2192</span>
+        <span class="promo-new">$${PROMO_PRICE_USD}</span>
+      </div>
+      <div class="promo-code-wrap"><span class="promo-code" id="promo-code-btn">${PROMO_CODE}<svg class="promo-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></span></div>
+      <div class="promo-tap" id="promo-tap-hint">Copy code and use at checkout</div>
+      <div class="promo-timer"><svg class="promo-timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Expires in <span class="promo-timer-num" id="promo-timer-num">${m}:${s < 10 ? '0' : ''}${s}</span></div>
+    </div>
+  `;
+  $('messages').appendChild(wrap);
+
+  // Copy-to-clipboard on tap
+  const codeBtn = wrap.querySelector('#promo-code-btn');
+  const tapHint = wrap.querySelector('#promo-tap-hint');
+  if (codeBtn) {
+    codeBtn.onclick = function() {
+      try { navigator.clipboard.writeText(PROMO_CODE); } catch (e) {}
+      codeBtn.style.background = 'rgba(0,196,160,0.15)';
+      codeBtn.style.borderColor = 'rgba(0,196,160,0.5)';
+      if (tapHint) { tapHint.textContent = 'Copied!'; tapHint.style.color = '#00c4a0'; }
+      setTimeout(function() {
+        codeBtn.style.background = '';
+        codeBtn.style.borderColor = '';
+        if (tapHint) { tapHint.textContent = 'Copy code and use at checkout'; tapHint.style.color = ''; }
+      }, 2000);
+    };
+  }
+
+  // Live countdown
+  const timerEl = wrap.querySelector('#promo-timer-num');
+  if (timerEl) {
+    const timerInterval = setInterval(function() {
+      const now = Date.now();
+      const left = PROMO_DURATION_S - Math.floor((now - promoStart) / 1000);
+      if (left <= 0) {
+        timerEl.textContent = '0:00';
+        clearInterval(timerInterval);
+        // Optionally hide the banner when expired
+        wrap.style.opacity = '0.4';
+        wrap.style.pointerEvents = 'none';
+        return;
+      }
+      const mm = Math.floor(left / 60);
+      const ss = left % 60;
+      timerEl.textContent = mm + ':' + (ss < 10 ? '0' : '') + ss;
+    }, 1000);
+  }
+
+  // Track promo view
+  try {
+    if (typeof window.gtag === 'function') window.gtag('event', 'promo_shown', { product: 'raise', code: PROMO_CODE, discount_pct: 50 });
+    if (typeof window.clarity === 'function') window.clarity('event', 'promo_banner_shown');
+  } catch (e) {}
+
+  return wrap;
+}
+
+// Check if the promo is currently active and not expired
+function isPromoActive() {
+  try {
+    const promoStart = parseInt(localStorage.getItem(LS_PROMO_START), 10);
+    if (!promoStart || isNaN(promoStart)) return false;
+    const elapsed = Math.floor((Date.now() - promoStart) / 1000);
+    return elapsed < PROMO_DURATION_S;
+  } catch (e) { return false; }
+}
+
 // Composes and renders the main paywall bubble from current state
 // (profile, range, obstacle, timing). Conversational style — uses regular
 // coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
+// opts.discounted: if true, show $19 instead of $39 on CTA and closing line.
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   state.paywall_shown = true;
   saveState();
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
+  const discounted = opts.discounted && isPromoActive();
+  const displayPrice = discounted ? PROMO_PRICE_USD : PRICE_USD;
+  const ctaPrice = discounted
+    ? `<span style="text-decoration:line-through;opacity:0.45;font-weight:500;font-size:13px;">$${PRICE_USD}</span> <span style="font-weight:800;">$${PROMO_PRICE_USD}</span>`
+    : `$${PRICE_USD}`;
 
   const headline = `Walk in ready.`;
 
@@ -4300,7 +4436,7 @@ async function renderPaywallBubble(opts) {
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
       <div class="paywall-pitch">You've seen how it works. Unlock every scenario now. You'll have every response prepared before the conversation starts. We're confident this works <span class="paywall-refund">if not, we'll give you a full refund.</span></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Practice every scenario · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+        Practice every scenario · ${ctaPrice} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span>
@@ -4318,7 +4454,7 @@ async function renderPaywallBubble(opts) {
           30 days of access
         </div>
       </div>
-      <div class="paywall-closing">$39 once, for a conversation that adds thousands to your salary.</div>
+      <div class="paywall-closing">$${displayPrice} once, for a conversation that adds thousands to your salary.</div>
     </div>
   `;
   $('messages').appendChild(wrap);
