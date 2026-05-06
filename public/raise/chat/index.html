@@ -2321,27 +2321,27 @@ async function startSimulationAtBlocker() {
   showToolbar();
   showModeToggle();
 
-  // Empathy quotes — show BEFORE mode banner
-  const quotes = EMPATHY_QUOTES[blocker.code];
-  if (quotes && quotes.length > 0) {
-    const empathyWrap = el('div', 'empathy-section', '');
-    const title = el('div', 'empathy-title', 'Voice of the Audience');
-    empathyWrap.appendChild(title);
-    const inner = el('div', 'empathy-quotes', '');
-    quotes.forEach(q => {
-      const quote = el('div', 'empathy-quote', '');
-      const text = el('div', 'empathy-text', '');
-      text.textContent = '\u201c' + q.text + '\u201d';
-      quote.appendChild(text);
-      const attr = el('div', 'empathy-attr', '');
-      attr.textContent = '\u2014 ' + q.name + ', ' + q.role;
-      quote.appendChild(attr);
-      inner.appendChild(quote);
-    });
-    empathyWrap.appendChild(inner);
-    const chatEl = $('messages');
-    if (chatEl) chatEl.appendChild(empathyWrap);
-  }
+  // [HIDDEN] Voice of the Audience — commented out, re-enable by uncommenting
+  // const quotes = EMPATHY_QUOTES[blocker.code];
+  // if (quotes && quotes.length > 0) {
+  //   const empathyWrap = el('div', 'empathy-section', '');
+  //   const title = el('div', 'empathy-title', 'Voice of the Audience');
+  //   empathyWrap.appendChild(title);
+  //   const inner = el('div', 'empathy-quotes', '');
+  //   quotes.forEach(q => {
+  //     const quote = el('div', 'empathy-quote', '');
+  //     const text = el('div', 'empathy-text', '');
+  //     text.textContent = '\u201c' + q.text + '\u201d';
+  //     quote.appendChild(text);
+  //     const attr = el('div', 'empathy-attr', '');
+  //     attr.textContent = '\u2014 ' + q.name + ', ' + q.role;
+  //     quote.appendChild(attr);
+  //     inner.appendChild(quote);
+  //   });
+  //   empathyWrap.appendChild(inner);
+  //   const chatEl = $('messages');
+  //   if (chatEl) chatEl.appendChild(empathyWrap);
+  // }
 
   // Show the simulation mode banner AFTER first tap (not here)
   // insertModeBanner('sim');
@@ -2351,15 +2351,9 @@ async function startSimulationAtBlocker() {
   const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
-  // Scroll to empathy section after DOM settles
+  // Scroll to bridge bubble after DOM settles
   await sleep(150);
-  const empathyEl = document.querySelector('.empathy-section');
-  if (empathyEl) {
-    const w = $('chat-wrap');
-    if (w) {
-      w.scrollTop = empathyEl.offsetTop - 10;
-    }
-  } else if (bridgeBubble) {
+  if (bridgeBubble) {
     const w = $('chat-wrap');
     if (w) {
       w.scrollTop = bridgeBubble.offsetTop - 10;
