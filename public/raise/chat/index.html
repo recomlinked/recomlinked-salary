@@ -256,12 +256,20 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 }
 .paywall-inc-item:last-child{border-bottom:none;}
 
-.proof-line{
-  margin-top:14px;text-align:center;
-  font-size:12px;color:var(--gold);line-height:1.5;font-weight:700;
-  min-height:18px;
+.paywall-closing{
+  margin-top:18px;text-align:center;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:15px;font-weight:700;color:var(--gold);line-height:1.5;
 }
-.proof-line strong{color:var(--gold);font-weight:700;}
+.paywall-ticker{overflow:hidden;padding:14px 0;margin-top:4px;}
+.paywall-ticker-inner{display:flex;gap:10px;white-space:nowrap;}
+.paywall-ticker-item{display:inline-flex;align-items:center;gap:8px;flex-shrink:0;}
+.paywall-ticker-avatar{width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;}
+.paywall-ticker-letter{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.paywall-ticker-raise{font-size:12px;font-weight:700;color:#00c4a0;white-space:nowrap;}
+.paywall-ticker-quote{font-size:12px;color:rgba(255,255,255,0.7);font-style:italic;white-space:nowrap;}
+.paywall-ticker-name{font-size:10px;color:rgba(255,255,255,0.55);white-space:nowrap;}
+.paywall-ticker-dot{color:rgba(255,255,255,0.15);font-size:18px;flex-shrink:0;margin:0 4px;}
 
 /* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
@@ -4292,8 +4300,6 @@ async function renderPaywallBubble(opts) {
 
   const headline = `Walk in ready.`;
 
-  const proof = pickProofLine(obs.code);
-
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
@@ -4305,7 +4311,7 @@ async function renderPaywallBubble(opts) {
       <div class="trust-row paywall-trust">
         <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Money-back guarantee</span>
       </div>
-      <div class="proof-line paywall-proof"><strong class="proof-typed"></strong></div>
+      <div class="paywall-ticker"><div class="paywall-ticker-inner" id="paywall-ticker-inner"></div></div>
       <div class="paywall-includes-title">Includes</div>
       <div class="paywall-includes">
         <div class="paywall-inc-item">
@@ -4315,9 +4321,10 @@ async function renderPaywallBubble(opts) {
           <strong>Fully customized to your situation</strong>
         </div>
         <div class="paywall-inc-item">
-          <strong>30 days of coaching</strong>
+          <strong>30 days of access</strong>
         </div>
       </div>
+      <div class="paywall-closing">$39 once, for a conversation that adds thousands to your salary.</div>
     </div>
   `;
   $('messages').appendChild(wrap);
@@ -4328,9 +4335,8 @@ async function renderPaywallBubble(opts) {
   if (!opts.animated) {
     wrap.querySelector('.paywall-typed-head').textContent = headline;
     wrap.querySelector('.paywall-head-cursor')?.remove();
-    wrap.querySelector('.proof-typed').textContent = proof.replace(/<\/?strong>/g, '');
+    populatePaywallTicker(wrap);
     scrollChatToBottom();
-    startProofRotation(wrap.querySelector('.proof-typed'));
     return wrap;
   }
 
@@ -4338,15 +4344,17 @@ async function renderPaywallBubble(opts) {
   const pitchEl       = wrap.querySelector('.paywall-pitch');
   const ctaEl         = wrap.querySelector('.paywall-cta');
   const trustEl       = wrap.querySelector('.paywall-trust');
-  const proofEl       = wrap.querySelector('.paywall-proof');
+  const tickerEl      = wrap.querySelector('.paywall-ticker');
   const incTitleEl    = wrap.querySelector('.paywall-includes-title');
   const includesEl    = wrap.querySelector('.paywall-includes');
+  const closingEl     = wrap.querySelector('.paywall-closing');
   pitchEl.style.opacity       = '0';
   ctaEl.style.opacity         = '0';
   trustEl.style.opacity       = '0';
-  proofEl.style.opacity       = '0';
+  tickerEl.style.opacity      = '0';
   incTitleEl.style.opacity    = '0';
   includesEl.style.opacity    = '0';
+  closingEl.style.opacity     = '0';
   scrollChatToBottom();
 
   // Type headline
@@ -4362,56 +4370,93 @@ async function renderPaywallBubble(opts) {
   fadeInElement(ctaEl);
   await sleep(100);
   fadeInElement(trustEl);
-  await sleep(150);
-  fadeInElement(proofEl);
+  await sleep(200);
+  populatePaywallTicker(wrap);
+  fadeInElement(tickerEl);
   await sleep(300);
   fadeInElement(incTitleEl);
   await sleep(100);
   fadeInElement(includesEl);
-  fadeInElement(proofEl);
-
-  // Start proof line type/untype rotation
-  const proofTyped = wrap.querySelector('.proof-typed');
-  proofTyped.textContent = proof.replace(/<\/?strong>/g, '');
-  startProofRotation(proofTyped);
+  await sleep(200);
+  fadeInElement(closingEl);
 
   return wrap;
 }
 
-// ── Proof line rotation — type and untype for attention ──
-function startProofRotation(el) {
-  if (!el) return;
-  let currentIndex = 0;
-  const lines = PROOF_LINES.map(l => l.text.replace(/<\/?strong>/g, ''));
-  
-  async function rotateProof() {
-    // Wait 4 seconds showing current line
-    await sleep(4000);
-    
-    // Untype current text
-    const currentText = el.textContent;
-    for (let i = currentText.length; i >= 0; i--) {
-      el.textContent = currentText.slice(0, i);
-      await sleep(15);
+// ── Solution quotes ticker — social proof below CTA ──
+const SOLUTION_QUOTES = [
+  { name: "Linda W.", role: "Operations Coordinator", raise: "10%", img: "linda_w.png", text: "My manager never brings it up. So I did." },
+  { name: "David L.", role: "Logistics Manager", raise: "8%", img: "david.png", text: "I just accepted whatever they offered my whole career. Not this time." },
+  { name: "Tamika J.", role: "HR Generalist", raise: "$8,200", img: "tamika.png", text: "Best $39 I\u2019ve spent. Not even close." },
+  { name: "Angela D.", role: "Dental Hygienist", raise: "12%", img: "angela.png", text: "Practiced 30 minutes Sunday. Asked Monday. Done!" },
+  { name: "Carlos G.", role: "Facilities Coordinator", raise: "9%", img: "carlos.png", text: "He said no budget. I had a response ready. We found budget :)" },
+  { name: "Sandra H.", role: "Insurance Underwriter", raise: "10%", img: "sandra.png", text: "Last time I asked I cried in my car. This time I drove home smiling." },
+  { name: "Brian T.", role: "Claims Adjuster", raise: "8%", img: "brian.png", text: "The whole thing took 10 minutes. I\u2019d been dreading it for six months." },
+  { name: "Linda C.", role: "Office Manager", raise: "10%", img: null, letter: "LC", color: "#00c4a0", text: "He said let me think about it. I had a response for that too." },
+  { name: "Janet M.", role: "Property Manager", raise: "$6,400", img: "janet.png", text: "Paid off my car loan four months early with the difference." },
+  { name: "Karen A.", role: "Payroll Admin", raise: "8%", img: "karen.png", text: "Three years from retirement and I finally spoke up." },
+  { name: "Tom H.", role: "Warehouse Supervisor", raise: "7%", img: "tom.png", text: "Canceled the job interview I had lined up. Didn\u2019t need it anymore." },
+  { name: "James P.", role: "Maintenance Tech", raise: "$4,200", img: null, letter: "JP", color: "#c9a84c", text: "My buddy said ask for more. This told me how." },
+];
+
+function populatePaywallTicker(paywallWrap) {
+  const inner = paywallWrap.querySelector('.paywall-ticker-inner');
+  if (!inner) return;
+  const tickerWrap = paywallWrap.querySelector('.paywall-ticker');
+  const allItems = SOLUTION_QUOTES.concat(SOLUTION_QUOTES);
+  allItems.forEach(function(s) {
+    const item = document.createElement('div');
+    item.className = 'paywall-ticker-item';
+    // Avatar
+    if (s.img) {
+      const avatar = document.createElement('img');
+      avatar.className = 'paywall-ticker-avatar';
+      avatar.src = '/raise/avatars/' + s.img;
+      avatar.alt = '';
+      item.appendChild(avatar);
+    } else {
+      const letter = document.createElement('div');
+      letter.className = 'paywall-ticker-letter';
+      letter.style.background = s.color + '20';
+      letter.style.border = '1px solid ' + s.color + '40';
+      letter.style.color = s.color;
+      letter.textContent = s.letter;
+      item.appendChild(letter);
     }
-    
-    await sleep(300);
-    
-    // Move to next line
-    currentIndex = (currentIndex + 1) % lines.length;
-    const nextText = lines[currentIndex];
-    
-    // Type new text
-    for (let i = 1; i <= nextText.length; i++) {
-      el.textContent = nextText.slice(0, i);
-      await sleep(20);
-    }
-    
-    // Continue rotation
-    rotateProof();
+    // Raise
+    const raise = document.createElement('span');
+    raise.className = 'paywall-ticker-raise';
+    raise.textContent = 'Raised: ' + s.raise;
+    item.appendChild(raise);
+    // Quote
+    const quote = document.createElement('span');
+    quote.className = 'paywall-ticker-quote';
+    quote.textContent = '\u201c' + s.text + '\u201d';
+    item.appendChild(quote);
+    // Name
+    const name = document.createElement('span');
+    name.className = 'paywall-ticker-name';
+    name.textContent = '\u2014 ' + s.name + ', ' + s.role;
+    item.appendChild(name);
+    // Dot
+    const dot = document.createElement('span');
+    dot.className = 'paywall-ticker-dot';
+    dot.textContent = '\u00b7';
+    item.appendChild(dot);
+    inner.appendChild(item);
+  });
+  // Auto-scroll
+  var pos = 0;
+  var raf;
+  function scroll() {
+    pos += 0.4;
+    if (pos >= inner.scrollWidth / 2) pos = 0;
+    tickerWrap.scrollLeft = pos;
+    raf = requestAnimationFrame(scroll);
   }
-  
-  rotateProof();
+  raf = requestAnimationFrame(scroll);
+  tickerWrap.addEventListener('pointerdown', function() { cancelAnimationFrame(raf); });
+  tickerWrap.addEventListener('pointerup', function() { pos = tickerWrap.scrollLeft; raf = requestAnimationFrame(scroll); });
 }
 
 // Deep dive handler — user chose "Not yet" at the paywall.
