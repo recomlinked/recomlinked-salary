@@ -4449,7 +4449,7 @@ function populatePaywallTicker(paywallWrap) {
   var pos = 0;
   var raf;
   function scroll() {
-    pos += 1.2;
+    pos += 0.8;
     if (pos >= inner.scrollWidth / 2) pos = 0;
     tickerWrap.scrollLeft = pos;
     raf = requestAnimationFrame(scroll);
