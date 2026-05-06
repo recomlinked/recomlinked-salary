@@ -76,6 +76,7 @@ module.exports = async function handler(req, res) {
     obstacle,        // { code, label, free_text?, user_phrase_echo?, coach_line? } — Round 2
     email,           // optional — Stripe will prompt if missing
     refSource,       // referral tracking
+    promo_code,      // optional — e.g. 'RAISE2026' from returning-user discount banner
   } = req.body || {};
 
   if (!profile_hash || !profile || !final_range) {
@@ -91,6 +92,28 @@ module.exports = async function handler(req, res) {
   const obs = obstacle || { code: '', label: '', free_text: '' };
 
   try {
+    // ── Resolve promo code → Stripe promotion_code ID ────────────
+    // If the frontend passed a promo_code (e.g. 'RAISE2026' from the
+    // returning-user discount banner), look it up in Stripe and auto-apply
+    // the discount so the user sees the reduced price immediately.
+    let promoDiscount = null;
+    if (promo_code && typeof promo_code === 'string') {
+      try {
+        const codes = await stripe.promotionCodes.list({
+          code:   promo_code.toUpperCase(),
+          active: true,
+          limit:  1,
+        });
+        if (codes.data.length > 0) {
+          promoDiscount = codes.data[0].id;
+        } else {
+          console.warn('[raise-checkout] promo code not found or inactive:', promo_code);
+        }
+      } catch (promoErr) {
+        console.warn('[raise-checkout] promo lookup failed:', promoErr.message);
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       ...(email ? { customer_email: email } : {}),
@@ -100,6 +123,11 @@ module.exports = async function handler(req, res) {
         price:    process.env.STRIPE_RAISE_PRICE_ID,
         quantity: 1,
       }],
+      // Auto-apply promo discount if resolved, otherwise allow manual code entry
+      ...(promoDiscount
+        ? { discounts: [{ promotion_code: promoDiscount }] }
+        : { allow_promotion_codes: true }
+      ),
       success_url: `${BASE}/raise/paid/?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE}/raise/chat/`,
       metadata: {
@@ -117,6 +145,7 @@ module.exports = async function handler(req, res) {
         obstacle_label:      metaStr(obs.label, 480),
         obstacle_free_text:  metaStr(obs.free_text, 480),
         refSource:    metaStr(refSource),
+        promo_code:   metaStr(promo_code || ''),
       },
     });
 
@@ -155,7 +184,8 @@ module.exports = async function handler(req, res) {
       final_ceil:    final_range.ceiling,
       obstacle_code: obs.code || '',
       stripeSession: session.id,
-      price_usd:     PRICE_USD,
+      price_usd:     promoDiscount ? 19 : PRICE_USD,
+      promo_code:    promo_code || '',
       refSource:     refSource || '',
       source:        'salary.recomlinked.com',
     });
