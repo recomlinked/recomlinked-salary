@@ -784,6 +784,7 @@ const PROMO_CODE       = 'RAISE2026';
 const PROMO_PRICE_USD  = 19;
 const PROMO_DURATION_S = 30 * 60; // 30 minutes
 const LS_PROMO_START   = 'rl_promo_start'; // localStorage key for timer start
+let   promoShownThisSession = false; // runtime flag — only true after renderPromoBanner() succeeds
 
 // Canonical state shape. Persists in localStorage between reloads.
 const state = {
@@ -3531,8 +3532,9 @@ async function init() {
 
   // ?reset=1 without reason — just clear everything
   if (forceReset) {
-    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); localStorage.removeItem(LS_TAP_COUNT); } catch (e) {}
+    try { localStorage.removeItem(LS_STATE); localStorage.removeItem(LS_PROFILE); localStorage.removeItem(LS_TAP_COUNT); localStorage.removeItem(LS_PROMO_START); } catch (e) {}
     simTapCount = 0;
+    promoShownThisSession = false;
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
   }
 
@@ -4218,11 +4220,11 @@ async function startCheckout() {
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'checkout_started', {
-        product: 'raise', value: isPromoActive() ? PROMO_PRICE_USD : PRICE_USD, currency: 'USD', transport_type: 'beacon',
+        product: 'raise', value: promoShownThisSession && isPromoActive() ? PROMO_PRICE_USD : PRICE_USD, currency: 'USD', transport_type: 'beacon',
         final_floor: (state && state.current_range) ? state.current_range.floor : null,
         final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
         obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
-        promo_code: isPromoActive() ? PROMO_CODE : '',
+        promo_code: promoShownThisSession && isPromoActive() ? PROMO_CODE : '',
       });
     }
     if (typeof window.clarity === 'function') {
@@ -4262,7 +4264,7 @@ async function startCheckout() {
         final_range: state.current_range,
         obstacle: state.obstacle,
         refSource,
-        promo_code: isPromoActive() ? PROMO_CODE : undefined,
+        promo_code: promoShownThisSession && isPromoActive() ? PROMO_CODE : undefined,
       }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -4398,6 +4400,7 @@ function renderPromoBanner() {
     if (typeof window.clarity === 'function') window.clarity('event', 'promo_banner_shown');
   } catch (e) {}
 
+  promoShownThisSession = true;
   return wrap;
 }
 
