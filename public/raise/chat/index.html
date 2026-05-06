@@ -2597,6 +2597,10 @@ async function pickOpening(opener, pill, container) {
 // After the user picks an opening, generate manager responses to it
 async function loadManagerResponseToOpening(openingText, turnNodes) {
   await sleep(400);
+
+  // Show the framing text BEFORE the API call — sets expectation during wait
+  await typeCoachBubble("**Now pick what your manager might say to that.**");
+  await sleep(200);
   showCoachTyping();
 
   try {
@@ -2613,10 +2617,6 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
     const data = await res.json();
     hideCoachTyping();
 
-    // Show "Now pick what your manager might say:" + manager chips
-    await typeCoachBubble("**Now pick what your manager might say to that.**");
-    await sleep(200);
-
     if (data && data.scenarios && data.scenarios.length >= 2) {
       renderScenarioLabels(data.scenarios);
     } else {
@@ -2624,7 +2624,6 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
     }
   } catch (err) {
     hideCoachTyping();
-    await typeCoachBubble("**Now pick what your manager might say to that.**");
     renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
   }
 }
