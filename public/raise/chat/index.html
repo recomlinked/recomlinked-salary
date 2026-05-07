@@ -801,6 +801,7 @@ const PROMO_PRICE_USD  = 19;
 const PROMO_DURATION_S = 30 * 60; // 30 minutes
 const LS_PROMO_START   = 'rl_promo_start'; // localStorage key for timer start
 let   promoShownThisSession = false; // runtime flag — only true after renderPromoBanner() succeeds
+let   tipsShown = new Set(); // track which tip indices have been shown this session
 
 // Canonical state shape. Persists in localStorage between reloads.
 const state = {
@@ -2398,7 +2399,8 @@ async function startSimulationAtBlocker() {
   renderOpeningChips();
 
   // Show locked pro tip card — nudge for first tap
-  if (simTapCount === 0) {
+  // Show for any user who hasn't hit the paywall yet
+  if (!state.paywall_shown) {
     await sleep(200);
     renderLockedTip();
   }
@@ -3168,6 +3170,10 @@ function renderProTip(tipIndex) {
   // Remove locked card if still present
   const locked = document.getElementById('pro-tip-locked');
   if (locked) locked.remove();
+
+  // Don't show the same tip twice
+  if (tipsShown.has(tipIndex)) return null;
+  tipsShown.add(tipIndex);
 
   const tip = PRO_TIPS[tipIndex];
   if (!tip) return null;
