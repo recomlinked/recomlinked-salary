@@ -2663,16 +2663,9 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
     } else {
       renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
     }
-    // Show locked tip #2 after scenario chips
-    if (simTapCount === 1 && !state.paywall_shown) {
-      renderLockedTip(2, 'Pick a scenario to unlock your next tip');
-    }
   } catch (err) {
     hideCoachTyping();
     renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
-    if (simTapCount === 1 && !state.paywall_shown) {
-      renderLockedTip(2, 'Pick a scenario to unlock your next tip');
-    }
   }
 }
 
@@ -2869,9 +2862,6 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   simConversation = [{ role: 'manager', text: scenario.text }];
   simTurnElements = [];
 
-  // Reveal Tip #2 BEFORE the user bubble
-  if (simTapCount === 2) renderProTip(1);
-
   appendUserBubble('My manager\u2019s response theme:\n' + scenario.type.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, ''));
   await sleep(200);
 
@@ -2931,11 +2921,6 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   $('messages').appendChild(backWrap);
 
   renderReplyPillsFlat(replies, scenario);
-
-  // Show locked tip #3 after reply pills
-  if (simTapCount === 2 && !state.paywall_shown) {
-    renderLockedTip(3, 'Pick your response to unlock your next tip');
-  }
 
 }
 
@@ -3018,13 +3003,11 @@ function renderReplyPillsFlat(replies, scenario) {
     simConversation.push({ role: 'user', text });
     await sleep(500);
     if (incrementSimTaps()) {
-      if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
       const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
       const turnNodes = [userBubble];
       simTurnElements.push(turnNodes);
       showSimulationPaywall(scenario);
     } else {
-      if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
       const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + text + '\u201d');
       const turnNodes = [userBubble];
       simTurnElements.push(turnNodes);
@@ -3262,14 +3245,12 @@ function pickReply(reply, pill, container, scenario) {
   simConversation.push({ role: 'user', text: reply.text });
 
   if (incrementSimTaps()) {
-    if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => showSimulationPaywall(scenario), 800);
   } else {
-    if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
     const turnNodes = [userBubble];
@@ -3520,6 +3501,10 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
+  // Show Tip #3 — validates what they just did — before the paywall
+  renderProTip(2);
+  await sleep(400);
+
   await typeCoachBubble("You've explored the free preview. Unlock the full practice session to **cover every scenario and every response.**");
   await sleep(300);
 
