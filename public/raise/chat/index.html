@@ -3501,10 +3501,6 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  // Show Tip #3 — validates what they just did — before the paywall
-  renderProTip(2);
-  await sleep(400);
-
   await typeCoachBubble("You've explored the free preview. Unlock the full practice session to **cover every scenario and every response.**");
   await sleep(300);
 
