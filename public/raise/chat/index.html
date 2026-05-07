@@ -3501,7 +3501,7 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
-  await typeCoachBubble("You've explored the free preview. Unlock the full practice session to **cover every scenario and every response.**");
+  await typeCoachBubble("You\u2019ve explored the free preview. Coaches charge $150\u2013300/hour to practice these exact scenarios. Unlock all of them and practice anytime you want.");
   await sleep(300);
 
   state.obstacle = SIM_STATE.blocker;
