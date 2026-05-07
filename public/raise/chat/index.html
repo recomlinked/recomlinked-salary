@@ -798,8 +798,8 @@ const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 const PRICE_USD = 39;
 
 // Promo discount — shown on second paywall view (returning users)
-const PROMO_CODE       = 'RAISE2026';
-const PROMO_PRICE_USD  = 19;
+const PROMO_CODE       = 'RAISE26';
+const PROMO_PRICE_USD  = 29;
 const PROMO_DURATION_S = 30 * 60; // 30 minutes
 const LS_PROMO_START   = 'rl_promo_start'; // localStorage key for timer start
 let   promoShownThisSession = false; // runtime flag — only true after renderPromoBanner() succeeds
@@ -3522,8 +3522,12 @@ async function showSimulationPaywall(lastScenario) {
     branches_practiced: SIM_STATE.branch_history.length,
   });
 
-  await renderPaywallBubble({ animated: true });
-  logEntry('paywall', {});
+  // Show promo banner on first paywall hit — limited time 25% off
+  renderPromoBanner();
+  await sleep(200);
+
+  await renderPaywallBubble({ animated: true, discounted: true });
+  logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null });
   state.paywall_shown = true;
   saveState();
   unlockModeToggle();
@@ -4486,8 +4490,8 @@ function renderPromoBanner() {
   const s = remaining % 60;
   wrap.innerHTML = `
     <div class="promo-banner">
-      <div class="promo-badge">Welcome back</div>
-      <div class="promo-text">That tells us your raise actually matters to you. Here\u2019s 50% off to start working on it now. Your win is the goal.</div>
+      <div class="promo-badge">Limited time</div>
+      <div class="promo-text">Get 25% off. Practice every scenario, every manager response \u2014 at your own pace for 30 days.</div>
       <div class="promo-price">
         <span class="promo-old">$${PRICE_USD}</span>
         <span class="promo-arrow">\u2192</span>
@@ -4539,7 +4543,7 @@ function renderPromoBanner() {
 
   // Track promo view
   try {
-    if (typeof window.gtag === 'function') window.gtag('event', 'promo_shown', { product: 'raise', code: PROMO_CODE, discount_pct: 50 });
+    if (typeof window.gtag === 'function') window.gtag('event', 'promo_shown', { product: 'raise', code: PROMO_CODE, discount_pct: 25 });
     if (typeof window.clarity === 'function') window.clarity('event', 'promo_banner_shown');
   } catch (e) {}
 
