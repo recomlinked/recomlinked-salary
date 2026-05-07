@@ -184,7 +184,7 @@ module.exports = async function handler(req, res) {
       final_ceil:    final_range.ceiling,
       obstacle_code: obs.code || '',
       stripeSession: session.id,
-      price_usd:     promoDiscount ? 19 : PRICE_USD,
+      price_usd:     promoDiscount ? 29 : PRICE_USD,
       promo_code:    promo_code || '',
       refSource:     refSource || '',
       source:        'salary.recomlinked.com',
