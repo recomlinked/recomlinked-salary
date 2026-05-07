@@ -581,7 +581,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 /* Manager + reply now flow as separate coach bubbles in the main stream
    (flat structure) rather than nested inside one card. The label still
    identifies who's speaking. */
-.sim-mgr-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--t3);display:block;margin-bottom:4px;}
+.sim-mgr-label{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#fff;background:#8a90a8;padding:2px 8px 2px 6px;border-radius:4px;margin-bottom:6px;}
+.sim-mgr-label svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
 .sim-you-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--gold);display:block;margin-bottom:4px;}
 
 .sim-reply-pill{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:8px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:flex;flex-direction:column;gap:2px;}
@@ -2931,7 +2932,7 @@ function renderManagerBubble(scenario) {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble">
-      <span class="sim-mgr-label">Manager</span>
+      <span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span>
       <p>"${escapeHtml(scenario.text)}"</p>
     </div>
   `;
@@ -3800,7 +3801,7 @@ async function resumeFromState() {
         // Manager bubble — render with MANAGER label
         const mgrText = text.slice(10);
         const wrap = el('div', 'coach-msg', '');
-        wrap.innerHTML = `<div class="bubble"><span class="sim-mgr-label">Manager</span><p>"${escapeHtml(mgrText)}"</p></div>`;
+        wrap.innerHTML = `<div class="bubble"><span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span><p>"${escapeHtml(mgrText)}"</p></div>`;
         $('messages').appendChild(wrap);
       } else {
         insertCoachBubble(text);
