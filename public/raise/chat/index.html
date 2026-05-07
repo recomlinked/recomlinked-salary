@@ -290,15 +290,17 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 
 /* ── Pro tip cards (gamification reward per tap) ───────── */
 .pro-tip-card{border-radius:10px;padding:14px 16px;margin:4px 0;position:relative;overflow:hidden;}
-.pro-tip-locked{background:linear-gradient(135deg,#f8f6f0,#f0ede4);border:1px dashed #d4c9a8;}
+.pro-tip-locked{background:linear-gradient(135deg,#f8f6f0,#f0ede4);border:1px dashed #d4c9a8;padding:9px 14px;display:flex;align-items:center;gap:8px;}
 .pro-tip-revealed{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;animation:tipReveal 0.4s ease;}
 .pro-tip-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
 .pro-tip-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#b8960c;}
 .pro-tip-badge svg{width:14px;height:14px;}
 .pro-tip-num{font-size:10px;color:#c9a84c;font-weight:600;background:rgba(201,168,76,0.12);padding:2px 8px;border-radius:10px;}
-.pro-tip-locked-body{text-align:center;padding:6px 0;}
-.pro-tip-locked-icon{font-size:18px;opacity:0.35;margin-bottom:4px;}
-.pro-tip-locked-text{font-size:12px;color:#a09070;}
+.pro-tip-locked-icon{font-size:14px;opacity:0.45;flex-shrink:0;}
+.pro-tip-locked-badge{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#b8960c;flex-shrink:0;}
+.pro-tip-locked-badge svg{width:12px;height:12px;}
+.pro-tip-locked-num{font-size:9px;color:#c9a84c;font-weight:600;background:rgba(201,168,76,0.12);padding:1px 6px;border-radius:8px;flex-shrink:0;}
+.pro-tip-locked-text{font-size:12px;color:#a09070;flex:1;}
 .pro-tip-locked-text b{color:#8a7540;font-weight:600;}
 .pro-tip-text{font-size:13px;color:#5a4a20;line-height:1.6;}
 .pro-tip-text b{color:#3d3010;font-weight:700;}
@@ -2241,6 +2243,7 @@ async function beginSimulationFlow(reasonParam) {
   SIM_STATE.blocker = blocker;
   SIM_STATE.context = {};
   SIM_STATE.branch_history = [];
+  tipsShown.clear(); // Reset tips for new blocker flow
   // Don't reset simTapCount — it's restored from localStorage
   // so users can't get free taps by switching blockers
 
@@ -3169,7 +3172,7 @@ const PRO_TIPS = [
 // Render a locked tip card (shown before first tap)
 function renderLockedTip(tipNum, promptText) {
   tipNum = tipNum || 1;
-  promptText = promptText || 'Choose your first move to unlock your first negotiation tip';
+  promptText = promptText || 'Choose your first move to unlock a negotiation tip';
   // Remove any existing locked card
   const existing = document.getElementById('pro-tip-locked');
   if (existing) existing.remove();
@@ -3178,14 +3181,10 @@ function renderLockedTip(tipNum, promptText) {
   wrap.id = 'pro-tip-locked';
   wrap.innerHTML = `
     <div class="pro-tip-card pro-tip-locked">
-      <div class="pro-tip-top">
-        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
-        <div class="pro-tip-num">#${tipNum}</div>
-      </div>
-      <div class="pro-tip-locked-body">
-        <div class="pro-tip-locked-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
-        <div class="pro-tip-locked-text"><b>${promptText}</b></div>
-      </div>
+      <div class="pro-tip-locked-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+      <div class="pro-tip-locked-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+      <div class="pro-tip-locked-num">#${tipNum}</div>
+      <div class="pro-tip-locked-text">${promptText}</div>
     </div>
   `;
   const chatEl = $('messages');
