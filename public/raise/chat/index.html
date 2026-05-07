@@ -288,6 +288,22 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .promo-timer-icon{width:14px;height:14px;}
 .promo-timer-num{font-variant-numeric:tabular-nums;}
 
+/* ── Pro tip cards (gamification reward per tap) ───────── */
+.pro-tip-card{border-radius:10px;padding:14px 16px;margin:4px 0;position:relative;overflow:hidden;}
+.pro-tip-locked{background:linear-gradient(135deg,#f8f6f0,#f0ede4);border:1px dashed #d4c9a8;}
+.pro-tip-revealed{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;animation:tipReveal 0.4s ease;}
+.pro-tip-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.pro-tip-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#b8960c;}
+.pro-tip-badge svg{width:14px;height:14px;}
+.pro-tip-num{font-size:10px;color:#c9a84c;font-weight:600;background:rgba(201,168,76,0.12);padding:2px 8px;border-radius:10px;}
+.pro-tip-locked-body{text-align:center;padding:6px 0;}
+.pro-tip-locked-icon{font-size:18px;opacity:0.35;margin-bottom:4px;}
+.pro-tip-locked-text{font-size:12px;color:#a09070;}
+.pro-tip-locked-text b{color:#8a7540;font-weight:600;}
+.pro-tip-text{font-size:13px;color:#5a4a20;line-height:1.6;}
+.pro-tip-text b{color:#3d3010;font-weight:700;}
+@keyframes tipReveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
 /* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
   flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
@@ -2380,6 +2396,13 @@ async function startSimulationAtBlocker() {
   const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
   renderOpeningChips();
+
+  // Show locked pro tip card — nudge for first tap
+  if (simTapCount === 0) {
+    await sleep(200);
+    renderLockedTip();
+  }
+
   // Scroll to bridge bubble after DOM settles
   await sleep(150);
   if (bridgeBubble) {
@@ -2557,6 +2580,7 @@ function renderOpeningChips() {
     if (incrementSimTaps()) {
       showSimulationPaywall(null);
     } else {
+      if (simTapCount === 1) renderProTip(0);
       await loadManagerResponseToOpening(text);
     }
   });
@@ -2590,6 +2614,8 @@ async function pickOpening(opener, pill, container) {
   if (incrementSimTaps()) {
     showSimulationPaywall(null);
   } else {
+    // Show Tip #1 instantly — user reads it during API wait
+    if (simTapCount === 1) renderProTip(0);
     await loadManagerResponseToOpening(opener.text, turnNodes);
   }
 }
@@ -2824,6 +2850,9 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   appendUserBubble('My manager\u2019s response theme:\n' + scenario.type.replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, ''));
   await sleep(200);
 
+  // Show Tip #2 instantly — user reads it during API wait
+  if (simTapCount === 2) renderProTip(1);
+
   // If we hit the tap limit on this very tap, show paywall
   if (hitLimit) {
     await sleep(300);
@@ -2967,6 +2996,7 @@ function renderReplyPillsFlat(replies, scenario) {
     if (incrementSimTaps()) {
       showSimulationPaywall(scenario);
     } else {
+      if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
       continueConversation(scenario, turnNodes);
     }
   };
@@ -3067,6 +3097,103 @@ const SIM_FREE_TAPS = 3;
 const LS_TAP_COUNT = 'rl_raise_tap_count';
 let simTapCount = 0;
 
+// ── Pro tips — shown one per tap as a reward ──────────────────────
+// Order ranked by influence: hook → weapon → validation → practical → research
+const PRO_TIPS = [
+  {
+    num: 1,
+    text: `<b>Never say "compensation." Say "career growth."</b> Your manager hears the first as a demand, the second as ambition. Same conversation, completely different reaction. This one word change doubles your chance of a positive opening.`,
+  },
+  {
+    num: 2,
+    text: `<b>The silence after your ask is your most powerful tool.</b> Columbia researchers found that negotiators who pause for at least 5 seconds after stating their number get better outcomes 70% of the time. Say your number. Stop. Most people fill the gap with "but I'm flexible" — every word after the ask weakens it.`,
+  },
+  {
+    num: 3,
+    text: `<b>People who practice out loud get 12-18% better outcomes.</b> Not thinking about it — actually saying the words. George Mason University research showed that verbal rehearsal rewires your brain's threat response. What feels like a confrontation starts feeling like a conversation. That's exactly what you're doing right now.`,
+  },
+  {
+    num: 4,
+    text: `<b>Giving a range? They'll only hear the bottom number.</b> If you say $85-95K, expect $85K. Set your floor at what you'd actually accept, then add 10% on top. Say $90-100K to land at $90K.`,
+  },
+  {
+    num: 5,
+    text: `<b>Ask in person or on video — never over email.</b> MIT research found that face-to-face requests are 34x more effective than written ones. Email gives your manager time to build a "no" case. In person, they respond to your confidence, not just your words.`,
+  },
+  {
+    num: 6,
+    text: `<b>Don't ask "Can I get a raise?" Ask "What would need to happen for me to reach $X by Q3?"</b> Stanford research found that framing raises as a joint problem increases success rates by 42%. The first question gets a yes or no. The second gets a roadmap.`,
+  },
+  {
+    num: 7,
+    text: `<b>Bring a number from outside your company, not inside.</b> Saying "John makes more than me" starts a political conversation. Saying "The market rate for this role in our city is $X" starts a business conversation. Managers can't argue with the market.`,
+  },
+  {
+    num: 8,
+    text: `<b>Never negotiate on Friday.</b> Managers are mentally checked out and will defer — "let's talk Monday" means never. Harvard Business Review found that requests made Tuesday-Wednesday morning get approved 20% more often. Time your ask accordingly.`,
+  },
+  {
+    num: 9,
+    text: `<b>When your manager says "let me think about it," you have exactly 48 hours.</b> After that, the conversation dies. Send a short follow-up: "Wanted to circle back on our conversation. I'm excited about the path forward — is there anything else you need from me to move this along?"`,
+  },
+  {
+    num: 10,
+    text: `<b>Employees who negotiate earn $1-1.5M more over a 45-year career.</b> That's not motivation talk — that's compounding math from Carnegie Mellon research. A $5,000 raise at age 30 becomes $600,000+ by retirement. Every raise after builds on top of it.`,
+  },
+];
+
+// Render a locked tip card (shown before first tap)
+function renderLockedTip() {
+  const wrap = el('div', 'coach-msg', '');
+  wrap.id = 'pro-tip-locked';
+  wrap.innerHTML = `
+    <div class="pro-tip-card pro-tip-locked">
+      <div class="pro-tip-top">
+        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+        <div class="pro-tip-num">#1</div>
+      </div>
+      <div class="pro-tip-locked-body">
+        <div class="pro-tip-locked-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+        <div class="pro-tip-locked-text"><b>Choose your first move</b> to unlock your first negotiation tip</div>
+      </div>
+    </div>
+  `;
+  const chatEl = $('messages');
+  if (chatEl) chatEl.appendChild(wrap);
+  return wrap;
+}
+
+// Render a revealed tip card (shown after each tap)
+function renderProTip(tipIndex) {
+  // Remove locked card if still present
+  const locked = document.getElementById('pro-tip-locked');
+  if (locked) locked.remove();
+
+  const tip = PRO_TIPS[tipIndex];
+  if (!tip) return null;
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="pro-tip-card pro-tip-revealed">
+      <div class="pro-tip-top">
+        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+        <div class="pro-tip-num">#${tip.num}</div>
+      </div>
+      <div class="pro-tip-text">${tip.text}</div>
+    </div>
+  `;
+  const chatEl = $('messages');
+  if (chatEl) chatEl.appendChild(wrap);
+  scrollChatToBottom();
+
+  // Track
+  try {
+    if (typeof window.clarity === 'function') window.clarity('event', 'pro_tip_shown_' + tip.num);
+  } catch (e) {}
+
+  return wrap;
+}
+
 // Restore tap count from localStorage on load
 try {
   const saved = parseInt(localStorage.getItem(LS_TAP_COUNT) || '0', 10);
@@ -3111,6 +3238,7 @@ function pickReply(reply, pill, container, scenario) {
   if (incrementSimTaps()) {
     setTimeout(() => showSimulationPaywall(scenario), 800);
   } else {
+    if (simTapCount >= 1 && simTapCount <= 3) renderProTip(simTapCount - 1);
     setTimeout(() => continueConversation(scenario, turnNodes), 400);
   }
 }
@@ -3357,6 +3485,10 @@ function goBack() {
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
 async function showSimulationPaywall(lastScenario) {
+  // Show Tip #3 — the validation tip — before the paywall
+  renderProTip(2);
+  await sleep(400);
+
   await typeCoachBubble("You've explored the free preview. Unlock the full practice session to **cover every scenario and every response.**");
   await sleep(300);
 
