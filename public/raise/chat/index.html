@@ -289,11 +289,11 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .promo-timer-num{font-variant-numeric:tabular-nums;}
 
 /* ── Depth revelation card (branches visual) ──────────── */
-.depth-card{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:8px;padding:12px;margin:4px 0;}
-.depth-card-text{font-size:11px;color:rgba(201,168,76,0.8);line-height:1.6;}
-.depth-card-text b{color:#c9a84c;}
-.depth-card-stat{text-align:center;margin-top:6px;font-size:10px;color:rgba(201,168,76,0.5);}
-.depth-card-stat b{color:rgba(201,168,76,0.8);}
+.depth-card{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:14px 16px;margin:4px 0;}
+.depth-card-text{font-size:13px;color:#5a4a20;line-height:1.6;}
+.depth-card-text b{color:#3d3010;font-weight:700;}
+.depth-card-stat{text-align:center;margin-top:6px;font-size:11px;color:#8a7540;line-height:1.5;}
+.depth-card-stat b{color:#3d3010;font-weight:700;}
 
 /* ── Pro tip cards (gamification reward per tap) ───────── */
 .pro-tip-card{border-radius:10px;padding:14px 16px;margin:4px 0;position:relative;overflow:hidden;}
@@ -2852,64 +2852,64 @@ function renderDepthCard() {
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="depth-card">
-      <div class="depth-card-text">You're at <b>step 2</b> of a 6-8 step negotiation. From here, this conversation branches <b>4 ways</b> — and each of those branches <b>3 more times</b>. Hundreds of possible paths.</div>
+      <div class="depth-card-text">You're at <b>step 2</b> of a 6-8 step negotiation. From here, this conversation branches in different ways. Hundreds of possible paths.</div>
       <svg width="100%" height="55" viewBox="0 0 320 55" style="margin:8px 0 2px;">
         <circle cx="22" cy="27" r="5" fill="#c9a84c"/>
         <line x1="27" y1="27" x2="55" y2="27" stroke="#c9a84c" stroke-width="1.5"/>
         <circle cx="60" cy="27" r="5" fill="#c9a84c"/>
         <line x1="65" y1="27" x2="93" y2="27" stroke="#c9a84c" stroke-width="1.5"/>
         <circle cx="98" cy="27" r="6" fill="#c9a84c" stroke="rgba(201,168,76,0.4)" stroke-width="2"/>
-        <line x1="104" y1="27" x2="138" y2="8" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
-        <line x1="104" y1="27" x2="138" y2="20" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
-        <line x1="104" y1="27" x2="138" y2="34" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
-        <line x1="104" y1="27" x2="138" y2="46" stroke="rgba(201,168,76,0.3)" stroke-width="1"/>
-        <circle cx="140" cy="8" r="3.5" fill="rgba(201,168,76,0.2)"/>
-        <circle cx="140" cy="20" r="3.5" fill="rgba(201,168,76,0.2)"/>
-        <circle cx="140" cy="34" r="3.5" fill="rgba(201,168,76,0.2)"/>
-        <circle cx="140" cy="46" r="3.5" fill="rgba(201,168,76,0.2)"/>
-        <line x1="144" y1="8" x2="172" y2="4" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="8" x2="172" y2="8" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="8" x2="172" y2="12" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="20" x2="172" y2="17" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="20" x2="172" y2="21" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="20" x2="172" y2="25" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="34" x2="172" y2="31" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="34" x2="172" y2="35" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="34" x2="172" y2="39" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="46" x2="172" y2="43" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="46" x2="172" y2="47" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <line x1="144" y1="46" x2="172" y2="51" stroke="rgba(201,168,76,0.15)" stroke-width="0.8"/>
-        <circle cx="174" cy="4" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="8" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="12" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="17" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="21" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="25" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="31" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="35" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="39" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="43" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="47" r="2" fill="rgba(201,168,76,0.1)"/>
-        <circle cx="174" cy="51" r="2" fill="rgba(201,168,76,0.1)"/>
-        <line x1="176" y1="4" x2="198" y2="3" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="4" x2="198" y2="5" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="8" x2="198" y2="7" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="8" x2="198" y2="9" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="12" x2="198" y2="11" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="12" x2="198" y2="13" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="17" x2="198" y2="16" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="17" x2="198" y2="18" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="21" x2="198" y2="20" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="21" x2="198" y2="22" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="25" x2="198" y2="24" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <line x1="176" y1="25" x2="198" y2="26" stroke="rgba(201,168,76,0.08)" stroke-width="0.5"/>
-        <text x="210" y="29" fill="rgba(201,168,76,0.35)" font-size="9" font-family="inherit">hundreds</text>
-        <text x="210" y="39" fill="rgba(201,168,76,0.35)" font-size="9" font-family="inherit">of paths...</text>
-        <text x="15" y="48" fill="rgba(201,168,76,0.4)" font-size="8" font-family="inherit">you</text>
-        <text x="53" y="48" fill="rgba(201,168,76,0.4)" font-size="8" font-family="inherit">mgr</text>
+        <line x1="104" y1="27" x2="138" y2="8" stroke="rgba(154,130,40,0.5)" stroke-width="1"/>
+        <line x1="104" y1="27" x2="138" y2="20" stroke="rgba(154,130,40,0.5)" stroke-width="1"/>
+        <line x1="104" y1="27" x2="138" y2="34" stroke="rgba(154,130,40,0.5)" stroke-width="1"/>
+        <line x1="104" y1="27" x2="138" y2="46" stroke="rgba(154,130,40,0.5)" stroke-width="1"/>
+        <circle cx="140" cy="8" r="3.5" fill="rgba(154,130,40,0.4)"/>
+        <circle cx="140" cy="20" r="3.5" fill="rgba(154,130,40,0.4)"/>
+        <circle cx="140" cy="34" r="3.5" fill="rgba(154,130,40,0.4)"/>
+        <circle cx="140" cy="46" r="3.5" fill="rgba(154,130,40,0.4)"/>
+        <line x1="144" y1="8" x2="172" y2="4" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="8" x2="172" y2="8" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="8" x2="172" y2="12" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="20" x2="172" y2="17" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="20" x2="172" y2="21" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="20" x2="172" y2="25" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="34" x2="172" y2="31" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="34" x2="172" y2="35" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="34" x2="172" y2="39" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="46" x2="172" y2="43" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="46" x2="172" y2="47" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <line x1="144" y1="46" x2="172" y2="51" stroke="rgba(154,130,40,0.35)" stroke-width="0.8"/>
+        <circle cx="174" cy="4" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="8" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="12" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="17" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="21" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="25" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="31" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="35" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="39" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="43" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="47" r="2" fill="rgba(154,130,40,0.25)"/>
+        <circle cx="174" cy="51" r="2" fill="rgba(154,130,40,0.25)"/>
+        <line x1="176" y1="4" x2="198" y2="3" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="4" x2="198" y2="5" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="8" x2="198" y2="7" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="8" x2="198" y2="9" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="12" x2="198" y2="11" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="12" x2="198" y2="13" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="17" x2="198" y2="16" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="17" x2="198" y2="18" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="21" x2="198" y2="20" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="21" x2="198" y2="22" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="25" x2="198" y2="24" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <line x1="176" y1="25" x2="198" y2="26" stroke="rgba(154,130,40,0.2)" stroke-width="0.5"/>
+        <text x="210" y="29" fill="#8a7540" font-size="9" font-family="inherit">hundreds</text>
+        <text x="210" y="39" fill="#8a7540" font-size="9" font-family="inherit">of paths...</text>
+        <text x="15" y="48" fill="#8a7540" font-size="8" font-family="inherit">you</text>
+        <text x="53" y="48" fill="#8a7540" font-size="8" font-family="inherit">mgr</text>
         <text x="89" y="48" fill="#c9a84c" font-size="8" font-weight="600" font-family="inherit">YOU</text>
       </svg>
-      <div class="depth-card-stat">A typical raise conversation takes <b>10-20 min</b> with 4-6 more exchanges after this point.</div>
+      <div class="depth-card-stat">A typical raise conversation takes <b>10-20 min</b>, with 4-6 more exchanges afterward.</div>
     </div>
   `;
   $('messages').appendChild(wrap);
