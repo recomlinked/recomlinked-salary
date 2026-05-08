@@ -3751,7 +3751,7 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Coaches charge $150\u2013300/hour to practice these scenarios. Unlock all of them and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them and practice anytime you want.");
   } else {
     await typeCoachBubble("You\u2019ve explored the free preview. Coaches charge $150\u2013300/hour to practice these exact scenarios. Unlock all of them and practice anytime you want.");
   }
@@ -4837,7 +4837,7 @@ async function renderPaywallBubble(opts) {
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <div class="paywall-pitch">You've seen how it works. Unlock every scenario now. You'll have every response prepared before the conversation starts. We're confident this works <span class="paywall-refund">if not, we'll give you a full refund.</span></div>
+      <div class="paywall-pitch">You've seen how it works. Unlock every scenario now.</div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
         Practice every scenario · ${ctaPrice} <span class="btn-pay-arrow">→</span>
       </button>
