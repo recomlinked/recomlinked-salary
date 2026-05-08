@@ -837,6 +837,16 @@ const PROMO_CODE       = 'RAISE26';
 const PROMO_PRICE_USD  = 29;
 const PROMO_DURATION_S = 30 * 60; // 30 minutes
 const LS_PROMO_START   = 'rl_promo_start'; // localStorage key for timer start
+const LS_PAYWALL_COUNT = 'rl_paywall_count'; // how many times this user has seen paywall
+
+function getPaywallCount() {
+  try { return parseInt(localStorage.getItem(LS_PAYWALL_COUNT), 10) || 0; } catch (e) { return 0; }
+}
+function incrementPaywallCount() {
+  var count = getPaywallCount() + 1;
+  try { localStorage.setItem(LS_PAYWALL_COUNT, String(count)); } catch (e) {}
+  return count;
+}
 let   promoShownThisSession = false; // runtime flag — only true after renderPromoBanner() succeeds
 let   tipsShown = new Set(); // track which tip indices have been shown this session
 
@@ -2307,7 +2317,9 @@ async function beginSimulationFlow(reasonParam) {
     state.current_range = state.current_range || { floor: 45, ceiling: 70 };
     state.initial_floor = state.initial_floor || 45;
     await renderPaywallBubble({ animated: true, discounted: true });
-    logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null });
+    var paywallHitNumber = incrementPaywallCount();
+    logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null, paywall_count: paywallHitNumber });
+    logSession('paywall', { paywall_seen: true, paywall_count: paywallHitNumber });
     showToolbar();
     showModeToggle();
     showHeaderPurchaseButton({ discounted: true });
@@ -2334,13 +2346,6 @@ async function beginSimulationFlow(reasonParam) {
     country: 'unknown',
     seniority: 'unknown',
     previous_session_id: previousSessionId,
-  });
-  logSession('analyze', {
-    initial_range: 'sim',
-    landing_ref: reasonParam,
-    path: 'B',
-    blocker_code: blocker.code,
-    obstacle_code: blocker.code,
   });
 
   // Go straight to opening lines — no mini demo, no ACK, no waiting
@@ -3787,8 +3792,11 @@ async function showSimulationPaywall(lastScenario) {
   state.current_range = state.current_range || { floor: 45, ceiling: 70 };
   state.initial_floor = state.initial_floor || 45;
 
+  var paywallHitNumber = incrementPaywallCount();
+
   logSession('paywall', {
     paywall_seen: true,
+    paywall_count: paywallHitNumber,
     path: 'simulation',
     taps: simTapCount,
     blocker_code: SIM_STATE.blocker?.code || '',
@@ -4717,8 +4725,9 @@ async function showPaywall() {
 
   // Animated render — the trust moment. Headline types, middle types, rest fades in.
   await renderPaywallBubble({ animated: true });
-  logEntry('paywall', {});
-  logSession('paywall', { paywall_seen: true });
+  var paywallHitNumber = incrementPaywallCount();
+  logEntry('paywall', { paywall_count: paywallHitNumber });
+  logSession('paywall', { paywall_seen: true, paywall_count: paywallHitNumber });
   unlockModeToggle();
 
   // GA4 + Clarity — paywall_viewed
