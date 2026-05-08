@@ -3531,7 +3531,24 @@ function showUnlockToast(anchorEl) {
   if (old) old.remove();
 
   const toast = el('div', 'unlock-toast', '');
-  toast.innerHTML = 'Unlock to practice this scenario <span class="unlock-toast-btn" onclick="scrollToPaywall()">Unlock now →</span>';
+  const textNode = document.createTextNode('Unlock to practice this scenario ');
+  toast.appendChild(textNode);
+  const btn = el('span', 'unlock-toast-btn', 'Unlock now \u2192');
+  btn.addEventListener('click', function() {
+    const pw = document.querySelector('.paywall-bubble');
+    if (pw) {
+      pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const cta = pw.querySelector('.cta-btn');
+      if (cta) {
+        cta.style.transition = 'transform 0.15s';
+        cta.style.transform = 'scale(1.05)';
+        setTimeout(() => { cta.style.transform = 'scale(1)'; }, 300);
+      }
+    }
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  });
+  toast.appendChild(btn);
   document.body.appendChild(toast);
 
   // Animate in
@@ -3547,23 +3564,6 @@ function showUnlockToast(anchorEl) {
   try {
     if (typeof window.clarity === 'function') window.clarity('event', 'unlock_toast_shown');
   } catch (e) {}
-}
-
-function scrollToPaywall() {
-  const pw = document.querySelector('.paywall-bubble');
-  if (pw) {
-    pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Pulse the CTA button
-    const cta = pw.querySelector('.cta-btn');
-    if (cta) {
-      cta.style.transition = 'transform 0.15s';
-      cta.style.transform = 'scale(1.05)';
-      setTimeout(() => { cta.style.transform = 'scale(1)'; }, 300);
-    }
-  }
-  // Remove toast
-  const toast = document.querySelector('.unlock-toast');
-  if (toast) { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }
 }
 
 async function showSimulationPaywall(lastScenario) {
