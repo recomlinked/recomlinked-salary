@@ -3778,9 +3778,9 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $39 and practice anytime you want.");
   } else {
-    await typeCoachBubble("You\u2019ve explored the free preview. Coaches charge $150\u2013300/hour to practice these exact scenarios. Unlock all of them and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $39 and practice anytime you want.");
   }
   await sleep(300);
 
@@ -4774,15 +4774,8 @@ function renderPromoBanner() {
   const s = remaining % 60;
   wrap.innerHTML = `
     <div class="promo-banner">
-      <div class="promo-badge">Limited time</div>
-      <div class="promo-text">Get 25% off</div>
-      <div class="promo-price">
-        <span class="promo-old">$${PRICE_USD}</span>
-        <span class="promo-arrow">\u2192</span>
-        <span class="promo-new">$${PROMO_PRICE_USD}</span>
-      </div>
+      <div class="promo-badge">Limited time: 25% off</div>
       <div class="promo-code-wrap"><span class="promo-code" id="promo-code-btn">${PROMO_CODE}<svg class="promo-copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></span></div>
-      <div class="promo-tap" id="promo-tap-hint">Copy code and use at checkout</div>
       <div class="promo-timer"><svg class="promo-timer-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Expires in <span class="promo-timer-num" id="promo-timer-num">${m}:${s < 10 ? '0' : ''}${s}</span></div>
     </div>
   `;
@@ -4862,13 +4855,13 @@ async function renderPaywallBubble(opts) {
     ? `<span style="text-decoration:line-through;opacity:0.45;font-weight:500;font-size:13px;">$${PRICE_USD}</span> <span style="font-weight:800;">$${PROMO_PRICE_USD}</span>`
     : `$${PRICE_USD}`;
 
-  const headline = `Walk in ready.`;
+  const headline = `Walk into the negotiation ready.`;
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
-      <div class="paywall-pitch">You've seen how it works. Unlock every scenario now.</div>
+      <div class="paywall-pitch"></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
         Practice every scenario · ${ctaPrice} <span class="btn-pay-arrow">→</span>
       </button>
