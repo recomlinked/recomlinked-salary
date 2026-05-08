@@ -611,10 +611,10 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
 .chip-chevron{display:none;}
-.chip-radio{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);margin-top:2px;display:flex;align-items:center;justify-content:center;}
-.sim-reply-pill:hover .chip-radio{border-color:rgba(0,196,160,0.5);}
-.sim-reply-pill.active .chip-radio{border-color:#00c4a0;background:#00c4a0;}
-.sim-reply-pill.active .chip-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#07090f;}
+.chip-radio{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:2px solid var(--divider);margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.sim-reply-pill:hover .chip-radio{border-color:var(--teal);}
+.sim-reply-pill.active .chip-radio{border-color:var(--teal);background:var(--teal);}
+.sim-reply-pill.active .chip-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--bg);}
 .chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
 .empathy-section{padding:16px 16px 12px;margin-bottom:4px;}
 .empathy-title{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:14px;letter-spacing:-0.01em;}
