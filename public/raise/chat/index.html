@@ -289,9 +289,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .promo-timer-num{font-variant-numeric:tabular-nums;}
 
 /* ── Locked pills (cliffhanger paywall) ────────────────── */
-.sim-reply-pill.locked{opacity:0.5;cursor:default;position:relative;}
-.sim-reply-pill.locked:hover{border-color:var(--divider);background:var(--card);}
-.sim-reply-pill.locked .lock-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--t3);opacity:0.5;}
+.sim-reply-pill.locked{opacity:0.5;cursor:pointer;position:relative;}
+.sim-reply-pill.locked:hover{border-color:var(--divider);background:var(--card);opacity:0.6;}
+.sim-reply-pill.locked .lock-icon{flex-shrink:0;font-size:14px;color:var(--t3);opacity:0.5;display:flex;align-items:center;}
 
 /* ── Depth revelation card (branches visual) ──────────── */
 .depth-card{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:14px 16px;margin:4px 0;}
@@ -3703,10 +3703,15 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
 
   scenarios.forEach((s) => {
     const pill = el('button', 'sim-reply-pill locked', '');
-    pill.disabled = true;
+    pill.disabled = false;
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
     pill.style.gap = '8px';
+
+    // Lock icon on left
+    const lock = el('span', 'lock-icon', '');
+    lock.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+    pill.appendChild(lock);
 
     const content = el('div', '', '');
     content.style.flex = '1';
@@ -3724,10 +3729,11 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
     }
     pill.appendChild(content);
 
-    // Lock icon
-    const lock = el('span', 'lock-icon', '');
-    lock.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
-    pill.appendChild(lock);
+    // Click scrolls to paywall
+    pill.addEventListener('click', function() {
+      const pw = document.querySelector('.paywall-bubble');
+      if (pw) pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
 
     row.appendChild(pill);
   });
@@ -3745,7 +3751,7 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Unlock to continue practicing.");
+    await typeCoachBubble("Coaches charge $150\u2013300/hour to practice these scenarios. Unlock all of them and practice anytime you want.");
   } else {
     await typeCoachBubble("You\u2019ve explored the free preview. Coaches charge $150\u2013300/hour to practice these exact scenarios. Unlock all of them and practice anytime you want.");
   }
