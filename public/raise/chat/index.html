@@ -775,12 +775,29 @@ const _UTM = (function() {
   };
 })();
 
+// ── Persistent user ID — survives across sessions/blockers ──
+const LS_USER_ID = 'rl_user_id';
+function getUserId() {
+  try {
+    let uid = localStorage.getItem(LS_USER_ID);
+    if (!uid) {
+      uid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem(LS_USER_ID, uid);
+    }
+    return uid;
+  } catch (e) {
+    return 'u_unknown';
+  }
+}
+const USER_ID = getUserId();
+
 function logSession(stage, extra) {
   const payload = {
     timestamp: new Date().toISOString(),
     event: 'RAISE_SESSION',
     product: 'raise',
     session_id: profileHash(),
+    user_id: USER_ID,
     stage,
     duration_s: Math.round((Date.now() - SESSION_START_TIME) / 1000),
     source: document.referrer || window.location.href,
@@ -2304,6 +2321,7 @@ async function beginSimulationFlow(reasonParam) {
   state.chat_log = [];
   state.current_exchange = 10;
   state.sim_reason = reasonParam;
+  const previousSessionId = state.sim_session_id || '';
   state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   saveState();
 
@@ -2315,6 +2333,7 @@ async function beginSimulationFlow(reasonParam) {
     path: 'B',
     country: 'unknown',
     seniority: 'unknown',
+    previous_session_id: previousSessionId,
   });
   logSession('analyze', {
     initial_range: 'sim',
@@ -2589,6 +2608,9 @@ function renderOpeningChips() {
   $('messages').appendChild(wrap);
   simBranchAnchor = wrap;
   scrollChatToBottom();
+
+  // Log that user saw the interactive chips
+  logSession('chips_seen', { chip_type: 'openings', count: openings.length });
 
   // Allow typing a custom opening
   enableInput('Tap an opening or type your own\u2026');
