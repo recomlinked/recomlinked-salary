@@ -610,7 +610,11 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;}
 .sim-reply-pill.active .sim-reply-theme{color:var(--teal);}
 .sim-reply-pill.active .sim-reply-preview{color:rgba(0,196,160,0.5);}
-.chip-chevron{flex-shrink:0;font-size:14px;color:var(--t4);align-self:center;margin-left:auto;padding-left:4px;}
+.chip-chevron{display:none;}
+.chip-radio{flex-shrink:0;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.sim-reply-pill:hover .chip-radio{border-color:rgba(0,196,160,0.5);}
+.sim-reply-pill.active .chip-radio{border-color:#00c4a0;background:#00c4a0;}
+.sim-reply-pill.active .chip-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:#07090f;}
 .chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
 .empathy-section{padding:16px 16px 12px;margin-bottom:4px;}
 .empathy-title{font-size:17px;font-weight:700;color:var(--t1);margin-bottom:14px;letter-spacing:-0.01em;}
@@ -2570,9 +2574,11 @@ function renderOpeningChips() {
     preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
     content.appendChild(preview);
 
+    // Radio circle (pick-one indicator)
+    const radio = el('div', 'chip-radio', '');
+    pill.insertBefore(radio, pill.firstChild);
+
     pill.appendChild(content);
-    const chev = el('span', 'chip-chevron', '›');
-    pill.appendChild(chev);
     pill.onclick = () => pickOpening(opener, pill, row);
 
     if (i < INITIAL_SHOW) {
@@ -2847,9 +2853,11 @@ function renderScenarioLabels(scenarios) {
       preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
       content.appendChild(preview);
     }
+    // Radio circle
+    const radio = el('div', 'chip-radio', '');
+    pill.insertBefore(radio, pill.firstChild);
+
     pill.appendChild(content);
-    const chev = el('span', 'chip-chevron', '›');
-    pill.appendChild(chev);
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
     row.appendChild(pill);
@@ -3201,9 +3209,11 @@ function renderReplyPillsFlat(replies, scenario) {
       preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
       content.appendChild(preview);
     }
+    // Radio circle
+    const radio = el('div', 'chip-radio', '');
+    pill.insertBefore(radio, pill.firstChild);
+
     pill.appendChild(content);
-    const chev = el('span', 'chip-chevron', '›');
-    pill.appendChild(chev);
     pill.onclick = () => pickReply(r, pill, row, scenario);
 
     if (i < INITIAL_SHOW) {
