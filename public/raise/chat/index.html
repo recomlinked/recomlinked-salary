@@ -306,6 +306,11 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .pro-tip-text b{color:#3d3010;font-weight:700;}
 @keyframes tipReveal{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
+/* ── Unlock toast (nudge after paywall) ────────────────── */
+.unlock-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:500;z-index:100;opacity:0;transition:opacity 0.2s;pointer-events:none;display:flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.unlock-toast.show{opacity:1;pointer-events:auto;}
+.unlock-toast-btn{color:#c9a84c;font-weight:700;cursor:pointer;text-decoration:underline;white-space:nowrap;}
+
 /* ── Bottom panel ──────────────────────────────────────── */
 .bottom-panel{
   flex-shrink:0;background:var(--page);border-top:1px solid var(--divider);
@@ -2594,6 +2599,12 @@ function renderOpeningChips() {
 }
 
 async function pickOpening(opener, pill, container) {
+  // If paywall already shown, nudge user to the CTA
+  if (state.paywall_shown && !state.paid) {
+    showUnlockToast(pill);
+    return;
+  }
+
   // Show mode banner on first tap (not before)
   if (!document.querySelector('.mode-banner')) {
     insertModeBanner('sim');
@@ -2841,6 +2852,12 @@ function renderScenarioLabels(scenarios) {
 //   4. user-bubble: the chosen reply (full text)
 //   5. paywall
 async function expandScenario(scenario, index, pill, pillContainer, parentWrap, allScenarios) {
+  // If paywall already shown, nudge user to the CTA instead of replaying paywall
+  if (state.paywall_shown && !state.paid) {
+    showUnlockToast(pill);
+    return;
+  }
+
   // Clear any existing branch content (previous scenario's messages)
   clearBranchContent();
 
@@ -3235,6 +3252,12 @@ let simTurnElements = [];
 // User picked a reply pill: show their reply, then continue the
 // conversation with the manager's follow-up responses.
 function pickReply(reply, pill, container, scenario) {
+  // If paywall already shown, nudge user to the CTA
+  if (state.paywall_shown && !state.paid) {
+    showUnlockToast(pill);
+    return;
+  }
+
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
     p.disabled = true;
@@ -3501,6 +3524,48 @@ function goBack() {
 // back button of the given type by calling goBack(). The toolbar
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
+// ── Unlock toast — nudge users who click chips after paywall ──
+function showUnlockToast(anchorEl) {
+  // Remove existing toast
+  const old = document.querySelector('.unlock-toast');
+  if (old) old.remove();
+
+  const toast = el('div', 'unlock-toast', '');
+  toast.innerHTML = 'Unlock to practice this scenario <span class="unlock-toast-btn" onclick="scrollToPaywall()">Unlock now →</span>';
+  document.body.appendChild(toast);
+
+  // Animate in
+  requestAnimationFrame(() => toast.classList.add('show'));
+
+  // Auto-dismiss after 4s
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+
+  // Track
+  try {
+    if (typeof window.clarity === 'function') window.clarity('event', 'unlock_toast_shown');
+  } catch (e) {}
+}
+
+function scrollToPaywall() {
+  const pw = document.querySelector('.paywall-bubble');
+  if (pw) {
+    pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Pulse the CTA button
+    const cta = pw.querySelector('.cta-btn');
+    if (cta) {
+      cta.style.transition = 'transform 0.15s';
+      cta.style.transform = 'scale(1.05)';
+      setTimeout(() => { cta.style.transform = 'scale(1)'; }, 300);
+    }
+  }
+  // Remove toast
+  const toast = document.querySelector('.unlock-toast');
+  if (toast) { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }
+}
+
 async function showSimulationPaywall(lastScenario) {
   await typeCoachBubble("You\u2019ve explored the free preview. Coaches charge $150\u2013300/hour to practice these exact scenarios. Unlock all of them and practice anytime you want.");
   await sleep(300);
