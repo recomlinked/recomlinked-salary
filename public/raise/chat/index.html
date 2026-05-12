@@ -862,7 +862,7 @@ function logSession(stage, extra) {
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 // Price — single source of truth. Change here to retest.
-const PRICE_USD = 39;
+const PRICE_USD = 19;
 
 // Promo discount — shown on second paywall view (returning users)
 const PROMO_CODE       = 'RAISE26';
@@ -983,12 +983,12 @@ const OBSTACLE_HOOKS = {
 // Proof lines — single-line claims that anchor the "cost is nothing compared
 // to the reward" framing. One shows per paywall card, randomly picked with
 // obstacle-specific weighting. Key phrases use <strong> for visual weight.
-// All lines frame $39 as trivial vs the dollar value or time-value of a raise.
+// All lines frame $19 as trivial vs the dollar value or time-value of a raise.
 const PROOF_LINES = [
   { text: `<strong>Your first raise pays this back over 60×.</strong>`,                                    weight: { all: 2 } },
-  { text: `<strong>$39 once, for a conversation that adds thousands to your salary.</strong>`,             weight: { all: 2 } },
+  { text: `<strong>$19 once, for a conversation that adds thousands to your salary.</strong>`,             weight: { all: 2 } },
   { text: `<strong>Your raise pays this back in week one.</strong>`,                                       weight: { all: 2 } },
-  { text: `<strong>$39 once, a raise that lasts years.</strong>`,                                          weight: { all: 2 } },
+  { text: `<strong>$19 once, a raise that lasts years.</strong>`,                                          weight: { all: 2 } },
 ];
 
 function pickProofLine(obstacleCode) {
@@ -2343,7 +2343,7 @@ async function beginSimulationFlow(reasonParam) {
     await sleep(300);
 
     // Show promo discount banner for returning users
-    renderPromoBanner();
+    // No promo — clean $19 price
     await sleep(200);
 
     state.current_range = state.current_range || { floor: 45, ceiling: 70 };
@@ -2354,7 +2354,7 @@ async function beginSimulationFlow(reasonParam) {
     logSession('paywall', { paywall_seen: true, paywall_count: paywallHitNumber });
     showToolbar();
     showModeToggle();
-    showHeaderPurchaseButton({ discounted: true });
+    showHeaderPurchaseButton({});
     enableInput('Ask me anything\u2026');
     awaitFreeText(handlePostPaywallText);
     return;
@@ -3933,9 +3933,9 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $39 and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 and practice anytime you want.");
   } else {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $39 and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 and practice anytime you want.");
   }
   await sleep(300);
 
@@ -3961,7 +3961,7 @@ async function showSimulationPaywall(lastScenario) {
   });
 
   // Show promo banner on first paywall hit — limited time 25% off
-  renderPromoBanner();
+  // No promo — clean $19 price
   await sleep(200);
 
   await renderPaywallBubble({ animated: true, discounted: true });
@@ -4224,7 +4224,7 @@ async function resumeFromState() {
 
   // If paywall was already shown, restore the header CTA immediately
   if (state.paywall_shown) {
-    showHeaderPurchaseButton({ discounted: isPromoActive() });
+    showHeaderPurchaseButton({});
   }
 
   // Replay the transcript from chat_log instantly (no animation) so refresh
@@ -4265,8 +4265,8 @@ async function resumeFromState() {
       // Ignore silently during replay; the card above will already show it.
     } else if (entry.type === 'paywall') {
       // Paywall rendered from state.obstacle + state.current_range
-      if (isPromoActive()) renderPromoBanner();
-      renderPaywallBubble({ discounted: isPromoActive() });
+      // No promo
+      renderPaywallBubble({ discounted: false });
     }
   }
 
@@ -4286,7 +4286,7 @@ async function resumeFromState() {
     showModeToggle();
 
     if (state.paywall_shown) {
-      showHeaderPurchaseButton({ discounted: isPromoActive() });
+      showHeaderPurchaseButton({});
       enableInput('Ask me anything…');
       awaitFreeText(handlePostPaywallText);
     } else {
@@ -4811,11 +4811,11 @@ async function startCheckout() {
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'checkout_started', {
-        product: 'raise', value: promoShownThisSession && isPromoActive() ? PROMO_PRICE_USD : PRICE_USD, currency: 'USD', transport_type: 'beacon',
+        product: 'raise', value: PRICE_USD, currency: 'USD', transport_type: 'beacon',
         final_floor: (state && state.current_range) ? state.current_range.floor : null,
         final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
         obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
-        promo_code: promoShownThisSession && isPromoActive() ? PROMO_CODE : '',
+        promo_code: '',
       });
     }
     if (typeof window.clarity === 'function') {
@@ -4855,7 +4855,7 @@ async function startCheckout() {
         final_range: state.current_range,
         obstacle: state.obstacle,
         refSource,
-        promo_code: promoShownThisSession && isPromoActive() ? PROMO_CODE : undefined,
+        promo_code: undefined,
       }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -5002,18 +5002,15 @@ function isPromoActive() {
 // (profile, range, obstacle, timing). Conversational style — uses regular
 // coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
-// opts.discounted: if true, show $19 instead of $39 on CTA and closing line.
+// Simple $19 pricing — no promo, no discount.
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   state.paywall_shown = true;
   saveState();
   const obs = state.obstacle || SIM_STATE.blocker || { code: 'other' };
   const explored = SIM_STATE.scenarios_explored?.length || 1;
-  const discounted = opts.discounted && isPromoActive();
-  const displayPrice = discounted ? PROMO_PRICE_USD : PRICE_USD;
-  const ctaPrice = discounted
-    ? `<span style="text-decoration:line-through;opacity:0.45;font-weight:500;font-size:13px;">$${PRICE_USD}</span> <span style="font-weight:800;">$${PROMO_PRICE_USD}</span>`
-    : `$${PRICE_USD}`;
+  const displayPrice = PRICE_USD;
+  const ctaPrice = `$${PRICE_USD}`;
 
   const headline = `Walk into the negotiation ready.`;
 
@@ -5104,7 +5101,7 @@ async function renderPaywallBubble(opts) {
 const SOLUTION_QUOTES = [
   { name: "Linda W.", role: "Operations Coordinator", raise: "10%", img: "linda_w.png", text: "My manager never brings it up. So I did." },
   { name: "David L.", role: "Logistics Manager", raise: "8%", img: "david.png", text: "I just accepted whatever they offered my whole career. Not this time." },
-  { name: "Tamika J.", role: "HR Generalist", raise: "$8,200", img: "tamika.png", text: "Best $39 I\u2019ve spent. Not even close." },
+  { name: "Tamika J.", role: "HR Generalist", raise: "$8,200", img: "tamika.png", text: "Best $19 I\u2019ve spent. Not even close." },
   { name: "Angela D.", role: "Dental Hygienist", raise: "12%", img: "angela.png", text: "Practiced 30 minutes Sunday. Asked Monday. Done!" },
   { name: "Carlos G.", role: "Facilities Coordinator", raise: "9%", img: "carlos.png", text: "He said no budget. I had a response ready. We found budget :)" },
   { name: "Sandra H.", role: "Insurance Underwriter", raise: "10%", img: "sandra.png", text: "Last time I asked I cried in my car. This time I drove home smiling." },
