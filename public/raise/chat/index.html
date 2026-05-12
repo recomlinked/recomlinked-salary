@@ -2461,6 +2461,7 @@ async function startSimulationAtBlocker() {
   // Bridge line — leads to chips
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
   const bridgeBubble = insertCoachBubble(bridge);
+  logEntry('coach_bubble', { text: bridge });
   await sleep(100);
 
   // Coaching video — thumbnail with first frame, tap for fullscreen
@@ -3256,6 +3257,7 @@ function createStarSVG(score, maxScore) {
 function renderReplyPillsFlat(replies, scenario) {
   // Coach bubble before reply pills
   insertCoachBubble("**How would you respond?**");
+  logEntry('coach_bubble', { text: '**How would you respond?**' });
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
@@ -4200,6 +4202,12 @@ async function resumeFromState() {
   // preserves everything the user saw. Then resume from the current_exchange
   // cursor for whatever prompt/chip UI needs to reappear.
   const log = Array.isArray(state.chat_log) ? state.chat_log : [];
+  if (log.length > 0) {
+    // Show a brief context message so user knows they're resuming
+    const resumeWrap = el('div', 'coach-msg', '');
+    resumeWrap.innerHTML = `<div class="bubble" style="opacity:0.6;font-size:12px;"><p>Resuming your practice session…</p></div>`;
+    $('messages').appendChild(resumeWrap);
+  }
   for (const entry of log) {
     if (entry.type === 'coach_bubble') {
       const text = entry.payload.text || '';
