@@ -2561,11 +2561,14 @@ const COACH_VIDEO_URLS = {
   prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/prior_no.mp4',
 };
 
-const COACH_THUMBS = [
-  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
-  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
-  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
-];
+const COACH_THUMBS = {
+  no_script: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
+  underpaid: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
+  fear_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
+  quiet: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
+  timing: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
+  prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
+};
 
 const COACH_VIDEO_DURATIONS = {
   no_script: 17, underpaid: 16, fear_no: 14, quiet: 15, timing: 18, prior_no: 15,
@@ -2581,7 +2584,7 @@ function renderCoachingVideo(blockerCode) {
   // Avatar with static thumbnail image
   const avatar = el('div', 'coach-video-avatar', '');
   const img = document.createElement('img');
-  img.src = COACH_THUMBS[Math.floor(Math.random() * COACH_THUMBS.length)];
+  img.src = COACH_THUMBS[blockerCode] || COACH_THUMBS.no_script;
   img.alt = 'Coach';
   img.style.width = '100%';
   img.style.height = '100%';
