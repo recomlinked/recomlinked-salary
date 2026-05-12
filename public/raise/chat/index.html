@@ -813,6 +813,14 @@ function getUserId() {
 const USER_ID = getUserId();
 
 function logSession(stage, extra) {
+  // Include video tracking if available
+  var videoWatched = '';
+  var videoCompleted = '';
+  try {
+    videoWatched = localStorage.getItem('rl_video_watched') || '';
+    videoCompleted = localStorage.getItem('rl_video_completed') || '';
+  } catch(e) {}
+
   const payload = {
     timestamp: new Date().toISOString(),
     event: 'RAISE_SESSION',
@@ -827,6 +835,8 @@ function logSession(stage, extra) {
     screen: window.innerWidth + 'x' + window.innerHeight,
     utm_term: _UTM.utm_term,
     gclid: _UTM.gclid,
+    video_watched: videoWatched,
+    video_completed: videoCompleted,
     ...(extra || {}),
   };
   console.log('[logSession]', stage, payload);
@@ -2633,7 +2643,11 @@ function renderCoachingVideo(blockerCode) {
     });
     overlay.appendChild(closeBtn);
 
+    // Track completion + close on video end
     fullVid.addEventListener('ended', function() {
+      try {
+        localStorage.setItem('rl_video_completed', 'yes');
+      } catch(e) {}
       overlay.remove();
     });
 
@@ -2645,7 +2659,11 @@ function renderCoachingVideo(blockerCode) {
     });
 
     document.body.appendChild(overlay);
-    logSession('video_watched', { blocker: blockerCode });
+    // Track video tap in localStorage — sent with next logSession call
+    try {
+      localStorage.setItem('rl_video_watched', blockerCode);
+    } catch(e) {}
+    logEntry('video_watched', { blocker: blockerCode });
   });
 
   wrap.appendChild(thumb);
