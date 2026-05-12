@@ -1053,46 +1053,46 @@ async function handleCoachingInsight(body, res) {
   let prompt;
 
   if (action === 'opening_picked') {
-    prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" just chose this opening approach: "${context?.opening || ''}" (theme: ${context?.theme || ''})
+    prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" chose an opening with the theme: "${context?.theme || 'direct approach'}"
 
-Analyze their OPENING CHOICE only. Give structured feedback using this EXACT format (1 sentence each):
+Analyze the STRATEGIC APPROACH of this opening theme. Do NOT quote, reference, or critique any specific words or phrases they used. Analyze only the strategy and direction.
 
-**Approach:** What strategy this opening signals to the manager and why it matters
-**Risk:** One specific risk or blind spot in choosing this opening
-**Opportunity:** What this opening creates if the manager responds well
-**Next move:** What type of manager response to expect after this opening
+Give structured feedback using this EXACT format (1 sentence each):
 
-Be specific to their opening choice. Do NOT suggest alternative words or scripts.`;
+**Approach:** What negotiation strategy this type of opening signals to a manager
+**Risk:** One strategic risk of this approach direction (not about wording)
+**Opportunity:** What this approach opens up if the manager responds positively
+**Next move:** What type of manager reaction to prepare for after this type of opening
+
+CRITICAL: Do NOT reference or critique their specific words, phrasing, or language. Only analyze the strategic approach and direction. Never say things like "the phrase X is vague" or "saying Y could backfire."`;
   }
   else if (action === 'scenario_selected') {
     prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
 
-${history ? `Conversation so far:\n${history}\n` : ''}
-The manager just responded with: "${context?.manager_said || ''}" (theme: "${context?.scenario_type || ''}")
+The manager responded with a "${context?.scenario_type || ''}" type of response.
 
-Analyze the MANAGER'S RESPONSE only — NOT the user's opening (that was already analyzed). Give structured feedback using this EXACT format (1 sentence each):
+Analyze the MANAGER'S RESPONSE TYPE only. Do NOT re-analyze the user's opening or quote specific words. Give structured feedback using this EXACT format (1 sentence each):
 
-**Signal:** What this manager response reveals about their position (supportive, defensive, deflecting, testing)
-**Hidden meaning:** What the manager is really saying beneath the surface
-**Preparation:** How the user should frame their next response to this specific reaction
-**Watch for:** The specific words or signals in this response that tell the user what to do next
+**Signal:** What this type of manager response reveals about their position (supportive, defensive, deflecting, testing)
+**Hidden meaning:** What managers typically mean beneath this type of response
+**Preparation:** What strategic approach works best when facing this type of reaction
+**Watch for:** The key signal to listen for that tells you whether to push forward or adjust
 
-Focus entirely on decoding the manager's response. Do NOT re-analyze the user's opening.`;
+CRITICAL: Analyze the response type and strategy only. Never quote or reference specific words or phrases.`;
   }
   else if (action === 'reply_chosen') {
     prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
 
-${history ? `Full conversation so far:\n${history}\n` : ''}
-The user just chose this reply: "${context?.reply || ''}" (theme: ${context?.reply_theme || ''})
+They chose a reply with the theme: "${context?.reply_theme || 'direct response'}" in response to a manager who gave a "${context?.scenario_type || ''}" reaction.
 
-Analyze the USER'S REPLY only — NOT their opening or the manager's response (those were already analyzed). Give structured feedback using this EXACT format (1 sentence each):
+Analyze the REPLY STRATEGY only. Do NOT re-analyze their opening or the manager's response. Do NOT quote or critique specific words. Give structured feedback using this EXACT format (1 sentence each):
 
-**Strategy:** What negotiation tactic this reply uses and whether it matches the situation
-**Strength:** The strongest element of this response
-**Weakness:** One specific thing that could backfire or weaken their position
-**After this:** What typically happens next in the conversation after a reply like this
+**Strategy:** What negotiation tactic this type of reply represents
+**Strength:** The strongest strategic element of this approach direction
+**Weakness:** One strategic vulnerability in this approach (not about wording)
+**After this:** What typically happens next in negotiations after this type of reply
 
-Focus entirely on evaluating their reply choice. Do NOT repeat analysis of earlier steps.`;
+CRITICAL: Analyze the strategic direction only. Never reference or critique their specific words, phrasing, or language.`;
   }
   else {
     prompt = `You are a salary negotiation coach giving brief feedback. The person's concern: "${blockerLabel}". Action: ${action}. Give a 2-sentence insight.`;
