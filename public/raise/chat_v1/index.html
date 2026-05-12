@@ -2299,25 +2299,25 @@ function getCoachPreviewBullets(action, context) {
   if (action === 'opening_picked') {
     return `
       <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
-      <div class="cpb">Alternative approaches you haven't tried</div>
-      <div class="cpb">Pro tip: the first 10 seconds matter most</div>
-      <div class="cpb">A short coaching video for this scenario</div>
+      <div class="cpb">Alternative openings you haven't tried</div>
+      <div class="cpb">Pro tip: the silence after your ask is your most powerful tool</div>
+      <div class="cpb">A short coaching video for your scenario</div>
     `;
   }
   if (action === 'scenario_selected') {
     return `
-      <div class="cpb">What this manager response really means</div>
-      <div class="cpb">Your path so far — ${SIM_STATE.scenarios_explored?.length || 1} scenario${(SIM_STATE.scenarios_explored?.length || 1) > 1 ? 's' : ''} explored</div>
-      <div class="cpb">Pro tip: reading between the lines</div>
-      <div class="cpb">How other negotiators handle this response</div>
+      <div class="cpb">What this manager response signals</div>
+      <div class="cpb">How to read between the lines</div>
+      <div class="cpb">Pro tip: they'll only hear the bottom of your range — set it wisely</div>
+      <div class="cpb">Your progress: ${SIM_STATE.scenarios_explored?.length || 1} path${(SIM_STATE.scenarios_explored?.length || 1) > 1 ? 's' : ''} explored</div>
     `;
   }
   if (action === 'reply_chosen') {
     return `
       <div class="cpb">Strengths and risks of your response</div>
-      <div class="cpb">What your manager is likely thinking right now</div>
+      <div class="cpb">What your manager is likely thinking now</div>
+      <div class="cpb">Pro tip: practicing out loud gets 12-18% better outcomes</div>
       <div class="cpb">Your full negotiation path summarized</div>
-      <div class="cpb">Pro tip: what to do after the conversation</div>
     `;
   }
   return `
@@ -3908,6 +3908,9 @@ function pickReply(reply, pill, container, scenario) {
     blocker: SIM_STATE.blocker,
     conversation: simConversation,
   });
+
+  // Add pro tip #3 to coaching mode
+  addCoachingProTip(2);
 
   if (incrementSimTaps()) {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
