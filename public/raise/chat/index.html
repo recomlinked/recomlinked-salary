@@ -291,8 +291,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 /* ── Coaching video thumbnail ──────────────────────────── */
 .coach-video-thumb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color 0.2s;}
 .coach-video-thumb:hover{border-color:rgba(201,168,76,0.35);}
-.coach-video-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;position:relative;background:#1a1f2e;}
+.coach-video-avatar{width:60px;height:60px;border-radius:50%;flex-shrink:0;position:relative;background:#1a1f2e;border:2px solid #c9a84c;box-shadow:0 0 0 1px rgba(201,168,76,0.2);}
 .coach-video-avatar video{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.coach-video-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .coach-video-play{position:absolute;bottom:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#c9a84c;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);box-shadow:0 1px 3px rgba(0,0,0,0.3);z-index:1;}
 .coach-video-play svg{width:8px;height:8px;fill:#07090f;}
 .coach-video-info{flex:1;min-width:0;}
@@ -2572,12 +2573,12 @@ const COACH_VIDEO_URLS = {
 };
 
 const COACH_THUMBS = {
-  no_script: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
-  underpaid: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
-  fear_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
-  quiet: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
-  timing: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
-  prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
+  no_script: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg?v=2',
+  underpaid: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg?v=2',
+  fear_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg?v=2',
+  quiet: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg?v=2',
+  timing: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg?v=2',
+  prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg?v=2',
 };
 
 const COACH_VIDEO_DURATIONS = {
@@ -2611,7 +2612,7 @@ function renderCoachingVideo(blockerCode) {
   // Info
   const info = el('div', 'coach-video-info', '');
   const title = el('div', 'coach-video-title', '▶ Coach tip');
-  const desc = el('div', 'coach-video-desc', 'Watch before you choose your opening');
+  const desc = el('div', 'coach-video-desc', 'Your coach has a tip for you');
   info.appendChild(title);
   info.appendChild(desc);
   thumb.appendChild(info);
