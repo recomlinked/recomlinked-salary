@@ -2339,16 +2339,69 @@ async function generateCoachingInsight(action, context) {
 // Coaching welcome messages per blocker
 function getCoachingWelcome(blockerCode) {
   const welcomes = {
-    no_script: "Welcome to your coaching session. I can see you're not sure how to start the raise conversation. As you practice different openings, I'll analyze each approach and give you specific feedback. Start by picking an opening in Practice mode.",
-    underpaid: "Welcome to your coaching session. Feeling underpaid is one of the strongest motivators for asking — let's turn that feeling into a strategy. As you practice, I'll show you what works and why.",
-    fear_no: "Welcome to your coaching session. The fear of hearing 'no' keeps most people from asking at all. I'll walk you through each scenario so when you hear pushback, you'll know exactly how to respond.",
-    quiet: "Welcome to your coaching session. Being quiet isn't a weakness in negotiation — it's actually an advantage. As you practice, I'll show you how to use your listening skills strategically.",
-    timing: "Welcome to your coaching session. Timing matters, but preparation matters more. I'll help you recognize the right signals and respond to any timing objection your manager raises.",
-    prior_no: "Welcome to your coaching session. You've asked before and got nothing — that actually gives you an advantage this time. I'll show you how to reopen the conversation with a stronger strategy.",
-    unknown_amount: "Welcome to your coaching session. Not knowing your number is more common than you think. As you practice, I'll help you figure out what to ask for and how to frame it.",
-    other: "Welcome to your coaching session. As you practice different scenarios, I'll give you personalized feedback on your approach and suggest improvements.",
+    no_script: "Choose an opening line and see how your manager might respond. Each choice reveals a different path.",
+    underpaid: "Choose how you'd open the conversation. Each approach leads to different manager reactions.",
+    fear_no: "Pick an opening to see what happens. Every response has a best move — practice finding it.",
+    quiet: "Start with an opening that feels right. You'll see how managers typically respond to each approach.",
+    timing: "Choose your opening to see how your manager reacts. Timing objections have specific counter-moves.",
+    prior_no: "Pick how you'd reopen the conversation. This time you'll be ready for their response.",
+    unknown_amount: "Start with an opening. The scenarios will help you figure out the right number to ask for.",
+    other: "Choose an opening and see what happens. Each path teaches you something different.",
   };
   return welcomes[blockerCode] || welcomes.other;
+}
+
+// Add a pro tip to coaching mode
+function addCoachingProTip(tipIndex) {
+  const tip = PRO_TIPS[tipIndex];
+  if (!tip) return;
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const wrap = el('div', 'coach-msg', '');
+  const card = el('div', '', '');
+  card.style.cssText = 'background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M10 2l2.5 5 5.5.8-4 3.9.9 5.3-4.9-2.6L5.1 18l.9-5.3-4-3.9 5.5-.8z" stroke="#c9a84c" stroke-width="1.3" fill="rgba(201,168,76,0.2)"/></svg>
+      <span style="font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;">Pro tip #${tip.num}</span>
+    </div>
+    <div style="font-size:12px;color:#5a4a20;line-height:1.6;">${tip.text}</div>
+  `;
+  wrap.appendChild(card);
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text: 'Pro tip #' + tip.num, type: 'pro_tip', time: Date.now() });
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
+}
+
+// Add depth card to coaching mode
+function addCoachingDepthCard() {
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const explored = SIM_STATE.scenarios_explored?.length || 1;
+  const wrap = el('div', 'coach-msg', '');
+  const card = el('div', '', '');
+  card.style.cssText = 'background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><circle cx="10" cy="4" r="2" stroke="#c9a84c" stroke-width="1.2"/><path d="M10 6v3M10 9L5 13M10 9l5 4" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="15" r="2" stroke="#c9a84c" stroke-width="1.2"/><circle cx="15" cy="15" r="2" stroke="#c9a84c" stroke-width="1.2"/></svg>
+      <span style="font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;">Your progress</span>
+    </div>
+    <div style="font-size:12px;color:#5a4a20;line-height:1.6;">You've explored <strong>${explored}</strong> scenario path${explored > 1 ? 's' : ''}. Each manager response branches into different strategies. The more paths you practice, the more prepared you'll be.</div>
+  `;
+  wrap.appendChild(card);
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text: 'Depth card', type: 'depth', time: Date.now() });
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
 }
 
 // No more mode banners in the chat — modes are separate containers
@@ -2702,9 +2755,17 @@ async function startSimulationAtBlocker() {
   // Video moves to coaching mode — not in practice flow
   addCoachingVideo(blocker.code);
 
-  // Add initial welcome message to coaching mode
+  // Add initial welcome to coaching mode (no preview card in practice — keep first impression clean)
   const welcomeText = getCoachingWelcome(blocker.code);
-  addCoachingInsight(welcomeText);
+  const coachingEl = $('coaching-messages');
+  if (coachingEl) {
+    const wrap = el('div', 'coach-msg', '');
+    wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(welcomeText)}</p></div>`;
+    coachingEl.appendChild(wrap);
+    coachingMessages.push({ text: welcomeText, type: 'welcome', time: Date.now() });
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
 
   // Unlock the mode toggle now that coaching has content
   unlockModeToggle();
@@ -3053,13 +3114,15 @@ async function pickOpening(opener, pill, container) {
     SIM_STATE.branch_history.push({ scenario: 'opening', reply: opener.theme });
     logSession('sim_opening_picked', { theme: opener.theme });
 
-    // Trigger coaching insight in background — show preview card immediately
-    showCoachPreviewCard('Analyzing your opening approach...');
+    // Generate coaching insight in background (preview card shown after framing text)
     generateCoachingInsight('opening_picked', {
       opening: opener.text,
       theme: opener.theme,
       blocker: SIM_STATE.blocker,
     });
+
+    // Add pro tip to coaching mode
+    addCoachingProTip(0);
 
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
@@ -3075,6 +3138,8 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
   // Show the framing text BEFORE the API call — sets expectation during wait
   await typeCoachBubble("**Now pick what your manager might say to that.**");
   await sleep(200);
+  // Coach preview card appears after framing text, fills loading time
+  showCoachPreviewCard('Analyzing your opening approach...');
   showCoachTyping();
 
   try {
@@ -3374,14 +3439,17 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
 
-  // Trigger coaching insight in background — show preview immediately
-  showCoachPreviewCard('Analyzing your manager\'s response...');
+  // Generate coaching insight in background (preview card shown after reply pills framing)
   generateCoachingInsight('scenario_selected', {
     scenario_type: scenario.type,
     manager_said: scenario.text,
     blocker: SIM_STATE.blocker,
     user_opening: SIM_STATE.user_opening,
   });
+
+  // Add depth revelation and pro tip to coaching mode
+  addCoachingDepthCard();
+  addCoachingProTip(1);
 
   // Every chip tap counts toward the paywall limit
   const hitLimit = incrementSimTaps();
@@ -3526,6 +3594,8 @@ function renderReplyPillsFlat(replies, scenario) {
   // Coach bubble before reply pills
   insertCoachBubble("**How would you respond?**");
   logEntry('coach_bubble', { text: '**How would you respond?**' });
+  // Coach preview card appears after framing text
+  showCoachPreviewCard('Analyzing your manager\'s response...');
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
@@ -3788,8 +3858,7 @@ function pickReply(reply, pill, container, scenario) {
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
   simConversation.push({ role: 'user', text: reply.text });
 
-  // Trigger coaching insight in background — show preview immediately
-  showCoachPreviewCard('Evaluating your response strategy...');
+  // Generate coaching insight in background (preview shown during loading)
   generateCoachingInsight('reply_chosen', {
     reply: reply.text,
     reply_theme: reply.theme,
@@ -3801,12 +3870,14 @@ function pickReply(reply, pill, container, scenario) {
   if (incrementSimTaps()) {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
+    showCoachPreviewCard('Evaluating your response strategy...');
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => showCliffhangerPaywall(scenario, turnNodes), 800);
   } else {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
+    showCoachPreviewCard('Evaluating your response strategy...');
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => continueConversation(scenario, turnNodes), 400);
@@ -5775,3 +5846,4 @@ init().catch(err => {
 <script defer src="/shared.js"></script>
 </body>
 </html>
+  
