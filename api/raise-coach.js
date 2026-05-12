@@ -1050,28 +1050,53 @@ async function handleCoachingInsight(body, res) {
     .map(t => `${t.role === 'manager' ? 'Manager' : 'You'}: "${t.text}"`)
     .join('\n');
 
-  const actionDescriptions = {
-    opening_picked: `chose this opening: "${context?.opening || ''}" (theme: ${context?.theme || ''})`,
-    scenario_selected: `selected this manager response scenario: "${context?.scenario_type || ''}" — manager said: "${context?.manager_said || ''}"`,
-    reply_chosen: `chose this reply: "${context?.reply || ''}" (theme: ${context?.reply_theme || ''})`,
-  };
+  let prompt;
 
-  const actionDesc = actionDescriptions[action] || `performed action: ${action}`;
+  if (action === 'opening_picked') {
+    prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" just chose this opening approach: "${context?.opening || ''}" (theme: ${context?.theme || ''})
 
-  const prompt = `You are a salary negotiation coach giving structured, personalized feedback during a practice session.
+Analyze their OPENING CHOICE only. Give structured feedback using this EXACT format (1 sentence each):
 
-The person's concern: "${blockerLabel}"
-They just ${actionDesc}
+**Approach:** What strategy this opening signals to the manager and why it matters
+**Risk:** One specific risk or blind spot in choosing this opening
+**Opportunity:** What this opening creates if the manager responds well
+**Next move:** What type of manager response to expect after this opening
+
+Be specific to their opening choice. Do NOT suggest alternative words or scripts.`;
+  }
+  else if (action === 'scenario_selected') {
+    prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
 
 ${history ? `Conversation so far:\n${history}\n` : ''}
-Give a structured coaching insight using this EXACT format (use these labels, keep each to 1 sentence):
+The manager just responded with: "${context?.manager_said || ''}" (theme: "${context?.scenario_type || ''}")
 
-**Approach:** What strategy their choice signals and why it matters
-**Risk:** One specific risk or blind spot in this approach
-**Opportunity:** What this opens up if executed well
-**Next move:** What to watch for in the manager's response
+Analyze the MANAGER'S RESPONSE only — NOT the user's opening (that was already analyzed). Give structured feedback using this EXACT format (1 sentence each):
 
-Be direct, specific, reference their actual choice. Talk about approach and direction, not exact sample words. Do NOT repeat what they said back to them. Do NOT suggest specific phrases or scripts. Focus on the strategic implications of their choice.`;
+**Signal:** What this manager response reveals about their position (supportive, defensive, deflecting, testing)
+**Hidden meaning:** What the manager is really saying beneath the surface
+**Preparation:** How the user should frame their next response to this specific reaction
+**Watch for:** The specific words or signals in this response that tell the user what to do next
+
+Focus entirely on decoding the manager's response. Do NOT re-analyze the user's opening.`;
+  }
+  else if (action === 'reply_chosen') {
+    prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
+
+${history ? `Full conversation so far:\n${history}\n` : ''}
+The user just chose this reply: "${context?.reply || ''}" (theme: ${context?.reply_theme || ''})
+
+Analyze the USER'S REPLY only — NOT their opening or the manager's response (those were already analyzed). Give structured feedback using this EXACT format (1 sentence each):
+
+**Strategy:** What negotiation tactic this reply uses and whether it matches the situation
+**Strength:** The strongest element of this response
+**Weakness:** One specific thing that could backfire or weaken their position
+**After this:** What typically happens next in the conversation after a reply like this
+
+Focus entirely on evaluating their reply choice. Do NOT repeat analysis of earlier steps.`;
+  }
+  else {
+    prompt = `You are a salary negotiation coach giving brief feedback. The person's concern: "${blockerLabel}". Action: ${action}. Give a 2-sentence insight.`;
+  }
 
   try {
     const response = await client.messages.create({
