@@ -1058,20 +1058,25 @@ async function handleCoachingInsight(body, res) {
 
   const actionDesc = actionDescriptions[action] || `performed action: ${action}`;
 
-  const prompt = `You are a salary negotiation coach giving brief, personalized feedback during a practice session.
+  const prompt = `You are a salary negotiation coach giving structured, personalized feedback during a practice session.
 
 The person's concern: "${blockerLabel}"
 They just ${actionDesc}
 
 ${history ? `Conversation so far:\n${history}\n` : ''}
-Give ONE specific coaching insight about this choice in 2-3 sentences. Be direct, specific, and reference their actual choice. Don't be generic. Explain WHY this choice matters in a real negotiation — what signal it sends to the manager, what risk it creates, or what opportunity it opens.
+Give a structured coaching insight using this EXACT format (use these labels, keep each to 1 sentence):
 
-Do NOT use markdown, bullets, or formatting. Just plain text.`;
+**Approach:** What strategy their choice signals and why it matters
+**Risk:** One specific risk or blind spot in this approach
+**Opportunity:** What this opens up if executed well
+**Next move:** What to watch for in the manager's response
+
+Be direct, specific, reference their actual choice. Talk about approach and direction, not exact sample words. Do NOT repeat what they said back to them. Do NOT suggest specific phrases or scripts. Focus on the strategic implications of their choice.`;
 
   try {
     const response = await client.messages.create({
       model: NUDGE_MODEL_ID,
-      max_tokens: 150,
+      max_tokens: 250,
       messages: [{ role: 'user', content: prompt }],
     });
     const text = response.content[0]?.text || '';
