@@ -304,6 +304,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .coach-preview-text{font-size:12px;color:#5a4a20;line-height:1.5;}
 .coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#c9a84c;cursor:pointer;}
 .coach-preview-cta:hover{color:#b8960c;}
+.coach-preview-bullets{display:flex;flex-direction:column;gap:4px;}
+.cpb{font-size:12px;color:#5a4a20;line-height:1.4;padding-left:14px;position:relative;}
+.cpb::before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:#c9a84c;}
 .coach-preview.collapsing{opacity:0;max-height:0;margin:0;padding:0;border:none;transition:all 0.3s ease;}
 
 /* Coaching mode unseen badge */
@@ -2179,16 +2182,10 @@ function addCoachingInsight(text, type) {
 
   coachingMessages.push({ text, type, time: Date.now() });
 
-  // If user is in practice mode, increment unseen and update preview
+  // If user is in practice mode, increment unseen and update badge
   if (SIM_STATE.simMode) {
     unseenCoachCount++;
     updateCoachBadge();
-    // Update existing preview card with real content, or create new one
-    if (currentCoachPreview && currentCoachPreview.querySelector('.coach-preview-text')) {
-      currentCoachPreview.querySelector('.coach-preview-text').textContent = text.length > 120 ? text.slice(0, 117) + '...' : text;
-    } else {
-      showCoachPreviewCard(text);
-    }
   } else {
     scrollCoachingToBottom();
   }
@@ -2255,12 +2252,12 @@ function addCoachingVideo(blockerCode) {
   if (SIM_STATE.simMode) {
     unseenCoachCount++;
     updateCoachBadge();
-    showCoachPreviewCard('Your coach recorded a video tip for this scenario');
   }
 }
 
 // Show a preview card in practice mode (one at a time, replaces previous)
-function showCoachPreviewCard(text) {
+// The card shows a MENU of what's available in coaching mode, not the full content
+function showCoachPreviewCard(action, context) {
   // Collapse previous preview
   if (currentCoachPreview) {
     currentCoachPreview.classList.add('collapsing');
@@ -2268,13 +2265,15 @@ function showCoachPreviewCard(text) {
     setTimeout(() => old.remove(), 300);
   }
 
+  const bullets = getCoachPreviewBullets(action, context);
+
   const preview = el('div', 'coach-preview', '');
   preview.innerHTML = `
     <div class="coach-preview-header">
       <span class="coach-preview-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
-      <span class="coach-preview-label">Coach insight</span>
+      <span class="coach-preview-label">Your coach prepared</span>
     </div>
-    <div class="coach-preview-text">${escapeHtml(text.length > 120 ? text.slice(0, 117) + '...' : text)}</div>
+    <div class="coach-preview-bullets">${bullets}</div>
     <div class="coach-preview-cta">Open coaching \u2192</div>
   `;
   preview.addEventListener('click', function() {
@@ -2284,6 +2283,40 @@ function showCoachPreviewCard(text) {
   $('messages').appendChild(preview);
   currentCoachPreview = preview;
   scrollChatToBottom();
+}
+
+function getCoachPreviewBullets(action, context) {
+  const theme = context?.theme || context?.scenario_type || context?.reply_theme || '';
+  const shortTheme = theme.length > 30 ? theme.slice(0, 27) + '...' : theme;
+
+  if (action === 'opening_picked') {
+    return `
+      <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
+      <div class="cpb">Alternative approaches you haven't tried</div>
+      <div class="cpb">Pro tip: the first 10 seconds matter most</div>
+      <div class="cpb">A short coaching video for this scenario</div>
+    `;
+  }
+  if (action === 'scenario_selected') {
+    return `
+      <div class="cpb">What this manager response really means</div>
+      <div class="cpb">Your path so far — ${SIM_STATE.scenarios_explored?.length || 1} scenario${(SIM_STATE.scenarios_explored?.length || 1) > 1 ? 's' : ''} explored</div>
+      <div class="cpb">Pro tip: reading between the lines</div>
+      <div class="cpb">How other negotiators handle this response</div>
+    `;
+  }
+  if (action === 'reply_chosen') {
+    return `
+      <div class="cpb">Strengths and risks of your response</div>
+      <div class="cpb">What your manager is likely thinking right now</div>
+      <div class="cpb">Your full negotiation path summarized</div>
+      <div class="cpb">Pro tip: what to do after the conversation</div>
+    `;
+  }
+  return `
+    <div class="cpb">Personalized coaching insight</div>
+    <div class="cpb">Pro tips for your situation</div>
+  `;
 }
 
 // Render "X unseen messages" header in coaching mode
@@ -3138,8 +3171,6 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
   // Show the framing text BEFORE the API call — sets expectation during wait
   await typeCoachBubble("**Now pick what your manager might say to that.**");
   await sleep(200);
-  // Coach preview card appears after framing text, fills loading time
-  showCoachPreviewCard('Analyzing your opening approach...');
   showCoachTyping();
 
   try {
@@ -3161,9 +3192,12 @@ async function loadManagerResponseToOpening(openingText, turnNodes) {
     } else {
       renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
     }
+    // Coach preview card appears AFTER options, before user picks next
+    showCoachPreviewCard('opening_picked', { theme: SIM_STATE.branch_history[0]?.reply || '' });
   } catch (err) {
     hideCoachTyping();
     renderScenarioLabels(getDefaultScenarios(SIM_STATE.blocker.code));
+    showCoachPreviewCard('opening_picked', { theme: SIM_STATE.branch_history[0]?.reply || '' });
   }
 }
 
@@ -3524,6 +3558,8 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   $('messages').appendChild(backWrap);
 
   renderReplyPillsFlat(replies, scenario);
+  // Coach preview card appears after reply options, before user picks next
+  showCoachPreviewCard('scenario_selected', { scenario_type: scenario.type, manager_said: scenario.text });
 
 }
 
@@ -3594,8 +3630,6 @@ function renderReplyPillsFlat(replies, scenario) {
   // Coach bubble before reply pills
   insertCoachBubble("**How would you respond?**");
   logEntry('coach_bubble', { text: '**How would you respond?**' });
-  // Coach preview card appears after framing text
-  showCoachPreviewCard('Analyzing your manager\'s response...');
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
   const row = el('div', 'sim-pills-row', '');
@@ -3870,14 +3904,14 @@ function pickReply(reply, pill, container, scenario) {
   if (incrementSimTaps()) {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
-    showCoachPreviewCard('Evaluating your response strategy...');
+    showCoachPreviewCard('reply_chosen', { reply_theme: reply.theme, scenario_type: scenario.type });
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => showCliffhangerPaywall(scenario, turnNodes), 800);
   } else {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
-    showCoachPreviewCard('Evaluating your response strategy...');
+    showCoachPreviewCard('reply_chosen', { reply_theme: reply.theme, scenario_type: scenario.type });
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => continueConversation(scenario, turnNodes), 400);
@@ -5846,4 +5880,3 @@ init().catch(err => {
 <script defer src="/shared.js"></script>
 </body>
 </html>
-  
