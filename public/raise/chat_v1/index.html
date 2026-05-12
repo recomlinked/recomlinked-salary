@@ -2176,14 +2176,19 @@ function updateCoachBadge() {
 }
 
 // Add coaching insight to coaching container (called after each practice action)
-function addCoachingInsight(text, type) {
+function addCoachingInsight(text, type, directionLabel) {
   type = type || 'insight';
   const coachingEl = $('coaching-messages');
   if (!coachingEl) return;
 
   const wrap = el('div', 'coach-msg', '');
   const bubble = el('div', 'bubble', '');
-  bubble.innerHTML = `<p>${inlineBold(escapeHtml(text))}</p>`;
+  let html = '';
+  if (directionLabel) {
+    html += `<p style="margin-bottom:8px;"><strong style="font-size:14px;">${escapeHtml(directionLabel)}</strong></p>`;
+  }
+  html += `<p>${inlineBold(escapeHtml(text))}</p>`;
+  bubble.innerHTML = html;
   wrap.appendChild(bubble);
   coachingEl.appendChild(wrap);
 
@@ -2348,6 +2353,16 @@ function addBackToPracticeCTA() {
 
 // Generate AI coaching insight based on practice action
 async function generateCoachingInsight(action, context) {
+  // Build direction label based on action
+  let directionLabel = '';
+  if (action === 'opening_picked') {
+    directionLabel = 'Your opening: ' + (context?.theme || 'Direct approach');
+  } else if (action === 'scenario_selected') {
+    directionLabel = 'Manager response: ' + (context?.scenario_type || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+  } else if (action === 'reply_chosen') {
+    directionLabel = 'Your reply: ' + (context?.reply_theme || 'Direct response');
+  }
+
   try {
     const res = await fetch('/api/raise-coach', {
       method: 'POST',
@@ -2363,7 +2378,7 @@ async function generateCoachingInsight(action, context) {
     });
     const data = await res.json();
     if (data.insight) {
-      addCoachingInsight(data.insight);
+      addCoachingInsight(data.insight, 'insight', directionLabel);
     }
   } catch (err) {
     // Fallback to static insight
@@ -2372,7 +2387,7 @@ async function generateCoachingInsight(action, context) {
       scenario_selected: "Interesting scenario. Your manager's response reveals what they really think about your ask. Pay attention to whether they address the amount or deflect to timing.",
       reply_chosen: "Your response matters here. The best negotiators match their manager's energy — if they're cautious, be reassuring. If they're open, be specific.",
     };
-    addCoachingInsight(fallbacks[action] || "Your coach is analyzing your approach...");
+    addCoachingInsight(fallbacks[action] || "Your coach is analyzing your approach...", 'insight', directionLabel);
   }
 }
 
