@@ -300,6 +300,12 @@ module.exports = async function handler(req, res) {
   if (body.mode === 'coach_reflection') {
     return handleCoachReflection(body, res);
   }
+  if (body.mode === 'coaching_insight') {
+    return handleCoachingInsight(body, res);
+  }
+  if (body.mode === 'coaching_chat') {
+    return handleCoachingChat(body, res);
+  }
   const isFreeMode = !body.token && !!body.profile;
   if (isFreeMode) {
     return handleFreeMode(body, res);
@@ -1029,5 +1035,114 @@ Be direct, encouraging, and specific. No filler. No generic advice. Reference th
   } catch (err) {
     console.error('[coach_reflection] error:', err);
     return res.status(200).json({ reflection: null, mode: 'coach_reflection' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ COACHING INSIGHT — personalized feedback after each     ══
+// ══ practice action (opening picked, scenario, reply)       ══
+// ════════════════════════════════════════════════════════════
+// Uses Haiku for speed — this runs in background during practice.
+async function handleCoachingInsight(body, res) {
+  const { action, context, conversation_history, blocker } = body;
+  const blockerLabel = blocker?.label || 'asking for a raise';
+  const history = (conversation_history || [])
+    .map(t => `${t.role === 'manager' ? 'Manager' : 'You'}: "${t.text}"`)
+    .join('\n');
+
+  const actionDescriptions = {
+    opening_picked: `chose this opening: "${context?.opening || ''}" (theme: ${context?.theme || ''})`,
+    scenario_selected: `selected this manager response scenario: "${context?.scenario_type || ''}" — manager said: "${context?.manager_said || ''}"`,
+    reply_chosen: `chose this reply: "${context?.reply || ''}" (theme: ${context?.reply_theme || ''})`,
+  };
+
+  const actionDesc = actionDescriptions[action] || `performed action: ${action}`;
+
+  const prompt = `You are a salary negotiation coach giving brief, personalized feedback during a practice session.
+
+The person's concern: "${blockerLabel}"
+They just ${actionDesc}
+
+${history ? `Conversation so far:\n${history}\n` : ''}
+Give ONE specific coaching insight about this choice in 2-3 sentences. Be direct, specific, and reference their actual choice. Don't be generic. Explain WHY this choice matters in a real negotiation — what signal it sends to the manager, what risk it creates, or what opportunity it opens.
+
+Do NOT use markdown, bullets, or formatting. Just plain text.`;
+
+  try {
+    const response = await client.messages.create({
+      model: NUDGE_MODEL_ID,
+      max_tokens: 150,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = response.content[0]?.text || '';
+    return res.status(200).json({ insight: text, mode: 'coaching_insight' });
+  } catch (err) {
+    console.error('[coaching_insight] error:', err);
+    return res.status(200).json({ insight: null, mode: 'coaching_insight' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ COACHING CHAT — free-form conversation with the coach   ══
+// ══ Uses full practice context for personalized responses    ══
+// ════════════════════════════════════════════════════════════
+// Uses Sonnet for deeper, more nuanced coaching responses.
+async function handleCoachingChat(body, res) {
+  const { message, chat_history, practice_context } = body;
+  const blocker = practice_context?.blocker || body.blocker || {};
+  const blockerLabel = blocker?.label || 'asking for a raise';
+  const userOpening = practice_context?.user_opening || '';
+  const scenariosExplored = practice_context?.scenarios_explored || [];
+  const branchHistory = practice_context?.branch_history || [];
+  const conversation = practice_context?.conversation || [];
+
+  const practiceHistory = conversation
+    .map(t => `${t.role === 'manager' ? 'Manager' : 'You'}: "${t.text}"`)
+    .join('\n');
+
+  const branchSummary = branchHistory
+    .map(b => `Scenario: "${b.scenario}" → User chose: "${b.reply}"`)
+    .join('\n');
+
+  const chatMessages = (chat_history || []).map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.content,
+  }));
+
+  const systemPrompt = `You are a salary negotiation coach having a conversation with someone who is practicing their raise negotiation.
+
+THEIR SITUATION:
+- Main concern: "${blockerLabel}"
+${userOpening ? `- They opened with: "${userOpening}"` : '- Haven\'t picked an opening yet'}
+${scenariosExplored.length > 0 ? `- Scenarios explored: ${scenariosExplored.join(', ')}` : ''}
+
+${practiceHistory ? `PRACTICE CONVERSATION SO FAR:\n${practiceHistory}\n` : ''}
+${branchSummary ? `CHOICES THEY'VE MADE:\n${branchSummary}\n` : ''}
+
+COACHING GUIDELINES:
+- Be direct, warm, and specific. Reference their actual practice choices when relevant.
+- Give actionable advice they can use in the real conversation.
+- If they ask about something they haven't practiced yet, encourage them to try it in practice mode.
+- Keep responses to 2-4 sentences. Don't lecture.
+- Never use markdown formatting, bullets, or headers. Plain conversational text only.
+- You're a supportive coach, not a textbook. Talk like a trusted mentor.`;
+
+  try {
+    const messages = [
+      ...chatMessages,
+      { role: 'user', content: message },
+    ];
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: messages,
+    });
+    const text = response.content[0]?.text || '';
+    return res.status(200).json({ reply: text, mode: 'coaching_chat' });
+  } catch (err) {
+    console.error('[coaching_chat] error:', err);
+    return res.status(200).json({ reply: null, mode: 'coaching_chat' });
   }
 }
