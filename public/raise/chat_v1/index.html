@@ -2391,7 +2391,7 @@ function getCoachingWelcome(blockerCode) {
   return welcomes[blockerCode] || welcomes.other;
 }
 
-// Add a pro tip to coaching mode
+// Add a pro tip to coaching mode — same styling as practice mode pro tips
 function addCoachingProTip(tipIndex) {
   const tip = PRO_TIPS[tipIndex];
   if (!tip) return;
@@ -2399,16 +2399,18 @@ function addCoachingProTip(tipIndex) {
   if (!coachingEl) return;
 
   const wrap = el('div', 'coach-msg', '');
-  const card = el('div', '', '');
-  card.style.cssText = 'background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;';
-  card.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-      <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><path d="M10 2l2.5 5 5.5.8-4 3.9.9 5.3-4.9-2.6L5.1 18l.9-5.3-4-3.9 5.5-.8z" stroke="#c9a84c" stroke-width="1.3" fill="rgba(201,168,76,0.2)"/></svg>
-      <span style="font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;">Pro tip #${tip.num}</span>
+  wrap.innerHTML = `
+    <div class="pro-tip-card pro-tip-revealed">
+      <div class="pro-tip-top">
+        <div class="pro-tip-badge">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10 8V4M7 4c0 0 0.5 4 3 4s3-4 3-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="10" y1="8" x2="10" y2="17" stroke="currentColor" stroke-width="1.3"/></svg>
+          Pro tip
+        </div>
+        <div class="pro-tip-num">#${tip.num}</div>
+      </div>
+      <div style="font-size:13px;color:#3d3010;line-height:1.65;">${tip.text}</div>
     </div>
-    <div style="font-size:12px;color:#5a4a20;line-height:1.6;">${tip.text}</div>
   `;
-  wrap.appendChild(card);
   coachingEl.appendChild(wrap);
 
   coachingMessages.push({ text: 'Pro tip #' + tip.num, type: 'pro_tip', time: Date.now() });
@@ -2418,23 +2420,66 @@ function addCoachingProTip(tipIndex) {
   }
 }
 
-// Add depth card to coaching mode
+// Add depth card to coaching mode — uses the same SVG branching visual
 function addCoachingDepthCard() {
   const coachingEl = $('coaching-messages');
   if (!coachingEl) return;
 
   const explored = SIM_STATE.scenarios_explored?.length || 1;
   const wrap = el('div', 'coach-msg', '');
-  const card = el('div', '', '');
-  card.style.cssText = 'background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:12px 14px;';
-  card.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-      <svg viewBox="0 0 20 20" fill="none" width="14" height="14"><circle cx="10" cy="4" r="2" stroke="#c9a84c" stroke-width="1.2"/><path d="M10 6v3M10 9L5 13M10 9l5 4" stroke="#c9a84c" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="15" r="2" stroke="#c9a84c" stroke-width="1.2"/><circle cx="15" cy="15" r="2" stroke="#c9a84c" stroke-width="1.2"/></svg>
-      <span style="font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;">Your progress</span>
+  wrap.innerHTML = `
+    <div class="depth-card">
+      <div class="depth-card-text">You're at <b>step 2</b> of a 6-8 step negotiation. From here, this conversation branches in different ways.</div>
+      <svg width="100%" height="80" viewBox="0 0 340 80" style="margin:8px 0 2px;">
+        <line x1="30" y1="14" x2="30" y2="66" stroke="rgba(154,130,40,0.12)" stroke-width="0.5"/>
+        <line x1="82" y1="14" x2="82" y2="66" stroke="rgba(154,130,40,0.12)" stroke-width="0.5"/>
+        <circle cx="30" cy="14" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="27" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="40" r="5.5" fill="#b8960c"/>
+        <circle cx="30" cy="53" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="66" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <line x1="36" y1="40" x2="76" y2="40" stroke="#b8960c" stroke-width="2"/>
+        <circle cx="82" cy="14" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="27" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="40" r="5.5" fill="#b8960c"/>
+        <circle cx="82" cy="53" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="66" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <line x1="88" y1="40" x2="120" y2="40" stroke="#b8960c" stroke-width="2"/>
+        <circle cx="126" cy="40" r="7" fill="#b8960c"/>
+        <circle cx="126" cy="40" r="10" fill="none" stroke="rgba(184,150,12,0.3)" stroke-width="1.5"/>
+        <line x1="133" y1="40" x2="168" y2="10" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="27" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="53" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="70" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <circle cx="170" cy="10" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="27" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="53" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="70" r="4" fill="rgba(154,130,40,0.3)"/>
+        <line x1="174" y1="10" x2="202" y2="4" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="10" x2="202" y2="10" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="10" x2="202" y2="16" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="22" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="28" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="34" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="48" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="54" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="60" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="66" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="72" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="78" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <circle cx="204" cy="4" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="10" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="16" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="22" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="28" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="34" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="48" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="54" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="60" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="66" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="72" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="78" r="2" fill="rgba(154,130,40,0.15)"/>
+        <text x="232" y="38" fill="#8a7540" font-size="10" font-weight="500" font-family="inherit">hundreds</text>
+        <text x="232" y="50" fill="#8a7540" font-size="10" font-weight="500" font-family="inherit">of paths...</text>
+        <text x="23" y="78" fill="#8a7540" font-size="8" font-family="inherit">you</text>
+        <text x="74" y="78" fill="#8a7540" font-size="8" font-family="inherit">mgr</text>
+        <text x="118" y="78" fill="#b8960c" font-size="9" font-weight="600" font-family="inherit">YOU</text>
+      </svg>
+      <div class="depth-card-stat">A typical raise conversation takes <b>10-20 min</b>, with 4-6 more exchanges afterward.</div>
     </div>
-    <div style="font-size:12px;color:#5a4a20;line-height:1.6;">You've explored <strong>${explored}</strong> scenario path${explored > 1 ? 's' : ''}. Each manager response branches into different strategies. The more paths you practice, the more prepared you'll be.</div>
   `;
-  wrap.appendChild(card);
   coachingEl.appendChild(wrap);
 
   coachingMessages.push({ text: 'Depth card', type: 'depth', time: Date.now() });
@@ -5841,9 +5886,20 @@ async function handleCoachingChat(userText) {
 
   // Show typing indicator (consistent with practice mode)
   const typingWrap = el('div', 'coach-msg coaching-typing', '');
-  typingWrap.innerHTML = '<div class="bubble" style="display:flex;align-items:center;gap:8px;"><span class="typing-dots"><span></span><span></span><span></span></span> <span style="opacity:0.5;font-size:13px;">Your coach is thinking\u2026</span></div>';
-  coachingEl.appendChild(typingWrap);
+  typingWrap.innerHTML = `
+    <div class="bubble typing-bubble">
+      <div class="typing-indicator">
+        <svg class="rl-typing-arc" width="28" height="28" viewBox="0 0 32 32">
+          <circle class="rl-arc-track" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="2.5" stroke-linecap="round" transform="rotate(-210 16 16)"/>
+          <circle class="rl-arc-fill"  cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="35" transform="rotate(-210 16 16)"/>
+        </svg>
+        <span class="typing-phrase">Your coach is thinking\u2026</span>
+      </div>
+    </div>
+  `;
+  $('coaching-messages').appendChild(typingWrap);
   scrollCoachingToBottom();
+  startTypingArcAnimation(typingWrap);
 
   try {
     const res = await fetchWithTimeout('/api/raise-coach', {
@@ -5866,6 +5922,7 @@ async function handleCoachingChat(userText) {
     const data = await res.json();
 
     // Remove typing indicator
+    if (typingWrap._arcStop) typingWrap._arcStop();
     typingWrap.remove();
 
     const reply = data.reply || data.insight || "I'm here to help with your raise conversation. Ask me anything about your situation.";
@@ -5876,6 +5933,7 @@ async function handleCoachingChat(userText) {
     replyWrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(reply))}</p></div>`;
     coachingEl.appendChild(replyWrap);
   } catch (err) {
+    if (typingWrap._arcStop) typingWrap._arcStop();
     typingWrap.remove();
     const errWrap = el('div', 'coach-msg', '');
     errWrap.innerHTML = '<div class="bubble"><p>Sorry, I couldn\'t process that. Try again.</p></div>';
