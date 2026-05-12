@@ -299,7 +299,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .coach-preview{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:12px 14px;margin:6px 0;cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden;}
 .coach-preview:hover{border-color:#c9a84c;}
 .coach-preview-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.coach-preview-icon{font-size:14px;}
+.coach-preview-icon{display:flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;}
 .coach-preview-label{font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;}
 .coach-preview-text{font-size:12px;color:#5a4a20;line-height:1.5;}
 .coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#c9a84c;cursor:pointer;}
@@ -2179,11 +2179,16 @@ function addCoachingInsight(text, type) {
 
   coachingMessages.push({ text, type, time: Date.now() });
 
-  // If user is in practice mode, increment unseen and show preview
+  // If user is in practice mode, increment unseen and update preview
   if (SIM_STATE.simMode) {
     unseenCoachCount++;
     updateCoachBadge();
-    showCoachPreviewCard(text);
+    // Update existing preview card with real content, or create new one
+    if (currentCoachPreview && currentCoachPreview.querySelector('.coach-preview-text')) {
+      currentCoachPreview.querySelector('.coach-preview-text').textContent = text.length > 120 ? text.slice(0, 117) + '...' : text;
+    } else {
+      showCoachPreviewCard(text);
+    }
   } else {
     scrollCoachingToBottom();
   }
@@ -2266,7 +2271,7 @@ function showCoachPreviewCard(text) {
   const preview = el('div', 'coach-preview', '');
   preview.innerHTML = `
     <div class="coach-preview-header">
-      <span class="coach-preview-icon">\uD83C\uDFAF</span>
+      <span class="coach-preview-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
       <span class="coach-preview-label">Coach insight</span>
     </div>
     <div class="coach-preview-text">${escapeHtml(text.length > 120 ? text.slice(0, 117) + '...' : text)}</div>
@@ -2708,13 +2713,6 @@ async function startSimulationAtBlocker() {
 
   renderOpeningChips();
 
-  // Show locked pro tip card — nudge for first tap
-  // Show for any user who hasn't hit the paywall yet
-  if (!state.paywall_shown) {
-    await sleep(200);
-    renderLockedTip(1, 'Choose your first move to unlock a negotiation tip');
-  }
-
   // Scroll to bridge bubble after DOM settles
   await sleep(150);
   if (bridgeBubble) {
@@ -3007,7 +3005,6 @@ function renderOpeningChips() {
       appendUserBubble('I\u2019d open with:\n\u201c' + text + '\u201d');
       showSimulationPaywall(null);
     } else {
-      if (simTapCount === 1) renderProTip(0);
       appendUserBubble('I\u2019d open with:\n\u201c' + text + '\u201d');
       await loadManagerResponseToOpening(text);
     }
@@ -3045,7 +3042,7 @@ async function pickOpening(opener, pill, container) {
     logSession('sim_opening_picked', { theme: opener.theme });
     showSimulationPaywall(null);
   } else {
-    if (simTapCount === 1) renderProTip(0);
+    // Pro tip moves to coaching mode (no longer in practice flow)
 
     const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
     scrollChatToBottom();
@@ -3056,7 +3053,8 @@ async function pickOpening(opener, pill, container) {
     SIM_STATE.branch_history.push({ scenario: 'opening', reply: opener.theme });
     logSession('sim_opening_picked', { theme: opener.theme });
 
-    // Trigger coaching insight in background
+    // Trigger coaching insight in background — show preview card immediately
+    showCoachPreviewCard('Analyzing your opening approach...');
     generateCoachingInsight('opening_picked', {
       opening: opener.text,
       theme: opener.theme,
@@ -3376,7 +3374,8 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
 
-  // Trigger coaching insight in background
+  // Trigger coaching insight in background — show preview immediately
+  showCoachPreviewCard('Analyzing your manager\'s response...');
   generateCoachingInsight('scenario_selected', {
     scenario_type: scenario.type,
     manager_said: scenario.text,
@@ -3410,9 +3409,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   renderManagerBubble(scenario);
   await sleep(300);
 
-  // Show depth revelation — user reads it during API wait for replies
-  renderDepthCard();
-  await sleep(200);
+  // Depth card moves to coaching mode (not in practice flow)
 
   // Step 3: thinking indicator → reply pills
   showCoachTyping();
@@ -3791,7 +3788,8 @@ function pickReply(reply, pill, container, scenario) {
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
   simConversation.push({ role: 'user', text: reply.text });
 
-  // Trigger coaching insight in background
+  // Trigger coaching insight in background — show preview immediately
+  showCoachPreviewCard('Evaluating your response strategy...');
   generateCoachingInsight('reply_chosen', {
     reply: reply.text,
     reply_theme: reply.theme,
