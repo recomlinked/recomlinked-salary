@@ -288,6 +288,21 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .promo-timer-icon{width:14px;height:14px;}
 .promo-timer-num{font-variant-numeric:tabular-nums;}
 
+/* ── Coaching video thumbnail ──────────────────────────── */
+.coach-video-thumb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color 0.2s;}
+.coach-video-thumb:hover{border-color:rgba(201,168,76,0.35);}
+.coach-video-avatar{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;position:relative;background:#1a1f2e;}
+.coach-video-avatar video{width:100%;height:100%;object-fit:cover;}
+.coach-video-play{position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#c9a84c;display:flex;align-items:center;justify-content:center;border:2px solid var(--card);}
+.coach-video-play svg{width:8px;height:8px;fill:#07090f;}
+.coach-video-info{flex:1;min-width:0;}
+.coach-video-title{font-size:12px;font-weight:500;color:#c9a84c;margin-bottom:2px;}
+.coach-video-desc{font-size:11px;color:var(--t3);line-height:1.4;}
+.coach-video-dur{font-size:10px;color:var(--t4);flex-shrink:0;}
+.coach-video-overlay{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;}
+.coach-video-overlay video{max-width:100%;max-height:100%;border-radius:0;}
+.coach-video-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
 /* ── Locked pills (cliffhanger paywall) ────────────────── */
 .sim-reply-pill.locked{opacity:0.5;cursor:pointer;position:relative;}
 .sim-reply-pill.locked:hover{border-color:var(--divider);background:var(--card);opacity:0.6;}
@@ -2447,6 +2462,11 @@ async function startSimulationAtBlocker() {
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
   const bridgeBubble = insertCoachBubble(bridge);
   await sleep(100);
+
+  // Coaching video — thumbnail with first frame, tap for fullscreen
+  renderCoachingVideo(blocker.code);
+  await sleep(50);
+
   renderOpeningChips();
 
   // Show locked pro tip card — nudge for first tap
@@ -2529,6 +2549,98 @@ const BLOCKER_OPENINGS = {
     { theme: 'Just start', text: "I keep waiting for the perfect time to bring this up, and I've realized there isn't one. So — I'd like to talk about my pay.", score: 2 },
   ],
 };
+
+// ── Coaching video — thumbnail with first frame, fullscreen on tap ──
+const COACH_VIDEO_URLS = {
+  no_script: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/no_script.mp4',
+  underpaid: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/underpaid.mp4',
+  fear_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/fear_no.mp4',
+  quiet: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/quiet.mp4',
+  timing: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/timing.mp4',
+  prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/prior_no.mp4',
+};
+
+function renderCoachingVideo(blockerCode) {
+  const url = COACH_VIDEO_URLS[blockerCode];
+  if (!url) return;
+
+  const wrap = el('div', 'coach-msg', '');
+  const thumb = el('div', 'coach-video-thumb', '');
+
+  // Avatar with video first frame
+  const avatar = el('div', 'coach-video-avatar', '');
+  const previewVid = document.createElement('video');
+  previewVid.src = url + '#t=0.5';
+  previewVid.preload = 'metadata';
+  previewVid.muted = true;
+  previewVid.playsInline = true;
+  previewVid.setAttribute('playsinline', '');
+  avatar.appendChild(previewVid);
+
+  // Play badge
+  const playBadge = el('div', 'coach-video-play', '');
+  playBadge.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg>';
+  avatar.appendChild(playBadge);
+  thumb.appendChild(avatar);
+
+  // Info
+  const info = el('div', 'coach-video-info', '');
+  const title = el('div', 'coach-video-title', '▶ Coach tip');
+  const desc = el('div', 'coach-video-desc', 'Watch before you choose your opening');
+  info.appendChild(title);
+  info.appendChild(desc);
+  thumb.appendChild(info);
+
+  // Duration
+  const dur = el('div', 'coach-video-dur', '');
+  previewVid.addEventListener('loadedmetadata', function() {
+    const secs = Math.round(previewVid.duration);
+    dur.textContent = '0:' + (secs < 10 ? '0' : '') + secs;
+  });
+  thumb.appendChild(dur);
+
+  // Tap to open fullscreen
+  thumb.addEventListener('click', function() {
+    const overlay = el('div', 'coach-video-overlay', '');
+    const fullVid = document.createElement('video');
+    fullVid.src = url;
+    fullVid.autoplay = true;
+    fullVid.playsInline = true;
+    fullVid.setAttribute('playsinline', '');
+    fullVid.controls = true;
+    fullVid.style.maxWidth = '100%';
+    fullVid.style.maxHeight = '100%';
+    overlay.appendChild(fullVid);
+
+    const closeBtn = el('button', 'coach-video-close', '×');
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      fullVid.pause();
+      overlay.remove();
+    });
+    overlay.appendChild(closeBtn);
+
+    // Close when video ends
+    fullVid.addEventListener('ended', function() {
+      overlay.remove();
+    });
+
+    // Close on overlay background tap
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) {
+        fullVid.pause();
+        overlay.remove();
+      }
+    });
+
+    document.body.appendChild(overlay);
+    logSession('video_watched', { blocker: blockerCode });
+  });
+
+  wrap.appendChild(thumb);
+  $('messages').appendChild(wrap);
+  scrollChatToBottom();
+}
 
 function renderOpeningChips() {
   const blocker = SIM_STATE.blocker;
