@@ -2551,7 +2551,7 @@ const BLOCKER_OPENINGS = {
   ],
 };
 
-// ── Coaching video — thumbnail with first frame, fullscreen on tap ──
+// ── Coaching video — thumbnail with static image, fullscreen on tap ──
 const COACH_VIDEO_URLS = {
   no_script: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/no_script.mp4',
   underpaid: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/underpaid.mp4',
@@ -2561,6 +2561,16 @@ const COACH_VIDEO_URLS = {
   prior_no: 'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/prior_no.mp4',
 };
 
+const COACH_THUMBS = [
+  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%281%29.jpg',
+  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%282%29.jpg',
+  'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/thumbnail%20%283%29.jpg',
+];
+
+const COACH_VIDEO_DURATIONS = {
+  no_script: 17, underpaid: 16, fear_no: 14, quiet: 15, timing: 18, prior_no: 15,
+};
+
 function renderCoachingVideo(blockerCode) {
   const url = COACH_VIDEO_URLS[blockerCode];
   if (!url) return;
@@ -2568,15 +2578,16 @@ function renderCoachingVideo(blockerCode) {
   const wrap = el('div', 'coach-msg', '');
   const thumb = el('div', 'coach-video-thumb', '');
 
-  // Avatar with video first frame
+  // Avatar with static thumbnail image
   const avatar = el('div', 'coach-video-avatar', '');
-  const previewVid = document.createElement('video');
-  previewVid.src = url + '#t=0.5';
-  previewVid.preload = 'metadata';
-  previewVid.muted = true;
-  previewVid.playsInline = true;
-  previewVid.setAttribute('playsinline', '');
-  avatar.appendChild(previewVid);
+  const img = document.createElement('img');
+  img.src = COACH_THUMBS[Math.floor(Math.random() * COACH_THUMBS.length)];
+  img.alt = 'Coach';
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = '50%';
+  avatar.appendChild(img);
 
   // Play badge
   const playBadge = el('div', 'coach-video-play', '');
@@ -2594,10 +2605,8 @@ function renderCoachingVideo(blockerCode) {
 
   // Duration
   const dur = el('div', 'coach-video-dur', '');
-  previewVid.addEventListener('loadedmetadata', function() {
-    const secs = Math.round(previewVid.duration);
-    dur.textContent = '0:' + (secs < 10 ? '0' : '') + secs;
-  });
+  const secs = COACH_VIDEO_DURATIONS[blockerCode] || 16;
+  dur.textContent = '0:' + (secs < 10 ? '0' : '') + secs;
   thumb.appendChild(dur);
 
   // Tap to open fullscreen
@@ -2621,12 +2630,10 @@ function renderCoachingVideo(blockerCode) {
     });
     overlay.appendChild(closeBtn);
 
-    // Close when video ends
     fullVid.addEventListener('ended', function() {
       overlay.remove();
     });
 
-    // Close on overlay background tap
     overlay.addEventListener('click', function(e) {
       if (e.target === overlay) {
         fullVid.pause();
