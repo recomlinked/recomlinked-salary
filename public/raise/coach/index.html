@@ -59,7 +59,7 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 
 .demo{padding:48px 20px 56px;}
 .demo-visual{max-width:500px;margin:0 auto;}
-.ds{display:flex;gap:12px;position:relative;opacity:0.25;transition:opacity 0.6s ease, transform 0.6s ease;transform:translateX(-4px);}
+.ds{display:flex;gap:12px;position:relative;opacity:0.5;transition:opacity 0.6s ease, transform 0.6s ease;transform:translateX(-4px);}
 .ds.active{opacity:1;transform:translateX(0);}
 .ds.active .dd{box-shadow:0 0 12px rgba(201,168,76,0.15);}
 .ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:var(--border);}
@@ -202,7 +202,7 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 @media(max-width:640px){
   .hero{padding:40px 16px 28px;}
   .hero-cta{width:100%;justify-content:center;max-width:calc(100% - 32px);margin-left:auto;margin-right:auto;}
-  .di-card{flex-direction:column;gap:8px;}
+  .di-card{flex-direction:row;gap:12px;}
   .bl-grid{grid-template-columns:1fr;}
   .demo{padding:36px 16px 40px;}
   .blockers{padding:36px 16px 44px;}
@@ -248,7 +248,7 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
       </div>
       <div class="ds">
         <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="dc"><div class="dl il">AI coach insights on your move</div><div class="di-card"><div class="di"><b>Approach</b>...</div><div class="di"><b>Risk</b>...</div><div class="di"><b>Opportunity</b>...</div><div class="di"><b>Next move</b>...</div></div></div>
+        <div class="dc"><div class="dl il">AI coach insights on your move</div><div class="di-card"><div class="di"><b>Approach</b></div><div class="di"><b>Risk</b></div><div class="di"><b>Opportunity</b></div><div class="di"><b>Next move</b></div></div></div>
       </div>
       <div class="ds">
         <div class="dd c"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4c0-.8.7-1.5 1.5-1.5h8c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-2.5 2.5V10.5H4c-.8 0-1.5-.7-1.5-1.5V4z" stroke="currentColor" stroke-width="1.2"/></svg></div>
@@ -260,7 +260,7 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
       </div>
       <div class="ds">
         <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-        <div class="dc"><div class="dl il">AI coach insights on the response</div><div class="di-card"><div class="di"><b>Signal</b>...</div><div class="di"><b>Hidden meaning</b>...</div><div class="di"><b>Preparation</b>...</div><div class="di"><b>Watch for</b>...</div></div></div>
+        <div class="dc"><div class="dl il">AI coach insights on the response</div><div class="di-card"><div class="di"><b>Signal</b></div><div class="di"><b>Hidden meaning</b></div><div class="di"><b>Preparation</b></div><div class="di"><b>Watch for</b></div></div></div>
       </div>
       <div class="ds" style="margin-top:12px;">
         <div class="dd m" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.25);"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 019.5-2M13 8a5 5 0 01-9.5 2" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round"/><path d="M12 3v3h-3" stroke="var(--gold)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
