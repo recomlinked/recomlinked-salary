@@ -5664,182 +5664,42 @@ function populatePaywallTicker(paywallWrap) {
 // the replies are terse and the CTA is the full message — prevents the
 // free chat from becoming the product.
 async function handlePostPaywallText(text) {
-  appendUserBubble(text);
-  disableInput('Thinking…');
+  // Unified post-paywall response — same in both modes
+  const targetContainer = SIM_STATE.simMode ? $('messages') : $('coaching-messages');
+
+  // Show user bubble in the active container
+  const userWrap = el('div', 'user-msg', '');
+  userWrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
+  targetContainer.appendChild(userWrap);
 
   state.free_dialog_count = (state.free_dialog_count || 0) + 1;
   saveState();
   logSession('free_text', { free_text_count: state.free_dialog_count });
 
-  await sleep(300);
-  showCoachTyping();
+  await sleep(400);
 
-  // Check dialog cap BEFORE calling the API — saves a Claude call when locked
-  if (state.free_dialog_count > FREE_DIALOG_LIMIT) {
-    await sleep(800);
-    hideCoachTyping();
-    // If the main paywall hasn't been shown yet (user hit the cap in
-    // coaching mode before exploring enough simulation chips), show it now.
-    if (!state.paywall_shown) {
-      state.obstacle = state.obstacle || SIM_STATE.blocker || { code: 'other' };
-      state.current_range = state.current_range || { floor: 45, ceiling: 70 };
-      await renderPaywallBubble({ animated: true });
-      logEntry('paywall', {});
-      enableInput('Ask your coach anything\u2026');
-      awaitFreeText(handlePostPaywallText);
-      return;
-    }
-    renderLockedReply(text);
-    return;
-  }
-
-  // Call the real coach API in free mode. Include simulation context
-  // so the coach knows what the user practiced and can give advice based
-  // on their specific scenario choices and responses.
-  let reply = null;
-  try {
-    const res = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile:               state.profile,
-        obstacle:              state.obstacle,
-        timing:                state.timing || 'exploring',
-        final_range:           state.current_range,
-        accumulated_exchanges: state.accumulated,
-        message:               text,
-        session_id:            profileHash(),
-        free_dialog_count:     state.free_dialog_count,
-        // Simulation context — so the coach can reference what the user practiced
-        sim_context: SIM_STATE.blocker ? {
-          blocker: SIM_STATE.blocker,
-          branch_history: SIM_STATE.branch_history || [],
-          scenarios_explored: SIM_STATE.scenarios_explored || [],
-          conversation_history: simConversation || [],
-          user_context: SIM_STATE.context || {},
-        } : undefined,
-      }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      reply = data.reply || null;
-    }
-  } catch (e) { /* fall through to fallback */ }
-
-  hideCoachTyping();
-
-  if (!reply) {
-    // API unavailable — render a short apologetic bubble without a CTA.
-    // Don't count this against the user's free_dialog_count (already incremented).
-    const wrap = el('div', 'coach-msg', '');
-    wrap.innerHTML = `<div class="bubble"><p>I couldn't respond just now. Try again, or jump into the plan — it has the answers to most questions you'd ask here.</p></div>`;
-    $('messages').appendChild(wrap);
-    scrollChatToBottom();
-    enableInput('Ask your coach anything…');
-    awaitFreeText(handlePostPaywallText);
-    return;
-  }
-
-  // Render the coach reply + dynamic CTA tail.
-  // Main reply text types char-by-char. Tail paragraph + CTA fade in after.
-  const remaining = FREE_DIALOG_LIMIT - state.free_dialog_count;
-  const tailCopy = remaining > 0
-    ? `<strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.`
-    : `<strong style="color:var(--t1);">Last free answer.</strong> The specifics — your exact words, your numbers, your handoff — live in the full plan. $${PRICE_USD} once.`;
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
+  // Single unified response — no API call
+  const responseWrap = el('div', 'coach-msg', '');
+  responseWrap.innerHTML = `
     <div class="bubble">
-      <p class="coach-typed"><span class="typed-text"></span><span class="cursor"></span></p>
-      <p class="coach-tail" style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
-      <button class="btn-pay coach-tail-btn" style="margin-top:10px;" data-tail-cta>
-        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      <p>I\u2019m ready to dive deeper into your specific situation. Unlock full access for $${PRICE_USD} to continue.</p>
+      <button class="btn-pay" style="margin-top:10px;width:100%;" data-tail-cta>
+        Practice every scenario \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
       </button>
     </div>
   `;
-  $('messages').appendChild(wrap);
+  targetContainer.appendChild(responseWrap);
 
-  const tailEl = wrap.querySelector('.coach-tail');
-  const btnEl  = wrap.querySelector('.coach-tail-btn');
-  tailEl.style.opacity = '0';
-  btnEl.style.opacity  = '0';
-  scrollChatToBottom();
-
-  // Type the main reply
-  const typedSpan = wrap.querySelector('.typed-text');
-  const cursorEl  = wrap.querySelector('.cursor');
-  await typeIntoElement(typedSpan, reply);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade in the tail + CTA together
-  await sleep(200);
-  fadeInElement(tailEl);
-  fadeInElement(btnEl);
-
-  logEntry('coach_bubble', { text: reply });
-
-  const btn = wrap.querySelector('[data-tail-cta]');
+  const btn = responseWrap.querySelector('[data-tail-cta]');
   if (btn) btn.onclick = startCheckout;
 
-  enableInput('Ask your coach anything…');
-  awaitFreeText(handlePostPaywallText);
-}
+  if (SIM_STATE.simMode) {
+    scrollChatToBottom();
+  } else {
+    scrollCoachingToBottom();
+  }
 
-/** Post-cap reply — short, polite, all CTA. Rendered when user has exceeded
-    FREE_DIALOG_LIMIT free-text messages. */
-async function renderLockedReply(userText) {
-  const obs = state.obstacle || { code: 'other' };
-  // Three rotating lead-ins so it doesn't feel scripted if they keep typing
-  const leadIns = [
-    "I can't go further without you on the plan — but I want to. Everything you're asking is in there, answered specifically for you.",
-    "The plan is the product. Every answer I'd give you here lives in there, sharper and built around your exact situation.",
-    "I've given you what I can for free. The rest is the plan — role-play, exact scripts, 30 days of follow-up.",
-  ];
-  const lockIdx = Math.min(state.free_dialog_count - FREE_DIALOG_LIMIT - 1, leadIns.length - 1);
-  const leadIn = leadIns[Math.max(0, lockIdx)];
-
-  const proof = pickProofLine(obs.code);
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="lock-lead"><span class="lock-typed"></span><span class="lock-cursor"></span></p>
-      <button class="btn-pay lock-cta" data-tail-cta>
-        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row lock-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line lock-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[data-tail-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  const ctaEl   = wrap.querySelector('.lock-cta');
-  const trustEl = wrap.querySelector('.lock-trust');
-  const proofEl = wrap.querySelector('.lock-proof');
-  ctaEl.style.opacity   = '0';
-  trustEl.style.opacity = '0';
-  proofEl.style.opacity = '0';
-  scrollChatToBottom();
-
-  // Type the lead-in
-  const typedSpan = wrap.querySelector('.lock-typed');
-  const cursorEl  = wrap.querySelector('.lock-cursor');
-  await typeIntoElement(typedSpan, leadIn);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade the rest in
-  await sleep(250);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-
-  // Keep input enabled but user gets the same locked reply each time after this
-  enableInput('Ask your coach anything…');
+  enableInput(SIM_STATE.simMode ? 'Tap an option or type your own\u2026' : 'Ask your coach anything\u2026');
   awaitFreeText(handlePostPaywallText);
 }
 
@@ -5952,14 +5812,14 @@ async function handleCoachingChat(userText) {
     `;
     coachingEl.appendChild(limitWrap);
 
-    // Start testimonial ticker if available
-    const tickerEl = limitWrap.querySelector('#coaching-paywall-ticker');
-    if (tickerEl && typeof startSolutionQuoteTicker === 'function') {
-      startSolutionQuoteTicker(tickerEl);
-    }
+    // Start testimonial ticker
+    populatePaywallTicker(limitWrap);
 
     addBackToPracticeCTA();
     scrollCoachingToBottom();
+    // After coaching paywall, further typing uses unified post-paywall handler
+    enableInput('Ask your coach anything\u2026');
+    awaitFreeText(handlePostPaywallText);
     return;
   }
 
