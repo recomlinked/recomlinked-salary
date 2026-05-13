@@ -2142,7 +2142,7 @@ function setMode(target) {
       const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
       const firstUnseen = allMsgs.length - unseenCoachCount;
       if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
-        const scrollParent = coachingEl.closest('.chat-scroll') || coachingEl.parentElement;
+        const scrollParent = $('chat-wrap');
         if (scrollParent) {
           scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 10;
         }
@@ -2158,9 +2158,7 @@ function setMode(target) {
 }
 
 function checkCoachingScrollSeen() {
-  const coachEl = $('coaching-messages');
-  if (!coachEl) return;
-  const scrollParent = coachEl.closest('.chat-scroll') || coachEl.parentElement;
+  const scrollParent = $('chat-wrap');
   if (!scrollParent) return;
   // If scrolled to bottom (or content fits without scrolling), mark all as seen
   const atBottom = scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight < 50;
@@ -2170,9 +2168,9 @@ function checkCoachingScrollSeen() {
   }
 }
 
-// Listen for scroll in coaching mode to mark messages as seen
-document.addEventListener('DOMContentLoaded', function() {
-  const chatWrap = document.querySelector('.chat-scroll') || document.querySelector('.chat-body');
+// Listen for scroll to mark coaching messages as seen
+setTimeout(function() {
+  const chatWrap = $('chat-wrap');
   if (chatWrap) {
     chatWrap.addEventListener('scroll', function() {
       if (!SIM_STATE.simMode) {
@@ -2180,7 +2178,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
+}, 500);
 
 function scrollCoachingToBottom() {
   const coachEl = $('coaching-messages');
