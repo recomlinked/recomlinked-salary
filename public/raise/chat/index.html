@@ -302,7 +302,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .coach-preview-icon{display:flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;}
 .coach-preview-label{font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;}
 .coach-preview-text{font-size:12px;color:#5a4a20;line-height:1.5;}
-.coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#c9a84c;cursor:pointer;}
+.coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:700;color:#c9a84c;cursor:pointer;}
 .coach-preview-cta:hover{color:#b8960c;}
 .coach-preview-bullets{display:flex;flex-direction:column;gap:4px;}
 .cpb{font-size:12px;color:#5a4a20;line-height:1.4;padding-left:14px;position:relative;font-weight:600;}
@@ -2378,7 +2378,7 @@ function showCoachPreviewCard(action, context) {
       <span class="coach-preview-label">Coach insight</span>
     </div>
     <div class="coach-preview-bullets">${bullets}</div>
-    <div class="coach-preview-cta">View coaching \u2192</div>
+    <div class="coach-preview-cta">View coach tips \u2192</div>
   `;
   preview.addEventListener('click', function() {
     setMode('coach');
