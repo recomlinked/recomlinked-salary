@@ -5367,14 +5367,25 @@ async function startCheckout() {
   try {
     const params = new URLSearchParams(location.search);
     const refSource = params.get('ref') || (state.profile && state.profile.refSource) || '';
+    // Fallback values for Path B users who skip profiling
+    const checkoutProfile = state.profile || {
+      role: 'Not specified',
+      country: 'US',
+      company_situation: 'Not specified',
+      last_raise: 'Not specified',
+      seniority: 'unknown',
+      company_size: 'unknown',
+    };
+    const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
+    const checkoutObstacle = state.obstacle || SIM_STATE.blocker || { code: 'other', label: 'Other' };
     const res = await fetch(API_CHECKOUT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         profile_hash: profileHash(),
-        profile: state.profile,
-        final_range: state.current_range,
-        obstacle: state.obstacle,
+        profile: checkoutProfile,
+        final_range: checkoutRange,
+        obstacle: checkoutObstacle,
         refSource,
         promo_code: undefined,
       }),
