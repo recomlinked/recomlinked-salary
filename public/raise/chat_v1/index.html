@@ -5506,7 +5506,7 @@ async function renderPaywallBubble(opts) {
           Unlimited scenario branches
         </div>
         <div class="paywall-inc-item">
-          AI coaching feedback on every move
+          AI coaching on every move
         </div>
         <div class="paywall-inc-item">
           30 days of access
@@ -5912,7 +5912,7 @@ function handleSend() {
 // Coaching mode free text chat
 let coachingChatHistory = [];
 let coachingFreeMessages = 0;
-const COACHING_FREE_LIMIT = 3;
+const COACHING_FREE_LIMIT = 2;
 
 async function handleCoachingChat(userText) {
   const coachingEl = $('coaching-messages');
@@ -5921,6 +5921,12 @@ async function handleCoachingChat(userText) {
   // Check free message limit
   if (!state.paid && coachingFreeMessages >= COACHING_FREE_LIMIT) {
     coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
+
+    // Coach bubble before paywall — same as practice mode
+    const coachWrap = el('div', 'coach-msg', '');
+    coachWrap.innerHTML = `<div class="bubble"><p>Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $${PRICE_USD} \u2014 with personalized AI coaching on every move.</p></div>`;
+    coachingEl.appendChild(coachWrap);
+
     const limitWrap = el('div', 'coach-msg', '');
     const displayPrice = PRICE_USD;
     const ctaPrice = `$${PRICE_USD}`;
@@ -5934,16 +5940,24 @@ async function handleCoachingChat(userText) {
         <div class="trust-row paywall-trust">
           <span>Stripe secure</span><span class="dot">\u00b7</span><span>No subscription</span>
         </div>
+        <div class="paywall-ticker"><div class="paywall-ticker-inner" id="coaching-paywall-ticker"></div></div>
         <div class="paywall-includes-title">Includes</div>
         <div class="paywall-includes">
           <div class="paywall-inc-item">Unlimited scenario branches</div>
-          <div class="paywall-inc-item">AI coaching feedback on every move</div>
+          <div class="paywall-inc-item">AI coaching on every move</div>
           <div class="paywall-inc-item">30 days of access</div>
         </div>
         <div class="paywall-closing">$${displayPrice} once, for a conversation that adds thousands to your salary.</div>
       </div>
     `;
     coachingEl.appendChild(limitWrap);
+
+    // Start testimonial ticker if available
+    const tickerEl = limitWrap.querySelector('#coaching-paywall-ticker');
+    if (tickerEl && typeof startSolutionQuoteTicker === 'function') {
+      startSolutionQuoteTicker(tickerEl);
+    }
+
     addBackToPracticeCTA();
     scrollCoachingToBottom();
     return;
