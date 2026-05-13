@@ -324,6 +324,20 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .typing-dots span:nth-child(3){animation-delay:0.4s;}
 @keyframes typingDot{0%,100%{opacity:0.3;}50%{opacity:1;}}
 
+/* Coaching analysis card */
+.coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;border-left:3px solid #c9a84c;}
+.analysis-direction{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--divider);}
+.analysis-body{font-size:13px;color:var(--t2);line-height:1.7;}
+.analysis-body p{margin:0;}
+
+/* Path breadcrumb */
+.coaching-path{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px;padding:6px 10px;background:rgba(201,168,76,0.06);border-radius:6px;}
+.path-step{font-size:11px;color:#8a7540;font-weight:500;}
+.path-arrow{font-size:10px;color:rgba(154,130,40,0.4);}
+
+/* Coaching toggle unread count */
+.coach-unread-count{min-width:16px;height:16px;border-radius:8px;background:#c9a84c;color:#07090f;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;position:absolute;top:-4px;right:-4px;}
+
 .coach-video-thumb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color 0.2s;}
 .coach-video-thumb:hover{border-color:rgba(201,168,76,0.35);}
 .coach-video-avatar{width:60px;height:60px;border-radius:50%;flex-shrink:0;position:relative;background:#1a1f2e;border:2px solid #c9a84c;box-shadow:0 0 0 1px rgba(201,168,76,0.2);}
@@ -2157,18 +2171,18 @@ function updateModeToggleUI() {
   }
 }
 
-// Update coaching tab badge with unseen count
+// Update coaching tab badge with unseen count number
 function updateCoachBadge() {
   const coachBtn = $('mode-btn-coach');
   if (!coachBtn) return;
-  let badge = coachBtn.querySelector('.coach-unseen-dot');
+  coachBtn.style.position = 'relative';
+  let badge = coachBtn.querySelector('.coach-unread-count');
   if (unseenCoachCount > 0 && SIM_STATE.simMode) {
     if (!badge) {
-      badge = el('span', 'coach-unseen-dot', '');
-      badge.style.cssText = 'width:8px;height:8px;border-radius:50%;background:#c9a84c;position:absolute;top:2px;right:2px;';
-      coachBtn.style.position = 'relative';
+      badge = el('span', 'coach-unread-count', '');
       coachBtn.appendChild(badge);
     }
+    badge.textContent = unseenCoachCount;
     badge.style.display = '';
   } else {
     if (badge) badge.style.display = 'none';
@@ -2182,19 +2196,33 @@ function addCoachingInsight(text, type, directionLabel) {
   if (!coachingEl) return;
 
   const wrap = el('div', 'coach-msg', '');
-  const bubble = el('div', 'bubble', '');
+
+  // Build path breadcrumb if we have history (#7)
+  let pathHtml = '';
+  if (SIM_STATE.branch_history && SIM_STATE.branch_history.length > 0) {
+    const steps = SIM_STATE.branch_history.map(b => {
+      const label = (b.reply || b.scenario || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+      return `<span class="path-step">${escapeHtml(label.length > 20 ? label.slice(0, 18) + '...' : label)}</span>`;
+    });
+    pathHtml = `<div class="coaching-path">${steps.join('<span class="path-arrow">\u2192</span>')}</div>`;
+  }
+
+  // Render as a structured card
+  const card = el('div', 'coaching-analysis-card', '');
   let html = '';
   if (directionLabel) {
-    html += `<p style="margin-bottom:8px;"><strong style="font-size:14px;">${escapeHtml(directionLabel)}</strong></p>`;
+    html += `<div class="analysis-direction">${escapeHtml(directionLabel)}</div>`;
   }
-  html += `<p>${inlineBold(escapeHtml(text))}</p>`;
-  bubble.innerHTML = html;
-  wrap.appendChild(bubble);
+  if (pathHtml) {
+    html += pathHtml;
+  }
+  html += `<div class="analysis-body">${inlineBold(escapeHtml(text))}</div>`;
+  card.innerHTML = html;
+  wrap.appendChild(card);
   coachingEl.appendChild(wrap);
 
   coachingMessages.push({ text, type, time: Date.now() });
 
-  // If user is in practice mode, increment unseen and update badge
   if (SIM_STATE.simMode) {
     unseenCoachCount++;
     updateCoachBadge();
@@ -2304,30 +2332,27 @@ function getCoachPreviewBullets(action, context) {
   if (action === 'opening_picked') {
     return `
       <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
-      <div class="cpb">Alternative openings you haven't tried</div>
-      <div class="cpb">Pro tip: the silence after your ask is your most powerful tool</div>
-      <div class="cpb">A short coaching video for your scenario</div>
+      <div class="cpb">A coaching video for your scenario</div>
+      <div class="cpb">A pro tip you haven't seen yet</div>
     `;
   }
   if (action === 'scenario_selected') {
     return `
-      <div class="cpb">What this manager response signals</div>
+      <div class="cpb">What this manager response really signals</div>
       <div class="cpb">How to read between the lines</div>
-      <div class="cpb">Pro tip: they'll only hear the bottom of your range — set it wisely</div>
-      <div class="cpb">Your progress: ${SIM_STATE.scenarios_explored?.length || 1} path${(SIM_STATE.scenarios_explored?.length || 1) > 1 ? 's' : ''} explored</div>
+      <div class="cpb">A pro tip you haven't seen yet</div>
     `;
   }
   if (action === 'reply_chosen') {
     return `
       <div class="cpb">Strengths and risks of your response</div>
       <div class="cpb">What your manager is likely thinking now</div>
-      <div class="cpb">Pro tip: practicing out loud gets 12-18% better outcomes</div>
-      <div class="cpb">Your full negotiation path summarized</div>
+      <div class="cpb">A pro tip you haven't seen yet</div>
     `;
   }
   return `
     <div class="cpb">Personalized coaching insight</div>
-    <div class="cpb">Pro tips for your situation</div>
+    <div class="cpb">A pro tip you haven't seen yet</div>
   `;
 }
 
@@ -4410,10 +4435,8 @@ async function showSimulationPaywall(lastScenario) {
     b.style.cursor = 'default';
     b.onclick = null;
   });
-  // 3. Mode toggle — lock it so user can't switch back to simulation
-  const modeToggle = $('mode-toggle');
-  if (modeToggle) modeToggle.classList.add('locked');
-  SIM_STATE.unlocked = false;
+  // 3. Mode toggle — keep it enabled so user can still check coaching
+  // (removed lock — user should always be able to switch modes)
 
   // ── Add purchase button to header — always visible from now on ──
   showHeaderPurchaseButton();
