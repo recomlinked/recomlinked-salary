@@ -405,7 +405,7 @@ var Q=[
 {n:"Tom H.",r:"Warehouse Supervisor",raise:"7%",img:"tom.png",t:"Canceled the job interview. Didn\u2019t need it anymore."},
 {n:"Linda C.",r:"Office Manager",raise:"10%",let:"LC",col:"#1dd9b3",t:"He said let me think about it. I had a response for that too."}
 ];
-var tk=document.getElementById('tk'),ib='https://uar39wfkzm81kvim.public.blob.vercel-storage.com/';
+var tk=document.getElementById('tk'),ib='/raise/avatars/';
 Q.concat(Q).forEach(function(q){
 var d=document.createElement('div');d.className='ti';
 var av=q.img?'<img class="ti-av" src="'+ib+q.img+'" alt="" loading="lazy">':'<div class="ti-let" style="background:'+(q.col||'#c9a84c')+'">'+q.let+'</div>';
