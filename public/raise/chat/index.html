@@ -5955,10 +5955,20 @@ async function handleCoachingChat(userText) {
     const reply = data.reply || data.insight || "I'm here to help with your raise conversation. Ask me anything about your situation.";
     coachingChatHistory.push({ role: 'assistant', content: reply });
 
-    // Show coach reply
+    // Show coach reply with typing animation
     const replyWrap = el('div', 'coach-msg', '');
-    replyWrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(reply))}</p></div>`;
+    const replyBubble = el('div', 'bubble', '');
+    replyBubble.innerHTML = '<p><span class="typed-text"></span><span class="cursor"></span></p>';
+    replyWrap.appendChild(replyBubble);
     coachingEl.appendChild(replyWrap);
+    scrollCoachingToBottom();
+
+    const typedSpan = replyBubble.querySelector('.typed-text');
+    const cursorEl2 = replyBubble.querySelector('.cursor');
+    await typeIntoElement(typedSpan, reply);
+    if (cursorEl2) cursorEl2.remove();
+    // Apply bold formatting after typing completes
+    typedSpan.innerHTML = inlineBold(escapeHtml(reply));
   } catch (err) {
     if (typingWrap._arcStop) typingWrap._arcStop();
     typingWrap.remove();
