@@ -4758,14 +4758,25 @@ async function resumeFromState() {
     // Don't reset simTapCount — restored from localStorage
     showToolbar();
     showModeToggle();
+    unlockModeToggle();
+
+    // Repopulate coaching mode with welcome + video
+    addCoachingVideo(blocker.code);
+    const welcomeText = getCoachingWelcome(blocker.code);
+    const coachingEl = $('coaching-messages');
+    if (coachingEl) {
+      const wrap = el('div', 'coach-msg', '');
+      wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(welcomeText)}</p></div>`;
+      coachingEl.appendChild(wrap);
+    }
 
     if (state.paywall_shown) {
       showHeaderPurchaseButton({});
-      enableInput('Ask your coach anything…');
+      enableInput('Ask your coach anything\u2026');
       awaitFreeText(handlePostPaywallText);
     } else {
       // Re-enter simulation — show scenario pills without re-typing intro
-      disableInput('Loading scenarios…');
+      disableInput('Loading scenarios\u2026');
       showCoachTyping();
       try {
         const res2 = await fetch('/api/raise-coach', {
@@ -4781,11 +4792,12 @@ async function resumeFromState() {
         const data2 = await res2.json();
         hideCoachTyping();
         renderScenarioLabels((data2.scenarios && data2.scenarios.length >= 2) ? data2.scenarios : getDefaultScenarios(blocker.code));
+        // Show coach insight card after pills
+        showCoachPreviewCard('opening_picked', { theme: '' });
       } catch (e) {
         hideCoachTyping();
         renderScenarioLabels(getDefaultScenarios(blocker.code));
       }
-      unlockModeToggle();
     }
   } else if (where === 1)      beginExchange2(); // Ex1 removed, go straight to Ex2
   else if (where === 2) beginExchange2();
