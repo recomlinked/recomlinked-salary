@@ -5780,6 +5780,11 @@ async function handleCoachingChat(userText) {
 
   // Check free message limit
   if (!state.paid && coachingFreeMessages >= COACHING_FREE_LIMIT) {
+    // If paywall already shown in coaching, use unified post-paywall handler
+    if (coachingEl.querySelector('.paywall-bubble')) {
+      handlePostPaywallText(userText);
+      return;
+    }
     coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
 
     // Coach bubble before paywall — same as practice mode
