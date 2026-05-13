@@ -289,6 +289,57 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .promo-timer-num{font-variant-numeric:tabular-nums;}
 
 /* ── Coaching video thumbnail ──────────────────────────── */
+/* ── Dual mode: Practice + Coaching containers ─────────── */
+.active-chat{display:block;}
+.coaching-chat{display:none;padding-bottom:20px;}
+.coaching-chat .coach-msg{animation:fadeInUp 0.3s ease;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* Coach preview card — shown in practice mode after each action */
+.coach-preview{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:12px 14px;margin:6px 0;cursor:pointer;transition:all 0.3s ease;position:relative;overflow:hidden;}
+.coach-preview:hover{border-color:#c9a84c;}
+.coach-preview-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.coach-preview-icon{display:flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;}
+.coach-preview-label{font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;}
+.coach-preview-text{font-size:12px;color:#5a4a20;line-height:1.5;}
+.coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#c9a84c;cursor:pointer;}
+.coach-preview-cta:hover{color:#b8960c;}
+.coach-preview-bullets{display:flex;flex-direction:column;gap:4px;}
+.cpb{font-size:12px;color:#5a4a20;line-height:1.4;padding-left:14px;position:relative;font-weight:600;}
+.cpb::before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:#c9a84c;}
+.coach-preview.collapsing{opacity:0;max-height:0;margin:0;padding:0;border:none;transition:all 0.3s ease;}
+
+/* Coaching mode unseen badge */
+.coaching-unseen{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 16px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:8px;margin:8px 0;font-size:11px;font-weight:500;color:#c9a84c;cursor:pointer;}
+.coaching-unseen:hover{background:rgba(201,168,76,0.15);}
+
+/* Back to practice CTA in coaching mode */
+.back-to-practice{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--card);border:1px solid var(--divider);border-radius:8px;margin:12px 0;font-size:12px;font-weight:500;color:var(--teal);cursor:pointer;}
+.back-to-practice:hover{border-color:var(--teal);}
+
+/* Typing dots animation for coaching mode */
+.typing-dots{display:flex;gap:4px;}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:typingDot 1.2s infinite;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes typingDot{0%,100%{opacity:0.3;}50%{opacity:1;}}
+
+/* Coaching analysis card */
+.coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;}
+.analysis-direction{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--divider);}
+.analysis-body{font-size:13px;color:var(--t2);line-height:1.7;}
+.analysis-body p{margin:0;}
+
+/* Path breadcrumb */
+.coaching-path{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px;padding:6px 10px;background:rgba(201,168,76,0.06);border-radius:6px;}
+.path-step{font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;}
+.path-user{color:#3d5a20;background:rgba(29,158,117,0.08);}
+.path-mgr{color:#5a4a20;background:rgba(201,168,76,0.1);}
+.path-arrow{font-size:10px;color:rgba(154,130,40,0.4);}
+
+/* Coaching toggle unread count */
+.coach-unread-count{min-width:16px;height:16px;border-radius:8px;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;position:absolute;top:-4px;right:-4px;}
+
 .coach-video-thumb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color 0.2s;}
 .coach-video-thumb:hover{border-color:rgba(201,168,76,0.35);}
 .coach-video-avatar{width:60px;height:60px;border-radius:50%;flex-shrink:0;position:relative;background:#1a1f2e;border:2px solid #c9a84c;box-shadow:0 0 0 1px rgba(201,168,76,0.2);}
@@ -631,6 +682,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-reply-pill:hover .chip-radio{border-color:var(--teal);}
 .sim-reply-pill.active .chip-radio{border-color:var(--teal);background:var(--teal);}
 .sim-reply-pill.active .chip-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--bg);}
+.sim-pill:hover .chip-radio{border-color:var(--teal);}
+.sim-pill.active .chip-radio{border-color:var(--teal);background:var(--teal);}
+.sim-pill.active .chip-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--bg);}
 .sim-reply-pill.active .chip-rank{color:var(--teal);background:rgba(0,196,160,0.1);}
 .sim-reply-pill.active .sim-reply-theme,.sim-reply-pill.active .sim-pill-theme{color:var(--text);}
 .chips-expand{display:inline-flex;align-items:center;gap:4px;padding:4px 0;background:none;border:none;cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);font-family:var(--sans);margin-top:2px;}
@@ -687,7 +741,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
     </div>
 
     <!-- Coach messages and card render into this area -->
-    <div id="messages"></div>
+    <!-- DUAL MODE: Practice and Coaching are separate containers -->
+    <div id="messages" class="active-chat"></div>
+    <div id="coaching-messages" class="coaching-chat" style="display:none;"></div>
 
   </div>
 
@@ -2041,32 +2097,97 @@ function exportTreeSummary(btn) {
 // updates the visual selected state, inserts a mode banner in the chat
 // stream so the user clearly sees they switched, and triggers the
 // appropriate flow (simulation pills stay tappable / coach-reflection runs).
+// ── Dual Mode: Practice + Coaching ──────────────────────
+// Practice and coaching are separate chat containers.
+// Switching modes shows/hides the containers.
+// Coaching messages accumulate in the background.
+let coachingMessages = [];   // array of coaching insights
+let unseenCoachCount = 0;    // how many coaching messages user hasn't seen
+let currentCoachPreview = null; // the preview card in practice mode
+
 function setMode(target) {
-  if (!SIM_STATE.unlocked) return;
   if (target !== 'sim' && target !== 'coach') return;
 
   const wantSim = target === 'sim';
-  // No-op if we're already in this mode
-  if (wantSim && SIM_STATE.simMode) return;
-  if (!wantSim && !SIM_STATE.simMode) return;
-
   SIM_STATE.simMode = wantSim;
   updateModeToggleUI();
 
+  const practiceEl = $('messages');
+  const coachingEl = $('coaching-messages');
+
   if (wantSim) {
-    // Switching back to simulation — show banner, re-enable pill mode
-    insertModeBanner('sim');
-    disableInput('Tap a scenario above\u2026');
+    // Show practice, hide coaching
+    practiceEl.style.display = '';
+    practiceEl.classList.add('active-chat');
+    coachingEl.style.display = 'none';
+    // Input placeholder for practice
+    const input = $('chat-input');
+    if (input) input.placeholder = 'Tap an opening or type your own\u2026';
+    scrollChatToBottom();
   } else {
-    // Switching to coaching — show banner, run reflection (or open chat
-    // input if nothing's been explored yet)
-    insertModeBanner('coach');
-    if (SIM_STATE.branch_history.length > 0) {
-      showCoachReflection();
-    } else {
-      enableInput('Ask me anything\u2026');
-      awaitFreeText(handlePostPaywallText);
+    // Show coaching, hide practice
+    practiceEl.style.display = 'none';
+    coachingEl.style.display = 'block';
+    coachingEl.classList.add('active-chat');
+    // Don't reset unseen count yet — only when user scrolls to bottom
+    // Input placeholder for coaching
+    const input = $('chat-input');
+    if (input) {
+      input.placeholder = 'Ask your coach anything\u2026';
+      input.disabled = false;
     }
+    const sendBtn = $('send-btn');
+    if (sendBtn) sendBtn.disabled = false;
+    // Show unseen indicator if needed
+    renderCoachingUnseenHeader();
+    // Scroll to first unseen message, not bottom
+    if (unseenCoachCount > 0) {
+      const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
+      const firstUnseen = allMsgs.length - unseenCoachCount;
+      if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
+        const scrollParent = $('chat-wrap');
+        if (scrollParent) {
+          scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 80;
+        }
+      }
+    } else {
+      scrollCoachingToBottom();
+    }
+    // Check if already at bottom (short content) — mark as seen
+    checkCoachingScrollSeen();
+    // Add "Back to practice" CTA at bottom
+    addBackToPracticeCTA();
+  }
+}
+
+function checkCoachingScrollSeen() {
+  const scrollParent = $('chat-wrap');
+  if (!scrollParent) return;
+  // If scrolled to bottom (or content fits without scrolling), mark all as seen
+  const atBottom = scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight < 50;
+  if (atBottom) {
+    unseenCoachCount = 0;
+    updateCoachBadge();
+  }
+}
+
+// Listen for scroll to mark coaching messages as seen
+setTimeout(function() {
+  const chatWrap = $('chat-wrap');
+  if (chatWrap) {
+    chatWrap.addEventListener('scroll', function() {
+      if (!SIM_STATE.simMode) {
+        checkCoachingScrollSeen();
+      }
+    });
+  }
+}, 500);
+
+function scrollCoachingToBottom() {
+  const coachEl = $('coaching-messages');
+  if (coachEl) {
+    const scrollParent = coachEl.closest('.chat-scroll') || coachEl.parentElement;
+    if (scrollParent) scrollParent.scrollTop = scrollParent.scrollHeight;
   }
 }
 
@@ -2090,47 +2211,392 @@ function updateModeToggleUI() {
   }
 }
 
-// Show a mode banner in the chat. Only ONE banner exists at a time —
-// previous banners are removed before inserting a new one. If the same
-// mode is already shown, no new banner is added.
+// Update coaching tab badge with unseen count number
+function updateCoachBadge() {
+  const coachBtn = $('mode-btn-coach');
+  if (!coachBtn) return;
+  coachBtn.style.position = 'relative';
+  let badge = coachBtn.querySelector('.coach-unread-count');
+  if (unseenCoachCount > 0 && SIM_STATE.simMode) {
+    if (!badge) {
+      badge = el('span', 'coach-unread-count', '');
+      coachBtn.appendChild(badge);
+    }
+    badge.textContent = unseenCoachCount;
+    badge.style.display = '';
+  } else {
+    if (badge) badge.style.display = 'none';
+  }
+}
+
+// Add coaching insight to coaching container (called after each practice action)
+function addCoachingInsight(text, type, directionLabel) {
+  type = type || 'insight';
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const wrap = el('div', 'coach-msg', '');
+
+  // Build path breadcrumb showing user choices and manager responses
+  let pathHtml = '';
+  if (SIM_STATE.branch_history && SIM_STATE.branch_history.length > 0) {
+    const chips = [];
+    for (const b of SIM_STATE.branch_history) {
+      // User's choice (opening theme or reply theme)
+      const userLabel = (b.reply || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+      if (userLabel) {
+        chips.push({ label: userLabel, type: 'user' });
+      }
+      // Manager's scenario response
+      const mgrLabel = (b.scenario || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+      if (mgrLabel && mgrLabel !== 'opening') {
+        chips.push({ label: mgrLabel, type: 'manager' });
+      }
+    }
+    if (chips.length > 0) {
+      const stepsHtml = chips.map(c => {
+        const short = c.label.length > 22 ? c.label.slice(0, 20) + '...' : c.label;
+        const cls = c.type === 'user' ? 'path-step path-user' : 'path-step path-mgr';
+        return `<span class="${cls}">${escapeHtml(short)}</span>`;
+      });
+      pathHtml = `<div class="coaching-path">${stepsHtml.join('<span class="path-arrow">\u2192</span>')}</div>`;
+    }
+  }
+
+  // Render as a structured card
+  const card = el('div', 'coaching-analysis-card', '');
+  let html = '';
+  if (directionLabel) {
+    html += `<div class="analysis-direction">${escapeHtml(directionLabel)}</div>`;
+  }
+  if (pathHtml) {
+    html += pathHtml;
+  }
+  // Format the analysis text — add line breaks before each **Label:**
+  let formattedText = escapeHtml(text);
+  // Split at bold labels (Approach:, Risk:, etc.) and add paragraph breaks
+  formattedText = formattedText.replace(/\*\*(Approach|Risk|Opportunity|Next move|Next Move|Signal|Hidden meaning|Hidden Meaning|Preparation|Watch for|Watch For|Strategy|Strength|Weakness|After this|After This):\*\*/g, '<br><br>**$1:**');
+  // Remove leading <br> if text starts with a label
+  formattedText = formattedText.replace(/^<br><br>/, '');
+  formattedText = inlineBold(formattedText);
+
+  html += `<div class="analysis-body">${formattedText}</div>`;
+  card.innerHTML = html;
+  wrap.appendChild(card);
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text, type, time: Date.now() });
+
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  } else {
+    scrollCoachingToBottom();
+  }
+}
+
+// Add video to coaching container
+function addCoachingVideo(blockerCode) {
+  const url = COACH_VIDEO_URLS[blockerCode];
+  if (!url) return;
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const wrap = el('div', 'coach-msg', '');
+  const thumb = el('div', 'coach-video-thumb', '');
+
+  const avatar = el('div', 'coach-video-avatar', '');
+  const img = document.createElement('img');
+  img.src = COACH_THUMBS[blockerCode] || COACH_THUMBS.no_script;
+  img.alt = 'Coach';
+  img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;';
+  avatar.appendChild(img);
+
+  const playBadge = el('div', 'coach-video-play', '');
+  playBadge.innerHTML = '<svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg>';
+  avatar.appendChild(playBadge);
+  thumb.appendChild(avatar);
+
+  const info = el('div', 'coach-video-info', '');
+  const title = el('div', 'coach-video-title', '\u25B6 Coach tip');
+  const desc = el('div', 'coach-video-desc', 'Your coach has a tip for you');
+  info.appendChild(title);
+  info.appendChild(desc);
+  thumb.appendChild(info);
+
+  const dur = el('div', 'coach-video-dur', '');
+  const secs = COACH_VIDEO_DURATIONS[blockerCode] || 16;
+  dur.textContent = '0:' + (secs < 10 ? '0' : '') + secs;
+  thumb.appendChild(dur);
+
+  thumb.addEventListener('click', function() {
+    const overlay = el('div', 'coach-video-overlay', '');
+    const fullVid = document.createElement('video');
+    fullVid.src = url;
+    fullVid.autoplay = true;
+    fullVid.playsInline = true;
+    fullVid.setAttribute('playsinline', '');
+    fullVid.controls = true;
+    fullVid.style.cssText = 'max-width:100%;max-height:100%;';
+    overlay.appendChild(fullVid);
+    const closeBtn = el('button', 'coach-video-close', '\u00d7');
+    closeBtn.addEventListener('click', function(e) { e.stopPropagation(); fullVid.pause(); overlay.remove(); });
+    overlay.appendChild(closeBtn);
+    fullVid.addEventListener('ended', function() { overlay.remove(); });
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) { fullVid.pause(); overlay.remove(); } });
+    document.body.appendChild(overlay);
+    try { localStorage.setItem('rl_video_watched', blockerCode); } catch(e) {}
+    logEntry('video_watched', { blocker: blockerCode });
+  });
+
+  wrap.appendChild(thumb);
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text: 'Video tip: ' + blockerCode, type: 'video', time: Date.now() });
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
+}
+
+// Show a preview card in practice mode (one at a time, replaces previous)
+// The card shows a MENU of what's available in coaching mode, not the full content
+function showCoachPreviewCard(action, context) {
+  // Collapse previous preview
+  if (currentCoachPreview) {
+    currentCoachPreview.classList.add('collapsing');
+    const old = currentCoachPreview;
+    setTimeout(() => old.remove(), 300);
+  }
+
+  const bullets = getCoachPreviewBullets(action, context);
+
+  const preview = el('div', 'coach-preview', '');
+  preview.innerHTML = `
+    <div class="coach-preview-header">
+      <span class="coach-preview-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
+      <span class="coach-preview-label">Coach insight</span>
+    </div>
+    <div class="coach-preview-bullets">${bullets}</div>
+    <div class="coach-preview-cta">View coaching \u2192</div>
+  `;
+  preview.addEventListener('click', function() {
+    setMode('coach');
+  });
+
+  $('messages').appendChild(preview);
+  currentCoachPreview = preview;
+  scrollChatToBottom();
+}
+
+function getCoachPreviewBullets(action, context) {
+  const theme = context?.theme || context?.scenario_type || context?.reply_theme || '';
+  const shortTheme = theme.length > 30 ? theme.slice(0, 27) + '...' : theme;
+
+  if (action === 'opening_picked') {
+    return `
+      <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
+      <div class="cpb">A coaching video for your scenario</div>
+      <div class="cpb">Pro tip: The silence after your ask...</div>
+    `;
+  }
+  if (action === 'scenario_selected') {
+    return `
+      <div class="cpb">What this manager response really signals</div>
+      <div class="cpb">How to read between the lines</div>
+      <div class="cpb">Pro tip: They'll only hear the bottom of your...</div>
+    `;
+  }
+  if (action === 'reply_chosen') {
+    return `
+      <div class="cpb">Strengths and risks of your response</div>
+      <div class="cpb">What your manager is likely thinking now</div>
+      <div class="cpb">Pro tip: People who practice out loud get...</div>
+    `;
+  }
+  return `
+    <div class="cpb">Personalized coaching insight</div>
+    <div class="cpb">Pro tip: The silence after your ask...</div>
+  `;
+}
+
+// Render "X unseen messages" header in coaching mode
+function renderCoachingUnseenHeader() {
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+  // Remove existing
+  coachingEl.querySelectorAll('.coaching-unseen').forEach(e => e.remove());
+}
+
+// Add "Back to practice" CTA at bottom of coaching
+function addBackToPracticeCTA() {
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+  // Remove existing
+  coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
+  const cta = el('div', 'back-to-practice', '');
+  cta.innerHTML = '\u2190 Continue practicing';
+  cta.addEventListener('click', function() { setMode('sim'); });
+  coachingEl.appendChild(cta);
+}
+
+// Generate AI coaching insight based on practice action
+async function generateCoachingInsight(action, context) {
+  // Build direction label based on action
+  let directionLabel = '';
+  if (action === 'opening_picked') {
+    directionLabel = 'Your opening: ' + (context?.theme || 'Direct approach');
+  } else if (action === 'scenario_selected') {
+    directionLabel = 'Manager response: ' + (context?.scenario_type || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+  } else if (action === 'reply_chosen') {
+    directionLabel = 'Your reply: ' + (context?.reply_theme || 'Direct response');
+  }
+
+  try {
+    const res = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'coaching_insight',
+        action: action,
+        context: context,
+        conversation_history: simConversation,
+        blocker: SIM_STATE.blocker,
+        session_id: profileHash(),
+      }),
+    });
+    const data = await res.json();
+    if (data.insight) {
+      addCoachingInsight(data.insight, 'insight', directionLabel);
+    }
+  } catch (err) {
+    // Fallback to static insight
+    const fallbacks = {
+      opening_picked: "Good choice. Your opening sets the tone for the entire conversation. The way you start tells your manager whether this is a request or a negotiation.",
+      scenario_selected: "Interesting scenario. Your manager's response reveals what they really think about your ask. Pay attention to whether they address the amount or deflect to timing.",
+      reply_chosen: "Your response matters here. The best negotiators match their manager's energy — if they're cautious, be reassuring. If they're open, be specific.",
+    };
+    addCoachingInsight(fallbacks[action] || "Your coach is analyzing your approach...", 'insight', directionLabel);
+  }
+}
+
+// Coaching welcome messages per blocker
+function getCoachingWelcome(blockerCode) {
+  const welcomes = {
+    no_script: "Choose an opening line and see how your manager might respond. Each choice reveals a different path.",
+    underpaid: "Choose how you'd open the conversation. Each approach leads to different manager reactions.",
+    fear_no: "Pick an opening to see what happens. Every response has a best move — practice finding it.",
+    quiet: "Start with an opening that feels right. You'll see how managers typically respond to each approach.",
+    timing: "Choose your opening to see how your manager reacts. Timing objections have specific counter-moves.",
+    prior_no: "Pick how you'd reopen the conversation. This time you'll be ready for their response.",
+    unknown_amount: "Start with an opening. The scenarios will help you figure out the right number to ask for.",
+    other: "Choose an opening and see what happens. Each path teaches you something different.",
+  };
+  return welcomes[blockerCode] || welcomes.other;
+}
+
+// Add a pro tip to coaching mode — same styling as practice mode pro tips
+function addCoachingProTip(tipIndex) {
+  const tip = PRO_TIPS[tipIndex];
+  if (!tip) return;
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="pro-tip-card pro-tip-revealed">
+      <div class="pro-tip-top">
+        <div class="pro-tip-badge">
+          <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M10 8V4M7 4c0 0 0.5 4 3 4s3-4 3-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="10" y1="8" x2="10" y2="17" stroke="currentColor" stroke-width="1.3"/></svg>
+          Pro tip
+        </div>
+        <div class="pro-tip-num">#${tip.num}</div>
+      </div>
+      <div style="font-size:13px;color:#3d3010;line-height:1.65;">${tip.text}</div>
+    </div>
+  `;
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text: 'Pro tip #' + tip.num, type: 'pro_tip', time: Date.now() });
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
+}
+
+// Add depth card to coaching mode — uses the same SVG branching visual
+function addCoachingDepthCard() {
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  const explored = SIM_STATE.scenarios_explored?.length || 1;
+  const wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="depth-card">
+      <div class="depth-card-text">You're at <b>step 2</b> of a 6-8 step negotiation. From here, this conversation branches in different ways.</div>
+      <svg width="100%" height="80" viewBox="0 0 340 80" style="margin:8px 0 2px;">
+        <line x1="30" y1="14" x2="30" y2="66" stroke="rgba(154,130,40,0.12)" stroke-width="0.5"/>
+        <line x1="82" y1="14" x2="82" y2="66" stroke="rgba(154,130,40,0.12)" stroke-width="0.5"/>
+        <circle cx="30" cy="14" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="27" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="40" r="5.5" fill="#b8960c"/>
+        <circle cx="30" cy="53" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="30" cy="66" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <line x1="36" y1="40" x2="76" y2="40" stroke="#b8960c" stroke-width="2"/>
+        <circle cx="82" cy="14" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="27" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="40" r="5.5" fill="#b8960c"/>
+        <circle cx="82" cy="53" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <circle cx="82" cy="66" r="3" fill="none" stroke="rgba(154,130,40,0.2)" stroke-width="1"/>
+        <line x1="88" y1="40" x2="120" y2="40" stroke="#b8960c" stroke-width="2"/>
+        <circle cx="126" cy="40" r="7" fill="#b8960c"/>
+        <circle cx="126" cy="40" r="10" fill="none" stroke="rgba(184,150,12,0.3)" stroke-width="1.5"/>
+        <line x1="133" y1="40" x2="168" y2="10" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="27" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="53" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <line x1="133" y1="40" x2="168" y2="70" stroke="rgba(154,130,40,0.45)" stroke-width="1"/>
+        <circle cx="170" cy="10" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="27" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="53" r="4" fill="rgba(154,130,40,0.3)"/>
+        <circle cx="170" cy="70" r="4" fill="rgba(154,130,40,0.3)"/>
+        <line x1="174" y1="10" x2="202" y2="4" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="10" x2="202" y2="10" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="10" x2="202" y2="16" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="22" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="28" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="27" x2="202" y2="34" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="48" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="54" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="53" x2="202" y2="60" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="66" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="72" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <line x1="174" y1="70" x2="202" y2="78" stroke="rgba(154,130,40,0.25)" stroke-width="0.8"/>
+        <circle cx="204" cy="4" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="10" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="16" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="22" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="28" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="34" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="48" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="54" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="60" r="2" fill="rgba(154,130,40,0.15)"/>
+        <circle cx="204" cy="66" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="72" r="2" fill="rgba(154,130,40,0.15)"/><circle cx="204" cy="78" r="2" fill="rgba(154,130,40,0.15)"/>
+        <text x="232" y="38" fill="#8a7540" font-size="10" font-weight="500" font-family="inherit">hundreds</text>
+        <text x="232" y="50" fill="#8a7540" font-size="10" font-weight="500" font-family="inherit">of paths...</text>
+        <text x="23" y="78" fill="#8a7540" font-size="8" font-family="inherit">you</text>
+        <text x="74" y="78" fill="#8a7540" font-size="8" font-family="inherit">mgr</text>
+        <text x="118" y="78" fill="#b8960c" font-size="9" font-weight="600" font-family="inherit">YOU</text>
+      </svg>
+      <div class="depth-card-stat">A typical raise conversation takes <b>10-20 min</b>, with 4-6 more exchanges afterward.</div>
+    </div>
+  `;
+  coachingEl.appendChild(wrap);
+
+  coachingMessages.push({ text: 'Depth card', type: 'depth', time: Date.now() });
+  if (SIM_STATE.simMode) {
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
+}
+
+// No more mode banners in the chat — modes are separate containers
 let currentModeBannerMode = null;
 function insertModeBanner(mode) {
-  // Remove all existing banners
-  $('messages').querySelectorAll('.mode-banner').forEach(b => b.remove());
-
-  // Don't re-insert if same mode (prevents stacking on rapid toggles)
-  if (currentModeBannerMode === mode) {
-    currentModeBannerMode = null; // allow re-inserting next time
-    return;
-  }
-  currentModeBannerMode = mode;
-
-  const wrap = el('div', 'mode-banner ' + (mode === 'sim' ? 'sim' : 'coach'), '');
-  if (mode === 'sim') {
-    wrap.innerHTML = `
-      <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true">
-        <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-        <rect x="7.5" y="2" width="5" height="2.5" rx="0.6" stroke="currentColor" stroke-width="1.4" fill="currentColor" fill-opacity="0.18"/>
-        <path d="M7 9l2 2M9 9l-2 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-        <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
-      </svg>
-      <span>Practice mode</span>
-      <span class="mode-banner-sub">Practicing your raise conversation</span>
-    `;
-  } else {
-    wrap.innerHTML = `
-      <svg viewBox="0 0 20 20" fill="none" width="14" height="14" aria-hidden="true">
-        <path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
-        <circle cx="7.5" cy="8.5" r="0.9" fill="currentColor"/>
-        <circle cx="10.5" cy="8.5" r="0.9" fill="currentColor"/>
-        <circle cx="13.5" cy="8.5" r="0.9" fill="currentColor"/>
-      </svg>
-      <span>Coaching mode</span>
-      <span class="mode-banner-sub">Reflecting on your choices</span>
-    `;
-  }
-  $('messages').appendChild(wrap);
-  scrollChatToBottom();
+  // Deprecated in v1 — mode switching handles container visibility
 }
 
 // Reveal the toggle (unlocked + visible) once the simulation flow starts.
@@ -2256,7 +2722,7 @@ async function showCoachReflection() {
   }
 
   logSession('coach_reflection', { paths_explored: SIM_STATE.scenarios_explored.length, paths_total: SIM_STATE.scenarios_total });
-  enableInput('Ask me anything\u2026');
+  enableInput('Ask your coach anything\u2026');
   awaitFreeText(handlePostPaywallText);
 }
 
@@ -2355,7 +2821,7 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     showHeaderPurchaseButton({});
-    enableInput('Ask me anything\u2026');
+    enableInput('Ask your coach anything\u2026');
     awaitFreeText(handlePostPaywallText);
     return;
   }
@@ -2425,15 +2891,15 @@ const EMPATHY_QUOTES = {
 
 // Bridge lines — lead to opening chips
 const BRIDGE_LINES = {
-  no_script:      "The first sentence is the hardest part. Most people rehearse it for months and never say it. Below are the opening lines that actually work \u2014 pick one to see how your manager responds.",
-  underpaid:      "You already know the gap is there. Bringing it up is the hard part. These are the opening lines that work best for this conversation \u2014 pick one to see how it plays out.",
-  quiet:          "Your work speaks for itself \u2014 but right now it needs your voice too. These openings are designed for people who\u2019d rather let results do the talking. Pick one to see how it lands.",
-  unknown_amount: "You don\u2019t need a perfect number to start the conversation. These opening lines let you explore what\u2019s possible without committing to a figure. Pick one to see how it unfolds.",
-  fear_no:        "The fear of \u2018no\u2019 keeps most people from ever asking. These openings are built to protect you if they push back \u2014 pick one to see how the conversation goes.",
-  no_advocate:    "If your manager won\u2019t bring it up, you have to. These openings are designed for exactly that situation \u2014 pick one to see how it lands.",
-  prior_no:       "Reopening this conversation is different from asking the first time. These openings acknowledge the history without starting from scratch \u2014 pick one to see how it goes.",
-  timing:         "There\u2019s never a perfect time, but there are ways to test the waters without fully committing. Pick an opening to see how it plays out.",
-  other:          "How you open this conversation sets the tone for everything after it. Pick an opening below to see how your manager might respond.",
+  no_script:      "The first sentence is the hardest part. Most people rehearse it for months and never say it. Below are the opening lines that actually work \u2014 **Try one and see how your manager reacts.**",
+  underpaid:      "You already know the gap is there. Bringing it up is the hard part. These are the opening lines that work best for this conversation \u2014 **Pick one and see what your manager says.**",
+  quiet:          "Your work speaks for itself \u2014 but right now it needs your voice too. These openings are designed for people who\u2019d rather let results do the talking. **Try one \u2014 see how your manager responds.**",
+  unknown_amount: "You don\u2019t need a perfect number to start the conversation. These opening lines let you explore what\u2019s possible without committing to a figure. **Pick one and see where the conversation goes.**",
+  fear_no:        "The fear of \u2018no\u2019 keeps most people from ever asking. These openings are built to protect you if they push back \u2014 **Try one and see how the pushback plays out.**",
+  no_advocate:    "If your manager won\u2019t bring it up, you have to. These openings are designed for exactly that situation \u2014 **Pick one and see how your manager reacts.**",
+  prior_no:       "Reopening this conversation is different from asking the first time. These openings acknowledge the history without starting from scratch \u2014 **Try one and see how the second ask lands.**",
+  timing:         "There\u2019s never a perfect time, but there are ways to test the waters without fully committing. **Pick one and see what your manager says.**",
+  other:          "How you open this conversation sets the tone for everything after it. **Try one and watch the conversation unfold.**",
 };
 
 // ── Start simulation at the specific blocker moment ──
@@ -2475,18 +2941,27 @@ async function startSimulationAtBlocker() {
   logEntry('coach_bubble', { text: bridge });
   await sleep(100);
 
-  // Coaching video — thumbnail with first frame, tap for fullscreen
-  renderCoachingVideo(blocker.code);
+  // Video moves to coaching mode — not in practice flow
+  addCoachingVideo(blocker.code);
+
+  // Add initial welcome to coaching mode (no preview card in practice — keep first impression clean)
+  const welcomeText = getCoachingWelcome(blocker.code);
+  const coachingEl = $('coaching-messages');
+  if (coachingEl) {
+    const wrap = el('div', 'coach-msg', '');
+    wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(welcomeText)}</p></div>`;
+    coachingEl.appendChild(wrap);
+    coachingMessages.push({ text: welcomeText, type: 'welcome', time: Date.now() });
+    unseenCoachCount++;
+    updateCoachBadge();
+  }
+
+  // Unlock the mode toggle now that coaching has content
+  unlockModeToggle();
+
   await sleep(50);
 
   renderOpeningChips();
-
-  // Show locked pro tip card — nudge for first tap
-  // Show for any user who hasn't hit the paywall yet
-  if (!state.paywall_shown) {
-    await sleep(200);
-    renderLockedTip(1, 'Choose your first move to unlock a negotiation tip');
-  }
 
   // Scroll to bridge bubble after DOM settles
   await sleep(150);
@@ -2780,7 +3255,6 @@ function renderOpeningChips() {
       appendUserBubble('I\u2019d open with:\n\u201c' + text + '\u201d');
       showSimulationPaywall(null);
     } else {
-      if (simTapCount === 1) renderProTip(0);
       appendUserBubble('I\u2019d open with:\n\u201c' + text + '\u201d');
       await loadManagerResponseToOpening(text);
     }
@@ -2818,7 +3292,7 @@ async function pickOpening(opener, pill, container) {
     logSession('sim_opening_picked', { theme: opener.theme });
     showSimulationPaywall(null);
   } else {
-    if (simTapCount === 1) renderProTip(0);
+    // Pro tip moves to coaching mode (no longer in practice flow)
 
     const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
     scrollChatToBottom();
@@ -2828,6 +3302,19 @@ async function pickOpening(opener, pill, container) {
     SIM_STATE.user_opening = opener.text;
     SIM_STATE.branch_history.push({ scenario: 'opening', reply: opener.theme });
     logSession('sim_opening_picked', { theme: opener.theme });
+
+    // Generate coaching insight in background (preview card shown after framing text)
+    generateCoachingInsight('opening_picked', {
+      opening: opener.text,
+      theme: opener.theme,
+      blocker: SIM_STATE.blocker,
+    });
+
+    // Add pro tip to coaching mode
+    addCoachingProTip(0);
+
+    // Coach preview card appears after user bubble — covers loading time
+    showCoachPreviewCard('opening_picked', { theme: opener.theme });
 
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
@@ -3142,6 +3629,18 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   logSession('sim_scenario_tapped', { type: scenario.type, blocker: SIM_STATE.blocker.code });
 
+  // Generate coaching insight in background (preview card shown after reply pills framing)
+  generateCoachingInsight('scenario_selected', {
+    scenario_type: scenario.type,
+    manager_said: scenario.text,
+    blocker: SIM_STATE.blocker,
+    user_opening: SIM_STATE.user_opening,
+  });
+
+  // Add depth revelation and pro tip to coaching mode
+  addCoachingDepthCard();
+  addCoachingProTip(1);
+
   // Every chip tap counts toward the paywall limit
   const hitLimit = incrementSimTaps();
 
@@ -3168,9 +3667,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   renderManagerBubble(scenario);
   await sleep(300);
 
-  // Show depth revelation — user reads it during API wait for replies
-  renderDepthCard();
-  await sleep(200);
+  // Depth card moves to coaching mode (not in practice flow)
 
   // Step 3: thinking indicator → reply pills
   showCoachTyping();
@@ -3215,6 +3712,9 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
   };
   backWrap.appendChild(backBtn);
   $('messages').appendChild(backWrap);
+
+  // Coach preview card appears after "Try a different assumption" — covers reply loading
+  showCoachPreviewCard('scenario_selected', { scenario_type: scenario.type, manager_said: scenario.text });
 
   renderReplyPillsFlat(replies, scenario);
 
@@ -3549,15 +4049,29 @@ function pickReply(reply, pill, container, scenario) {
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
   simConversation.push({ role: 'user', text: reply.text });
 
+  // Generate coaching insight in background (preview shown during loading)
+  generateCoachingInsight('reply_chosen', {
+    reply: reply.text,
+    reply_theme: reply.theme,
+    scenario_type: scenario.type,
+    blocker: SIM_STATE.blocker,
+    conversation: simConversation,
+  });
+
+  // Add pro tip #3 to coaching mode
+  addCoachingProTip(2);
+
   if (incrementSimTaps()) {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
+    showCoachPreviewCard('reply_chosen', { reply_theme: reply.theme, scenario_type: scenario.type });
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => showCliffhangerPaywall(scenario, turnNodes), 800);
   } else {
     const userBubble = appendUserBubble('I\u2019d respond:\n\u201c' + reply.text + '\u201d');
     scrollChatToBottom();
+    showCoachPreviewCard('reply_chosen', { reply_theme: reply.theme, scenario_type: scenario.type });
     const turnNodes = [userBubble];
     simTurnElements.push(turnNodes);
     setTimeout(() => continueConversation(scenario, turnNodes), 400);
@@ -3933,9 +4447,9 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 — with personalized AI coaching on every move.");
   } else {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 and practice anytime you want.");
+    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 — with personalized AI coaching on every move.");
   }
   await sleep(300);
 
@@ -3985,10 +4499,8 @@ async function showSimulationPaywall(lastScenario) {
     b.style.cursor = 'default';
     b.onclick = null;
   });
-  // 3. Mode toggle — lock it so user can't switch back to simulation
-  const modeToggle = $('mode-toggle');
-  if (modeToggle) modeToggle.classList.add('locked');
-  SIM_STATE.unlocked = false;
+  // 3. Mode toggle — keep it enabled so user can still check coaching
+  // (removed lock — user should always be able to switch modes)
 
   // ── Add purchase button to header — always visible from now on ──
   showHeaderPurchaseButton();
@@ -3998,7 +4510,7 @@ async function showSimulationPaywall(lastScenario) {
     if (typeof window.clarity === 'function') window.clarity('event', 'simulation_paywall');
   } catch (e) {}
 
-  enableInput('Ask me anything…');
+  enableInput('Ask your coach anything…');
   awaitFreeText(handlePostPaywallText);
 }
 
@@ -4284,14 +4796,25 @@ async function resumeFromState() {
     // Don't reset simTapCount — restored from localStorage
     showToolbar();
     showModeToggle();
+    unlockModeToggle();
+
+    // Repopulate coaching mode with welcome + video
+    addCoachingVideo(blocker.code);
+    const welcomeText = getCoachingWelcome(blocker.code);
+    const coachingEl = $('coaching-messages');
+    if (coachingEl) {
+      const wrap = el('div', 'coach-msg', '');
+      wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(welcomeText)}</p></div>`;
+      coachingEl.appendChild(wrap);
+    }
 
     if (state.paywall_shown) {
       showHeaderPurchaseButton({});
-      enableInput('Ask me anything…');
+      enableInput('Ask your coach anything\u2026');
       awaitFreeText(handlePostPaywallText);
     } else {
       // Re-enter simulation — show scenario pills without re-typing intro
-      disableInput('Loading scenarios…');
+      disableInput('Loading scenarios\u2026');
       showCoachTyping();
       try {
         const res2 = await fetch('/api/raise-coach', {
@@ -4307,11 +4830,12 @@ async function resumeFromState() {
         const data2 = await res2.json();
         hideCoachTyping();
         renderScenarioLabels((data2.scenarios && data2.scenarios.length >= 2) ? data2.scenarios : getDefaultScenarios(blocker.code));
+        // Show coach insight card after pills
+        showCoachPreviewCard('opening_picked', { theme: '' });
       } catch (e) {
         hideCoachTyping();
         renderScenarioLabels(getDefaultScenarios(blocker.code));
       }
-      unlockModeToggle();
     }
   } else if (where === 1)      beginExchange2(); // Ex1 removed, go straight to Ex2
   else if (where === 2) beginExchange2();
@@ -4320,7 +4844,7 @@ async function resumeFromState() {
   else if (where === 5) {
     // Paywall state — ensure chips + post-paywall input wiring is live
       showHeaderPurchaseButton();
-      enableInput('Ask me anything…');
+      enableInput('Ask your coach anything…');
     awaitFreeText(handlePostPaywallText);
   } else {
     beginExchange1();
@@ -4846,14 +5370,25 @@ async function startCheckout() {
   try {
     const params = new URLSearchParams(location.search);
     const refSource = params.get('ref') || (state.profile && state.profile.refSource) || '';
+    // Fallback values for Path B users who skip profiling
+    const checkoutProfile = state.profile || {
+      role: 'Not specified',
+      country: 'US',
+      company_situation: 'Not specified',
+      last_raise: 'Not specified',
+      seniority: 'unknown',
+      company_size: 'unknown',
+    };
+    const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
+    const checkoutObstacle = state.obstacle || SIM_STATE.blocker || { code: 'other', label: 'Other' };
     const res = await fetch(API_CHECKOUT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         profile_hash: profileHash(),
-        profile: state.profile,
-        final_range: state.current_range,
-        obstacle: state.obstacle,
+        profile: checkoutProfile,
+        final_range: checkoutRange,
+        obstacle: checkoutObstacle,
         refSource,
         promo_code: undefined,
       }),
@@ -4911,7 +5446,7 @@ async function showPaywall() {
 
   // Re-enable input so user can keep asking questions after paywall.
   // Any post-paywall text routes to handlePostPaywallText.
-  enableInput('Ask me anything…');
+  enableInput('Ask your coach anything…');
   awaitFreeText(handlePostPaywallText);
 }
 
@@ -5032,7 +5567,7 @@ async function renderPaywallBubble(opts) {
           Unlimited scenario branches
         </div>
         <div class="paywall-inc-item">
-          Fully customized to your situation
+          AI coaching on every move
         </div>
         <div class="paywall-inc-item">
           30 days of access
@@ -5190,182 +5725,42 @@ function populatePaywallTicker(paywallWrap) {
 // the replies are terse and the CTA is the full message — prevents the
 // free chat from becoming the product.
 async function handlePostPaywallText(text) {
-  appendUserBubble(text);
-  disableInput('Thinking…');
+  // Unified post-paywall response — same in both modes
+  const targetContainer = SIM_STATE.simMode ? $('messages') : $('coaching-messages');
+
+  // Show user bubble in the active container
+  const userWrap = el('div', 'user-msg', '');
+  userWrap.innerHTML = `<div class="user-bubble">${escapeHtml(text)}</div>`;
+  targetContainer.appendChild(userWrap);
 
   state.free_dialog_count = (state.free_dialog_count || 0) + 1;
   saveState();
   logSession('free_text', { free_text_count: state.free_dialog_count });
 
-  await sleep(300);
-  showCoachTyping();
+  await sleep(400);
 
-  // Check dialog cap BEFORE calling the API — saves a Claude call when locked
-  if (state.free_dialog_count > FREE_DIALOG_LIMIT) {
-    await sleep(800);
-    hideCoachTyping();
-    // If the main paywall hasn't been shown yet (user hit the cap in
-    // coaching mode before exploring enough simulation chips), show it now.
-    if (!state.paywall_shown) {
-      state.obstacle = state.obstacle || SIM_STATE.blocker || { code: 'other' };
-      state.current_range = state.current_range || { floor: 45, ceiling: 70 };
-      await renderPaywallBubble({ animated: true });
-      logEntry('paywall', {});
-      enableInput('Ask me anything\u2026');
-      awaitFreeText(handlePostPaywallText);
-      return;
-    }
-    renderLockedReply(text);
-    return;
-  }
-
-  // Call the real coach API in free mode. Include simulation context
-  // so the coach knows what the user practiced and can give advice based
-  // on their specific scenario choices and responses.
-  let reply = null;
-  try {
-    const res = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        profile:               state.profile,
-        obstacle:              state.obstacle,
-        timing:                state.timing || 'exploring',
-        final_range:           state.current_range,
-        accumulated_exchanges: state.accumulated,
-        message:               text,
-        session_id:            profileHash(),
-        free_dialog_count:     state.free_dialog_count,
-        // Simulation context — so the coach can reference what the user practiced
-        sim_context: SIM_STATE.blocker ? {
-          blocker: SIM_STATE.blocker,
-          branch_history: SIM_STATE.branch_history || [],
-          scenarios_explored: SIM_STATE.scenarios_explored || [],
-          conversation_history: simConversation || [],
-          user_context: SIM_STATE.context || {},
-        } : undefined,
-      }),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      reply = data.reply || null;
-    }
-  } catch (e) { /* fall through to fallback */ }
-
-  hideCoachTyping();
-
-  if (!reply) {
-    // API unavailable — render a short apologetic bubble without a CTA.
-    // Don't count this against the user's free_dialog_count (already incremented).
-    const wrap = el('div', 'coach-msg', '');
-    wrap.innerHTML = `<div class="bubble"><p>I couldn't respond just now. Try again, or jump into the plan — it has the answers to most questions you'd ask here.</p></div>`;
-    $('messages').appendChild(wrap);
-    scrollChatToBottom();
-    enableInput('Ask me anything…');
-    awaitFreeText(handlePostPaywallText);
-    return;
-  }
-
-  // Render the coach reply + dynamic CTA tail.
-  // Main reply text types char-by-char. Tail paragraph + CTA fade in after.
-  const remaining = FREE_DIALOG_LIMIT - state.free_dialog_count;
-  const tailCopy = remaining > 0
-    ? `<strong style="color:var(--t1);">If you want the specific version for your situation</strong> — the exact words, the numbers, the handoff to your manager — that's in your plan. $${PRICE_USD} once.`
-    : `<strong style="color:var(--t1);">Last free answer.</strong> The specifics — your exact words, your numbers, your handoff — live in the full plan. $${PRICE_USD} once.`;
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
+  // Single unified response — no API call
+  const responseWrap = el('div', 'coach-msg', '');
+  responseWrap.innerHTML = `
     <div class="bubble">
-      <p class="coach-typed"><span class="typed-text"></span><span class="cursor"></span></p>
-      <p class="coach-tail" style="color:var(--t2);font-size:12.5px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--divider);">${tailCopy}</p>
-      <button class="btn-pay coach-tail-btn" style="margin-top:10px;" data-tail-cta>
-        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
+      <p>I\u2019m ready to dive deeper into your specific situation. Unlock full access for $${PRICE_USD} to continue.</p>
+      <button class="btn-pay" style="margin-top:10px;width:100%;" data-tail-cta>
+        Practice every scenario \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
       </button>
     </div>
   `;
-  $('messages').appendChild(wrap);
+  targetContainer.appendChild(responseWrap);
 
-  const tailEl = wrap.querySelector('.coach-tail');
-  const btnEl  = wrap.querySelector('.coach-tail-btn');
-  tailEl.style.opacity = '0';
-  btnEl.style.opacity  = '0';
-  scrollChatToBottom();
-
-  // Type the main reply
-  const typedSpan = wrap.querySelector('.typed-text');
-  const cursorEl  = wrap.querySelector('.cursor');
-  await typeIntoElement(typedSpan, reply);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade in the tail + CTA together
-  await sleep(200);
-  fadeInElement(tailEl);
-  fadeInElement(btnEl);
-
-  logEntry('coach_bubble', { text: reply });
-
-  const btn = wrap.querySelector('[data-tail-cta]');
+  const btn = responseWrap.querySelector('[data-tail-cta]');
   if (btn) btn.onclick = startCheckout;
 
-  enableInput('Ask me anything…');
-  awaitFreeText(handlePostPaywallText);
-}
+  if (SIM_STATE.simMode) {
+    scrollChatToBottom();
+  } else {
+    scrollCoachingToBottom();
+  }
 
-/** Post-cap reply — short, polite, all CTA. Rendered when user has exceeded
-    FREE_DIALOG_LIMIT free-text messages. */
-async function renderLockedReply(userText) {
-  const obs = state.obstacle || { code: 'other' };
-  // Three rotating lead-ins so it doesn't feel scripted if they keep typing
-  const leadIns = [
-    "I can't go further without you on the plan — but I want to. Everything you're asking is in there, answered specifically for you.",
-    "The plan is the product. Every answer I'd give you here lives in there, sharper and built around your exact situation.",
-    "I've given you what I can for free. The rest is the plan — role-play, exact scripts, 30 days of follow-up.",
-  ];
-  const lockIdx = Math.min(state.free_dialog_count - FREE_DIALOG_LIMIT - 1, leadIns.length - 1);
-  const leadIn = leadIns[Math.max(0, lockIdx)];
-
-  const proof = pickProofLine(obs.code);
-
-  const wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="paywall-bubble">
-      <p class="lock-lead"><span class="lock-typed"></span><span class="lock-cursor"></span></p>
-      <button class="btn-pay lock-cta" data-tail-cta>
-        Get my plan · $${PRICE_USD} <span class="btn-pay-arrow">→</span>
-      </button>
-      <div class="trust-row lock-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>One-time</span><span class="dot">·</span><span>No subscription</span>
-      </div>
-      <div class="proof-line lock-proof">${proof}</div>
-    </div>
-  `;
-  $('messages').appendChild(wrap);
-
-  const btn = wrap.querySelector('[data-tail-cta]');
-  if (btn) btn.onclick = startCheckout;
-
-  const ctaEl   = wrap.querySelector('.lock-cta');
-  const trustEl = wrap.querySelector('.lock-trust');
-  const proofEl = wrap.querySelector('.lock-proof');
-  ctaEl.style.opacity   = '0';
-  trustEl.style.opacity = '0';
-  proofEl.style.opacity = '0';
-  scrollChatToBottom();
-
-  // Type the lead-in
-  const typedSpan = wrap.querySelector('.lock-typed');
-  const cursorEl  = wrap.querySelector('.lock-cursor');
-  await typeIntoElement(typedSpan, leadIn);
-  if (cursorEl) cursorEl.remove();
-
-  // Fade the rest in
-  await sleep(250);
-  fadeInElement(ctaEl);
-  fadeInElement(trustEl);
-  fadeInElement(proofEl);
-
-  // Keep input enabled but user gets the same locked reply each time after this
-  enableInput('Ask me anything…');
+  enableInput(SIM_STATE.simMode ? 'Tap an option or type your own\u2026' : 'Ask your coach anything\u2026');
   awaitFreeText(handlePostPaywallText);
 }
 
@@ -5419,12 +5814,153 @@ function handleSend() {
   const input = $('chat-input');
   const val = (input.value || '').trim();
   if (!val) return;
-  if (!pendingSubmitHandler) return;
 
+  // If in coaching mode, handle as coaching free text
+  if (!SIM_STATE.simMode) {
+    input.value = '';
+    handleCoachingChat(val);
+    return;
+  }
+
+  // Practice mode — existing chip/free-text handler
+  if (!pendingSubmitHandler) return;
   input.value = '';
   const h = pendingSubmitHandler;
   pendingSubmitHandler = null;
   h(val);
+}
+
+// Coaching mode free text chat
+let coachingChatHistory = [];
+let coachingFreeMessages = 0;
+const COACHING_FREE_LIMIT = 2;
+
+async function handleCoachingChat(userText) {
+  const coachingEl = $('coaching-messages');
+  if (!coachingEl) return;
+
+  // Check free message limit
+  if (!state.paid && coachingFreeMessages >= COACHING_FREE_LIMIT) {
+    // If paywall already shown in coaching, use unified post-paywall handler
+    if (coachingEl.querySelector('.paywall-bubble')) {
+      handlePostPaywallText(userText);
+      return;
+    }
+    coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
+
+    // Coach bubble before paywall — same as practice mode
+    const coachWrap = el('div', 'coach-msg', '');
+    coachWrap.innerHTML = `<div class="bubble"><p>You\u2019ve reached the free coaching limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $${PRICE_USD} \u2014 with personalized AI coaching on every move.</p></div>`;
+    coachingEl.appendChild(coachWrap);
+
+    const limitWrap = el('div', 'coach-msg', '');
+    const displayPrice = PRICE_USD;
+    const ctaPrice = `$${PRICE_USD}`;
+    limitWrap.innerHTML = `
+      <div class="bubble paywall-bubble">
+        <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+        <div class="paywall-pitch"></div>
+        <button class="btn-pay paywall-cta" onclick="startCheckout()">
+          Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
+        </button>
+        <div class="trust-row paywall-trust">
+          <span>Stripe secure</span><span class="dot">\u00b7</span><span>No subscription</span>
+        </div>
+        <div class="paywall-ticker"><div class="paywall-ticker-inner" id="coaching-paywall-ticker"></div></div>
+        <div class="paywall-includes-title">Includes</div>
+        <div class="paywall-includes">
+          <div class="paywall-inc-item">Unlimited scenario branches</div>
+          <div class="paywall-inc-item">AI coaching on every move</div>
+          <div class="paywall-inc-item">30 days of access</div>
+        </div>
+        <div class="paywall-closing">$${displayPrice} once, for a conversation that adds thousands to your salary.</div>
+      </div>
+    `;
+    coachingEl.appendChild(limitWrap);
+
+    // Start testimonial ticker
+    populatePaywallTicker(limitWrap);
+
+    addBackToPracticeCTA();
+    scrollCoachingToBottom();
+    // After coaching paywall, further typing uses unified post-paywall handler
+    enableInput('Ask your coach anything\u2026');
+    awaitFreeText(handlePostPaywallText);
+    return;
+  }
+
+  coachingFreeMessages++;
+
+  // Remove "Back to practice" CTA while responding
+  coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
+
+  // Show user message in coaching
+  const userWrap = el('div', 'user-msg', '');
+  userWrap.innerHTML = `<div class="user-bubble">${escapeHtml(userText)}</div>`;
+  coachingEl.appendChild(userWrap);
+  scrollCoachingToBottom();
+
+  coachingChatHistory.push({ role: 'user', content: userText });
+
+  // Show typing indicator (consistent with practice mode)
+  const typingWrap = el('div', 'coach-msg coaching-typing', '');
+  typingWrap.innerHTML = `
+    <div class="bubble typing-bubble">
+      <div class="typing-indicator">
+        <svg class="rl-typing-arc" width="28" height="28" viewBox="0 0 32 32">
+          <circle class="rl-arc-track" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="2.5" stroke-linecap="round" transform="rotate(-210 16 16)"/>
+          <circle class="rl-arc-fill"  cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="35" transform="rotate(-210 16 16)"/>
+        </svg>
+        <span class="typing-phrase">Your coach is thinking\u2026</span>
+      </div>
+    </div>
+  `;
+  $('coaching-messages').appendChild(typingWrap);
+  scrollCoachingToBottom();
+  startTypingArcAnimation(typingWrap);
+
+  try {
+    const res = await fetchWithTimeout('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'coaching_chat',
+        message: userText,
+        chat_history: coachingChatHistory.slice(-10),
+        practice_context: {
+          blocker: SIM_STATE.blocker,
+          user_opening: SIM_STATE.user_opening,
+          scenarios_explored: SIM_STATE.scenarios_explored,
+          branch_history: SIM_STATE.branch_history,
+          conversation: simConversation,
+        },
+        session_id: profileHash(),
+      }),
+    }, 30000);
+    const data = await res.json();
+
+    // Remove typing indicator
+    if (typingWrap._arcStop) typingWrap._arcStop();
+    typingWrap.remove();
+
+    const reply = data.reply || data.insight || "I'm here to help with your raise conversation. Ask me anything about your situation.";
+    coachingChatHistory.push({ role: 'assistant', content: reply });
+
+    // Show coach reply
+    const replyWrap = el('div', 'coach-msg', '');
+    replyWrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(reply))}</p></div>`;
+    coachingEl.appendChild(replyWrap);
+  } catch (err) {
+    if (typingWrap._arcStop) typingWrap._arcStop();
+    typingWrap.remove();
+    const errWrap = el('div', 'coach-msg', '');
+    errWrap.innerHTML = '<div class="bubble"><p>Sorry, I couldn\'t process that. Try again.</p></div>';
+    coachingEl.appendChild(errWrap);
+  }
+
+  // Re-add "Back to practice" CTA
+  addBackToPracticeCTA();
+  scrollCoachingToBottom();
 }
 
 function placeholderForExchange(n) {
