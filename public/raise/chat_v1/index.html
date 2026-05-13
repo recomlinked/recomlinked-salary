@@ -325,7 +325,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 @keyframes typingDot{0%,100%{opacity:0.3;}50%{opacity:1;}}
 
 /* Coaching analysis card */
-.coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;border-left:3px solid #c9a84c;}
+.coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;}
 .analysis-direction{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--divider);}
 .analysis-body{font-size:13px;color:var(--t2);line-height:1.7;}
 .analysis-body p{margin:0;}
@@ -338,7 +338,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .path-arrow{font-size:10px;color:rgba(154,130,40,0.4);}
 
 /* Coaching toggle unread count */
-.coach-unread-count{min-width:16px;height:16px;border-radius:8px;background:#c9a84c;color:#07090f;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;position:absolute;top:-4px;right:-4px;}
+.coach-unread-count{min-width:16px;height:16px;border-radius:8px;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;position:absolute;top:-4px;right:-4px;}
 
 .coach-video-thumb{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(201,168,76,0.15);border-radius:10px;padding:10px 14px;cursor:pointer;transition:border-color 0.2s;}
 .coach-video-thumb:hover{border-color:rgba(201,168,76,0.35);}
@@ -5922,11 +5922,25 @@ async function handleCoachingChat(userText) {
   if (!state.paid && coachingFreeMessages >= COACHING_FREE_LIMIT) {
     coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
     const limitWrap = el('div', 'coach-msg', '');
+    const displayPrice = PRICE_USD;
+    const ctaPrice = `$${PRICE_USD}`;
     limitWrap.innerHTML = `
       <div class="bubble paywall-bubble">
-        <p><strong>You've used your free coaching messages.</strong></p>
-        <p style="margin-top:6px;font-size:13px;opacity:0.8;">Unlock unlimited coaching, personalized analysis, and a full negotiation plan for $${PRICE_USD}.</p>
-        <button class="btn-pay" onclick="startCheckout()" style="margin-top:12px;">Unlock coaching \u00b7 $${PRICE_USD} \u2192</button>
+        <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+        <div class="paywall-pitch"></div>
+        <button class="btn-pay paywall-cta" onclick="startCheckout()">
+          Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
+        </button>
+        <div class="trust-row paywall-trust">
+          <span>Stripe secure</span><span class="dot">\u00b7</span><span>No subscription</span>
+        </div>
+        <div class="paywall-includes-title">Includes</div>
+        <div class="paywall-includes">
+          <div class="paywall-inc-item">Unlimited scenario branches</div>
+          <div class="paywall-inc-item">AI coaching feedback on every move</div>
+          <div class="paywall-inc-item">30 days of access</div>
+        </div>
+        <div class="paywall-closing">$${displayPrice} once, for a conversation that adds thousands to your salary.</div>
       </div>
     `;
     coachingEl.appendChild(limitWrap);
