@@ -2126,9 +2126,7 @@ function setMode(target) {
     practiceEl.style.display = 'none';
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
-    // Reset unseen count
-    unseenCoachCount = 0;
-    updateCoachBadge();
+    // Don't reset unseen count yet — only when user scrolls to bottom
     // Input placeholder for coaching
     const input = $('chat-input');
     if (input) {
@@ -2139,11 +2137,50 @@ function setMode(target) {
     if (sendBtn) sendBtn.disabled = false;
     // Show unseen indicator if needed
     renderCoachingUnseenHeader();
-    scrollCoachingToBottom();
+    // Scroll to first unseen message, not bottom
+    if (unseenCoachCount > 0) {
+      const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
+      const firstUnseen = allMsgs.length - unseenCoachCount;
+      if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
+        const scrollParent = coachingEl.closest('.chat-scroll') || coachingEl.parentElement;
+        if (scrollParent) {
+          scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 10;
+        }
+      }
+    } else {
+      scrollCoachingToBottom();
+    }
+    // Check if already at bottom (short content) — mark as seen
+    checkCoachingScrollSeen();
     // Add "Back to practice" CTA at bottom
     addBackToPracticeCTA();
   }
 }
+
+function checkCoachingScrollSeen() {
+  const coachEl = $('coaching-messages');
+  if (!coachEl) return;
+  const scrollParent = coachEl.closest('.chat-scroll') || coachEl.parentElement;
+  if (!scrollParent) return;
+  // If scrolled to bottom (or content fits without scrolling), mark all as seen
+  const atBottom = scrollParent.scrollHeight - scrollParent.scrollTop - scrollParent.clientHeight < 50;
+  if (atBottom) {
+    unseenCoachCount = 0;
+    updateCoachBadge();
+  }
+}
+
+// Listen for scroll in coaching mode to mark messages as seen
+document.addEventListener('DOMContentLoaded', function() {
+  const chatWrap = document.querySelector('.chat-scroll') || document.querySelector('.chat-body');
+  if (chatWrap) {
+    chatWrap.addEventListener('scroll', function() {
+      if (!SIM_STATE.simMode) {
+        checkCoachingScrollSeen();
+      }
+    });
+  }
+});
 
 function scrollCoachingToBottom() {
   const coachEl = $('coaching-messages');
