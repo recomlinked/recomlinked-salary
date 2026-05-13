@@ -332,7 +332,9 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 
 /* Path breadcrumb */
 .coaching-path{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:10px;padding:6px 10px;background:rgba(201,168,76,0.06);border-radius:6px;}
-.path-step{font-size:11px;color:#8a7540;font-weight:500;}
+.path-step{font-size:11px;font-weight:500;padding:2px 6px;border-radius:4px;}
+.path-user{color:#3d5a20;background:rgba(29,158,117,0.08);}
+.path-mgr{color:#5a4a20;background:rgba(201,168,76,0.1);}
 .path-arrow{font-size:10px;color:rgba(154,130,40,0.4);}
 
 /* Coaching toggle unread count */
@@ -2197,14 +2199,30 @@ function addCoachingInsight(text, type, directionLabel) {
 
   const wrap = el('div', 'coach-msg', '');
 
-  // Build path breadcrumb if we have history (#7)
+  // Build path breadcrumb showing user choices and manager responses
   let pathHtml = '';
   if (SIM_STATE.branch_history && SIM_STATE.branch_history.length > 0) {
-    const steps = SIM_STATE.branch_history.map(b => {
-      const label = (b.reply || b.scenario || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
-      return `<span class="path-step">${escapeHtml(label.length > 20 ? label.slice(0, 18) + '...' : label)}</span>`;
-    });
-    pathHtml = `<div class="coaching-path">${steps.join('<span class="path-arrow">\u2192</span>')}</div>`;
+    const chips = [];
+    for (const b of SIM_STATE.branch_history) {
+      // User's choice (opening theme or reply theme)
+      const userLabel = (b.reply || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+      if (userLabel) {
+        chips.push({ label: userLabel, type: 'user' });
+      }
+      // Manager's scenario response
+      const mgrLabel = (b.scenario || '').replace(/^["'\u201c\u201d]+|["'\u201c\u201d]+$/g, '');
+      if (mgrLabel && mgrLabel !== 'opening') {
+        chips.push({ label: mgrLabel, type: 'manager' });
+      }
+    }
+    if (chips.length > 0) {
+      const stepsHtml = chips.map(c => {
+        const short = c.label.length > 22 ? c.label.slice(0, 20) + '...' : c.label;
+        const cls = c.type === 'user' ? 'path-step path-user' : 'path-step path-mgr';
+        return `<span class="${cls}">${escapeHtml(short)}</span>`;
+      });
+      pathHtml = `<div class="coaching-path">${stepsHtml.join('<span class="path-arrow">\u2192</span>')}</div>`;
+    }
   }
 
   // Render as a structured card
@@ -2216,7 +2234,15 @@ function addCoachingInsight(text, type, directionLabel) {
   if (pathHtml) {
     html += pathHtml;
   }
-  html += `<div class="analysis-body">${inlineBold(escapeHtml(text))}</div>`;
+  // Format the analysis text — add line breaks before each **Label:**
+  let formattedText = escapeHtml(text);
+  // Split at bold labels (Approach:, Risk:, etc.) and add paragraph breaks
+  formattedText = formattedText.replace(/\*\*(Approach|Risk|Opportunity|Next move|Next Move|Signal|Hidden meaning|Hidden Meaning|Preparation|Watch for|Watch For|Strategy|Strength|Weakness|After this|After This):\*\*/g, '<br><br>**$1:**');
+  // Remove leading <br> if text starts with a label
+  formattedText = formattedText.replace(/^<br><br>/, '');
+  formattedText = inlineBold(formattedText);
+
+  html += `<div class="analysis-body">${formattedText}</div>`;
   card.innerHTML = html;
   wrap.appendChild(card);
   coachingEl.appendChild(wrap);
@@ -2333,26 +2359,26 @@ function getCoachPreviewBullets(action, context) {
     return `
       <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
       <div class="cpb">A coaching video for your scenario</div>
-      <div class="cpb">A pro tip you haven't seen yet</div>
+      <div class="cpb">Pro tip: The silence after your ask...</div>
     `;
   }
   if (action === 'scenario_selected') {
     return `
       <div class="cpb">What this manager response really signals</div>
       <div class="cpb">How to read between the lines</div>
-      <div class="cpb">A pro tip you haven't seen yet</div>
+      <div class="cpb">Pro tip: They'll only hear the bottom of your...</div>
     `;
   }
   if (action === 'reply_chosen') {
     return `
       <div class="cpb">Strengths and risks of your response</div>
       <div class="cpb">What your manager is likely thinking now</div>
-      <div class="cpb">A pro tip you haven't seen yet</div>
+      <div class="cpb">Pro tip: People who practice out loud get...</div>
     `;
   }
   return `
     <div class="cpb">Personalized coaching insight</div>
-    <div class="cpb">A pro tip you haven't seen yet</div>
+    <div class="cpb">Pro tip: The silence after your ask...</div>
   `;
 }
 
