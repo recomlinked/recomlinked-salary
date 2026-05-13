@@ -5836,7 +5836,7 @@ async function handleCoachingChat(userText) {
 
     // Coach bubble before paywall — same as practice mode
     const coachWrap = el('div', 'coach-msg', '');
-    coachWrap.innerHTML = `<div class="bubble"><p>Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $${PRICE_USD} \u2014 with personalized AI coaching on every move.</p></div>`;
+    coachWrap.innerHTML = `<div class="bubble"><p>You\u2019ve reached the free coaching limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $${PRICE_USD} \u2014 with personalized AI coaching on every move.</p></div>`;
     coachingEl.appendChild(coachWrap);
 
     const limitWrap = el('div', 'coach-msg', '');
