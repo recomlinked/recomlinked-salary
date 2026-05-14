@@ -687,9 +687,13 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .tip-card-gist .verdict-risky{color:#d04040;}
 .tip-card-gist .verdict-safe{color:#b8960c;}
 .tip-card-gist .verdict-bold{color:#7c3aed;}
+.tip-card-header{display:flex;align-items:center;gap:5px;margin-bottom:6px;}
+.tip-card-icon{display:flex;align-items:center;}
+.tip-card-label{font-size:10px;font-weight:700;color:#8a7540;letter-spacing:0.04em;text-transform:uppercase;}
 .tip-card-link{font-size:11px;color:var(--gold);font-weight:600;margin-top:6px;display:inline-block;cursor:pointer;text-decoration:none;}
 .tip-card-link:hover{text-decoration:underline;}
-.tip-card.loading .tip-card-gist{background:linear-gradient(90deg,#e8d9a8 25%,#f0e6c8 50%,#e8d9a8 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px;height:18px;width:70%;}
+.tip-card-shimmer{display:block;height:14px;width:65%;border-radius:4px;background:linear-gradient(90deg,rgba(201,168,76,0.1) 25%,rgba(201,168,76,0.2) 50%,rgba(201,168,76,0.1) 75%);background-size:200% 100%;animation:shimmer 1.5s ease infinite;}
+.tip-card.loading .tip-card-link{opacity:0.4;pointer-events:none;}
 @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
 /* Manager + reply now flow as separate coach bubbles in the main stream
@@ -2418,11 +2422,23 @@ function showCoachPreviewCard(action, context) {
     setTimeout(() => old.remove(), 300);
   }
 
+  // Context-aware CTA text — short but clear
+  const ctaTexts = {
+    opening_picked: 'See risk & opportunity \u2192',
+    scenario_selected: 'See hidden meaning \u2192',
+    reply_chosen: 'See strength & weakness \u2192',
+  };
+  const ctaText = ctaTexts[action] || 'See full coach tips \u2192';
+
   const preview = el('div', 'tip-card loading', '');
   preview.id = 'active-tip-card';
   preview.innerHTML = `
-    <div class="tip-card-gist">&nbsp;</div>
-    <a class="tip-card-link" href="javascript:void(0)">Full analysis \u2192</a>
+    <div class="tip-card-header">
+      <span class="tip-card-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
+      <span class="tip-card-label">Coach tip</span>
+    </div>
+    <div class="tip-card-gist"><span class="tip-card-shimmer"></span></div>
+    <a class="tip-card-link" href="javascript:void(0)">${ctaText}</a>
   `;
   preview.querySelector('.tip-card-link').addEventListener('click', function(e) {
     e.stopPropagation();
@@ -2432,11 +2448,19 @@ function showCoachPreviewCard(action, context) {
   $('messages').appendChild(preview);
   currentCoachPreview = preview;
   scrollChatToBottom();
+
+  // Fallback: if API doesn't respond in 8 seconds, show generic gist
+  preview._tipTimeout = setTimeout(() => {
+    if (preview.classList.contains('loading')) {
+      populateTipCard('Your coach is analyzing this move — switch to coaching mode for the full breakdown.');
+    }
+  }, 8000);
 }
 
 function populateTipCard(gist) {
   const card = document.getElementById('active-tip-card');
   if (!card) return;
+  if (card._tipTimeout) clearTimeout(card._tipTimeout);
   card.classList.remove('loading');
   const gistEl = card.querySelector('.tip-card-gist');
   if (gistEl && gist) {
@@ -3313,8 +3337,6 @@ function renderOpeningChips() {
     banner.innerHTML = `
       <div class="pro-tip-card pro-tip-locked">
         <div class="pro-tip-locked-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
-        <div class="pro-tip-locked-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
-        <div class="pro-tip-locked-num">#1</div>
         <div class="pro-tip-locked-text"><b>Tap your first move</b> to unlock your first coach tip</div>
       </div>
     `;
