@@ -234,6 +234,8 @@ async function init(){
 
   // Free user (no token, no session) — show tree from localStorage if available
   let token=urlToken||localStorage.getItem(LS_TOKEN)||null;
+  // Recover token from state if LS_TOKEN is empty (backward compat with old key too)
+  if(!token){try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||localStorage.getItem('rl_raise_sim_state')||'{}');if(cs.paid_token)token=cs.paid_token;}catch(e){}}
   if(!token&&!urlSession){
     try{
       const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');
