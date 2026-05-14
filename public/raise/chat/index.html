@@ -3039,7 +3039,7 @@ async function startSimulationAtBlocker() {
   await sleep(100);
 
   // Video moves to coaching mode — not in practice flow
-  addCoachingVideo(blocker.code);
+  // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
 
   // Add initial welcome to coaching mode (no preview card in practice — keep first impression clean)
   const welcomeText = getCoachingWelcome(blocker.code);
@@ -4938,7 +4938,7 @@ async function resumeFromState() {
     unlockModeToggle();
 
     // Repopulate coaching mode with welcome + video
-    addCoachingVideo(blocker.code);
+    // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
     const welcomeText = getCoachingWelcome(blocker.code);
     const coachingEl = $('coaching-messages');
     if (coachingEl) {
