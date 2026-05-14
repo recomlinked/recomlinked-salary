@@ -819,12 +819,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
           <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M7 7h6M7 10h4M7 13h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
           <span class="toolbar-badge" id="ctx-badge">4</span>
         </button>
-        <button class="toolbar-btn" id="tree-btn" onclick="toggleTreePanel()" title="View explored scenarios">
-          <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M10 6v3M10 9L5 13M10 9l5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="15" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
-          <span class="toolbar-badge" id="tree-badge" style="display:none;">0/0</span>
-        </button>
-        <div class="scenarios-counter" id="scenarios-counter" style="display:none;">
-          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.5 5H18l-4 3.5 1.5 5.5L10 13l-5.5 3 1.5-5.5L2 7h5.5z" stroke="currentColor" stroke-width="1.3" fill="currentColor" fill-opacity="0.15"/></svg>
+        <div class="scenarios-counter" id="scenarios-counter">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M6 3h8v2h3v3c0 1.5-1.2 2.8-2.7 3H14c-.8 1.8-2.3 3-4 3s-3.2-1.2-4-3h-.3C4.2 11.8 3 10.5 3 9V6h3V3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 14.5h6M8.5 14.5v2h3v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           <span class="sc-num" id="sc-num">0</span> scenarios unlocked
         </div>
       </div>
@@ -1859,15 +1855,12 @@ function updateTreeBadge() {
   const numEl = $('sc-num');
   if (counter && numEl) {
     const count = SIM_STATE.scenarios_explored.length;
-    if (count > 0) {
-      counter.style.display = '';
-      const prev = parseInt(numEl.textContent || '0', 10);
-      numEl.textContent = count;
-      if (count > prev) {
-        numEl.classList.remove('bump');
-        void numEl.offsetWidth; // force reflow
-        numEl.classList.add('bump');
-      }
+    const prev = parseInt(numEl.textContent || '0', 10);
+    numEl.textContent = count;
+    if (count > prev) {
+      numEl.classList.remove('bump');
+      void numEl.offsetWidth;
+      numEl.classList.add('bump');
     }
   }
   // Persist to localStorage
@@ -3322,7 +3315,7 @@ function renderOpeningChips() {
         <div class="pro-tip-locked-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
         <div class="pro-tip-locked-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
         <div class="pro-tip-locked-num">#1</div>
-        <div class="pro-tip-locked-text"><b>Tap your first move</b> to unlock a free negotiation tip</div>
+        <div class="pro-tip-locked-text"><b>Tap your first move</b> to unlock your first coach tip</div>
       </div>
     `;
     $('messages').appendChild(banner);
