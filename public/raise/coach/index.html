@@ -95,8 +95,11 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 .bl-ic{width:30px;height:30px;border-radius:6px;background:rgba(201,168,76,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .bl-ic svg{width:15px;height:15px;color:var(--gold);}
 .bl-t{font-size:13px;font-weight:500;line-height:1.3;flex:1;}
-.bl-arr{color:var(--t3);font-size:15px;opacity:0.4;transition:all 0.15s;}
-.bl:hover .bl-arr{opacity:1;color:var(--gold);transform:translateX(2px);}
+.bl-arr{color:var(--gold);font-size:12px;font-weight:600;opacity:0.6;transition:all 0.15s;flex-shrink:0;white-space:nowrap;}
+.bl:hover .bl-arr{opacity:1;transform:translateX(2px);}
+.bl-cta{border-color:rgba(201,168,76,0.35);}
+.bl-cta .bl-t{color:var(--gold);font-weight:600;}
+.bl-cta:hover{border-color:var(--gold);}
 
 .pricing{padding:48px 20px 56px;}
 .pr-card{max-width:440px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -282,16 +285,17 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 
 <section class="blockers" id="blockers">
   <div class="wrap">
-    <h2 class="st" style="margin-bottom:20px;">What's stopping you from asking for a raise?</h2>
+    <h2 class="st" style="margin-bottom:20px;">Most common raise blockers</h2>
     <div class="bl-grid">
-      <a href="/raise/chat/?reason=no_script" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M4 3h8v10H4zM6 6h4M6 8h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="bl-t">I don't know how to start the conversation</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=underpaid" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bl-t">I know I'm underpaid but haven't said anything</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=fear_no" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="bl-t">What if they say no?</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=quiet_performer" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3.5 14c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="bl-t">I do great work but don't talk about it</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=unknown_timing" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M8 4.5v3.5l2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="bl-t">I'm not sure it's the right time</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=unknown_number" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.2"/></svg></div><div class="bl-t">I don't know what number to ask for</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=already_asked" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 019.5-2M13 8a5 5 0 01-9.5 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M12 3v3h-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="bl-t">I already asked and got nothing</div><span class="bl-arr">→</span></a>
-      <a href="/raise/chat/?reason=no_advocate" class="bl"><div class="bl-ic"><svg viewBox="0 0 16 16" fill="none"><path d="M5.5 6a2 2 0 100-4 2 2 0 000 4zM10.5 6a2 2 0 100-4 2 2 0 000 4zM1.5 13c0-2 1.5-3.5 4-3.5s4 1.5 4 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div><div class="bl-t">My manager won't bring it up</div><span class="bl-arr">→</span></a>
+      <a href="/raise/chat/?reason=no_script" class="bl"><div class="bl-t">I don't know how to start the conversation</div><span class="bl-arr">Get it →</span></a>
+      <a href="/raise/chat/?reason=underpaid" class="bl"><div class="bl-t">I think I'm underpaid but I can't prove it</div><span class="bl-arr">Fix it →</span></a>
+      <a href="/raise/chat/?reason=quiet_performer" class="bl"><div class="bl-t">I'm a strong performer but quiet</div><span class="bl-arr">Fix it →</span></a>
+      <a href="/raise/chat/?reason=unknown_number" class="bl"><div class="bl-t">I don't know what number to ask for</div><span class="bl-arr">Find it →</span></a>
+      <a href="/raise/chat/?reason=fear_no" class="bl"><div class="bl-t">What if they say no?</div><span class="bl-arr">Handle it →</span></a>
+      <a href="/raise/chat/?reason=no_advocate" class="bl"><div class="bl-t">My manager doesn't advocate for me</div><span class="bl-arr">Fix it →</span></a>
+      <a href="/raise/chat/?reason=already_asked" class="bl"><div class="bl-t">I already asked and got nothing</div><span class="bl-arr">Reopen it →</span></a>
+      <a href="/raise/chat/?reason=unknown_timing" class="bl"><div class="bl-t">I'm not sure if now is the right time</div><span class="bl-arr">Find out →</span></a>
+      <a href="/raise/chat/?reason=other" class="bl bl-cta"><div class="bl-t">None of these? Let's find yours</div><span class="bl-arr">→</span></a>
     </div>
   </div>
 </section>
