@@ -1780,6 +1780,7 @@ const SIM_STATE = {
   context: {},
   branch_history: [],
   scenarios_explored: [],
+  scenarios_unlocked_count: 0,
   scenarios_total: 0,
   simMode: true,
   unlocked: false,
@@ -1857,11 +1858,11 @@ function updateTreeBadge() {
     badge.textContent = SIM_STATE.scenarios_explored.length + '/\u221e';
     badge.style.display = '';
   }
-  // Update scenarios unlocked counter
+  // Update scenarios unlocked counter — uses scenarios_unlocked_count (simple counter)
   const counter = $('scenarios-counter');
   const numEl = $('sc-num');
   if (counter && numEl) {
-    const count = SIM_STATE.scenarios_explored.length;
+    const count = SIM_STATE.scenarios_unlocked_count || 0;
     const prev = parseInt(numEl.textContent || '0', 10);
     numEl.textContent = count;
     if (count > prev) {
@@ -1873,9 +1874,14 @@ function updateTreeBadge() {
   // Persist to localStorage
   try {
     const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
-    s.scenarios_unlocked = SIM_STATE.scenarios_explored.length;
+    s.scenarios_unlocked = SIM_STATE.scenarios_unlocked_count || 0;
     localStorage.setItem(LS_STATE, JSON.stringify(s));
   } catch(e) {}
+}
+
+function incrementScenariosUnlocked() {
+  SIM_STATE.scenarios_unlocked_count = (SIM_STATE.scenarios_unlocked_count || 0) + 1;
+  updateTreeBadge();
 }
 
 function showToolbar() {
@@ -3393,6 +3399,7 @@ async function pickOpening(opener, pill, container) {
 
   // Reveal Tip #1 BEFORE the user bubble — reward for tapping
   if (incrementSimTaps()) {
+    incrementScenariosUnlocked();
     // Hit paywall limit on first tap (edge case)
     const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
     scrollChatToBottom();
@@ -3403,6 +3410,7 @@ async function pickOpening(opener, pill, container) {
     logSession('sim_opening_picked', { theme: opener.theme });
     showSimulationPaywall(null);
   } else {
+    incrementScenariosUnlocked();
     // Pro tip moves to coaching mode (no longer in practice flow)
 
     const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
@@ -3760,6 +3768,7 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 
   // Every chip tap counts toward the paywall limit
   const hitLimit = incrementSimTaps();
+  incrementScenariosUnlocked();
 
   if (!SIM_STATE.scenarios_explored.includes(scenario.type)) {
     SIM_STATE.scenarios_explored.push(scenario.type);
@@ -4165,6 +4174,7 @@ function pickReply(reply, pill, container, scenario) {
   logSession('sim_reply_tapped', { theme: reply.theme, scenario: scenario.type });
   SIM_STATE.branch_history.push({ scenario: scenario.type, reply: reply.theme });
   simConversation.push({ role: 'user', text: reply.text });
+  incrementScenariosUnlocked();
 
   // Generate coaching insight in background (preview shown during loading)
   generateCoachingInsight('reply_chosen', {
