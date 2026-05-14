@@ -280,12 +280,11 @@ async function init(){
     }
   }catch(e){}}
 
-  // Save token + mark paid
-  if(dash.token){
-    try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}
-    try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');cs.paid=true;cs.paid_token=dash.token;cs.paid_at=Date.now();localStorage.setItem(LS_STATE,JSON.stringify(cs));localStorage.removeItem(LS_TAP);}catch(e){}
-    if(urlSession||urlToken)history.replaceState({},'','/raise/paid/');
-  }
+  // Save token + mark paid — write paid flag unconditionally on valid verify.
+  // Token write is separate so missing access_token doesn't block paywall unlock.
+  try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');cs.paid=true;cs.paid_at=Date.now();if(dash.token)cs.paid_token=dash.token;localStorage.setItem(LS_STATE,JSON.stringify(cs));localStorage.removeItem(LS_TAP);}catch(e){}
+  if(dash.token){try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}}
+  if(urlSession||urlToken)history.replaceState({},'','/raise/paid/');
 
   showScreen('dashboard');renderPaid();
 }
