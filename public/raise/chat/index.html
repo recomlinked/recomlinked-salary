@@ -3237,6 +3237,22 @@ function renderOpeningChips() {
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
   simBranchAnchor = wrap;
+
+  // Gift tip encourager banner — collapses on first tap
+  if (!state.paid) {
+    const banner = el('div', 'coach-msg', '');
+    banner.id = 'tip-gift-banner';
+    banner.innerHTML = `
+      <div class="pro-tip-card pro-tip-locked">
+        <div class="pro-tip-locked-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+        <div class="pro-tip-locked-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+        <div class="pro-tip-locked-num">#1</div>
+        <div class="pro-tip-locked-text"><b>Tap your first move</b> to unlock a free negotiation tip</div>
+      </div>
+    `;
+    $('messages').appendChild(banner);
+  }
+
   scrollChatToBottom();
 
   // Log that user saw the interactive chips
@@ -3246,6 +3262,8 @@ function renderOpeningChips() {
   enableInput('Tap an opening or type your own\u2026');
   awaitFreeText(async (text) => {
     if (!text || text.trim().length < 4) return;
+    // Remove gift banner
+    const gb = document.getElementById('tip-gift-banner'); if (gb) gb.remove();
     clearChips();
     disableInput('');
     simConversation.push({ role: 'user', text });
@@ -3272,6 +3290,10 @@ async function pickOpening(opener, pill, container) {
   if (!document.querySelector('.mode-banner')) {
     insertModeBanner('sim');
   }
+
+  // Remove gift tip banner on first tap
+  const giftBanner = document.getElementById('tip-gift-banner');
+  if (giftBanner) { giftBanner.style.transition = 'opacity 0.2s, max-height 0.3s'; giftBanner.style.opacity = '0'; giftBanner.style.maxHeight = '0'; giftBanner.style.overflow = 'hidden'; setTimeout(() => giftBanner.remove(), 300); }
 
   // Disable all pills
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
