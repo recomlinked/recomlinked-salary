@@ -2433,13 +2433,13 @@ function showCoachPreviewCard(action, context) {
   };
   const gistText = gistTexts[action] || 'Your coach has tips for this move.';
 
-  // Two CTA chips per action
-  const chipTexts = {
-    opening_picked: ['Risk & opportunity', 'Full breakdown'],
-    scenario_selected: ['Hidden meaning', 'Full breakdown'],
-    reply_chosen: ['Strength & weakness', 'Full breakdown'],
+  // Single CTA text per action
+  const ctaTexts = {
+    opening_picked: 'See risk, opportunity & full breakdown \u2192',
+    scenario_selected: 'See hidden meaning & full breakdown \u2192',
+    reply_chosen: 'See strength, weakness & full breakdown \u2192',
   };
-  const chips = chipTexts[action] || ['Coach tips', 'Full breakdown'];
+  const ctaText = ctaTexts[action] || 'See full coach tips \u2192';
 
   const preview = el('div', 'tip-card', '');
   preview.id = 'active-tip-card';
@@ -2449,16 +2449,11 @@ function showCoachPreviewCard(action, context) {
       <span class="tip-card-label">Coach tip</span>
     </div>
     <div class="tip-card-gist">${gistText}</div>
-    <div class="tip-card-chips">
-      <a class="tip-card-chip" href="javascript:void(0)">${chips[0]} \u2192</a>
-      <a class="tip-card-chip" href="javascript:void(0)">${chips[1]} \u2192</a>
-    </div>
+    <a class="tip-card-link" href="javascript:void(0)">${ctaText}</a>
   `;
-  preview.querySelectorAll('.tip-card-chip').forEach(chip => {
-    chip.addEventListener('click', function(e) {
-      e.stopPropagation();
-      setMode('coach');
-    });
+  preview.querySelector('.tip-card-link').addEventListener('click', function(e) {
+    e.stopPropagation();
+    setMode('coach');
   });
 
   $('messages').appendChild(preview);
@@ -4325,6 +4320,12 @@ async function expandFollowupScenario(scenario, pill, pillContainer, parentScena
   pillContainer.querySelectorAll('.sim-pill').forEach(p => {
     p.classList.toggle('active', p === pill);
   });
+
+  // Count this as an unlocked scenario
+  if (!SIM_STATE.scenarios_explored.includes(scenario.type)) {
+    SIM_STATE.scenarios_explored.push(scenario.type);
+    updateTreeBadge();
+  }
 
   simConversation.push({ role: 'manager', text: scenario.text });
 
