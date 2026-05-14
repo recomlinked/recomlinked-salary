@@ -59,9 +59,10 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 
 .demo{padding:48px 20px 56px;}
 .demo-visual{max-width:500px;margin:0 auto;background:rgba(29,217,179,0.02);border:1px solid rgba(29,217,179,0.06);border-radius:12px;padding:20px;}
-.ds{display:flex;gap:12px;position:relative;opacity:0.5;transition:opacity 0.6s ease, transform 0.6s ease;transform:translateX(-4px);}
-.ds.active{opacity:1;transform:translateX(0);}
-.ds.active .dd{box-shadow:0 0 12px rgba(201,168,76,0.15);}
+.ds{display:flex;gap:12px;position:relative;opacity:0.4;transition:opacity 0.6s ease, transform 0.6s ease;transform:scale(0.95) translateX(-4px);}
+.ds.active{opacity:1;transform:scale(1.04) translateX(0);}
+.ds.active .dd{box-shadow:0 0 16px rgba(201,168,76,0.25);}
+.ds.active .dc{background:rgba(201,168,76,0.03);border-radius:8px;padding:8px 10px 18px;margin:-8px -10px 0;}
 .ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:var(--border);}
 .ds:last-child::before{display:none;}
 .dd{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
@@ -285,7 +286,7 @@ button{font-family:var(--sans);cursor:pointer;border:none;}
 
 <section class="blockers" id="blockers">
   <div class="wrap">
-    <h2 class="st" style="margin-bottom:20px;">Most common raise blockers</h2>
+    <h2 class="st" style="margin-bottom:20px;">What's stopping you from asking for a raise?</h2>
     <div class="bl-grid">
       <a href="/raise/chat/?reason=no_script" class="bl"><div class="bl-t">I don't know how to start the conversation</div><span class="bl-arr">Get it →</span></a>
       <a href="/raise/chat/?reason=underpaid" class="bl"><div class="bl-t">I think I'm underpaid but I can't prove it</div><span class="bl-arr">Fix it →</span></a>
