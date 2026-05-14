@@ -2555,7 +2555,7 @@ function getCoachingWelcome(blockerCode) {
   const welcomes = {
     no_script: "Choose an opening line and see how your manager might respond. Each choice reveals a different path.",
     underpaid: "Choose how you'd open the conversation. Each approach leads to different manager reactions.",
-    fear_no: "Pick an opening to see what happens. Every response has a best move — practice finding it.",
+    fear_no: "Pick an opening to see what happens. Every response has a smart counter — practice finding it.",
     quiet: "Start with an opening that feels right. You'll see how managers typically respond to each approach.",
     timing: "Choose your opening to see how your manager reacts. Timing objections have specific counter-moves.",
     prior_no: "Pick how you'd reopen the conversation. This time you'll be ready for their response.",
@@ -3280,7 +3280,7 @@ function renderOpeningChips() {
     themeRow.appendChild(themeSpan);
 
     if (i === 0) {
-      const badge = el('span', 'reply-best-badge', 'Best move');
+      const badge = el('span', 'reply-best-badge', 'Consider');
       themeRow.appendChild(badge);
     }
     content.appendChild(themeRow);
@@ -3966,9 +3966,9 @@ function renderReplyPillsFlat(replies, scenario) {
     themeSpan.textContent = r.theme;
     themeRow.appendChild(themeSpan);
 
-    // "Best move" badge on top-ranked reply
+    // "Consider" badge on top-ranked reply
     if (i === 0) {
-      const badge = el('span', 'reply-best-badge', 'Best move');
+      const badge = el('span', 'reply-best-badge', 'Consider');
       themeRow.appendChild(badge);
     }
     content.appendChild(themeRow);
