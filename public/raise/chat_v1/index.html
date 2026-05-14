@@ -668,10 +668,10 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .diff-badge.tough{background:rgba(201,168,76,0.15);color:#b8960c;}
 .diff-badge.curveball{background:rgba(224,85,85,0.12);color:#d04040;}
 /* Badge on expanded manager bubble */
-.mgr-diff-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;letter-spacing:0.03em;text-transform:uppercase;margin-left:6px;}
-.mgr-diff-badge.easy{background:rgba(0,196,160,0.12);color:#00a878;}
-.mgr-diff-badge.tough{background:rgba(201,168,76,0.15);color:#b8960c;}
-.mgr-diff-badge.curveball{background:rgba(224,85,85,0.12);color:#d04040;}
+.mgr-diff-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;letter-spacing:0.03em;text-transform:uppercase;margin-left:6px;vertical-align:middle;}
+.mgr-diff-badge.easy{background:rgba(0,196,160,0.15);color:#00c4a0;}
+.mgr-diff-badge.tough{background:rgba(201,168,76,0.2);color:#c9a84c;}
+.mgr-diff-badge.curveball{background:rgba(224,85,85,0.15);color:#e05555;}
 
 /* Scenarios unlocked counter — replaces tree badge */
 .scenarios-counter{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3);padding:4px 10px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid var(--divider);}
@@ -692,8 +692,11 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .tip-card-label{font-size:10px;font-weight:700;color:#8a7540;letter-spacing:0.04em;text-transform:uppercase;}
 .tip-card-link{font-size:11px;color:var(--gold);font-weight:600;margin-top:6px;display:inline-block;cursor:pointer;text-decoration:none;}
 .tip-card-link:hover{text-decoration:underline;}
+.tip-card-chips{display:flex;gap:8px;margin-top:8px;}
+.tip-card-chip{display:inline-flex;align-items:center;padding:5px 12px;border-radius:14px;border:1px solid #e8d9a8;background:rgba(201,168,76,0.06);font-size:11px;font-weight:600;color:#8a7540;cursor:pointer;text-decoration:none;transition:all 0.15s;}
+.tip-card-chip:hover{background:rgba(201,168,76,0.15);border-color:var(--gold);}
 .tip-card-shimmer{display:block;height:14px;width:65%;border-radius:4px;background:linear-gradient(90deg,rgba(201,168,76,0.1) 25%,rgba(201,168,76,0.2) 50%,rgba(201,168,76,0.1) 75%);background-size:200% 100%;animation:shimmer 1.5s ease infinite;}
-.tip-card.loading .tip-card-link{opacity:0.4;pointer-events:none;}
+.tip-card.loading .tip-card-chips{opacity:0.4;pointer-events:none;}
 @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
 /* Manager + reply now flow as separate coach bubbles in the main stream
@@ -824,7 +827,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
           <span class="toolbar-badge" id="ctx-badge">4</span>
         </button>
         <div class="scenarios-counter" id="scenarios-counter">
-          <svg viewBox="0 0 20 20" fill="none"><path d="M6 3h8v2h3v3c0 1.5-1.2 2.8-2.7 3H14c-.8 1.8-2.3 3-4 3s-3.2-1.2-4-3h-.3C4.2 11.8 3 10.5 3 9V6h3V3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 14.5h6M8.5 14.5v2h3v-2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <svg viewBox="0 0 20 20" fill="none" width="13" height="13"><path d="M10 2a5 5 0 00-2 9.58V14h4v-2.42A5 5 0 0010 2z" stroke="currentColor" stroke-width="1.3" fill="currentColor" fill-opacity="0.12"/><path d="M8 16h4M8.5 18h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           <span class="sc-num" id="sc-num">0</span> scenarios unlocked
         </div>
       </div>
@@ -2422,57 +2425,58 @@ function showCoachPreviewCard(action, context) {
     setTimeout(() => old.remove(), 300);
   }
 
-  // Context-aware CTA text — short but clear
-  const ctaTexts = {
-    opening_picked: 'See risk & opportunity \u2192',
-    scenario_selected: 'See hidden meaning \u2192',
-    reply_chosen: 'See strength & weakness \u2192',
+  // Static gist messages per action — no API wait
+  const gistTexts = {
+    opening_picked: 'Your coach analyzed this opening strategy.',
+    scenario_selected: 'Your coach decoded this manager response.',
+    reply_chosen: 'Your coach evaluated your reply strategy.',
   };
-  const ctaText = ctaTexts[action] || 'See full coach tips \u2192';
+  const gistText = gistTexts[action] || 'Your coach has tips for this move.';
 
-  const preview = el('div', 'tip-card loading', '');
+  // Two CTA chips per action
+  const chipTexts = {
+    opening_picked: ['Risk & opportunity', 'Full breakdown'],
+    scenario_selected: ['Hidden meaning', 'Full breakdown'],
+    reply_chosen: ['Strength & weakness', 'Full breakdown'],
+  };
+  const chips = chipTexts[action] || ['Coach tips', 'Full breakdown'];
+
+  const preview = el('div', 'tip-card', '');
   preview.id = 'active-tip-card';
   preview.innerHTML = `
     <div class="tip-card-header">
       <span class="tip-card-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
       <span class="tip-card-label">Coach tip</span>
     </div>
-    <div class="tip-card-gist"><span class="tip-card-shimmer"></span></div>
-    <a class="tip-card-link" href="javascript:void(0)">${ctaText}</a>
+    <div class="tip-card-gist">${gistText}</div>
+    <div class="tip-card-chips">
+      <a class="tip-card-chip" href="javascript:void(0)">${chips[0]} \u2192</a>
+      <a class="tip-card-chip" href="javascript:void(0)">${chips[1]} \u2192</a>
+    </div>
   `;
-  preview.querySelector('.tip-card-link').addEventListener('click', function(e) {
-    e.stopPropagation();
-    setMode('coach');
+  preview.querySelectorAll('.tip-card-chip').forEach(chip => {
+    chip.addEventListener('click', function(e) {
+      e.stopPropagation();
+      setMode('coach');
+    });
   });
 
   $('messages').appendChild(preview);
   currentCoachPreview = preview;
   scrollChatToBottom();
-
-  // Fallback: if API doesn't respond in 8 seconds, show generic gist
-  preview._tipTimeout = setTimeout(() => {
-    if (preview.classList.contains('loading')) {
-      populateTipCard('Your coach is analyzing this move — switch to coaching mode for the full breakdown.');
-    }
-  }, 8000);
 }
 
 function populateTipCard(gist) {
   const card = document.getElementById('active-tip-card');
   if (!card) return;
-  if (card._tipTimeout) clearTimeout(card._tipTimeout);
-  card.classList.remove('loading');
   const gistEl = card.querySelector('.tip-card-gist');
   if (gistEl && gist) {
-    // Color the verdict word
     let html = escapeHtml(gist);
     html = html.replace(/^(Strong)\s*[—\-]/, '<span class="verdict-strong">$1</span> —');
     html = html.replace(/^(Risky)\s*[—\-]/, '<span class="verdict-risky">$1</span> —');
     html = html.replace(/^(Safe)\s*[—\-]/, '<span class="verdict-safe">$1</span> —');
     html = html.replace(/^(Bold)\s*[—\-]/, '<span class="verdict-bold">$1</span> —');
     gistEl.innerHTML = html;
-  } else if (gistEl) {
-    gistEl.textContent = 'Your coach is analyzing this move...';
   }
 }
 
