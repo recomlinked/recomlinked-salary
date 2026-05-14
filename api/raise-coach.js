@@ -850,11 +850,12 @@ ${timing ? `Timeline: ${timing}` : ''}
 For each scenario, provide:
 - "type": a SHORT quote (3-7 words) showing what the manager says. This is the pill label — it must be instantly understandable. Write it as a direct mini-quote in the manager's voice, like: "No budget right now" or "Why do you deserve more?" or "Let me think about it". Do NOT use abstract labels like "Deflecting upward" or "Passive agreement" — users can't tell what those mean.${userOpening ? '\n- The manager is responding DIRECTLY to what the employee just said. Each response should feel like a natural reaction to their specific opening.' : ''}
 - "text": the full 1-2 sentence version of what the manager would say.
+- "difficulty": one of "easy", "tough", or "curveball". Easy = receptive, open, or curious responses. Tough = standard pushback, budget objections, delays. Curveball = unexpected, emotional, or confrontational responses that catch you off guard.
 
-The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person.
+The themes should be VARIED — mix supportive, challenging, deflecting, emotional, and factual responses. Make them feel like a real person. Include a mix of difficulties.
 
 JSON only, no preamble:
-{ "scenarios": [ { "type": "\\"No budget right now\\"", "text": "Budgets are locked until..." }, ... ] }`;
+{ "scenarios": [ { "type": "\\"No budget right now\\"", "text": "Budgets are locked until...", "difficulty": "tough" }, ... ] }`;
 
   try {
     const response = await client.messages.create({
@@ -967,9 +968,10 @@ The employee just said their last line. Now generate 4-5 DIFFERENT ways the mana
 For each scenario:
 - "type": a short quote (3-7 words) showing what the manager says — a mini-quote in the manager's voice like: "That's fair, let me check", "I need to loop in HR", "What exactly are you asking for?"
 - "text": the full 1-2 sentence version
+- "difficulty": one of "easy", "tough", or "curveball". Easy = receptive/open. Tough = standard pushback. Curveball = unexpected/confrontational.
 
 JSON only:
-{ "scenarios": [ { "type": "\\"That's fair, let me check\\"", "text": "..." }, ... ] }`;
+{ "scenarios": [ { "type": "\\"That's fair, let me check\\"", "text": "...", "difficulty": "easy" }, ... ] }`;
 
   try {
     const response = await client.messages.create({
@@ -1051,64 +1053,77 @@ async function handleCoachingInsight(body, res) {
     .join('\n');
 
   let prompt;
+  const gistInstruction = `\n\nRESPONSE FORMAT — respond ONLY with valid JSON, no preamble:\n{ "gist": "One sentence: the key risk or strength of this move (max 15 words, starts with a verdict like 'Strong —', 'Risky —', 'Safe —', 'Bold —')", "full": "The full multi-paragraph analysis below" }`;
 
   if (action === 'opening_picked') {
     prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" chose an opening with the theme: "${context?.theme || 'direct approach'}"
 
 Analyze the STRATEGIC APPROACH of this opening theme. Do NOT quote, reference, or critique any specific words or phrases they used. Analyze only the strategy and direction.
 
-Give structured feedback using this EXACT format (1 sentence each):
+For the "full" field, give structured feedback using this EXACT format (1 sentence each):
 
 **Approach:** What negotiation strategy this type of opening signals to a manager
 **Risk:** One strategic risk of this approach direction (not about wording)
 **Opportunity:** What this approach opens up if the manager responds positively
 **Next move:** What type of manager reaction to prepare for after this type of opening
 
-CRITICAL: Do NOT reference or critique their specific words, phrasing, or language. Only analyze the strategic approach and direction. Never say things like "the phrase X is vague" or "saying Y could backfire."`;
+CRITICAL: Do NOT reference or critique their specific words, phrasing, or language. Only analyze the strategic approach and direction.${gistInstruction}`;
   }
   else if (action === 'scenario_selected') {
     prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
 
 The manager responded with a "${context?.scenario_type || ''}" type of response.
 
-Analyze the MANAGER'S RESPONSE TYPE only. Do NOT re-analyze the user's opening or quote specific words. Give structured feedback using this EXACT format (1 sentence each):
+Analyze the MANAGER'S RESPONSE TYPE only. Do NOT re-analyze the user's opening or quote specific words.
+
+For the "full" field, give structured feedback using this EXACT format (1 sentence each):
 
 **Signal:** What this type of manager response reveals about their position (supportive, defensive, deflecting, testing)
 **Hidden meaning:** What managers typically mean beneath this type of response
 **Preparation:** What strategic approach works best when facing this type of reaction
 **Watch for:** The key signal to listen for that tells you whether to push forward or adjust
 
-CRITICAL: Analyze the response type and strategy only. Never quote or reference specific words or phrases.`;
+CRITICAL: Analyze the response type and strategy only.${gistInstruction}`;
   }
   else if (action === 'reply_chosen') {
     prompt = `You are a salary negotiation coach. A person whose concern is "${blockerLabel}" is practicing their raise conversation.
 
 They chose a reply with the theme: "${context?.reply_theme || 'direct response'}" in response to a manager who gave a "${context?.scenario_type || ''}" reaction.
 
-Analyze the REPLY STRATEGY only. Do NOT re-analyze their opening or the manager's response. Do NOT quote or critique specific words. Give structured feedback using this EXACT format (1 sentence each):
+Analyze the REPLY STRATEGY only. Do NOT re-analyze their opening or the manager's response. Do NOT quote or critique specific words.
+
+For the "full" field, give structured feedback using this EXACT format (1 sentence each):
 
 **Strategy:** What negotiation tactic this type of reply represents
 **Strength:** The strongest strategic element of this approach direction
 **Weakness:** One strategic vulnerability in this approach (not about wording)
 **After this:** What typically happens next in negotiations after this type of reply
 
-CRITICAL: Analyze the strategic direction only. Never reference or critique their specific words, phrasing, or language.`;
+CRITICAL: Analyze the strategic direction only.${gistInstruction}`;
   }
   else {
-    prompt = `You are a salary negotiation coach giving brief feedback. The person's concern: "${blockerLabel}". Action: ${action}. Give a 2-sentence insight.`;
+    prompt = `You are a salary negotiation coach giving brief feedback. The person's concern: "${blockerLabel}". Action: ${action}.${gistInstruction}`;
   }
 
   try {
     const response = await client.messages.create({
       model: NUDGE_MODEL_ID,
-      max_tokens: 250,
+      max_tokens: 350,
       messages: [{ role: 'user', content: prompt }],
     });
-    const text = response.content[0]?.text || '';
-    return res.status(200).json({ insight: text, mode: 'coaching_insight' });
+    const raw = (response.content[0]?.text || '').trim();
+    // Try to parse as JSON for new gist+full format
+    try {
+      const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      return res.status(200).json({ insight: parsed.full || raw, gist: parsed.gist || '', mode: 'coaching_insight' });
+    } catch (e) {
+      // Fallback — old format (plain text), generate gist from first sentence
+      const firstSentence = raw.split(/[.!]\s/)[0] || raw.slice(0, 80);
+      return res.status(200).json({ insight: raw, gist: firstSentence, mode: 'coaching_insight' });
+    }
   } catch (err) {
     console.error('[coaching_insight] error:', err);
-    return res.status(200).json({ insight: null, mode: 'coaching_insight' });
+    return res.status(200).json({ insight: null, gist: null, mode: 'coaching_insight' });
   }
 }
 
