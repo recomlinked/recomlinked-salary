@@ -302,7 +302,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .coach-preview-icon{display:flex;align-items:center;justify-content:center;width:16px;height:16px;flex-shrink:0;}
 .coach-preview-label{font-size:11px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.05em;}
 .coach-preview-text{font-size:12px;color:#5a4a20;line-height:1.5;}
-.coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#c9a84c;cursor:pointer;}
+.coach-preview-cta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:700;color:#c9a84c;cursor:pointer;}
 .coach-preview-cta:hover{color:#b8960c;}
 .coach-preview-bullets{display:flex;flex-direction:column;gap:4px;}
 .cpb{font-size:12px;color:#5a4a20;line-height:1.4;padding-left:14px;position:relative;font-weight:600;}
@@ -662,6 +662,36 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;}
 .sim-pill-custom:hover{border-color:var(--teal);color:var(--teal);}
 
+/* Difficulty badges — shown on manager scenario pills */
+.diff-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:0.03em;text-transform:uppercase;flex-shrink:0;margin-left:auto;}
+.diff-badge.easy{background:rgba(0,196,160,0.12);color:#00a878;}
+.diff-badge.tough{background:rgba(201,168,76,0.15);color:#b8960c;}
+.diff-badge.curveball{background:rgba(224,85,85,0.12);color:#d04040;}
+/* Badge on expanded manager bubble */
+.mgr-diff-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;letter-spacing:0.03em;text-transform:uppercase;margin-left:6px;}
+.mgr-diff-badge.easy{background:rgba(0,196,160,0.12);color:#00a878;}
+.mgr-diff-badge.tough{background:rgba(201,168,76,0.15);color:#b8960c;}
+.mgr-diff-badge.curveball{background:rgba(224,85,85,0.12);color:#d04040;}
+
+/* Scenarios unlocked counter — replaces tree badge */
+.scenarios-counter{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3);padding:4px 10px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid var(--divider);}
+.scenarios-counter svg{width:13px;height:13px;color:var(--gold);}
+.scenarios-counter .sc-num{color:var(--gold);font-weight:800;font-size:12px;transition:transform 0.3s;display:inline-block;}
+.scenarios-counter .sc-num.bump{animation:scBump 0.4s ease;}
+@keyframes scBump{0%{transform:scale(1);}40%{transform:scale(1.5);}100%{transform:scale(1);}}
+
+/* Tip card — compact gist of coaching insight */
+.tip-card{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:10px 14px;animation:msgIn 0.5s ease;}
+.tip-card-gist{font-size:13px;font-weight:600;color:#5a4a20;line-height:1.5;}
+.tip-card-gist .verdict-strong{color:#00a878;}
+.tip-card-gist .verdict-risky{color:#d04040;}
+.tip-card-gist .verdict-safe{color:#b8960c;}
+.tip-card-gist .verdict-bold{color:#7c3aed;}
+.tip-card-link{font-size:11px;color:var(--gold);font-weight:600;margin-top:6px;display:inline-block;cursor:pointer;text-decoration:none;}
+.tip-card-link:hover{text-decoration:underline;}
+.tip-card.loading .tip-card-gist{background:linear-gradient(90deg,#e8d9a8 25%,#f0e6c8 50%,#e8d9a8 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:4px;height:18px;width:70%;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
 /* Manager + reply now flow as separate coach bubbles in the main stream
    (flat structure) rather than nested inside one card. The label still
    identifies who's speaking. */
@@ -720,7 +750,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 <body>
 
 <header class="site-header">
-  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <a href="/raise/coach/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
 </header>
 
 <div class="page-wrap">
@@ -793,6 +823,10 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
           <svg viewBox="0 0 20 20" fill="none" width="16" height="16"><circle cx="10" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M10 6v3M10 9L5 13M10 9l5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="5" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/><circle cx="15" cy="15" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
           <span class="toolbar-badge" id="tree-badge" style="display:none;">0/0</span>
         </button>
+        <div class="scenarios-counter" id="scenarios-counter" style="display:none;">
+          <svg viewBox="0 0 20 20" fill="none"><path d="M10 2l2.5 5H18l-4 3.5 1.5 5.5L10 13l-5.5 3 1.5-5.5L2 7h5.5z" stroke="currentColor" stroke-width="1.3" fill="currentColor" fill-opacity="0.15"/></svg>
+          <span class="sc-num" id="sc-num">0</span> scenarios unlocked
+        </div>
       </div>
       <div class="input-row">
         <input type="text" id="chat-input" placeholder="Calculating your probability…" disabled autocomplete="off"/>
@@ -1820,6 +1854,28 @@ function updateTreeBadge() {
     badge.textContent = SIM_STATE.scenarios_explored.length + '/\u221e';
     badge.style.display = '';
   }
+  // Update scenarios unlocked counter
+  const counter = $('scenarios-counter');
+  const numEl = $('sc-num');
+  if (counter && numEl) {
+    const count = SIM_STATE.scenarios_explored.length;
+    if (count > 0) {
+      counter.style.display = '';
+      const prev = parseInt(numEl.textContent || '0', 10);
+      numEl.textContent = count;
+      if (count > prev) {
+        numEl.classList.remove('bump');
+        void numEl.offsetWidth; // force reflow
+        numEl.classList.add('bump');
+      }
+    }
+  }
+  // Persist to localStorage
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
+    s.scenarios_unlocked = SIM_STATE.scenarios_explored.length;
+    localStorage.setItem(LS_STATE, JSON.stringify(s));
+  } catch(e) {}
 }
 
 function showToolbar() {
@@ -2362,25 +2418,21 @@ function addCoachingVideo(blockerCode) {
 // Show a preview card in practice mode (one at a time, replaces previous)
 // The card shows a MENU of what's available in coaching mode, not the full content
 function showCoachPreviewCard(action, context) {
-  // Collapse previous preview
+  // Collapse previous tip card
   if (currentCoachPreview) {
     currentCoachPreview.classList.add('collapsing');
     const old = currentCoachPreview;
     setTimeout(() => old.remove(), 300);
   }
 
-  const bullets = getCoachPreviewBullets(action, context);
-
-  const preview = el('div', 'coach-preview', '');
+  const preview = el('div', 'tip-card loading', '');
+  preview.id = 'active-tip-card';
   preview.innerHTML = `
-    <div class="coach-preview-header">
-      <span class="coach-preview-icon"><svg viewBox="0 0 20 20" fill="none" width="16" height="16"><path d="M3.5 5.5c0-1.1 0.9-2 2-2h9c1.1 0 2 0.9 2 2v6c0 1.1-0.9 2-2 2H8.5l-3 3v-3h-0.5c-1.1 0-2-0.9-2-2v-6z" stroke="#8a7540" stroke-width="1.4" stroke-linejoin="round"/><circle cx="7.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="10.5" cy="8.5" r="0.8" fill="#8a7540"/><circle cx="13.5" cy="8.5" r="0.8" fill="#8a7540"/></svg></span>
-      <span class="coach-preview-label">Coach insight</span>
-    </div>
-    <div class="coach-preview-bullets">${bullets}</div>
-    <div class="coach-preview-cta">View coaching \u2192</div>
+    <div class="tip-card-gist">&nbsp;</div>
+    <a class="tip-card-link" href="javascript:void(0)">Full analysis \u2192</a>
   `;
-  preview.addEventListener('click', function() {
+  preview.querySelector('.tip-card-link').addEventListener('click', function(e) {
+    e.stopPropagation();
     setMode('coach');
   });
 
@@ -2389,42 +2441,33 @@ function showCoachPreviewCard(action, context) {
   scrollChatToBottom();
 }
 
-function getCoachPreviewBullets(action, context) {
-  const theme = context?.theme || context?.scenario_type || context?.reply_theme || '';
-  const shortTheme = theme.length > 30 ? theme.slice(0, 27) + '...' : theme;
+function populateTipCard(gist) {
+  const card = document.getElementById('active-tip-card');
+  if (!card) return;
+  card.classList.remove('loading');
+  const gistEl = card.querySelector('.tip-card-gist');
+  if (gistEl && gist) {
+    // Color the verdict word
+    let html = escapeHtml(gist);
+    html = html.replace(/^(Strong)\s*[—\-]/, '<span class="verdict-strong">$1</span> —');
+    html = html.replace(/^(Risky)\s*[—\-]/, '<span class="verdict-risky">$1</span> —');
+    html = html.replace(/^(Safe)\s*[—\-]/, '<span class="verdict-safe">$1</span> —');
+    html = html.replace(/^(Bold)\s*[—\-]/, '<span class="verdict-bold">$1</span> —');
+    gistEl.innerHTML = html;
+  } else if (gistEl) {
+    gistEl.textContent = 'Your coach is analyzing this move...';
+  }
+}
 
-  if (action === 'opening_picked') {
-    return `
-      <div class="cpb">Why "${shortTheme}" works (and when it doesn't)</div>
-      <div class="cpb">A coaching video for your scenario</div>
-      <div class="cpb">Pro tip: The silence after your ask...</div>
-    `;
-  }
-  if (action === 'scenario_selected') {
-    return `
-      <div class="cpb">What this manager response really signals</div>
-      <div class="cpb">How to read between the lines</div>
-      <div class="cpb">Pro tip: They'll only hear the bottom of your...</div>
-    `;
-  }
-  if (action === 'reply_chosen') {
-    return `
-      <div class="cpb">Strengths and risks of your response</div>
-      <div class="cpb">What your manager is likely thinking now</div>
-      <div class="cpb">Pro tip: People who practice out loud get...</div>
-    `;
-  }
-  return `
-    <div class="cpb">Personalized coaching insight</div>
-    <div class="cpb">Pro tip: The silence after your ask...</div>
-  `;
+function getCoachPreviewBullets(action, context) {
+  // Legacy — kept for backward compat but no longer used by showCoachPreviewCard
+  return '';
 }
 
 // Render "X unseen messages" header in coaching mode
 function renderCoachingUnseenHeader() {
   const coachingEl = $('coaching-messages');
   if (!coachingEl) return;
-  // Remove existing
   coachingEl.querySelectorAll('.coaching-unseen').forEach(e => e.remove());
 }
 
@@ -2432,7 +2475,6 @@ function renderCoachingUnseenHeader() {
 function addBackToPracticeCTA() {
   const coachingEl = $('coaching-messages');
   if (!coachingEl) return;
-  // Remove existing
   coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
   const cta = el('div', 'back-to-practice', '');
   cta.innerHTML = '\u2190 Continue practicing';
@@ -2442,7 +2484,6 @@ function addBackToPracticeCTA() {
 
 // Generate AI coaching insight based on practice action
 async function generateCoachingInsight(action, context) {
-  // Build direction label based on action
   let directionLabel = '';
   if (action === 'opening_picked') {
     directionLabel = 'Your opening: ' + (context?.theme || 'Direct approach');
@@ -2466,15 +2507,22 @@ async function generateCoachingInsight(action, context) {
       }),
     });
     const data = await res.json();
+    // Populate the tip card gist in practice mode
+    if (data.gist) {
+      populateTipCard(data.gist);
+    } else {
+      populateTipCard(null);
+    }
+    // Full insight goes to coaching mode
     if (data.insight) {
       addCoachingInsight(data.insight, 'insight', directionLabel);
     }
   } catch (err) {
-    // Fallback to static insight
+    populateTipCard(null);
     const fallbacks = {
-      opening_picked: "Good choice. Your opening sets the tone for the entire conversation. The way you start tells your manager whether this is a request or a negotiation.",
-      scenario_selected: "Interesting scenario. Your manager's response reveals what they really think about your ask. Pay attention to whether they address the amount or deflect to timing.",
-      reply_chosen: "Your response matters here. The best negotiators match their manager's energy — if they're cautious, be reassuring. If they're open, be specific.",
+      opening_picked: "Good choice. Your opening sets the tone for the entire conversation.",
+      scenario_selected: "Your manager's response reveals what they really think about your ask.",
+      reply_chosen: "The best negotiators match their manager's energy.",
     };
     addCoachingInsight(fallbacks[action] || "Your coach is analyzing your approach...", 'insight', directionLabel);
   }
@@ -2889,17 +2937,30 @@ const EMPATHY_QUOTES = {
   ],
 };
 
-// Bridge lines — lead to opening chips
+// Bridge lines — CTA only (shortened — pro tip provides the context now)
 const BRIDGE_LINES = {
-  no_script:      "The first sentence is the hardest part. Most people rehearse it for months and never say it. Below are the opening lines that actually work \u2014 **Try one and see how your manager reacts.**",
-  underpaid:      "You already know the gap is there. Bringing it up is the hard part. These are the opening lines that work best for this conversation \u2014 **Pick one and see what your manager says.**",
-  quiet:          "Your work speaks for itself \u2014 but right now it needs your voice too. These openings are designed for people who\u2019d rather let results do the talking. **Try one \u2014 see how your manager responds.**",
-  unknown_amount: "You don\u2019t need a perfect number to start the conversation. These opening lines let you explore what\u2019s possible without committing to a figure. **Pick one and see where the conversation goes.**",
-  fear_no:        "The fear of \u2018no\u2019 keeps most people from ever asking. These openings are built to protect you if they push back \u2014 **Try one and see how the pushback plays out.**",
-  no_advocate:    "If your manager won\u2019t bring it up, you have to. These openings are designed for exactly that situation \u2014 **Pick one and see how your manager reacts.**",
-  prior_no:       "Reopening this conversation is different from asking the first time. These openings acknowledge the history without starting from scratch \u2014 **Try one and see how the second ask lands.**",
-  timing:         "There\u2019s never a perfect time, but there are ways to test the waters without fully committing. **Pick one and see what your manager says.**",
-  other:          "How you open this conversation sets the tone for everything after it. **Try one and watch the conversation unfold.**",
+  no_script:      "Below are the opening lines that actually work \u2014 **Tap one to start.**",
+  underpaid:      "These are the opening lines that work best when you know you\u2019re underpaid \u2014 **Tap one to start.**",
+  quiet:          "These openings are designed for people who\u2019d rather let results do the talking \u2014 **Tap one to start.**",
+  unknown_amount: "These opening lines let you explore what\u2019s possible without committing to a figure \u2014 **Tap one to start.**",
+  fear_no:        "These openings are built to protect you if they push back \u2014 **Tap one to start.**",
+  no_advocate:    "These openings are designed to start a conversation your manager is avoiding \u2014 **Tap one to start.**",
+  prior_no:       "These openings acknowledge the history without starting from scratch \u2014 **Tap one to start.**",
+  timing:         "There are ways to test the waters without fully committing \u2014 **Tap one to start.**",
+  other:          "How you open sets the tone for everything after it \u2014 **Tap one to start.**",
+};
+
+// Blocker-specific pro tips — shown as first thing on arrival (instant value)
+const BLOCKER_PRO_TIPS = {
+  no_script:       "People who rehearse their opening out loud get 12\u201318% better outcomes. You\u2019re about to do exactly that.",
+  underpaid:       "The strongest underpaid conversations lead with market data, not feelings. Your first move sets the frame.",
+  fear_no:         "76% of managers expect the ask \u2014 they\u2019re more surprised when you DON\u2019T bring it up.",
+  quiet:           "Your results are your leverage. The move is turning invisible work into a visible conversation.",
+  timing:          "There\u2019s no perfect time, but Tuesday\u2013Wednesday mornings get 20% more approvals than Fridays.",
+  unknown_amount:  "Employees who name a specific range get 15\u201325% more than those who say \u201cwhatever you think is fair.\u201d",
+  prior_no:        "Reopening isn\u2019t starting over \u2014 it\u2019s showing what changed since last time. That reframe changes everything.",
+  no_advocate:     "When your manager won\u2019t initiate, the person who brings data wins. Make silence cost more than a conversation.",
+  other:           "The person who speaks first anchors the conversation. Your opening line shapes everything that follows.",
 };
 
 // ── Start simulation at the specific blocker moment ──
@@ -2935,7 +2996,21 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner AFTER first tap (not here)
   // insertModeBanner('sim');
 
-  // Bridge line — leads to chips
+  // Show blocker-specific pro tip card FIRST (instant value before action)
+  const tipText = BLOCKER_PRO_TIPS[blocker.code] || BLOCKER_PRO_TIPS.other;
+  const tipWrap = el('div', 'coach-msg', '');
+  tipWrap.innerHTML = `
+    <div class="pro-tip-card pro-tip-revealed">
+      <div class="pro-tip-top">
+        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+      </div>
+      <div class="pro-tip-text">${tipText}</div>
+    </div>
+  `;
+  $('messages').appendChild(tipWrap);
+  await sleep(300);
+
+  // Bridge line — shortened CTA only
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
   const bridgeBubble = insertCoachBubble(bridge);
   logEntry('coach_bubble', { text: bridge });
@@ -3237,6 +3312,22 @@ function renderOpeningChips() {
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
   simBranchAnchor = wrap;
+
+  // Gift tip encourager banner — collapses on first tap
+  if (!state.paid) {
+    const banner = el('div', 'coach-msg', '');
+    banner.id = 'tip-gift-banner';
+    banner.innerHTML = `
+      <div class="pro-tip-card pro-tip-locked">
+        <div class="pro-tip-locked-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b8960c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg></div>
+        <div class="pro-tip-locked-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
+        <div class="pro-tip-locked-num">#1</div>
+        <div class="pro-tip-locked-text"><b>Tap your first move</b> to unlock a free negotiation tip</div>
+      </div>
+    `;
+    $('messages').appendChild(banner);
+  }
+
   scrollChatToBottom();
 
   // Log that user saw the interactive chips
@@ -3246,6 +3337,8 @@ function renderOpeningChips() {
   enableInput('Tap an opening or type your own\u2026');
   awaitFreeText(async (text) => {
     if (!text || text.trim().length < 4) return;
+    // Remove gift banner
+    const gb = document.getElementById('tip-gift-banner'); if (gb) gb.remove();
     clearChips();
     disableInput('');
     simConversation.push({ role: 'user', text });
@@ -3272,6 +3365,10 @@ async function pickOpening(opener, pill, container) {
   if (!document.querySelector('.mode-banner')) {
     insertModeBanner('sim');
   }
+
+  // Remove gift tip banner on first tap
+  const giftBanner = document.getElementById('tip-gift-banner');
+  if (giftBanner) { giftBanner.style.transition = 'opacity 0.2s, max-height 0.3s'; giftBanner.style.opacity = '0'; giftBanner.style.maxHeight = '0'; giftBanner.style.overflow = 'hidden'; setTimeout(() => giftBanner.remove(), 300); }
 
   // Disable all pills
   container.querySelectorAll('.sim-reply-pill').forEach(p => {
@@ -3489,6 +3586,12 @@ function renderScenarioLabels(scenarios) {
     pill.insertBefore(radio, pill.firstChild);
 
     pill.appendChild(content);
+    // Difficulty badge for manager scenarios
+    if (s.difficulty) {
+      const badge = el('span', 'diff-badge ' + s.difficulty, '');
+      badge.textContent = s.difficulty === 'curveball' ? '⚡ Curveball' : s.difficulty === 'tough' ? 'Tough' : 'Easy';
+      pill.appendChild(badge);
+    }
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
     row.appendChild(pill);
@@ -3725,15 +3828,15 @@ async function expandScenario(scenario, index, pill, pillContainer, parentWrap, 
 // but with a MANAGER label so the user knows it's roleplay, not coaching.
 function renderManagerBubble(scenario) {
   const wrap = el('div', 'coach-msg', '');
+  const diffBadge = scenario.difficulty ? `<span class="mgr-diff-badge ${scenario.difficulty}">${scenario.difficulty === 'curveball' ? '⚡ Curveball' : scenario.difficulty === 'tough' ? 'Tough' : 'Easy'}</span>` : '';
   wrap.innerHTML = `
     <div class="bubble">
-      <span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span>
+      <span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager${diffBadge}</span>
       <p>"${escapeHtml(scenario.text)}"</p>
     </div>
   `;
   $('messages').appendChild(wrap);
   scrollChatToBottom();
-  // Log so it replays on refresh (uses coach_bubble type with a marker)
   logEntry('coach_bubble', { text: '[MANAGER] ' + scenario.text });
   return wrap;
 }
@@ -4155,6 +4258,12 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
       pill.appendChild(preview);
     }
     pill.onclick = () => expandFollowupScenario(s, pill, row, parentScenario, wrap, turnNodes);
+    // Difficulty badge for manager followup scenarios
+    if (s.difficulty) {
+      const badge = el('span', 'diff-badge ' + s.difficulty, '');
+      badge.textContent = s.difficulty === 'curveball' ? '⚡ Curveball' : s.difficulty === 'tough' ? 'Tough' : 'Easy';
+      pill.appendChild(badge);
+    }
     row.appendChild(pill);
   });
 
@@ -4447,9 +4556,9 @@ async function showSimulationPaywall(lastScenario) {
   // If cliffhanger already shown locked pills, keep text minimal
   const hasCliffhanger = document.querySelector('.sim-reply-pill.locked');
   if (hasCliffhanger) {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 — with personalized AI coaching on every move.");
+    await typeCoachBubble("You\u2019ve reached the free practice limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 \u2014 with personalized AI coaching on every move.");
   } else {
-    await typeCoachBubble("Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 — with personalized AI coaching on every move.");
+    await typeCoachBubble("You\u2019ve reached the free practice limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $19 \u2014 with personalized AI coaching on every move.");
   }
   await sleep(300);
 
@@ -5848,10 +5957,19 @@ async function handleCoachingChat(userText) {
     }
     coachingEl.querySelectorAll('.back-to-practice').forEach(e => e.remove());
 
-    // Coach bubble before paywall — same as practice mode
+    // Coach bubble before paywall — with typing animation
     const coachWrap = el('div', 'coach-msg', '');
-    coachWrap.innerHTML = `<div class="bubble"><p>You\u2019ve reached the free coaching limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $${PRICE_USD} \u2014 with personalized AI coaching on every move.</p></div>`;
+    const coachBubble = el('div', 'bubble', '');
+    coachBubble.innerHTML = '<p><span class="typed-text"></span><span class="cursor"></span></p>';
+    coachWrap.appendChild(coachBubble);
     coachingEl.appendChild(coachWrap);
+    scrollCoachingToBottom();
+
+    const paywallText = "You\u2019ve reached the free coaching limit. Salary negotiation coaches charge $150\u2013300 per hour to practice exactly these scenarios. Unlock all of them for just $" + PRICE_USD + " \u2014 with personalized AI coaching on every move.";
+    const typedSpan = coachBubble.querySelector('.typed-text');
+    const cursorEl = coachBubble.querySelector('.cursor');
+    await typeIntoElement(typedSpan, paywallText);
+    if (cursorEl) cursorEl.remove();
 
     const limitWrap = el('div', 'coach-msg', '');
     const displayPrice = PRICE_USD;
@@ -5946,10 +6064,20 @@ async function handleCoachingChat(userText) {
     const reply = data.reply || data.insight || "I'm here to help with your raise conversation. Ask me anything about your situation.";
     coachingChatHistory.push({ role: 'assistant', content: reply });
 
-    // Show coach reply
+    // Show coach reply with typing animation
     const replyWrap = el('div', 'coach-msg', '');
-    replyWrap.innerHTML = `<div class="bubble"><p>${inlineBold(escapeHtml(reply))}</p></div>`;
+    const replyBubble = el('div', 'bubble', '');
+    replyBubble.innerHTML = '<p><span class="typed-text"></span><span class="cursor"></span></p>';
+    replyWrap.appendChild(replyBubble);
     coachingEl.appendChild(replyWrap);
+    scrollCoachingToBottom();
+
+    const typedSpan = replyBubble.querySelector('.typed-text');
+    const cursorEl2 = replyBubble.querySelector('.cursor');
+    await typeIntoElement(typedSpan, reply);
+    if (cursorEl2) cursorEl2.remove();
+    // Apply bold formatting after typing completes
+    typedSpan.innerHTML = inlineBold(escapeHtml(reply));
   } catch (err) {
     if (typingWrap._arcStop) typingWrap._arcStop();
     typingWrap.remove();
