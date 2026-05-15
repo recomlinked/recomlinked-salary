@@ -4584,14 +4584,24 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
-  scenarios.forEach((s) => {
-    const pill = el('button', 'sim-reply-pill locked', '');
-    pill.disabled = false;
+  // Reorder to show mixed difficulties
+  const diffOrder = ['easy', 'tough', 'curveball'];
+  const sorted = [];
+  const remaining = [...scenarios];
+  for (const d of diffOrder) {
+    const idx = remaining.findIndex(s => s.difficulty === d);
+    if (idx >= 0) { sorted.push(remaining.splice(idx, 1)[0]); }
+  }
+  const reordered = [...sorted, ...remaining];
+
+  reordered.forEach((s) => {
+    const pill = el('button', 'sim-pill locked', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
     pill.style.gap = '8px';
+    pill.style.opacity = '0.5';
 
-    // Lock icon on left
+    // Lock icon instead of radio circle
     const lock = el('span', 'lock-icon', '');
     lock.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
     pill.appendChild(lock);
@@ -4611,6 +4621,13 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
       content.appendChild(preview);
     }
     pill.appendChild(content);
+
+    // Difficulty badge — same as main scenario chips
+    if (s.difficulty) {
+      const badge = el('span', 'diff-badge ' + s.difficulty, '');
+      badge.textContent = s.difficulty === 'curveball' ? '⚡ Curveball' : s.difficulty === 'tough' ? 'Tough' : 'Easy';
+      pill.appendChild(badge);
+    }
 
     // Click scrolls to paywall
     pill.addEventListener('click', function() {
