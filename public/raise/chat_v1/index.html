@@ -3647,7 +3647,7 @@ function renderScenarioLabels(scenarios) {
 
   // "Something else" pill — hidden inside more options
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = "+ Something else\u2026";
+  custom.textContent = "+ I'd say something else\u2026";
   custom.style.display = 'none';
   custom.onclick = () => {
     const inputEl = $('chat-input');
@@ -4340,7 +4340,7 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
   });
 
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = "+ Something else\u2026";
+  custom.textContent = "+ I'd say something else\u2026";
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
