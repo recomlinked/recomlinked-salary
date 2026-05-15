@@ -659,7 +659,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;color:inherit;display:block;}
 .sim-pill-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;display:block;margin-top:2px;}
 .sim-pill.active .sim-pill-preview{color:var(--navy);opacity:0.5;}
-.sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;}
+.sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;min-height:52px;align-items:center;}
 .sim-pill-custom:hover{border-color:var(--navy);color:var(--navy);}
 
 /* Difficulty badges — shown on manager scenario pills */
@@ -3249,7 +3249,7 @@ function renderCoachingVideo(blockerCode) {
 function renderOpeningChips() {
   const blocker = SIM_STATE.blocker;
   const openings = BLOCKER_OPENINGS[blocker.code] || BLOCKER_OPENINGS.no_script;
-  const INITIAL_SHOW = 2;
+  const INITIAL_SHOW = 3;
 
   const wrap = el('div', 'coach-msg', '');
   const inner = el('div', '', '');
@@ -3308,6 +3308,17 @@ function renderOpeningChips() {
     }
   });
 
+  // Custom "I'd say something else" pill — hidden inside more options
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
+  custom.textContent = "+ I'd say something else\u2026";
+  custom.style.display = 'none';
+  custom.onclick = () => {
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
+  };
+  row.appendChild(custom);
+  hiddenPills.push(custom);
+
   // Expand/collapse toggle
   if (hiddenPills.length > 0) {
     const toggle = el('button', 'chips-expand', '');
@@ -3324,14 +3335,6 @@ function renderOpeningChips() {
     };
     row.appendChild(toggle);
   }
-
-  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else\u2026";
-  custom.onclick = () => {
-    const inputEl = $('chat-input');
-    if (inputEl) inputEl.focus();
-  };
-  row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
@@ -3586,7 +3589,21 @@ function renderScenarioLabels(scenarios) {
     }
   };
 
-  scenarios.forEach((s, i) => {
+  const SCENARIO_INITIAL_SHOW = 3;
+  const hiddenScenarioPills = [];
+
+  // Ensure first 3 visible scenarios have one of each difficulty (easy/tough/curveball)
+  const diffOrder = ['easy', 'tough', 'curveball'];
+  const sorted = [];
+  const remaining = [...scenarios];
+  for (const d of diffOrder) {
+    const idx = remaining.findIndex(s => s.difficulty === d);
+    if (idx >= 0) { sorted.push(remaining.splice(idx, 1)[0]); }
+  }
+  // Fill remaining spots if we didn't find all 3 difficulties
+  const reordered = [...sorted, ...remaining];
+
+  reordered.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
@@ -3618,17 +3635,43 @@ function renderScenarioLabels(scenarios) {
     }
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
-    row.appendChild(pill);
+
+    if (i < SCENARIO_INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenScenarioPills.push(pill);
+    }
   });
 
-  // "Something else" pill
+  // "Something else" pill — hidden inside more options
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = '+ Something else\u2026';
+  custom.textContent = "+ Something else\u2026";
+  custom.style.display = 'none';
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
   };
   row.appendChild(custom);
+  hiddenScenarioPills.push(custom);
+
+  // Expand/collapse toggle
+  if (hiddenScenarioPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenScenarioPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
@@ -3942,7 +3985,7 @@ function renderReplyPillsFlat(replies, scenario) {
 
   // Sort replies by score (highest first)
   const sorted = [...replies].sort((a, b) => (b.score || 3) - (a.score || 3));
-  const INITIAL_SHOW = 2;
+  const INITIAL_SHOW = 3;
   const hiddenReplyPills = [];
 
   sorted.forEach((r, i) => {
@@ -3998,6 +4041,17 @@ function renderReplyPillsFlat(replies, scenario) {
     }
   });
 
+  // Custom pill — hidden inside more options
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
+  custom.textContent = "+ I'd say something else\u2026";
+  custom.style.display = 'none';
+  custom.onclick = () => {
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
+  };
+  row.appendChild(custom);
+  hiddenReplyPills.push(custom);
+
   // Expand/collapse toggle
   if (hiddenReplyPills.length > 0) {
     const toggle = el('button', 'chips-expand', '');
@@ -4014,14 +4068,6 @@ function renderReplyPillsFlat(replies, scenario) {
     };
     row.appendChild(toggle);
   }
-
-  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else\u2026";
-  custom.onclick = () => {
-    const inputEl = $('chat-input');
-    if (inputEl) inputEl.focus();
-  };
-  row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
@@ -4294,7 +4340,7 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
   });
 
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = '+ Something else\u2026';
+  custom.textContent = "+ Something else\u2026";
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
@@ -4538,14 +4584,27 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
   const row = el('div', 'sim-pills-row', '');
   inner.appendChild(row);
 
-  scenarios.forEach((s) => {
-    const pill = el('button', 'sim-reply-pill locked', '');
-    pill.disabled = false;
+  // Reorder to show mixed difficulties
+  const diffOrder = ['easy', 'tough', 'curveball'];
+  const sorted = [];
+  const remaining = [...scenarios];
+  for (const d of diffOrder) {
+    const idx = remaining.findIndex(s => s.difficulty === d);
+    if (idx >= 0) { sorted.push(remaining.splice(idx, 1)[0]); }
+  }
+  const reordered = [...sorted, ...remaining];
+
+  const LOCKED_INITIAL_SHOW = 3;
+  const hiddenLockedPills = [];
+
+  reordered.forEach((s, i) => {
+    const pill = el('button', 'sim-pill locked', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
     pill.style.gap = '8px';
+    pill.style.opacity = '0.5';
 
-    // Lock icon on left
+    // Lock icon instead of radio circle
     const lock = el('span', 'lock-icon', '');
     lock.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
     pill.appendChild(lock);
@@ -4566,14 +4625,45 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
     }
     pill.appendChild(content);
 
+    // Difficulty badge — same as main scenario chips
+    if (s.difficulty) {
+      const badge = el('span', 'diff-badge ' + s.difficulty, '');
+      badge.textContent = s.difficulty === 'curveball' ? '⚡ Curveball' : s.difficulty === 'tough' ? 'Tough' : 'Easy';
+      pill.appendChild(badge);
+    }
+
     // Click scrolls to paywall
     pill.addEventListener('click', function() {
       const pw = document.querySelector('.paywall-bubble');
       if (pw) pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    row.appendChild(pill);
+    if (i < LOCKED_INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenLockedPills.push(pill);
+    }
   });
+
+  // Expand/collapse toggle for locked pills
+  if (hiddenLockedPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.style.opacity = '0.5';
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenLockedPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenLockedPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenLockedPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
@@ -5699,7 +5789,7 @@ async function renderPaywallBubble(opts) {
         Practice every scenario · ${ctaPrice} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
-        <span>Stripe secure</span><span class="dot">·</span><span>No subscription</span>
+        <span>One-time payment</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Stripe secure</span>
       </div>
       <div class="paywall-ticker"><div class="paywall-ticker-inner" id="paywall-ticker-inner"></div></div>
       <div class="paywall-includes-title">Includes</div>
@@ -6014,7 +6104,7 @@ async function handleCoachingChat(userText) {
           Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
         </button>
         <div class="trust-row paywall-trust">
-          <span>Stripe secure</span><span class="dot">\u00b7</span><span>No subscription</span>
+          <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
         </div>
         <div class="paywall-ticker"><div class="paywall-ticker-inner" id="coaching-paywall-ticker"></div></div>
         <div class="paywall-includes-title">Includes</div>
