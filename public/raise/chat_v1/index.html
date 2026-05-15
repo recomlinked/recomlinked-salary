@@ -659,7 +659,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .sim-pill-theme{font-weight:600;font-size:12.5px;line-height:1.3;color:inherit;display:block;}
 .sim-pill-preview{font-size:11px;color:var(--t3);font-style:italic;line-height:1.4;white-space:normal;opacity:0.6;display:block;margin-top:2px;}
 .sim-pill.active .sim-pill-preview{color:var(--navy);opacity:0.5;}
-.sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;}
+.sim-pill-custom{border-style:dashed;color:var(--t3);flex-direction:row;min-height:52px;align-items:center;}
 .sim-pill-custom:hover{border-color:var(--navy);color:var(--navy);}
 
 /* Difficulty badges — shown on manager scenario pills */
@@ -3647,7 +3647,7 @@ function renderScenarioLabels(scenarios) {
 
   // "Something else" pill — hidden inside more options
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else\u2026";
+  custom.textContent = "+ Something else\u2026";
   custom.style.display = 'none';
   custom.onclick = () => {
     const inputEl = $('chat-input');
@@ -4340,7 +4340,7 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
   });
 
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else\u2026";
+  custom.textContent = "+ Something else\u2026";
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
