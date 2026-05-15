@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>How to Ask for a Raise: Your Pro Salary Negotiation Plan</title>
-<meta name="description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
+<title>How to Ask for a Raise at Work: Your Negotiation Plan</title>
+<meta name="description" content="How to ask for a raise at work and negotiate a pay raise without sounding pushy. Professionally ask for a raise with scripts and pushback responses."/>
 
 <!-- Open Graph / social sharing -->
 <meta property="og:type" content="website"/>
 <meta property="og:site_name" content="Recomlinked"/>
 <meta property="og:url" content="https://salary.recomlinked.com/raise/"/>
-<meta property="og:title" content="How to Ask for a Raise: Your Pro Salary Negotiation Plan"/>
-<meta property="og:description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
+<meta property="og:title" content="How to Ask for a Raise at Work: Your Negotiation Plan"/>
+<meta property="og:description" content="How to ask for a raise at work and negotiate a pay raise without sounding pushy. Professionally ask for a raise with scripts and pushback responses."/>
 <meta property="og:image" content="https://salary.recomlinked.com/og-image.png"/>
 <meta property="og:image:width" content="1200"/>
 <meta property="og:image:height" content="630"/>
@@ -19,8 +19,8 @@
 
 <!-- Twitter/X card -->
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="How to Ask for a Raise: Your Pro Salary Negotiation Plan"/>
-<meta name="twitter:description" content="How to ask for a raise and how to negotiate salary without sounding pushy. A personalized negotiation plan with scripts, pushback responses, and timing."/>
+<meta name="twitter:title" content="How to Ask for a Raise at Work: Your Negotiation Plan"/>
+<meta name="twitter:description" content="How to ask for a raise at work and negotiate a pay raise without sounding pushy. Professionally ask for a raise with scripts and pushback responses."/>
 <meta name="twitter:image" content="https://salary.recomlinked.com/og-image.png"/>
 <link rel="canonical" href="https://salary.recomlinked.com/raise/"/>
 <link rel="preconnect" href="https://h.clarity.ms">
@@ -494,6 +494,7 @@ h2.section-title {
 .reasons-section {
   scroll-margin-top: 40px;
   margin-top: 0;
+  padding-bottom: 32px;
 }
 .reasons-grid {
   display: grid; grid-template-columns: 1fr 1fr;
@@ -1243,6 +1244,46 @@ h2.section-title {
 @keyframes stPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.7);}}
 @keyframes stFadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 @keyframes stBlink{0%,100%{opacity:1;}50%{opacity:0;}}
+/* Demo visual — adapted from coach landing */
+.demo-section{padding:20px 20px 56px;}
+.demo-visual{max-width:500px;margin:0 auto;background:rgba(10,10,15,0.97);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;color:#eeeee6;}
+.ds{display:flex;gap:12px;position:relative;opacity:0.4;transition:opacity 0.6s ease, transform 0.6s ease;transform:scale(0.95) translateX(-4px);}
+.ds.active{opacity:1;transform:scale(1.04) translateX(0);}
+.ds.active .dd{box-shadow:0 0 16px rgba(201,168,76,0.25);}
+.ds.active .dc{background:rgba(201,168,76,0.03);border-radius:8px;padding:8px 10px 18px;margin:-8px -10px 0;}
+.ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:rgba(255,255,255,0.07);}
+.ds:last-child::before{display:none;}
+.dd{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
+.dd svg{width:14px;height:14px;}
+.dd.c{background:rgba(201,168,76,0.1);border:1.5px solid rgba(201,168,76,0.25);}
+.dd.c svg{color:#c9a84c;}
+.dd.u{background:rgba(29,217,179,0.08);border:1.5px solid rgba(29,217,179,0.2);}
+.dd.u svg{color:#1dd9b3;}
+.dd.i{background:rgba(201,168,76,0.06);border:1.5px dashed rgba(201,168,76,0.2);}
+.dd.i svg{color:#c9a84c;}
+.dd.m{background:rgba(25,26,36,1);border:1.5px solid rgba(255,255,255,0.07);}
+.dd.m svg{color:#6a6960;}
+.dc{flex:1;padding-bottom:18px;}
+.dl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
+.dl.cl{color:#c9a84c;}
+.dl.ul{color:#1dd9b3;}
+.dl.il{color:#c9a84c;}
+.dl.ml{color:#6a6960;}
+.dp-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.dp{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:500;background:rgba(25,26,36,1);border:1px solid rgba(255,255,255,0.07);color:#eeeee6;}
+.dp.sel{border-color:#1dd9b3;color:#1dd9b3;background:rgba(29,217,179,0.04);}
+.di-card{background:rgba(17,18,25,1);border:1px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 12px;margin-top:5px;display:inline-flex;gap:14px;flex-wrap:wrap;}
+.di{font-size:11px;color:#9a9890;line-height:1.3;}
+.di b{color:#eeeee6;font-weight:600;display:block;font-size:10.5px;margin-bottom:1px;}
+.demo-text-cta{color:#c9a84c;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.15s;}
+.demo-text-cta:hover{color:#d8b75a;}
+.demo-text-cta-arrow{display:inline-block;margin-left:4px;transition:transform 0.15s;}
+.demo-text-cta:hover .demo-text-cta-arrow{transform:translateX(4px);}
+.why-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,0.07);background:rgba(10,10,15,0.97);font-size:13px;font-weight:500;color:#eeeee6;}
+@media(max-width:600px){
+  .demo-section{padding:16px 16px 40px;}
+  .why-pill{font-size:12px;padding:5px 10px;}
+}
 </style>
 </head>
 
@@ -1263,7 +1304,6 @@ h2.section-title {
   <!-- Hero ─────────────────────────────────────────────── -->
   <section class="hero">
     <h1>How to ask for a <span class="accent">raise</span> <br><span class="hero-h1-line2">with a professional <span class="accent-soft">negotiation plan</span></span></h1>
-
     <p class="hero-sub">Map every conversation path. Walk in ready for anything.</p>
 
     <div class="cta-stack">
@@ -1278,13 +1318,13 @@ h2.section-title {
 
   <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
   <section class="section hiw-section" id="how-it-works">
-    <h2 class="section-title">In 3 simple steps</h2>
+    <h2 class="section-title">In <b style="color:var(--gold);">3 simple steps</b>, ask for a raise at work</h2>
 
     <a href="#blockers" class="hiw-card" aria-label="Step 1: know what's stopping you">
       <div class="hiw-num">1</div>
       <div class="hiw-body">
         <div class="hiw-title">Know what's stopping you</div>
-        <div class="hiw-desc">Every raise has one thing that holds you back. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. <span class="hiw-question">Do you know what's standing in your way?</span></div>
+        <div class="hiw-desc">Every raise negotiation has one thing that holds you back. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. <span class="hiw-question">What's stopping you from asking for a raise?</span></div>
         <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
@@ -1292,8 +1332,8 @@ h2.section-title {
     <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 2: practice the conversation">
       <div class="hiw-num">2</div>
       <div class="hiw-body">
-        <div class="hiw-title">Practice the conversation</div>
-        <div class="hiw-desc">Choose your opening, see how your manager responds, and try different paths. Practice until nothing can surprise you. <span class="hiw-question">Ready to learn the best way to professionally ask for a raise?</span></div>
+        <div class="hiw-title">Simulate the raise negotiation</div>
+        <div class="hiw-desc">Imagine you're about to request a raise — pick your opening, guess your manager's response, and try different paths. Repeat until nothing can surprise you. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
         <div class="hiw-cta">Start practicing now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
@@ -1301,16 +1341,16 @@ h2.section-title {
     <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 3: get AI coaching on every move">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
-        <div class="hiw-title">Get AI coaching on every move</div>
-        <div class="hiw-desc">Your AI coach analyzes every choice you make — what signal it sends, what risk it carries, and how to handle what comes next. <span class="hiw-question">Like having a negotiation expert watching over your shoulder.</span></div>
-        <div class="hiw-cta">Start practicing now <span class="hiw-cta-arrow">→</span></div>
+        <div class="hiw-title">Add an AI coach to your simulation</div>
+        <div class="hiw-desc">Your AI coach analyzes every move you make — what signal it sends and how to handle what comes next. <span class="hiw-question">Like having a negotiation expert beside you while asking for a raise.</span></div>
+        <div class="hiw-cta">Try it now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
     <!-- Blockers section — each chip is one dimension of the full plan -->
     <div class="divider"></div>
     <div class="reasons-section" id="blockers">
-      <h2 class="section-title">Most common raise blockers</h2>
+      <h2 class="section-title">Common blockers to asking for a raise</h2>
       <div class="reasons-grid">
         <a href="/raise/chat/?reason=no_script" class="reason-chip">
           <span>I don't know how to start the conversation</span><span class="reason-arrow">Get it →</span>
@@ -1342,21 +1382,65 @@ h2.section-title {
       </div>
     </div>
 
+    <!-- Harvard proof bar -->
+    <div class="proof-bar" style="margin-top:32px;">
+      <div class="proof-stat">
+        People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+      </div>
+      <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+    </div>
+
+    <!-- Demo visual section -->
+    <div class="divider"></div>
+    <div class="demo-section">
+      <h2 class="section-title">How to professionally ask for a raise</h2>
+      <div class="demo-visual">
+        <div class="ds">
+          <div class="dd c"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4c0-.8.7-1.5 1.5-1.5h8c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-2.5 2.5V10.5H4c-.8 0-1.5-.7-1.5-1.5V4z" stroke="currentColor" stroke-width="1.2"/></svg></div>
+          <div class="dc"><div class="dl cl">Coach gives you opening options</div><div class="dp-wrap"><div class="dp">#1</div><div class="dp">#2</div><div class="dp">#3</div><div class="dp">#4</div><div class="dp">#5</div><div class="dp" style="opacity:0.5;border-style:dashed;">+</div></div></div>
+        </div>
+        <div class="ds">
+          <div class="dd u"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="dc"><div class="dl ul">You tap your choice</div><div class="dp-wrap"><div class="dp sel">✓ Anchor to results</div></div></div>
+        </div>
+        <div class="ds">
+          <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="dc"><div class="dl il">AI coach tips on your move</div><div class="di-card"><div class="di"><b>Approach</b></div><div class="di"><b>Risk</b></div><div class="di"><b>Opportunity</b></div><div class="di"><b>Next move</b></div></div></div>
+        </div>
+        <div class="ds">
+          <div class="dd c"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4c0-.8.7-1.5 1.5-1.5h8c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-2.5 2.5V10.5H4c-.8 0-1.5-.7-1.5-1.5V4z" stroke="currentColor" stroke-width="1.2"/></svg></div>
+          <div class="dc"><div class="dl cl">Coach predicts manager responses</div><div class="dp-wrap"><div class="dp">#1</div><div class="dp">#2</div><div class="dp">#3</div><div class="dp">#4</div><div class="dp" style="opacity:0.5;border-style:dashed;">+</div></div></div>
+        </div>
+        <div class="ds">
+          <div class="dd u"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2a3 3 0 100 6 3 3 0 000-6zM3.5 13c0-2.5 2-4 4.5-4s4.5 1.5 4.5 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="dc"><div class="dl ul">You pick a scenario</div><div class="dp-wrap"><div class="dp sel">✓ "Budgets frozen"</div></div></div>
+        </div>
+        <div class="ds">
+          <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+          <div class="dc"><div class="dl il">AI coach tips on the response</div><div class="di-card"><div class="di"><b>Signal</b></div><div class="di"><b>Hidden meaning</b></div><div class="di"><b>Preparation</b></div><div class="di"><b>Watch for</b></div></div></div>
+        </div>
+        <div class="ds" style="margin-top:12px;">
+          <div class="dd m" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.25);"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 019.5-2M13 8a5 5 0 01-9.5 2" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round"/><path d="M12 3v3h-3" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="dc" style="padding-top:10px;"><div class="dl ml" style="font-weight:700;color:#c9a84c;font-size:11px;">Go deeper or explore another path<br><span style="font-weight:400;opacity:0.7;">Until nothing surprises you</span></div></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--text2);">The best pay raise negotiations take a few hours of prep</div>
+      <div style="text-align:center;margin-top:12px;margin-bottom:12px;"><a href="/raise/chat/?reason=no_script" class="demo-text-cta">Start now <span class="demo-text-cta-arrow">→</span></a></div>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px;">
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 013 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 013 0v2.5"/><path d="M14 10.5a1.5 1.5 0 013 0v1.5"/><path d="M17 11.5a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-2a6 6 0 01-5.3-3.2l-2.7-5a1.5 1.5 0 012.6-1.5l1.4 2.2"/></svg> Just tap, no typing</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 7c0-1.7 6-3.5 6-6"/><path d="M6 17c0-1.7 6-3.5 6-6"/></svg> Branching scenarios</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5h4.5l-3.5 2.7 1.3 4.3-3.8-2.8-3.8 2.8 1.3-4.3-3.5-2.7h4.5z"/><path d="M2 12h2M20 12h2M12 20v2"/></svg> AI coaching every move</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg> Anytime, anywhere</span>
+      </div>
+    </div>
+
   </section>
 
-  <!-- Proof rotator (typewriter, 5 lines) ──────────────── -->
-  <div class="proof-rotator" id="proof-rotator">
-    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- Sample report card — scenario tree widget ─── -->
+  <!--
   <div class="rep-section" id="rep-section">
     <h2 class="section-title">Practice asking for a raise before you actually do it</h2>
     <a href="#blockers" style="text-decoration:none;color:inherit;display:block;cursor:pointer;">
     <div class="scenario-tree-widget" id="scenario-tree" style="pointer-events:none;">
-      <!-- Header -->
       <div class="st-header">
         <div>
           <div class="st-badge"><span class="st-badge-dot"></span>Scenario Planning</div>
@@ -1367,7 +1451,6 @@ h2.section-title {
           <div class="st-counter st-counter-y"><span class="st-counter-n" id="st-paths">0</span><span class="st-counter-l">paths</span></div>
         </div>
       </div>
-      <!-- Tree SVG -->
       <div class="st-tree-wrap">
         <div class="st-fade-l"></div><div class="st-fade-r"></div><div class="st-fade-b"></div>
         <svg id="st-svg" width="100%" height="320" preserveAspectRatio="xMidYMid meet">
@@ -1376,7 +1459,6 @@ h2.section-title {
           </defs>
         </svg>
       </div>
-      <!-- Chat panel -->
       <div class="st-chat-section">
         <div class="st-chat-header">
           <div class="st-chat-header-left"><span class="st-chat-dot"></span><span>Your prepared responses</span></div>
@@ -1395,22 +1477,11 @@ h2.section-title {
       <span class="cta-arrow">→</span>
     </a>
   </div>
+  -->
 
   <div class="divider"></div>
 
-  <!-- Proof bar (cited stats) — research validation -->
-  <div class="proof-bar">
-    <div class="proof-stat">
-      People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
-    </div>
-    <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
-    <div style="margin-top:16px;font-size:14px;color:var(--text2);">The best negotiations take a few hours of prep</div>
-    <a href="#blockers" class="cta-btn" style="margin-top:12px;padding:14px 28px;font-size:14px;">Start practicing <span class="cta-arrow">→</span></a>
-  </div>
-
-  <div class="divider"></div>
-
-  <h2 class="section-title" id="calculator">What each 1% raise means for your career</h2>
+  <h2 class="section-title" id="calculator">What each 1% raise at work means for your career</h2>
 
   <!-- Interactive compound-raise calculator -->
   <div class="proof-bar">
@@ -1472,14 +1543,19 @@ h2.section-title {
 
 
 
+  <!-- Proof rotator (typewriter) ──────────────── -->
+  <div class="proof-rotator" id="proof-rotator">
+    <div class="proof-rotator-text" id="proof-rotator-text"><span class="cursor"></span></div>
+  </div>
+
   <!-- Closing CTA (positioning statement lands here) ──────── -->
   <div class="closing-pitch">
-    <h3><span class="accent">A negotiation coach</span> for people who hate asking</h3>
+    <h3><span class="accent">A negotiation coach</span> for people who hate asking for a raise</h3>
     <p>
-      Asking for a raise and selling your work <strong>isn't greedy</strong>. It's how careers move. We coach you to <strong>ask for what you're worth</strong>: professionally, with evidence, in words that sound like you.
+      Selling your work <strong>isn't greedy</strong>. It's how careers move. We coach you to <strong>ask for a raise</strong> professionally, with evidence, and in words that sound like you.
     </p>
     <a href="#blockers" class="cta-btn">
-      <span>Practice my raise conversation</span>
+      <span>Start Now</span>
       <span class="cta-arrow">→</span>
     </a>
     <div class="mini-trust">
@@ -1489,43 +1565,39 @@ h2.section-title {
 
   <!-- FAQ ─────────────────────────────────────────────── -->
   <section class="section">
-    <h2>Common questions</h2>
+    <h2>Request a raise with AI coaching — FAQ</h2>
     <div style="margin-top: 16px;">
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How does this help me ask for a raise?<span class="faq-icon">+</span></div>
-        <div class="faq-a">You pick your biggest raise blocker — like not knowing what to say, or worrying they'll say no — and the tool lets you tap through every way your manager could respond. For each response, you see a prepared answer. Then you go back and try different paths until you've covered everything. By the time you walk into the real conversation, you've already practiced it.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach help me ask for a raise at work?<span class="faq-icon">+</span></div>
+        <div class="faq-a">It's an AI-powered practice tool. You pick what's stopping you from asking for a raise, then practice the actual conversation — choose your opening, see how your manager responds, try different replies. The AI coach gives you feedback on every choice: what signal it sends, what risk it carries, and what to say next. By the time you walk into the real conversation, you've already had it.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Is this just ChatGPT?<span class="faq-icon">+</span></div>
-        <div class="faq-a">No. ChatGPT gives you one script in one thread. This maps every direction your raise conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're not typing prompts and hoping for good advice. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning for your pay raise, not a chatbot.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">What's the best way to ask for a raise?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The best way to ask for a raise is to practice the conversation before you have it. Not read about it — practice it. The AI coach lets you try different openings, see how your boss might respond, and rehearse your answers to pushback like "budgets are frozen" or "your reviews are mixed." People who practice negotiate significantly better than those who walk in unprepared.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What if I don't know how to start the conversation with my boss?<span class="faq-icon">+</span></div>
-        <div class="faq-a">That's the most common raise blocker — 1 in 4 people who use this tool pick it. Instead of starting with what your manager says, you'll see seven different opening lines you could use to bring up a pay raise with your boss. Pick the one that feels right, and the tool generates your manager's likely responses to that specific opening. You don't need to figure out the words on your own.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">Is the AI coach a real conversation with a person?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No. The manager responses and coaching tips are AI-generated based on real negotiation patterns. You're practicing with an AI simulation, not a human coach.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Can this help me negotiate a higher salary?<span class="faq-icon">+</span></div>
-        <div class="faq-a">People who prepare for salary negotiations using scenario planning get better outcomes because nothing catches them off guard. When your manager says "budgets are frozen" or "why do you think you deserve more," you already know what to say. The preparation is what makes the difference — not a script you read off a page, but having tested every path the conversation could take before you ask your boss for a raise.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How much can I do for free?<span class="faq-icon">+</span></div>
+        <div class="faq-a">You can pick an opening, see how your manager responds, and get your first coaching tips — all free, no email needed. The $19 unlock gives you unlimited branches, full AI coaching, and 30 days of access.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">How much does it cost?<span class="faq-icon">+</span></div>
-        <div class="faq-a">The scenario planning preview is free. If you want unlimited scenario branches, fully customized to your situation, plus 30 days of coaching, it's $19 one-time. No subscription, no upsells.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach help me ask my boss for a raise professionally?<span class="faq-icon">+</span></div>
+        <div class="faq-a">The AI coach analyzes the tone and strategy of every choice you make — not just what you say, but how it lands. It flags when an approach sounds demanding vs. collaborative, when to push and when to pause. You learn how to ask for a raise professionally by practicing it, not by memorizing a script.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What if I'm not sure about some of the answers?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Pick the closest option. The coaching chat handles the nuance: if you're unsure about your market rate, your manager's position, or when exactly your review is, the coach will help you figure it out.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach help me properly ask for a raise without risking my job?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Every scenario shows you the risk alongside the opportunity. The coach tells you what signals each move sends to your manager — so you know which approaches protect the relationship and which ones push too hard. You learn how to properly ask for a raise by seeing the consequences of each path before you take it.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">Will my employer find out I'm using this?<span class="faq-icon">+</span></div>
-        <div class="faq-a">No. Nothing you type here leaves this site. We don't share data, and we don't sell anything. You can delete everything with one click from your dashboard after you've bought the plan.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach help me ask for a raise if I've never done it?<span class="faq-icon">+</span></div>
+        <div class="faq-a">That's exactly who this is for. You don't type anything — just tap through options the coach gives you. Pick an opening, see what happens, try a different path. It's how you ask for a raise when you've never done it before — by practicing in a safe environment where mistakes don't cost you anything.</div>
       </div>
       <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What does the 30-day coaching look like?<span class="faq-icon">+</span></div>
-        <div class="faq-a">After you purchase, you get a personal link (valid 30 days). Come back whenever you need. Your coach remembers every conversation in that window. Week 1 is usually preparation and evidence-gathering. Week 2 is practice conversations and role-play. Week 3 is the actual negotiation. Week 4 is follow-up and counter-offer handling. You're never reading dry advice. You're working through a specific plan with a coach who knows your situation.</div>
-      </div>
-      <div class="faq-item">
-        <div class="faq-q" onclick="toggleFaq(this)">What about a job offer I'm negotiating?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Different product, different dynamics (counter-offers, equity, sign-on, levelling). We're building it. <a href="/raise/waitlist/">Join the waitlist</a> and we'll let you know when it's live.</div>
+        <div class="faq-q" onclick="toggleFaq(this)">How is the AI coach different from ChatGPT?<span class="faq-icon">+</span></div>
+        <div class="faq-a">ChatGPT gives you one generic conversation. The AI coach gives you branching scenarios with multiple manager responses, structured coaching analysis on every choice, pro tips backed by research, and a purpose-built practice environment — not a blank chat box.</div>
       </div>
     </div>
   </section>
@@ -2629,82 +2701,20 @@ function submitAssessment() {
   }
 
   // Start when visible
-  if('IntersectionObserver' in window){
+  var stEl=document.getElementById('scenario-tree');
+  if('IntersectionObserver' in window && stEl){
     var obs=new IntersectionObserver(function(entries){
       if(entries[0].isIntersecting){obs.disconnect();renderTree();timer=setTimeout(runScript,600);}
     },{threshold:0.2});
-    obs.observe(document.getElementById('scenario-tree'));
-  }else{
+    obs.observe(stEl);
+  }else if(stEl){
     renderTree();timer=setTimeout(runScript,600);
   }
 })();
 </script>
 
 <!-- FAQ Schema (structured data for Google) -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How does this help me ask for a raise?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "You pick your biggest raise blocker — like not knowing what to say, or worrying they'll say no — and the tool lets you tap through every way your manager could respond. For each response, you see a prepared answer. Then you go back and try different paths until you've covered everything. By the time you walk into the real conversation, you've already practiced it."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is this just ChatGPT?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. ChatGPT gives you one script in one thread. This maps every direction your raise conversation could take — every manager response, every way to reply, every follow-up — and lets you tap through all of them. You're testing real scenarios, seeing prepared responses, and going back to try different paths until you've covered everything. It's scenario planning for your pay raise, not a chatbot."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What if I don't know how to start the conversation with my boss?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "That's the most common raise blocker. Instead of starting with what your manager says, you'll see seven different opening lines you could use to bring up a pay raise with your boss. Pick the one that feels right, and the tool generates your manager's likely responses to that specific opening."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can this help me negotiate a higher salary?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "People who prepare for salary negotiations using scenario planning get better outcomes because nothing catches them off guard. When your manager says 'budgets are frozen' or 'why do you think you deserve more,' you already know what to say. The preparation is what makes the difference."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does it cost?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The scenario planning preview is free. If you want unlimited scenario branches, fully customized to your situation, plus 30 days of coaching, it's $19 one-time. No subscription, no upsells."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How do I get a raise the right way?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The right way to get a raise at work is to prepare for every scenario before you walk in. Know your number, know what to say if your boss pushes back, and have a raise plan ready. Most people who are underpaid stay that way because they ask once, get told no, and never bring it up again. The ones who succeed negotiate a raise by treating it as a process, not a single conversation."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Will my employer find out I'm using this?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No. Nothing you type here leaves this site. We don't share data, and we don't sell anything. You can delete everything with one click from your dashboard."
-      }
-    }
-  ]
-}
-</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does the AI coach help me ask for a raise at work?", "acceptedAnswer": {"@type": "Answer", "text": "It's an AI-powered practice tool. You pick what's stopping you, then practice the conversation — choose your opening, see how your manager responds, try different replies. The AI coach gives feedback on every choice."}}, {"@type": "Question", "name": "What's the best way to ask for a raise?", "acceptedAnswer": {"@type": "Answer", "text": "The best way to ask for a raise is to practice the conversation before you have it. The AI coach lets you try different openings, see how your boss might respond, and rehearse your answers to pushback."}}, {"@type": "Question", "name": "Is the AI coach a real conversation with a person?", "acceptedAnswer": {"@type": "Answer", "text": "No. The manager responses and coaching tips are AI-generated based on real negotiation patterns."}}, {"@type": "Question", "name": "How much can I do for free?", "acceptedAnswer": {"@type": "Answer", "text": "Pick an opening, see manager responses, and get first coaching tips — free, no email needed. $19 unlocks everything for 30 days."}}, {"@type": "Question", "name": "How does the AI coach help me ask my boss for a raise professionally?", "acceptedAnswer": {"@type": "Answer", "text": "The AI coach analyzes the tone and strategy of every choice — not just what you say, but how it lands. You learn how to ask for a raise professionally by practicing it."}}, {"@type": "Question", "name": "How does the AI coach help me properly ask for a raise without risking my job?", "acceptedAnswer": {"@type": "Answer", "text": "Every scenario shows you the risk alongside the opportunity. The coach tells you what signals each move sends so you know which approaches protect the relationship."}}, {"@type": "Question", "name": "How does the AI coach help me ask for a raise if I've never done it?", "acceptedAnswer": {"@type": "Answer", "text": "Just tap through options the coach gives you. Pick an opening, see what happens, try a different path. Practice in a safe environment where mistakes don't cost anything."}}, {"@type": "Question", "name": "How is the AI coach different from ChatGPT?", "acceptedAnswer": {"@type": "Answer", "text": "ChatGPT gives one generic conversation. This gives branching scenarios, structured coaching analysis, pro tips, and a purpose-built practice environment."}}]}</script>
 
 <!-- Pass UTM params through to chat page links -->
 <script>
@@ -2738,5 +2748,33 @@ function submitAssessment() {
 <!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
 <script defer src="/shared.js"></script>
 
+<script>
+// Demo visual step animation
+(function(){
+  var steps = document.querySelectorAll('.demo-visual > .ds');
+  if (!steps.length) return;
+  var current = 0;
+  var demoTimer = null;
+  function rotateSteps() {
+    steps.forEach(function(s){ s.classList.remove('active'); });
+    steps[current].classList.add('active');
+    current = (current + 1) % steps.length;
+    demoTimer = setTimeout(rotateSteps, 2500);
+  }
+  var demoEl = document.querySelector('.demo-visual');
+  if ('IntersectionObserver' in window) {
+    var dobs = new IntersectionObserver(function(entries){
+      if (entries[0].isIntersecting) {
+        if (!demoTimer) rotateSteps();
+      } else {
+        if (demoTimer) { clearTimeout(demoTimer); demoTimer = null; }
+      }
+    });
+    dobs.observe(demoEl);
+  } else {
+    rotateSteps();
+  }
+})();
+</script>
 </body>
 </html>
