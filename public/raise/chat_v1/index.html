@@ -3589,6 +3589,9 @@ function renderScenarioLabels(scenarios) {
     }
   };
 
+  const SCENARIO_INITIAL_SHOW = 3;
+  const hiddenScenarioPills = [];
+
   scenarios.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
     pill.style.flexDirection = 'row';
@@ -3621,17 +3624,43 @@ function renderScenarioLabels(scenarios) {
     }
     pill.dataset.index = i;
     pill.onclick = () => expandScenario(s, i, pill, row, wrap, scenarios);
-    row.appendChild(pill);
+
+    if (i < SCENARIO_INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenScenarioPills.push(pill);
+    }
   });
 
-  // "Something else" pill
+  // "Something else" pill — hidden inside more options
   const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = '+ Something else\u2026';
+  custom.style.display = 'none';
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
   };
   row.appendChild(custom);
+  hiddenScenarioPills.push(custom);
+
+  // Expand/collapse toggle
+  if (hiddenScenarioPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenScenarioPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenScenarioPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
@@ -3945,7 +3974,7 @@ function renderReplyPillsFlat(replies, scenario) {
 
   // Sort replies by score (highest first)
   const sorted = [...replies].sort((a, b) => (b.score || 3) - (a.score || 3));
-  const INITIAL_SHOW = 2;
+  const INITIAL_SHOW = 3;
   const hiddenReplyPills = [];
 
   sorted.forEach((r, i) => {
@@ -4001,6 +4030,17 @@ function renderReplyPillsFlat(replies, scenario) {
     }
   });
 
+  // Custom pill — hidden inside more options
+  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
+  custom.textContent = "+ I'd say something else\u2026";
+  custom.style.display = 'none';
+  custom.onclick = () => {
+    const inputEl = $('chat-input');
+    if (inputEl) inputEl.focus();
+  };
+  row.appendChild(custom);
+  hiddenReplyPills.push(custom);
+
   // Expand/collapse toggle
   if (hiddenReplyPills.length > 0) {
     const toggle = el('button', 'chips-expand', '');
@@ -4017,14 +4057,6 @@ function renderReplyPillsFlat(replies, scenario) {
     };
     row.appendChild(toggle);
   }
-
-  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
-  custom.textContent = "+ I'd say something else\u2026";
-  custom.onclick = () => {
-    const inputEl = $('chat-input');
-    if (inputEl) inputEl.focus();
-  };
-  row.appendChild(custom);
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
