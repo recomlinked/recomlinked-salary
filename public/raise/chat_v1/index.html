@@ -4594,7 +4594,10 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
   }
   const reordered = [...sorted, ...remaining];
 
-  reordered.forEach((s) => {
+  const LOCKED_INITIAL_SHOW = 3;
+  const hiddenLockedPills = [];
+
+  reordered.forEach((s, i) => {
     const pill = el('button', 'sim-pill locked', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
@@ -4635,8 +4638,32 @@ async function showCliffhangerPaywall(scenario, turnNodes) {
       if (pw) pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
 
-    row.appendChild(pill);
+    if (i < LOCKED_INITIAL_SHOW) {
+      row.appendChild(pill);
+    } else {
+      pill.style.display = 'none';
+      row.appendChild(pill);
+      hiddenLockedPills.push(pill);
+    }
   });
+
+  // Expand/collapse toggle for locked pills
+  if (hiddenLockedPills.length > 0) {
+    const toggle = el('button', 'chips-expand', '');
+    toggle.style.opacity = '0.5';
+    toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenLockedPills.length + ' more options';
+    let expanded = false;
+    toggle.onclick = () => {
+      expanded = !expanded;
+      hiddenLockedPills.forEach(p => { p.style.display = expanded ? '' : 'none'; });
+      if (expanded) {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="18 15 12 9 6 15"/></svg> Show less';
+      } else {
+        toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenLockedPills.length + ' more options';
+      }
+    };
+    row.appendChild(toggle);
+  }
 
   wrap.appendChild(inner);
   $('messages').appendChild(wrap);
