@@ -3309,7 +3309,7 @@ function renderOpeningChips() {
   });
 
   // Custom "I'd say something else" pill — hidden inside more options
-  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = "+ I'd say something else\u2026";
   custom.style.display = 'none';
   custom.onclick = () => {
@@ -3592,7 +3592,18 @@ function renderScenarioLabels(scenarios) {
   const SCENARIO_INITIAL_SHOW = 3;
   const hiddenScenarioPills = [];
 
-  scenarios.forEach((s, i) => {
+  // Ensure first 3 visible scenarios have one of each difficulty (easy/tough/curveball)
+  const diffOrder = ['easy', 'tough', 'curveball'];
+  const sorted = [];
+  const remaining = [...scenarios];
+  for (const d of diffOrder) {
+    const idx = remaining.findIndex(s => s.difficulty === d);
+    if (idx >= 0) { sorted.push(remaining.splice(idx, 1)[0]); }
+  }
+  // Fill remaining spots if we didn't find all 3 difficulties
+  const reordered = [...sorted, ...remaining];
+
+  reordered.forEach((s, i) => {
     const pill = el('button', 'sim-pill', '');
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
@@ -3636,7 +3647,7 @@ function renderScenarioLabels(scenarios) {
 
   // "Something else" pill — hidden inside more options
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = '+ Something else\u2026';
+  custom.textContent = "+ Something else\u2026";
   custom.style.display = 'none';
   custom.onclick = () => {
     const inputEl = $('chat-input');
@@ -4031,7 +4042,7 @@ function renderReplyPillsFlat(replies, scenario) {
   });
 
   // Custom pill — hidden inside more options
-  const custom = el('button', 'sim-reply-pill sim-pill-custom', '');
+  const custom = el('button', 'sim-pill sim-pill-custom', '');
   custom.textContent = "+ I'd say something else\u2026";
   custom.style.display = 'none';
   custom.onclick = () => {
@@ -4329,7 +4340,7 @@ function renderFollowupScenarios(scenarios, parentScenario, turnNodes) {
   });
 
   const custom = el('button', 'sim-pill sim-pill-custom', '');
-  custom.textContent = '+ Something else\u2026';
+  custom.textContent = "+ Something else\u2026";
   custom.onclick = () => {
     const inputEl = $('chat-input');
     if (inputEl) inputEl.focus();
