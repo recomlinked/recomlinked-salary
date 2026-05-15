@@ -673,6 +673,15 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .mgr-diff-badge.tough{background:rgba(201,168,76,0.2);color:#c9a84c;}
 .mgr-diff-badge.curveball{background:rgba(224,85,85,0.15);color:#e05555;}
 
+/* Opening style tags */
+.opening-tag{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:0.03em;text-transform:uppercase;flex-shrink:0;margin-left:auto;}
+.opening-tag.safe{background:rgba(0,196,160,0.12);color:#00a878;}
+.opening-tag.direct{background:rgba(56,132,244,0.12);color:#3884f4;}
+.opening-tag.bold{background:rgba(224,85,85,0.12);color:#d04040;}
+.opening-tag.subtle{background:rgba(140,130,115,0.12);color:#8a8270;}
+.opening-tag.disarming{background:rgba(124,58,237,0.12);color:#7c3aed;}
+.opening-tag.unexpected{background:rgba(201,168,76,0.15);color:#b8960c;}
+
 /* Scenarios unlocked counter — replaces tree badge */
 .scenarios-counter{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--t3);padding:4px 10px;border-radius:12px;background:rgba(0,0,0,0.03);border:1px solid var(--divider);}
 .scenarios-counter svg{width:13px;height:13px;color:var(--gold);}
@@ -3077,62 +3086,62 @@ async function startSimulationAtBlocker() {
 // Each blocker has 5 custom openings ranked by effectiveness.
 const BLOCKER_OPENINGS = {
   no_script: [
-    { theme: 'Anchor to your results', text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.", score: 5 },
-    { theme: 'Lead with market data', text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?", score: 5 },
-    { theme: 'Tie it to a milestone', text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.", score: 4 },
-    { theme: 'Make it collaborative', text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.", score: 4 },
-    { theme: 'Connect to a recent win', text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.", score: 3 },
-    { theme: 'Frame it as retention', text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.", score: 2 },
-    { theme: 'Just ask directly', text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.", score: 2 },
+    { theme: 'Anchor to your results', tag: 'Direct', text: "I want to check in on something. I've taken on a lot more this past year — and I want to make sure my pay reflects where my role actually is now.", score: 5 },
+    { theme: 'Lead with market data', tag: 'Bold', text: "I did some homework on what people in similar roles are earning right now, and I think it's worth looking at together. Can I share what I found?", score: 5 },
+    { theme: 'Tie it to a milestone', tag: 'Safe', text: "My review is coming up and I don't want compensation to be an afterthought. I've thought about where I think I should be and I'd like to talk it through before we get to the formal process.", score: 4 },
+    { theme: 'Make it collaborative', tag: 'Disarming', text: "I'd like your help thinking through something. I want to build a case for a pay adjustment, and I'd rather work on it with you than bring it to HR cold.", score: 4 },
+    { theme: 'Connect to a recent win', tag: 'Subtle', text: "After wrapping up that last project, I've been thinking about my trajectory here. I'd like to talk about how that kind of contribution gets reflected in my pay.", score: 3 },
+    { theme: 'Frame it as retention', tag: 'Bold', text: "I want to be upfront with you — I've had recruiters reaching out, and some of the numbers are hard to ignore. I'd rather stay, but I need to know where I stand here.", score: 2 },
+    { theme: 'Just ask directly', tag: 'Direct', text: "I'll be straightforward — I think I'm underpaid for what I'm doing. My responsibilities have grown, and I'd like to fix the gap.", score: 2 },
   ],
   underpaid: [
-    { theme: 'Lead with market research', text: "I've been looking at what my role pays in this market — across a few different sources — and I'd like to walk you through what I found.", score: 5 },
-    { theme: 'Anchor to scope growth', text: "When I started this role, the scope was pretty different from what I'm doing now. I want to make sure my compensation reflects the job I'm actually doing today.", score: 5 },
-    { theme: 'Ask for a comp review', text: "I'd like to do a compensation review. I haven't had one in a while and I want to make sure I'm in the right range for the work I'm delivering.", score: 4 },
-    { theme: 'Name the gap directly', text: "I'll be honest — I think there's a gap between what I'm earning and what this role is worth. I'd like to talk about closing it.", score: 3 },
-    { theme: 'Mention external interest', text: "I've had some conversations outside the company recently, and the numbers I'm hearing are quite different from where I am now. I'd rather solve this here.", score: 2 },
+    { theme: 'Lead with market research', tag: 'Direct', text: "I've been looking at what my role pays in this market — across a few different sources — and I'd like to walk you through what I found.", score: 5 },
+    { theme: 'Anchor to scope growth', tag: 'Subtle', text: "When I started this role, the scope was pretty different from what I'm doing now. I want to make sure my compensation reflects the job I'm actually doing today.", score: 5 },
+    { theme: 'Ask for a comp review', tag: 'Safe', text: "I'd like to do a compensation review. I haven't had one in a while and I want to make sure I'm in the right range for the work I'm delivering.", score: 4 },
+    { theme: 'Name the gap directly', tag: 'Bold', text: "I'll be honest — I think there's a gap between what I'm earning and what this role is worth. I'd like to talk about closing it.", score: 3 },
+    { theme: 'Mention external interest', tag: 'Unexpected', text: "I've had some conversations outside the company recently, and the numbers I'm hearing are quite different from where I am now. I'd rather solve this here.", score: 2 },
   ],
   quiet: [
-    { theme: 'Lead with a written summary', text: "I put together a quick summary of what I've contributed this year — specific results, not just tasks. I'd like to share it with you and talk about where that puts me.", score: 5 },
-    { theme: 'Ask for visibility', text: "I know I'm not the loudest person on the team, but I want to make sure my work is visible when compensation decisions happen. Can we talk about that?", score: 5 },
-    { theme: 'Tie to a specific result', text: "I don't usually bring this up, but after delivering on the last project, I want to talk about how that kind of work gets reflected in my pay.", score: 4 },
-    { theme: 'Frame as career growth', text: "I've been thinking about my growth here. I want to make sure my compensation is keeping up with the level of work I'm doing — not just the title I have.", score: 3 },
-    { theme: 'Be direct about being overlooked', text: "I think my work sometimes flies under the radar because I'm not someone who talks about it a lot. I'd like to change that, starting with a conversation about my pay.", score: 2 },
+    { theme: 'Lead with a written summary', tag: 'Safe', text: "I put together a quick summary of what I've contributed this year — specific results, not just tasks. I'd like to share it with you and talk about where that puts me.", score: 5 },
+    { theme: 'Ask for visibility', tag: 'Direct', text: "I know I'm not the loudest person on the team, but I want to make sure my work is visible when compensation decisions happen. Can we talk about that?", score: 5 },
+    { theme: 'Tie to a specific result', tag: 'Subtle', text: "I don't usually bring this up, but after delivering on the last project, I want to talk about how that kind of work gets reflected in my pay.", score: 4 },
+    { theme: 'Frame as career growth', tag: 'Disarming', text: "I've been thinking about my growth here. I want to make sure my compensation is keeping up with the level of work I'm doing — not just the title I have.", score: 3 },
+    { theme: 'Be direct about being overlooked', tag: 'Bold', text: "I think my work sometimes flies under the radar because I'm not someone who talks about it a lot. I'd like to change that, starting with a conversation about my pay.", score: 2 },
   ],
   unknown_amount: [
-    { theme: 'Ask what\'s possible', text: "I'd like to talk about compensation, but honestly I want to hear your perspective first. What range do you think is realistic for someone in my role performing at my level?", score: 5 },
-    { theme: 'Anchor to market data', text: "I've looked at some market data but I'm not sure how it maps to our structure. Can we look at it together and figure out the right number?", score: 4 },
-    { theme: 'Frame as alignment', text: "I want to make sure we're aligned on where my compensation should be. I have some thoughts but I'd rather this be a conversation than a demand.", score: 4 },
-    { theme: 'Start with contributions', text: "Before we talk numbers, I want to walk you through what I've delivered this year. Then I'd like to discuss what that's worth.", score: 3 },
-    { theme: 'Be direct about uncertainty', text: "I want to ask for a raise but I'll be honest — I'm not sure exactly what number to ask for. Can you help me figure out what's fair?", score: 2 },
+    { theme: 'Ask what\'s possible', tag: 'Safe', text: "I'd like to talk about compensation, but honestly I want to hear your perspective first. What range do you think is realistic for someone in my role performing at my level?", score: 5 },
+    { theme: 'Anchor to market data', tag: 'Direct', text: "I've looked at some market data but I'm not sure how it maps to our structure. Can we look at it together and figure out the right number?", score: 4 },
+    { theme: 'Frame as alignment', tag: 'Disarming', text: "I want to make sure we're aligned on where my compensation should be. I have some thoughts but I'd rather this be a conversation than a demand.", score: 4 },
+    { theme: 'Start with contributions', tag: 'Subtle', text: "Before we talk numbers, I want to walk you through what I've delivered this year. Then I'd like to discuss what that's worth.", score: 3 },
+    { theme: 'Be direct about uncertainty', tag: 'Bold', text: "I want to ask for a raise but I'll be honest — I'm not sure exactly what number to ask for. Can you help me figure out what's fair?", score: 2 },
   ],
   fear_no: [
-    { theme: 'Frame as a check-in', text: "I wanted to check in on something — I've been here a while and I want to make sure my pay is in the right place. Can we talk about where I stand?", score: 5 },
-    { theme: 'Make it exploratory', text: "I'm not coming in with a specific demand — I just want to explore where I am relative to the market and what a path forward looks like.", score: 4 },
-    { theme: 'Ask what\'s possible', text: "I know budgets can be tight, but I'd like to understand what's possible for my compensation. Even if it's not right now, I'd like to know the path.", score: 4 },
-    { theme: 'Tie to performance', text: "I feel good about what I've delivered this year and I'd like to talk about whether there's room to reflect that in my pay.", score: 3 },
-    { theme: 'Be direct but soft', text: "This is a little uncomfortable for me to bring up, but I think it's important. I'd like to talk about my compensation.", score: 2 },
+    { theme: 'Frame as a check-in', tag: 'Safe', text: "I wanted to check in on something — I've been here a while and I want to make sure my pay is in the right place. Can we talk about where I stand?", score: 5 },
+    { theme: 'Make it exploratory', tag: 'Subtle', text: "I'm not coming in with a specific demand — I just want to explore where I am relative to the market and what a path forward looks like.", score: 4 },
+    { theme: 'Ask what\'s possible', tag: 'Disarming', text: "I know budgets can be tight, but I'd like to understand what's possible for my compensation. Even if it's not right now, I'd like to know the path.", score: 4 },
+    { theme: 'Tie to performance', tag: 'Direct', text: "I feel good about what I've delivered this year and I'd like to talk about whether there's room to reflect that in my pay.", score: 3 },
+    { theme: 'Be direct but soft', tag: 'Bold', text: "This is a little uncomfortable for me to bring up, but I think it's important. I'd like to talk about my compensation.", score: 2 },
   ],
   no_advocate: [
-    { theme: 'Make them your ally', text: "I want to build a case for a pay adjustment, and I need your help. What would make it easiest for you to take this to leadership?", score: 5 },
-    { theme: 'Give them the ammo', text: "I've put together the data — market rates, my contributions, the business case. I want to make it easy for you to go to bat for me.", score: 4 },
-    { theme: 'Ask what they need', text: "I know these decisions don't always happen in our 1-on-1s. What information would you need from me to push this forward on your end?", score: 4 },
-    { theme: 'Frame as partnership', text: "I'd like to work together on getting my compensation reviewed. I don't want to go around you — I'd rather we present this as a team.", score: 3 },
-    { theme: 'Be direct about the gap', text: "I've noticed that compensation conversations don't come up naturally between us. I'd like to change that — can we talk about where I stand?", score: 2 },
+    { theme: 'Make them your ally', tag: 'Disarming', text: "I want to build a case for a pay adjustment, and I need your help. What would make it easiest for you to take this to leadership?", score: 5 },
+    { theme: 'Give them the ammo', tag: 'Direct', text: "I've put together the data — market rates, my contributions, the business case. I want to make it easy for you to go to bat for me.", score: 4 },
+    { theme: 'Ask what they need', tag: 'Subtle', text: "I know these decisions don't always happen in our 1-on-1s. What information would you need from me to push this forward on your end?", score: 4 },
+    { theme: 'Frame as partnership', tag: 'Safe', text: "I'd like to work together on getting my compensation reviewed. I don't want to go around you — I'd rather we present this as a team.", score: 3 },
+    { theme: 'Be direct about the gap', tag: 'Bold', text: "I've noticed that compensation conversations don't come up naturally between us. I'd like to change that — can we talk about where I stand?", score: 2 },
   ],
   prior_no: [
-    { theme: 'Reference the timeline', text: "Last time we talked about compensation, you mentioned revisiting it in a few months. I think now's a good time — here's what's changed since then.", score: 5 },
-    { theme: 'Bring new evidence', text: "I want to revisit the compensation conversation. Since last time, I've taken on more responsibility and I've got some new market data that's relevant.", score: 4 },
-    { theme: 'Ask what changed', text: "When we talked about this before, the answer was not right now. I'd like to understand — has anything changed on your end that would make this a better time?", score: 4 },
-    { theme: 'Reframe the ask', text: "I know I've brought this up before, but I want to approach it differently this time. Instead of a specific number, I'd like to understand what it would take to get there.", score: 3 },
-    { theme: 'Be persistent', text: "I'm bringing this up again because it matters to me. I respect that the timing wasn't right before, but I don't want to let it go.", score: 2 },
+    { theme: 'Reference the timeline', tag: 'Direct', text: "Last time we talked about compensation, you mentioned revisiting it in a few months. I think now's a good time — here's what's changed since then.", score: 5 },
+    { theme: 'Bring new evidence', tag: 'Safe', text: "I want to revisit the compensation conversation. Since last time, I've taken on more responsibility and I've got some new market data that's relevant.", score: 4 },
+    { theme: 'Ask what changed', tag: 'Subtle', text: "When we talked about this before, the answer was not right now. I'd like to understand — has anything changed on your end that would make this a better time?", score: 4 },
+    { theme: 'Reframe the ask', tag: 'Disarming', text: "I know I've brought this up before, but I want to approach it differently this time. Instead of a specific number, I'd like to understand what it would take to get there.", score: 3 },
+    { theme: 'Be persistent', tag: 'Bold', text: "I'm bringing this up again because it matters to me. I respect that the timing wasn't right before, but I don't want to let it go.", score: 2 },
   ],
   timing: [
-    { theme: 'Frame as forward planning', text: "I want to plan ahead. My goal is to have a compensation conversation before the next review cycle — can we start laying the groundwork now?", score: 5 },
-    { theme: 'Ask about the process', text: "I'd like to understand how compensation decisions work here. When's the best time to have this conversation, and what should I prepare?", score: 4 },
-    { theme: 'Test the waters', text: "I've been thinking about my compensation and I wanted to get your read — is this a good time to have that conversation, or should we plan for a specific date?", score: 4 },
-    { theme: 'Tie to a coming milestone', text: "With reviews coming up, I want to make sure compensation is part of the conversation. Can we set aside time to talk about it before then?", score: 3 },
-    { theme: 'Just start', text: "I keep waiting for the perfect time to bring this up, and I've realized there isn't one. So — I'd like to talk about my pay.", score: 2 },
+    { theme: 'Frame as forward planning', tag: 'Safe', text: "I want to plan ahead. My goal is to have a compensation conversation before the next review cycle — can we start laying the groundwork now?", score: 5 },
+    { theme: 'Ask about the process', tag: 'Subtle', text: "I'd like to understand how compensation decisions work here. When's the best time to have this conversation, and what should I prepare?", score: 4 },
+    { theme: 'Test the waters', tag: 'Disarming', text: "I've been thinking about my compensation and I wanted to get your read — is this a good time to have that conversation, or should we plan for a specific date?", score: 4 },
+    { theme: 'Tie to a coming milestone', tag: 'Direct', text: "With reviews coming up, I want to make sure compensation is part of the conversation. Can we set aside time to talk about it before then?", score: 3 },
+    { theme: 'Just start', tag: 'Bold', text: "I keep waiting for the perfect time to bring this up, and I've realized there isn't one. So — I'd like to talk about my pay.", score: 2 },
   ],
 };
 
@@ -3281,10 +3290,6 @@ function renderOpeningChips() {
     themeSpan.textContent = opener.theme;
     themeRow.appendChild(themeSpan);
 
-    if (i === 0) {
-      const badge = el('span', 'reply-best-badge', 'Consider');
-      themeRow.appendChild(badge);
-    }
     content.appendChild(themeRow);
 
     const preview = el('span', 'sim-reply-preview', '');
@@ -3297,6 +3302,12 @@ function renderOpeningChips() {
     pill.insertBefore(radio, pill.firstChild);
 
     pill.appendChild(content);
+    // Opening style tag badge — same position as difficulty badges on manager chips
+    if (opener.tag) {
+      const tagBadge = el('span', 'opening-tag ' + opener.tag.toLowerCase(), '');
+      tagBadge.textContent = opener.tag;
+      pill.appendChild(tagBadge);
+    }
     pill.onclick = () => pickOpening(opener, pill, row);
 
     if (i < INITIAL_SHOW) {
