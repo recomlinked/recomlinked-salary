@@ -7,16 +7,18 @@
     { "src": "/robots.txt",  "dest": "/robots.txt"  },
     { "src": "/sitemap.xml", "dest": "/sitemap.xml" },
 
-    { "src": "/raise",                "dest": "/raise/index.html"           },
+    { "src": "/raise",                "status": 301, "headers": { "Location": "/raise/" }           },
     { "src": "/raise/",               "dest": "/raise/index.html"           },
-    { "src": "/raise/chat",           "dest": "/raise/chat/index.html"      },
+    { "src": "/raise/chat",           "status": 301, "headers": { "Location": "/raise/chat/" }      },
     { "src": "/raise/chat/",          "dest": "/raise/chat/index.html"      },
-    { "src": "/raise/paid",           "dest": "/raise/paid/index.html"      },
+    { "src": "/raise/paid",           "status": 301, "headers": { "Location": "/raise/paid/" }      },
     { "src": "/raise/paid/",          "dest": "/raise/paid/index.html"      },
-    { "src": "/raise/enter",          "dest": "/raise/enter/index.html"     },
+    { "src": "/raise/enter",          "status": 301, "headers": { "Location": "/raise/enter/" }     },
     { "src": "/raise/enter/",         "dest": "/raise/enter/index.html"     },
-    { "src": "/raise/waitlist",       "dest": "/raise/waitlist/index.html"  },
+    { "src": "/raise/waitlist",       "status": 301, "headers": { "Location": "/raise/waitlist/" }  },
     { "src": "/raise/waitlist/",      "dest": "/raise/waitlist/index.html"  },
+    { "src": "/raise/coach",          "status": 301, "headers": { "Location": "/raise/coach/" }     },
+    { "src": "/raise/coach/",         "dest": "/raise/coach/index.html"     },
 
     { "src": "/", "dest": "/index.html" }
   ],
