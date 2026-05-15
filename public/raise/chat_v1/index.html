@@ -3290,10 +3290,6 @@ function renderOpeningChips() {
     themeSpan.textContent = opener.theme;
     themeRow.appendChild(themeSpan);
 
-    if (i === 0) {
-      const badge = el('span', 'reply-best-badge', 'Consider');
-      themeRow.appendChild(badge);
-    }
     content.appendChild(themeRow);
 
     const preview = el('span', 'sim-reply-preview', '');
@@ -3306,7 +3302,7 @@ function renderOpeningChips() {
     pill.insertBefore(radio, pill.firstChild);
 
     pill.appendChild(content);
-    // Opening style tag badge
+    // Opening style tag badge — same position as difficulty badges on manager chips
     if (opener.tag) {
       const tagBadge = el('span', 'opening-tag ' + opener.tag.toLowerCase(), '');
       tagBadge.textContent = opener.tag;
