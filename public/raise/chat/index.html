@@ -3274,40 +3274,28 @@ function renderOpeningChips() {
     pill.style.alignItems = 'flex-start';
     pill.style.gap = '10px';
 
+    // Radio circle (pick-one indicator)
+    const radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+
     // Rank number
     const rank = el('div', 'chip-rank', `#${i + 1}`);
     pill.appendChild(rank);
 
-    // Content
-    const content = el('div', '', '');
-    content.style.flex = '1';
+    // Show actual opening text — long enough to wrap to 2 lines
+    const textSpan = el('span', 'sim-reply-preview', '');
+    textSpan.style.flex = '1';
+    textSpan.style.fontSize = '12.5px';
+    textSpan.style.lineHeight = '1.5';
+    textSpan.style.color = 'var(--t2)';
+    textSpan.style.display = '-webkit-box';
+    textSpan.style.webkitLineClamp = '2';
+    textSpan.style.webkitBoxOrient = 'vertical';
+    textSpan.style.overflow = 'hidden';
+    const clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
+    textSpan.textContent = '\u201c' + clean + '\u201d';
+    pill.appendChild(textSpan);
 
-    const themeRow = el('div', '', '');
-    themeRow.style.display = 'flex';
-    themeRow.style.alignItems = 'center';
-    themeRow.style.gap = '6px';
-    const themeSpan = el('span', 'sim-reply-theme', '');
-    themeSpan.textContent = opener.theme;
-    themeRow.appendChild(themeSpan);
-
-    content.appendChild(themeRow);
-
-    const preview = el('span', 'sim-reply-preview', '');
-    const clean = opener.text;
-    preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
-    content.appendChild(preview);
-
-    // Radio circle (pick-one indicator)
-    const radio = el('div', 'chip-radio', '');
-    pill.insertBefore(radio, pill.firstChild);
-
-    pill.appendChild(content);
-    // Opening style tag badge — same position as difficulty badges on manager chips
-    if (opener.tag) {
-      const tagBadge = el('span', 'opening-tag ' + opener.tag.toLowerCase(), '');
-      tagBadge.textContent = opener.tag;
-      pill.appendChild(tagBadge);
-    }
     pill.onclick = () => pickOpening(opener, pill, row);
 
     if (i < INITIAL_SHOW) {
@@ -3344,7 +3332,7 @@ function renderOpeningChips() {
         toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenPills.length + ' more options';
       }
     };
-    row.appendChild(toggle);
+    inner.appendChild(toggle);
   }
 
   wrap.appendChild(inner);
