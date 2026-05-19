@@ -565,8 +565,53 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .mode-toggle-btn.active{color:#07090f;}
 .mode-toggle-btn.active.sim{background:rgba(30,61,114,0.12);color:var(--navy);}
 .mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
+.mode-toggle-btn.active.disc{background:rgba(56,132,244,0.12);color:#185FA5;}
 .mode-toggle-btn svg{flex-shrink:0;}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
+
+/* ── Discovery mode ── */
+.discovery-chat{padding:16px 0;}
+.disc-layout{display:flex;gap:16px;align-items:flex-start;}
+.disc-questions{flex:1;min-width:0;}
+.disc-radar-wrap{width:200px;flex-shrink:0;position:sticky;top:8px;}
+.disc-qb{margin-bottom:14px;animation:discFade 0.4s ease;}
+@keyframes discFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.disc-ql{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;line-height:1.4;}
+.disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;}
+.disc-dim-evidence{background:rgba(93,202,165,0.12);color:#1D9E75;}
+.disc-dim-timing{background:rgba(56,132,244,0.12);color:#378ADD;}
+.disc-dim-market{background:rgba(201,168,76,0.12);color:#BA7517;}
+.disc-dim-relationship{background:rgba(124,58,237,0.12);color:#7c3aed;}
+.disc-dim-company{background:rgba(216,90,48,0.12);color:#D85A30;}
+.disc-chip{display:flex;align-items:center;text-align:left;padding:10px 14px;background:var(--card);border:1.5px solid var(--divider);border-radius:10px;cursor:pointer;font-size:13px;color:var(--t1);width:100%;transition:all 0.15s;font-family:var(--sans);}
+.disc-chip:hover{border-color:var(--navy);background:rgba(30,61,114,0.03);}
+.disc-chip.selected{border-color:#185FA5;background:rgba(56,132,244,0.08);color:#185FA5;}
+.disc-chip.dimmed{opacity:0.35;pointer-events:none;}
+.disc-opts{display:flex;flex-direction:column;gap:6px;}
+.ds-row{display:flex;align-items:center;gap:6px;padding:3px 0;}
+.ds-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all 0.4s;}
+.ds-dot.off{background:var(--divider);}
+.ds-dot.low{background:#E05555;}
+.ds-dot.mid{background:#c9a84c;}
+.ds-dot.high{background:#00c4a0;}
+.ds-label{font-size:11px;color:var(--t3);flex:1;}
+.ds-val{font-size:11px;font-weight:600;color:var(--t3);}
+.ds-val.low{color:#E05555;}
+.ds-val.mid{color:#c9a84c;}
+.ds-val.high{color:#00c4a0;}
+.disc-paywall{margin-top:16px;animation:discFade 0.5s ease;}
+.disc-pw-card{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+.disc-pw-item{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:var(--t1);}
+.disc-pw-plus{color:#00c4a0;font-size:16px;font-weight:600;}
+.disc-pw-minus{color:#E05555;font-size:16px;font-weight:600;}
+.disc-inc{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);padding:4px 0;}
+.disc-cta{width:100%;padding:14px;border-radius:10px;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;font-family:var(--sans);}
+.disc-cta:hover{opacity:0.9;}
+.disc-trust{display:flex;justify-content:center;gap:10px;font-size:11px;color:var(--t3);margin-top:8px;}
+@media(max-width:600px){
+  .disc-layout{flex-direction:column-reverse;}
+  .disc-radar-wrap{width:100%;position:static;display:flex;flex-direction:column;align-items:center;}
+}
 
 /* ── Mode banner ── shown in chat when user switches mode, makes the
    current mode crystal clear. Inline message that says what's happening. */
@@ -788,7 +833,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
     <!-- Coach messages and card render into this area -->
     <!-- DUAL MODE: Practice and Coaching are separate containers -->
-    <div id="messages" class="active-chat"></div>
+    <div id="discovery-messages" class="discovery-chat" style="display:none;"></div>
+    <div id="messages" class="active-chat" style="display:none;"></div>
     <div id="coaching-messages" class="coaching-chat" style="display:none;"></div>
 
   </div>
@@ -808,7 +854,14 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
              switch modes. Replaces the older single-button toggle which
              made it unclear whether you were in coach or simulation mode. -->
         <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
-          <button class="mode-toggle-btn sim active" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="true" title="Practice scenarios — tap manager replies and your responses">
+          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Discover your negotiation leverage and weaknesses">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Discovery</span>
+          </button>
+          <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Practice scenarios — tap manager replies and your responses">
             <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
               <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
@@ -1794,6 +1847,7 @@ const SIM_STATE = {
   scenarios_unlocked_count: 0,
   scenarios_total: 0,
   simMode: true,
+  currentMode: 'discovery',
   unlocked: false,
 };
 
@@ -2179,31 +2233,40 @@ let unseenCoachCount = 0;    // how many coaching messages user hasn't seen
 let currentCoachPreview = null; // the preview card in practice mode
 
 function setMode(target) {
-  if (target !== 'sim' && target !== 'coach') return;
+  if (target !== 'sim' && target !== 'coach' && target !== 'discovery') return;
 
-  const wantSim = target === 'sim';
-  SIM_STATE.simMode = wantSim;
+  SIM_STATE.simMode = (target === 'sim');
+  SIM_STATE.currentMode = target;
   updateModeToggleUI();
 
   const practiceEl = $('messages');
   const coachingEl = $('coaching-messages');
+  const discoveryEl = $('discovery-messages');
 
-  if (wantSim) {
-    // Show practice, hide coaching
+  // Hide all
+  practiceEl.style.display = 'none';
+  coachingEl.style.display = 'none';
+  if (discoveryEl) discoveryEl.style.display = 'none';
+
+  if (target === 'discovery') {
+    if (discoveryEl) {
+      discoveryEl.style.display = 'block';
+      if (!discoveryEl.dataset.initialized) {
+        initDiscoveryMode(discoveryEl);
+        discoveryEl.dataset.initialized = 'true';
+      }
+    }
+    const input = $('chat-input');
+    if (input) { input.placeholder = 'Tap to discover your position\u2026'; input.disabled = true; }
+  } else if (target === 'sim') {
     practiceEl.style.display = '';
     practiceEl.classList.add('active-chat');
-    coachingEl.style.display = 'none';
-    // Input placeholder for practice
     const input = $('chat-input');
-    if (input) input.placeholder = 'Tap an opening or type your own\u2026';
+    if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
     scrollChatToBottom();
   } else {
-    // Show coaching, hide practice
-    practiceEl.style.display = 'none';
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
-    // Don't reset unseen count yet — only when user scrolls to bottom
-    // Input placeholder for coaching
     const input = $('chat-input');
     if (input) {
       input.placeholder = 'Ask your coach anything\u2026';
@@ -2211,9 +2274,7 @@ function setMode(target) {
     }
     const sendBtn = $('send-btn');
     if (sendBtn) sendBtn.disabled = false;
-    // Show unseen indicator if needed
     renderCoachingUnseenHeader();
-    // Scroll to first unseen message, not bottom
     if (unseenCoachCount > 0) {
       const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
       const firstUnseen = allMsgs.length - unseenCoachCount;
@@ -2226,9 +2287,7 @@ function setMode(target) {
     } else {
       scrollCoachingToBottom();
     }
-    // Check if already at bottom (short content) — mark as seen
     checkCoachingScrollSeen();
-    // Add "Back to practice" CTA at bottom
     addBackToPracticeCTA();
   }
 }
@@ -2268,19 +2327,26 @@ function scrollCoachingToBottom() {
 function updateModeToggleUI() {
   const simBtn   = $('mode-btn-sim');
   const coachBtn = $('mode-btn-coach');
+  const discBtn  = $('mode-btn-disc');
   if (!simBtn || !coachBtn) return;
-  if (SIM_STATE.simMode) {
+  
+  // Reset all
+  [simBtn, coachBtn, discBtn].forEach(function(b) {
+    if (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); }
+  });
+  document.body.classList.remove('sim-mode');
+
+  var mode = SIM_STATE.currentMode || 'discovery';
+  if (mode === 'sim') {
     simBtn.classList.add('active');
     simBtn.setAttribute('aria-selected', 'true');
-    coachBtn.classList.remove('active');
-    coachBtn.setAttribute('aria-selected', 'false');
     document.body.classList.add('sim-mode');
-  } else {
+  } else if (mode === 'coach') {
     coachBtn.classList.add('active');
     coachBtn.setAttribute('aria-selected', 'true');
-    simBtn.classList.remove('active');
-    simBtn.setAttribute('aria-selected', 'false');
-    document.body.classList.remove('sim-mode');
+  } else if (mode === 'discovery' && discBtn) {
+    discBtn.classList.add('active');
+    discBtn.setAttribute('aria-selected', 'true');
   }
 }
 
@@ -2688,7 +2754,6 @@ function showModeToggle() {
   if (toggle) {
     toggle.style.display = '';
   }
-  SIM_STATE.simMode = true;
   updateModeToggleUI();
 }
 
@@ -2996,6 +3061,325 @@ const BLOCKER_PRO_TIPS = {
   other:           "The person who speaks first anchors the conversation. Your opening line shapes everything that follows.",
 };
 
+// ── Discovery mode — radar visualization + context questions ──
+var discDims = {evidence:0,timing:0,market:0,relationship:0,company:0};
+var discActive = {evidence:false,timing:false,market:false,relationship:false,company:false};
+var discLevers = [];
+var discWeaks = [];
+var discStep = 0;
+
+var DISC_QUESTIONS = [
+  { id: 'blocker', label: 'What\u2019s stopping you from asking for a raise?', dimTag: null, options: [
+    { val: 'no_script', text: 'I don\u2019t know how to start the conversation', scores: {evidence:25,timing:40}, note: 'No prepared script', type: 'weak' },
+    { val: 'fear_no', text: 'What if they say no?', scores: {evidence:35,relationship:30}, note: 'Fear of rejection', type: 'weak' },
+    { val: 'underpaid', text: 'I think I\u2019m underpaid but can\u2019t prove it', scores: {evidence:45,market:50}, note: 'Market awareness', type: 'lever' },
+    { val: 'quiet', text: 'I\u2019m a strong performer but quiet', scores: {evidence:30,relationship:25}, note: 'Invisible contributions', type: 'weak' },
+    { val: 'timing', text: 'Not sure it\u2019s the right time', scores: {timing:25,company:35}, note: 'Uncertain timing', type: 'weak' },
+    { val: 'no_advocate', text: 'My manager won\u2019t bring it up', scores: {relationship:20,evidence:30}, note: 'No internal advocate', type: 'weak' },
+  ]},
+  { id: 'evidence', label: 'What\u2019s your strongest card right now?', dimTag: 'evidence', options: [
+    { val: 'exceeded', text: 'I exceeded expectations / had a strong win', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
+    { val: 'competing', text: 'I have a competing offer', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
+    { val: 'recruited', text: 'I\u2019m being actively recruited', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
+    { val: 'underpaid', text: 'I know I\u2019m underpaid for my role', scores: {evidence:55,market:55}, note: 'Underpaid awareness', type: 'lever' },
+    { val: 'met_overdue', text: 'I met expectations and it\u2019s been a while', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
+    { val: 'none', text: 'I don\u2019t have strong evidence right now', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
+  ]},
+  { id: 'last_raise', label: 'When was your last raise?', dimTag: 'timing', options: [
+    { val: 'lt_6mo', text: 'In the last 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky timing', type: 'weak' },
+    { val: '6_12mo', text: '6\u201312 months ago', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
+    { val: '1_2yr', text: '1\u20132 years ago', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
+    { val: 'gt_2yr', text: 'More than 2 years ago', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
+    { val: 'never', text: 'I\u2019ve never had one here', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
+  ]},
+  { id: 'manager_type', label: 'What\u2019s your manager like?', dimTag: 'relationship', options: [
+    { val: 'supportive', text: 'Supportive \u2014 advocates for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
+    { val: 'neutral', text: 'Neutral \u2014 fair but not pushing', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
+    { val: 'distant', text: 'Distant or hands-off', scores: {relationship:25}, note: 'Distant \u2014 hard to read', type: 'weak' },
+    { val: 'by_book', text: 'By-the-book, follows process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
+    { val: 'tough', text: 'Tough \u2014 tends to push back', scores: {relationship:30}, note: 'Tough manager \u2014 expect pushback', type: 'weak' },
+  ]},
+  { id: 'company', label: 'How\u2019s your company doing right now?', dimTag: 'company', options: [
+    { val: 'growing', text: 'Growing \u2014 hiring, expanding', scores: {company:80}, note: 'Company thriving \u2014 budget likely', type: 'lever' },
+    { val: 'stable', text: 'Stable', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
+    { val: 'cautious', text: 'Cautious \u2014 hiring frozen', scores: {company:30}, note: 'Cautious \u2014 harder ask', type: 'weak' },
+    { val: 'cutting', text: 'Actively cutting costs', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
+  ]},
+  { id: 'target', label: 'Do you have a number in mind?', dimTag: 'market', options: [
+    { val: 'lt_5', text: 'Under 5%', scores: {market:30}, note: 'Low target \u2014 easy to grant', type: 'neutral' },
+    { val: '5_10', text: '5\u201310%', scores: {market:50}, note: 'Standard range', type: 'neutral' },
+    { val: '10_15', text: '10\u201315%', scores: {market:60}, note: 'Ambitious but achievable', type: 'lever' },
+    { val: '15_20', text: '15\u201320%', scores: {market:55}, note: 'High target \u2014 needs strong case', type: 'neutral' },
+    { val: 'gt_20', text: '20%+', scores: {market:40}, note: 'Very ambitious \u2014 expect resistance', type: 'weak' },
+    { val: 'no_idea', text: 'I don\u2019t know yet', scores: {market:20}, note: 'No target number', type: 'weak' },
+  ]},
+];
+
+function initDiscoveryMode(container) {
+  container.innerHTML = '';
+  var layout = el('div', 'disc-layout', '');
+  var qCol = el('div', 'disc-questions', '');
+  qCol.id = 'disc-q-col';
+  var radarWrap = el('div', 'disc-radar-wrap', '');
+  
+  // Radar canvas
+  var canvas = document.createElement('canvas');
+  canvas.id = 'disc-radar';
+  canvas.width = 200;
+  canvas.height = 200;
+  radarWrap.appendChild(canvas);
+
+  // Dimension status rows
+  var statusDiv = el('div', '', '');
+  statusDiv.id = 'disc-dim-status';
+  statusDiv.style.marginTop = '8px';
+  var dimNames = ['evidence','timing','market','relationship','company'];
+  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
+  dimNames.forEach(function(d, i) {
+    var row = el('div', 'ds-row', '');
+    row.id = 'disc-ds-' + d;
+    row.innerHTML = '<span class="ds-dot off"></span><span class="ds-label">' + dimLabels[i] + '</span><span class="ds-val" id="disc-dv-' + d + '">\u2014</span>';
+    statusDiv.appendChild(row);
+  });
+  radarWrap.appendChild(statusDiv);
+
+  layout.appendChild(qCol);
+  layout.appendChild(radarWrap);
+  container.appendChild(layout);
+
+  // Render first question
+  renderDiscQuestion(0);
+  drawDiscRadar();
+}
+
+function renderDiscQuestion(idx) {
+  if (idx >= DISC_QUESTIONS.length) { showDiscPaywall(); return; }
+  var q = DISC_QUESTIONS[idx];
+  var qCol = $('disc-q-col');
+  var qb = el('div', 'disc-qb', '');
+  qb.id = 'disc-q-' + idx;
+  
+  var labelHtml = '';
+  if (q.dimTag) {
+    labelHtml = '<span class="disc-dim-tag disc-dim-' + q.dimTag + '">' + q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) + '</span> ';
+  }
+  var ql = el('div', 'disc-ql', '');
+  ql.innerHTML = labelHtml + q.label;
+  qb.appendChild(ql);
+  
+  var opts = el('div', 'disc-opts', '');
+  q.options.forEach(function(opt) {
+    var btn = el('button', 'disc-chip', '');
+    btn.textContent = opt.text;
+    btn.onclick = function() { pickDiscAnswer(idx, opt, btn, qb); };
+    opts.appendChild(btn);
+  });
+  qb.appendChild(opts);
+  qCol.appendChild(qb);
+  
+  setTimeout(function() {
+    qb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 100);
+}
+
+function pickDiscAnswer(qIdx, opt, btn, qb) {
+  // Disable all chips in this question
+  qb.querySelectorAll('.disc-chip').forEach(function(c) {
+    c.classList.add('dimmed');
+    c.classList.remove('selected');
+  });
+  btn.classList.remove('dimmed');
+  btn.classList.add('selected');
+
+  // Update scores
+  Object.keys(opt.scores).forEach(function(k) {
+    discDims[k] = Math.max(discDims[k], opt.scores[k]);
+    discActive[k] = true;
+  });
+  if (opt.type === 'lever') discLevers.push(opt.note);
+  if (opt.type === 'weak') discWeaks.push(opt.note);
+
+  // Also store in SIM_STATE context for use in practice/coaching
+  var q = DISC_QUESTIONS[qIdx];
+  if (q.id === 'blocker') {
+    // Map blocker val to blocker code for simulation
+    var blockerMap = { no_script:'no_script', fear_no:'fear_no', underpaid:'underpaid', quiet:'quiet', timing:'timing', no_advocate:'no_advocate' };
+    SIM_STATE.context.blocker_code = blockerMap[opt.val] || opt.val;
+  } else {
+    SIM_STATE.context[q.id] = opt.val;
+  }
+
+  updateDiscDimStatus();
+  drawDiscRadar();
+  
+  discStep++;
+  setTimeout(function() { renderDiscQuestion(discStep); }, 500);
+}
+
+function updateDiscDimStatus() {
+  ['evidence','timing','market','relationship','company'].forEach(function(d) {
+    var row = document.querySelector('#disc-ds-' + d + ' .ds-dot');
+    var val = document.getElementById('disc-dv-' + d);
+    if (!row || !val) return;
+    if (!discActive[d]) { row.className = 'ds-dot off'; val.textContent = '\u2014'; val.className = 'ds-val'; return; }
+    var v = discDims[d];
+    var cls = v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low';
+    row.className = 'ds-dot ' + cls;
+    val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
+    val.className = 'ds-val ' + cls;
+  });
+}
+
+function drawDiscRadar() {
+  var c = document.getElementById('disc-radar');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  var w = 200, h = 200, cx = 100, cy = 100, r = 70;
+  ctx.clearRect(0, 0, w, h);
+
+  var labels = ['Evidence','Timing','Market','Relationship','Company'];
+  var keys = ['evidence','timing','market','relationship','company'];
+  var colors = ['#1D9E75','#378ADD','#BA7517','#7c3aed','#D85A30'];
+  var n = 5;
+
+  // Grid rings
+  for (var ring = 3; ring >= 1; ring--) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var rr = r * ring / 3;
+      if (i === 0) ctx.moveTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+      else ctx.lineTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Axis lines + labels
+  for (var i = 0; i < n; i++) {
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+    var lx = cx + (r + 16) * Math.cos(a);
+    var ly = cy + (r + 16) * Math.sin(a);
+    ctx.fillStyle = discActive[keys[i]] ? colors[i] : 'rgba(128,128,128,0.3)';
+    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  // Data shape
+  var hasActive = keys.some(function(k) { return discActive[k]; });
+  if (hasActive) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var k = keys[i % n];
+      var v = discActive[k] ? (discDims[k] / 100) : 0;
+      var x = cx + r * v * Math.cos(a);
+      var y = cy + r * v * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(56,132,244,0.1)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56,132,244,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Active dots
+    for (var i = 0; i < n; i++) {
+      if (!discActive[keys[i]]) continue;
+      var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var v = discDims[keys[i]] / 100;
+      ctx.beginPath();
+      ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
+      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
+      ctx.fill();
+    }
+  }
+
+  // Disabled dots (grey, at center-ish)
+  for (var i = 0; i < n; i++) {
+    if (discActive[keys[i]]) continue;
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(cx + r * 0.15 * Math.cos(a), cy + r * 0.15 * Math.sin(a), 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(128,128,128,0.2)';
+    ctx.fill();
+  }
+}
+
+function showDiscPaywall() {
+  var qCol = $('disc-q-col');
+  if (!qCol) return;
+  var pw = el('div', 'disc-paywall', '');
+  
+  var card = el('div', 'disc-pw-card', '');
+  var title = el('p', '', '');
+  title.style.cssText = 'font-size:15px;font-weight:600;color:var(--t1);margin:0 0 10px;';
+  title.textContent = 'Your negotiation position';
+  card.appendChild(title);
+
+  discLevers.forEach(function(l) {
+    var item = el('div', 'disc-pw-item', '');
+    item.innerHTML = '<span class="disc-pw-plus">+</span> ' + l;
+    card.appendChild(item);
+  });
+  discWeaks.forEach(function(w) {
+    var item = el('div', 'disc-pw-item', '');
+    item.innerHTML = '<span class="disc-pw-minus">\u2212</span> ' + w;
+    card.appendChild(item);
+  });
+  pw.appendChild(card);
+
+  var planCard = el('div', 'disc-pw-card', '');
+  var planTitle = el('p', '', '');
+  planTitle.style.cssText = 'font-size:13px;font-weight:600;color:var(--t1);margin:0 0 10px;';
+  planTitle.textContent = 'Your personalized plan includes:';
+  planCard.appendChild(planTitle);
+
+  var includes = [
+    'Opening scripts tailored to your leverage points',
+    'Counter-arguments for your specific weaknesses',
+    'Practice simulation against your manager type',
+    'AI coaching on every move you make'
+  ];
+  includes.forEach(function(inc) {
+    var row = el('div', 'disc-inc', '');
+    row.innerHTML = '<span style="color:#00c4a0;font-size:14px;flex-shrink:0;">\u2713</span> ' + inc;
+    planCard.appendChild(row);
+  });
+
+  var cta = el('button', 'disc-cta', '');
+  cta.textContent = 'Unlock your plan \u00b7 $19';
+  cta.onclick = function() {
+    if (typeof initiateCheckout === 'function') initiateCheckout();
+  };
+  planCard.appendChild(cta);
+
+  var trust = el('div', 'disc-trust', '');
+  trust.innerHTML = '<span>One-time payment</span><span>\u00b7</span><span>No subscription</span><span>\u00b7</span><span>Stripe secure</span>';
+  planCard.appendChild(trust);
+
+  pw.appendChild(planCard);
+
+  // Or try practice mode free
+  var tryPractice = el('div', '', '');
+  tryPractice.style.cssText = 'text-align:center;margin-top:12px;';
+  tryPractice.innerHTML = '<a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a>';
+  pw.appendChild(tryPractice);
+
+  qCol.appendChild(pw);
+  setTimeout(function() {
+    pw.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 200);
+}
+
 // ── Start simulation at the specific blocker moment ──
 async function startSimulationAtBlocker() {
   const blocker = SIM_STATE.blocker;
@@ -3029,19 +3413,12 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner AFTER first tap (not here)
   // insertModeBanner('sim');
 
-  // Show blocker-specific pro tip card FIRST (instant value before action)
-  const tipText = BLOCKER_PRO_TIPS[blocker.code] || BLOCKER_PRO_TIPS.other;
-  const tipWrap = el('div', 'coach-msg', '');
-  tipWrap.innerHTML = `
-    <div class="pro-tip-card pro-tip-revealed">
-      <div class="pro-tip-top">
-        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
-      </div>
-      <div class="pro-tip-text">${tipText}</div>
-    </div>
-  `;
-  $('messages').appendChild(tipWrap);
-  await sleep(300);
+  // Pro tip removed — reduces friction before first tap
+  // const tipText = BLOCKER_PRO_TIPS[blocker.code] || BLOCKER_PRO_TIPS.other;
+  // const tipWrap = el('div', 'coach-msg', '');
+  // tipWrap.innerHTML = `...`;
+  // $('messages').appendChild(tipWrap);
+  // await sleep(300);
 
   // Bridge line — shortened CTA only
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
@@ -3080,6 +3457,9 @@ async function startSimulationAtBlocker() {
     }
   }
   unlockModeToggle();
+
+  // Start in Discovery mode by default
+  setMode('discovery');
 }
 
 // ── Blocker-specific opening lines ──
@@ -3282,18 +3662,15 @@ function renderOpeningChips() {
     const rank = el('div', 'chip-rank', `#${i + 1}`);
     pill.appendChild(rank);
 
-    // Show actual opening text — long enough to wrap to 2 lines
-    const textSpan = el('span', 'sim-reply-preview', '');
+    // Show actual opening text — always truncated to create curiosity
+    const textSpan = el('span', '', '');
     textSpan.style.flex = '1';
     textSpan.style.fontSize = '12.5px';
     textSpan.style.lineHeight = '1.5';
-    textSpan.style.color = 'var(--t2)';
-    textSpan.style.display = '-webkit-box';
-    textSpan.style.webkitLineClamp = '2';
-    textSpan.style.webkitBoxOrient = 'vertical';
-    textSpan.style.overflow = 'hidden';
+    textSpan.style.color = 'var(--t1)';
+    textSpan.style.fontWeight = '400';
     const clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
-    textSpan.textContent = '\u201c' + clean + '\u201d';
+    textSpan.textContent = '\u201c' + clean.slice(0, 75) + '...\u201d';
     pill.appendChild(textSpan);
 
     pill.onclick = () => pickOpening(opener, pill, row);
@@ -3405,7 +3782,7 @@ async function pickOpening(opener, pill, container) {
   if (incrementSimTaps()) {
     incrementScenariosUnlocked();
     // Hit paywall limit on first tap (edge case)
-    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
+    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d\n\n\u2014 ' + opener.theme);
     scrollChatToBottom();
     disableInput('');
     simConversation.push({ role: 'user', text: opener.text });
@@ -3417,7 +3794,7 @@ async function pickOpening(opener, pill, container) {
     incrementScenariosUnlocked();
     // Pro tip moves to coaching mode (no longer in practice flow)
 
-    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
+    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d\n\n\u2014 ' + opener.theme);
     scrollChatToBottom();
     disableInput('');
 
