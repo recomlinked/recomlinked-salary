@@ -3271,21 +3271,29 @@ function renderOpeningChips() {
   openings.forEach((opener, i) => {
     const pill = el('button', 'sim-reply-pill', '');
     pill.style.flexDirection = 'row';
-    pill.style.alignItems = 'center';
+    pill.style.alignItems = 'flex-start';
     pill.style.gap = '10px';
 
     // Radio circle (pick-one indicator)
     const radio = el('div', 'chip-radio', '');
     pill.appendChild(radio);
 
-    // Show actual opening text, truncated at ~70 chars
-    const textSpan = el('span', 'sim-pill-theme', '');
-    textSpan.style.fontWeight = '400';
-    textSpan.style.fontSize = '13px';
-    textSpan.style.lineHeight = '1.5';
+    // Rank number
+    const rank = el('div', 'chip-rank', `#${i + 1}`);
+    pill.appendChild(rank);
+
+    // Show actual opening text — long enough to wrap to 2 lines
+    const textSpan = el('span', 'sim-reply-preview', '');
     textSpan.style.flex = '1';
+    textSpan.style.fontSize = '12.5px';
+    textSpan.style.lineHeight = '1.5';
+    textSpan.style.color = 'var(--t2)';
+    textSpan.style.display = '-webkit-box';
+    textSpan.style.webkitLineClamp = '2';
+    textSpan.style.webkitBoxOrient = 'vertical';
+    textSpan.style.overflow = 'hidden';
     const clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
-    textSpan.textContent = clean.length > 70 ? '\u201c' + clean.slice(0, 67) + '...' : '\u201c' + clean + '\u201d';
+    textSpan.textContent = '\u201c' + clean + '\u201d';
     pill.appendChild(textSpan);
 
     pill.onclick = () => pickOpening(opener, pill, row);
