@@ -3117,79 +3117,100 @@ var DISC_QUESTIONS = [
 
 function initDiscoveryMode(container) {
   container.innerHTML = '';
-  var layout = el('div', 'disc-layout', '');
-  var qCol = el('div', 'disc-questions', '');
-  qCol.id = 'disc-q-col';
-  var radarWrap = el('div', 'disc-radar-wrap', '');
   
-  // Radar canvas
+  // Radar at the top — always visible
+  var radarSection = el('div', '', '');
+  radarSection.style.cssText = 'display:flex;flex-direction:column;align-items:center;margin-bottom:16px;';
   var canvas = document.createElement('canvas');
   canvas.id = 'disc-radar';
   canvas.width = 200;
   canvas.height = 200;
-  radarWrap.appendChild(canvas);
+  radarSection.appendChild(canvas);
 
-  // Dimension status rows
+  // Dimension status row (horizontal on mobile)
   var statusDiv = el('div', '', '');
   statusDiv.id = 'disc-dim-status';
-  statusDiv.style.marginTop = '8px';
+  statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin-top:6px;';
   var dimNames = ['evidence','timing','market','relationship','company'];
   var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
   dimNames.forEach(function(d, i) {
     var row = el('div', 'ds-row', '');
     row.id = 'disc-ds-' + d;
+    row.style.padding = '0';
     row.innerHTML = '<span class="ds-dot off"></span><span class="ds-label">' + dimLabels[i] + '</span><span class="ds-val" id="disc-dv-' + d + '">\u2014</span>';
     statusDiv.appendChild(row);
   });
-  radarWrap.appendChild(statusDiv);
+  radarSection.appendChild(statusDiv);
+  container.appendChild(radarSection);
 
-  layout.appendChild(qCol);
-  layout.appendChild(radarWrap);
-  container.appendChild(layout);
+  // Chat-style questions container
+  var chatArea = el('div', '', '');
+  chatArea.id = 'disc-chat';
+  container.appendChild(chatArea);
 
-  // Render first question
-  renderDiscQuestion(0);
+  // Opening coach message
+  var intro = el('div', 'coach-msg', '');
+  intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
+  chatArea.appendChild(intro);
+
   drawDiscRadar();
+
+  // Start first question after a short delay
+  setTimeout(function() { renderDiscQuestion(0); }, 600);
 }
 
 function renderDiscQuestion(idx) {
   if (idx >= DISC_QUESTIONS.length) { showDiscPaywall(); return; }
   var q = DISC_QUESTIONS[idx];
-  var qCol = $('disc-q-col');
-  var qb = el('div', 'disc-qb', '');
-  qb.id = 'disc-q-' + idx;
-  
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Coach question bubble
+  var coachBubble = el('div', 'coach-msg', '');
   var labelHtml = '';
   if (q.dimTag) {
     labelHtml = '<span class="disc-dim-tag disc-dim-' + q.dimTag + '">' + q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) + '</span> ';
   }
-  var ql = el('div', 'disc-ql', '');
-  ql.innerHTML = labelHtml + q.label;
-  qb.appendChild(ql);
-  
+  coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
+  chatArea.appendChild(coachBubble);
+
+  // Chip options (coach-side)
+  var chipsWrap = el('div', 'coach-msg', '');
   var opts = el('div', 'disc-opts', '');
+  opts.id = 'disc-opts-' + idx;
   q.options.forEach(function(opt) {
     var btn = el('button', 'disc-chip', '');
     btn.textContent = opt.text;
-    btn.onclick = function() { pickDiscAnswer(idx, opt, btn, qb); };
+    btn.onclick = function() { pickDiscAnswer(idx, opt, btn); };
     opts.appendChild(btn);
   });
-  qb.appendChild(opts);
-  qCol.appendChild(qb);
-  
+  chipsWrap.appendChild(opts);
+  chatArea.appendChild(chipsWrap);
+
+  // Scroll to new question
   setTimeout(function() {
-    qb.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    var wrap = $('chat-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
   }, 100);
 }
 
-function pickDiscAnswer(qIdx, opt, btn, qb) {
-  // Disable all chips in this question
-  qb.querySelectorAll('.disc-chip').forEach(function(c) {
+function pickDiscAnswer(qIdx, opt, btn) {
+  var opts = $('disc-opts-' + qIdx);
+  if (!opts) return;
+  
+  // Disable all chips, highlight selected
+  opts.querySelectorAll('.disc-chip').forEach(function(c) {
     c.classList.add('dimmed');
     c.classList.remove('selected');
   });
   btn.classList.remove('dimmed');
   btn.classList.add('selected');
+
+  // Show as user response bubble
+  var chatArea = $('disc-chat');
+  var userBubble = el('div', 'user-msg', '');
+  userBubble.innerHTML = '<div class="bubble">' + btn.textContent + '</div>';
+  chatArea.appendChild(userBubble);
 
   // Update scores
   Object.keys(opt.scores).forEach(function(k) {
@@ -3199,12 +3220,10 @@ function pickDiscAnswer(qIdx, opt, btn, qb) {
   if (opt.type === 'lever') discLevers.push(opt.note);
   if (opt.type === 'weak') discWeaks.push(opt.note);
 
-  // Also store in SIM_STATE context for use in practice/coaching
+  // Store in SIM_STATE context
   var q = DISC_QUESTIONS[qIdx];
   if (q.id === 'blocker') {
-    // Map blocker val to blocker code for simulation
-    var blockerMap = { no_script:'no_script', fear_no:'fear_no', underpaid:'underpaid', quiet:'quiet', timing:'timing', no_advocate:'no_advocate' };
-    SIM_STATE.context.blocker_code = blockerMap[opt.val] || opt.val;
+    SIM_STATE.context.blocker_code = opt.val;
   } else {
     SIM_STATE.context[q.id] = opt.val;
   }
@@ -3213,7 +3232,9 @@ function pickDiscAnswer(qIdx, opt, btn, qb) {
   drawDiscRadar();
   
   discStep++;
-  setTimeout(function() { renderDiscQuestion(discStep); }, 500);
+  setTimeout(function() {
+    renderDiscQuestion(discStep);
+  }, 500);
 }
 
 function updateDiscDimStatus() {
@@ -3315,34 +3336,26 @@ function drawDiscRadar() {
 }
 
 function showDiscPaywall() {
-  var qCol = $('disc-q-col');
-  if (!qCol) return;
-  var pw = el('div', 'disc-paywall', '');
-  
-  var card = el('div', 'disc-pw-card', '');
-  var title = el('p', '', '');
-  title.style.cssText = 'font-size:15px;font-weight:600;color:var(--t1);margin:0 0 10px;';
-  title.textContent = 'Your negotiation position';
-  card.appendChild(title);
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
 
+  // Coach summary bubble
+  var summaryBubble = el('div', 'coach-msg', '');
+  var summaryHtml = '<div class="bubble"><p style="font-weight:600;margin-bottom:8px;">Your negotiation position</p>';
   discLevers.forEach(function(l) {
-    var item = el('div', 'disc-pw-item', '');
-    item.innerHTML = '<span class="disc-pw-plus">+</span> ' + l;
-    card.appendChild(item);
+    summaryHtml += '<div class="disc-pw-item"><span class="disc-pw-plus">+</span> ' + l + '</div>';
   });
   discWeaks.forEach(function(w) {
-    var item = el('div', 'disc-pw-item', '');
-    item.innerHTML = '<span class="disc-pw-minus">\u2212</span> ' + w;
-    card.appendChild(item);
+    summaryHtml += '<div class="disc-pw-item"><span class="disc-pw-minus">\u2212</span> ' + w + '</div>';
   });
-  pw.appendChild(card);
+  summaryHtml += '</div>';
+  summaryBubble.innerHTML = summaryHtml;
+  chatArea.appendChild(summaryBubble);
 
-  var planCard = el('div', 'disc-pw-card', '');
-  var planTitle = el('p', '', '');
-  planTitle.style.cssText = 'font-size:13px;font-weight:600;color:var(--t1);margin:0 0 10px;';
-  planTitle.textContent = 'Your personalized plan includes:';
-  planCard.appendChild(planTitle);
-
+  // Paywall card as coach message
+  var pwBubble = el('div', 'coach-msg', '');
+  var pwHtml = '<div class="disc-pw-card">';
+  pwHtml += '<p style="font-size:13px;font-weight:600;color:var(--t1);margin:0 0 10px;">Your personalized plan includes:</p>';
   var includes = [
     'Opening scripts tailored to your leverage points',
     'Counter-arguments for your specific weaknesses',
@@ -3350,33 +3363,37 @@ function showDiscPaywall() {
     'AI coaching on every move you make'
   ];
   includes.forEach(function(inc) {
-    var row = el('div', 'disc-inc', '');
-    row.innerHTML = '<span style="color:#00c4a0;font-size:14px;flex-shrink:0;">\u2713</span> ' + inc;
-    planCard.appendChild(row);
+    pwHtml += '<div class="disc-inc"><span style="color:#00c4a0;font-size:14px;flex-shrink:0;">\u2713</span> ' + inc + '</div>';
   });
+  pwHtml += '</div>';
+  pwBubble.innerHTML = pwHtml;
+  chatArea.appendChild(pwBubble);
 
+  // CTA button
+  var ctaWrap = el('div', 'coach-msg', '');
+  ctaWrap.style.cssText = 'display:flex;flex-direction:column;align-items:stretch;';
   var cta = el('button', 'disc-cta', '');
   cta.textContent = 'Unlock your plan \u00b7 $19';
   cta.onclick = function() {
     if (typeof initiateCheckout === 'function') initiateCheckout();
   };
-  planCard.appendChild(cta);
+  ctaWrap.appendChild(cta);
 
   var trust = el('div', 'disc-trust', '');
   trust.innerHTML = '<span>One-time payment</span><span>\u00b7</span><span>No subscription</span><span>\u00b7</span><span>Stripe secure</span>';
-  planCard.appendChild(trust);
+  ctaWrap.appendChild(trust);
 
-  pw.appendChild(planCard);
+  // Try practice free link
+  var tryLink = el('div', '', '');
+  tryLink.style.cssText = 'text-align:center;margin-top:12px;';
+  tryLink.innerHTML = '<a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a>';
+  ctaWrap.appendChild(tryLink);
 
-  // Or try practice mode free
-  var tryPractice = el('div', '', '');
-  tryPractice.style.cssText = 'text-align:center;margin-top:12px;';
-  tryPractice.innerHTML = '<a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a>';
-  pw.appendChild(tryPractice);
+  chatArea.appendChild(ctaWrap);
 
-  qCol.appendChild(pw);
   setTimeout(function() {
-    pw.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    var wrap = $('chat-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
   }, 200);
 }
 
