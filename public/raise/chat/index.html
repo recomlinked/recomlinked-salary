@@ -3029,19 +3029,12 @@ async function startSimulationAtBlocker() {
   // Show the simulation mode banner AFTER first tap (not here)
   // insertModeBanner('sim');
 
-  // Show blocker-specific pro tip card FIRST (instant value before action)
-  const tipText = BLOCKER_PRO_TIPS[blocker.code] || BLOCKER_PRO_TIPS.other;
-  const tipWrap = el('div', 'coach-msg', '');
-  tipWrap.innerHTML = `
-    <div class="pro-tip-card pro-tip-revealed">
-      <div class="pro-tip-top">
-        <div class="pro-tip-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Pro tip</div>
-      </div>
-      <div class="pro-tip-text">${tipText}</div>
-    </div>
-  `;
-  $('messages').appendChild(tipWrap);
-  await sleep(300);
+  // Pro tip removed — reduces friction before first tap
+  // const tipText = BLOCKER_PRO_TIPS[blocker.code] || BLOCKER_PRO_TIPS.other;
+  // const tipWrap = el('div', 'coach-msg', '');
+  // tipWrap.innerHTML = `...`;
+  // $('messages').appendChild(tipWrap);
+  // await sleep(300);
 
   // Bridge line — shortened CTA only
   const bridge = BRIDGE_LINES[blocker.code] || BRIDGE_LINES.other;
@@ -3405,7 +3398,7 @@ async function pickOpening(opener, pill, container) {
   if (incrementSimTaps()) {
     incrementScenariosUnlocked();
     // Hit paywall limit on first tap (edge case)
-    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
+    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d\n\n\u2014 ' + opener.theme);
     scrollChatToBottom();
     disableInput('');
     simConversation.push({ role: 'user', text: opener.text });
@@ -3417,7 +3410,7 @@ async function pickOpening(opener, pill, container) {
     incrementScenariosUnlocked();
     // Pro tip moves to coaching mode (no longer in practice flow)
 
-    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d');
+    const userBubble = appendUserBubble('I\u2019d open with:\n\u201c' + opener.text + '\u201d\n\n\u2014 ' + opener.theme);
     scrollChatToBottom();
     disableInput('');
 
