@@ -56,8 +56,8 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 /* Simulation mode: subtle green-tinted background so the environment
    feels distinct from coaching mode. Mirrors the green accent of the
    Simulation toggle pill in the toolbar. */
-body.sim-mode .chat-wrap{background:rgba(0,196,160,0.03);}
-body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
+body.sim-mode .chat-wrap{background:rgba(30,61,114,0.02);}
+body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 /* ── Coach message ─────────────────────────────────────── */
 .coach-msg{display:flex;flex-direction:column;gap:4px;padding:14px 0;animation:msgIn 0.5s cubic-bezier(0.22,1,0.36,1);}
@@ -314,8 +314,8 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .coaching-unseen:hover{background:rgba(201,168,76,0.15);}
 
 /* Back to practice CTA in coaching mode */
-.back-to-practice{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--card);border:1px solid var(--divider);border-radius:8px;margin:12px 0;font-size:12px;font-weight:500;color:var(--teal);cursor:pointer;}
-.back-to-practice:hover{border-color:var(--teal);}
+.back-to-practice{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;background:var(--card);border:1px solid var(--divider);border-radius:8px;margin:12px 0;font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;}
+.back-to-practice:hover{border-color:var(--navy);}
 
 /* Typing dots animation for coaching mode */
 .typing-dots{display:flex;gap:4px;}
@@ -563,7 +563,7 @@ body.sim-mode .bottom-panel{background:rgba(0,196,160,0.03);}
 .mode-toggle-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:14px;border:none;background:transparent;cursor:pointer;font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--t3);transition:all 0.15s;white-space:nowrap;}
 .mode-toggle-btn:hover{color:var(--t1);}
 .mode-toggle-btn.active{color:#07090f;}
-.mode-toggle-btn.active.sim{background:rgba(0,196,160,0.16);color:#008970;}
+.mode-toggle-btn.active.sim{background:rgba(30,61,114,0.12);color:var(--navy);}
 .mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
 .mode-toggle-btn svg{flex-shrink:0;}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
@@ -3271,43 +3271,23 @@ function renderOpeningChips() {
   openings.forEach((opener, i) => {
     const pill = el('button', 'sim-reply-pill', '');
     pill.style.flexDirection = 'row';
-    pill.style.alignItems = 'flex-start';
+    pill.style.alignItems = 'center';
     pill.style.gap = '10px';
-
-    // Rank number
-    const rank = el('div', 'chip-rank', `#${i + 1}`);
-    pill.appendChild(rank);
-
-    // Content
-    const content = el('div', '', '');
-    content.style.flex = '1';
-
-    const themeRow = el('div', '', '');
-    themeRow.style.display = 'flex';
-    themeRow.style.alignItems = 'center';
-    themeRow.style.gap = '6px';
-    const themeSpan = el('span', 'sim-reply-theme', '');
-    themeSpan.textContent = opener.theme;
-    themeRow.appendChild(themeSpan);
-
-    content.appendChild(themeRow);
-
-    const preview = el('span', 'sim-reply-preview', '');
-    const clean = opener.text;
-    preview.textContent = clean.length > 38 ? clean.slice(0, 35) + '...' : clean;
-    content.appendChild(preview);
 
     // Radio circle (pick-one indicator)
     const radio = el('div', 'chip-radio', '');
-    pill.insertBefore(radio, pill.firstChild);
+    pill.appendChild(radio);
 
-    pill.appendChild(content);
-    // Opening style tag badge — same position as difficulty badges on manager chips
-    if (opener.tag) {
-      const tagBadge = el('span', 'opening-tag ' + opener.tag.toLowerCase(), '');
-      tagBadge.textContent = opener.tag;
-      pill.appendChild(tagBadge);
-    }
+    // Show actual opening text, truncated at ~70 chars
+    const textSpan = el('span', 'sim-pill-theme', '');
+    textSpan.style.fontWeight = '400';
+    textSpan.style.fontSize = '13px';
+    textSpan.style.lineHeight = '1.5';
+    textSpan.style.flex = '1';
+    const clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
+    textSpan.textContent = clean.length > 70 ? clean.slice(0, 67) + '...' : clean;
+    pill.appendChild(textSpan);
+
     pill.onclick = () => pickOpening(opener, pill, row);
 
     if (i < INITIAL_SHOW) {
