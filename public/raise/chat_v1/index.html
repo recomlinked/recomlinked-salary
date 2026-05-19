@@ -3285,7 +3285,7 @@ function renderOpeningChips() {
     textSpan.style.lineHeight = '1.5';
     textSpan.style.flex = '1';
     const clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
-    textSpan.textContent = clean.length > 70 ? clean.slice(0, 67) + '...' : clean;
+    textSpan.textContent = clean.length > 70 ? '\u201c' + clean.slice(0, 67) + '...' : '\u201c' + clean + '\u201d';
     pill.appendChild(textSpan);
 
     pill.onclick = () => pickOpening(opener, pill, row);
@@ -3324,7 +3324,7 @@ function renderOpeningChips() {
         toggle.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + hiddenPills.length + ' more options';
       }
     };
-    row.appendChild(toggle);
+    inner.appendChild(toggle);
   }
 
   wrap.appendChild(inner);
