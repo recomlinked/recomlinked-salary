@@ -3069,49 +3069,48 @@ var discWeaks = [];
 var discStep = 0;
 
 var DISC_QUESTIONS = [
-  { id: 'blocker', label: 'What\u2019s stopping you from asking for a raise?', dimTag: null, options: [
-    { val: 'no_script', text: 'I don\u2019t know how to start the conversation', scores: {evidence:25,timing:40}, note: 'No prepared script', type: 'weak' },
-    { val: 'fear_no', text: 'What if they say no?', scores: {evidence:35,relationship:30}, note: 'Fear of rejection', type: 'weak' },
-    { val: 'underpaid', text: 'I think I\u2019m underpaid but can\u2019t prove it', scores: {evidence:45,market:50}, note: 'Market awareness', type: 'lever' },
-    { val: 'quiet', text: 'I\u2019m a strong performer but quiet', scores: {evidence:30,relationship:25}, note: 'Invisible contributions', type: 'weak' },
-    { val: 'timing', text: 'Not sure it\u2019s the right time', scores: {timing:25,company:35}, note: 'Uncertain timing', type: 'weak' },
-    { val: 'no_advocate', text: 'My manager won\u2019t bring it up', scores: {relationship:20,evidence:30}, note: 'No internal advocate', type: 'weak' },
+  { id: 'blocker', label: 'What\u2019s the main thing holding you back from asking?', dimTag: null, options: [
+    { val: 'no_script', text: 'I don\u2019t know what to say', scores: {evidence:25,timing:40}, note: 'No prepared script', type: 'weak' },
+    { val: 'fear_no', text: 'I\u2019m worried they\u2019ll say no', scores: {evidence:35,relationship:30}, note: 'Fear of rejection', type: 'weak' },
+    { val: 'underpaid', text: 'I know I\u2019m underpaid but can\u2019t prove it', scores: {evidence:45,market:50}, note: 'Market awareness', type: 'lever' },
+    { val: 'quiet', text: 'I do great work but nobody notices', scores: {evidence:30,relationship:25}, note: 'Invisible contributions', type: 'weak' },
+    { val: 'timing', text: 'I\u2019m not sure it\u2019s the right time', scores: {timing:25,company:35}, note: 'Uncertain timing', type: 'weak' },
+    { val: 'no_advocate', text: 'My manager won\u2019t bring it up for me', scores: {relationship:20,evidence:30}, note: 'No internal advocate', type: 'weak' },
   ]},
-  { id: 'evidence', label: 'What\u2019s your strongest card right now?', dimTag: 'evidence', options: [
-    { val: 'exceeded', text: 'I exceeded expectations / had a strong win', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
-    { val: 'competing', text: 'I have a competing offer', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
-    { val: 'recruited', text: 'I\u2019m being actively recruited', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
-    { val: 'underpaid', text: 'I know I\u2019m underpaid for my role', scores: {evidence:55,market:55}, note: 'Underpaid awareness', type: 'lever' },
-    { val: 'met_overdue', text: 'I met expectations and it\u2019s been a while', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
-    { val: 'none', text: 'I don\u2019t have strong evidence right now', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
+  { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
+    { val: 'exceeded', text: 'I just delivered a big, visible result', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
+    { val: 'competing', text: 'I have another offer on the table', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
+    { val: 'recruited', text: 'Recruiters keep reaching out to me', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
+    { val: 'underpaid', text: 'I\u2019ve researched it \u2014 I\u2019m clearly underpaid', scores: {evidence:55,market:55}, note: 'Underpaid with data', type: 'lever' },
+    { val: 'met_overdue', text: 'I\u2019ve been solid for a while \u2014 nothing flashy', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
+    { val: 'none', text: 'Honestly, I don\u2019t have strong evidence yet', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
   ]},
-  { id: 'last_raise', label: 'When was your last raise?', dimTag: 'timing', options: [
-    { val: 'lt_6mo', text: 'In the last 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky timing', type: 'weak' },
-    { val: '6_12mo', text: '6\u201312 months ago', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
-    { val: '1_2yr', text: '1\u20132 years ago', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
-    { val: 'gt_2yr', text: 'More than 2 years ago', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
-    { val: 'never', text: 'I\u2019ve never had one here', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
+  { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
+    { val: 'lt_6mo', text: 'Less than 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky', type: 'weak' },
+    { val: '6_12mo', text: 'About a year', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
+    { val: '1_2yr', text: '1\u20132 years', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
+    { val: 'gt_2yr', text: '3+ years', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
+    { val: 'never', text: 'I\u2019ve never asked', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
   ]},
-  { id: 'manager_type', label: 'What\u2019s your manager like?', dimTag: 'relationship', options: [
-    { val: 'supportive', text: 'Supportive \u2014 advocates for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
-    { val: 'neutral', text: 'Neutral \u2014 fair but not pushing', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
-    { val: 'distant', text: 'Distant or hands-off', scores: {relationship:25}, note: 'Distant \u2014 hard to read', type: 'weak' },
-    { val: 'by_book', text: 'By-the-book, follows process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
-    { val: 'tough', text: 'Tough \u2014 tends to push back', scores: {relationship:30}, note: 'Tough manager \u2014 expect pushback', type: 'weak' },
+  { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'relationship', options: [
+    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
+    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
+    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {relationship:25}, note: 'Distant manager', type: 'weak' },
+    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
+    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {relationship:30}, note: 'Tough manager', type: 'weak' },
   ]},
-  { id: 'company', label: 'How\u2019s your company doing right now?', dimTag: 'company', options: [
-    { val: 'growing', text: 'Growing \u2014 hiring, expanding', scores: {company:80}, note: 'Company thriving \u2014 budget likely', type: 'lever' },
-    { val: 'stable', text: 'Stable', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
-    { val: 'cautious', text: 'Cautious \u2014 hiring frozen', scores: {company:30}, note: 'Cautious \u2014 harder ask', type: 'weak' },
-    { val: 'cutting', text: 'Actively cutting costs', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
+  { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
+    { val: 'growing', text: 'Growing \u2014 hiring, expanding, good energy', scores: {company:80}, note: 'Company thriving', type: 'lever' },
+    { val: 'stable', text: 'Stable \u2014 not great, not bad', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
+    { val: 'cautious', text: 'Cautious \u2014 hiring freeze, belt-tightening', scores: {company:30}, note: 'Cautious environment', type: 'weak' },
+    { val: 'cutting', text: 'Cutting costs \u2014 layoffs, budget cuts', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
   ]},
-  { id: 'target', label: 'Do you have a number in mind?', dimTag: 'market', options: [
-    { val: 'lt_5', text: 'Under 5%', scores: {market:30}, note: 'Low target \u2014 easy to grant', type: 'neutral' },
+  { id: 'target', label: 'Do you have a number in mind for what you\u2019d ask for?', dimTag: 'market', options: [
+    { val: 'lt_5', text: 'Under 5% \u2014 something small is fine', scores: {market:30}, note: 'Low target \u2014 easy ask', type: 'neutral' },
     { val: '5_10', text: '5\u201310%', scores: {market:50}, note: 'Standard range', type: 'neutral' },
-    { val: '10_15', text: '10\u201315%', scores: {market:60}, note: 'Ambitious but achievable', type: 'lever' },
-    { val: '15_20', text: '15\u201320%', scores: {market:55}, note: 'High target \u2014 needs strong case', type: 'neutral' },
-    { val: 'gt_20', text: '20%+', scores: {market:40}, note: 'Very ambitious \u2014 expect resistance', type: 'weak' },
-    { val: 'no_idea', text: 'I don\u2019t know yet', scores: {market:20}, note: 'No target number', type: 'weak' },
+    { val: '10_15', text: '10\u201315% \u2014 I know my worth', scores: {market:60}, note: 'Ambitious but achievable', type: 'lever' },
+    { val: '15_plus', text: '15%+ \u2014 big gap to close', scores: {market:45}, note: 'High target \u2014 needs strong case', type: 'neutral' },
+    { val: 'no_idea', text: 'I have no idea what to ask for', scores: {market:20}, note: 'No target number', type: 'weak' },
   ]},
 ];
 
@@ -3277,15 +3276,27 @@ function renderDiscQuestion(idx) {
   coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
   chatArea.appendChild(coachBubble);
 
-  // Chip options (coach-side)
+  // Chip options — uses sim-pills-row and sim-reply-pill for consistency
   var chipsWrap = el('div', 'coach-msg', '');
-  var opts = el('div', 'disc-opts', '');
+  var opts = el('div', 'sim-pills-row', '');
   opts.id = 'disc-opts-' + idx;
+  opts.style.alignItems = 'flex-start';
   q.options.forEach(function(opt) {
-    var btn = el('button', 'disc-chip', '');
-    btn.textContent = opt.text;
-    btn.onclick = function() { pickDiscAnswer(idx, opt, btn); };
-    opts.appendChild(btn);
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    textSpan.textContent = opt.text;
+    pill.appendChild(textSpan);
+
+    pill.onclick = function() { pickDiscAnswer(idx, opt, pill); };
+    opts.appendChild(pill);
   });
   chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
@@ -3297,22 +3308,24 @@ function renderDiscQuestion(idx) {
   }, 100);
 }
 
-function pickDiscAnswer(qIdx, opt, btn) {
+function pickDiscAnswer(qIdx, opt, pill) {
   var opts = $('disc-opts-' + qIdx);
   if (!opts) return;
   
-  // Disable all chips, highlight selected
-  opts.querySelectorAll('.disc-chip').forEach(function(c) {
-    c.classList.add('dimmed');
-    c.classList.remove('selected');
+  // Disable all pills, highlight selected — same as Practice mode
+  opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
+    p.disabled = true;
+    p.style.opacity = '0.35';
+    p.style.pointerEvents = 'none';
+    p.classList.remove('active');
   });
-  btn.classList.remove('dimmed');
-  btn.classList.add('selected');
+  pill.style.opacity = '1';
+  pill.classList.add('active');
 
   // Show as user response bubble
   var chatArea = $('disc-chat');
   var userBubble = el('div', 'user-msg', '');
-  userBubble.innerHTML = '<div class="bubble">' + btn.textContent + '</div>';
+  userBubble.innerHTML = '<div class="bubble">' + escapeHtml(opt.text) + '</div>';
   chatArea.appendChild(userBubble);
 
   // Update scores
@@ -3344,61 +3357,69 @@ function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Coach summary bubble
-  var summaryBubble = el('div', 'coach-msg', '');
-  var summaryHtml = '<div class="bubble"><p style="font-weight:600;margin-bottom:8px;">Your negotiation position</p>';
+  var PRICE_USD = 19;
+  var wrap = el('div', 'coach-msg', '');
+  
+  // Build leverage/weakness HTML
+  var positionHtml = '';
   discLevers.forEach(function(l) {
-    summaryHtml += '<div class="disc-pw-item"><span class="disc-pw-plus">+</span> ' + l + '</div>';
+    positionHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12.5px;"><span style="color:#00c4a0;font-weight:700;">+</span><span style="color:rgba(255,255,255,0.82);">' + l + '</span></div>';
   });
   discWeaks.forEach(function(w) {
-    summaryHtml += '<div class="disc-pw-item"><span class="disc-pw-minus">\u2212</span> ' + w + '</div>';
+    positionHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12.5px;"><span style="color:#E05555;font-weight:700;">\u2212</span><span style="color:rgba(255,255,255,0.82);">' + w + '</span></div>';
   });
-  summaryHtml += '</div>';
-  summaryBubble.innerHTML = summaryHtml;
-  chatArea.appendChild(summaryBubble);
 
-  // Paywall card as coach message
-  var pwBubble = el('div', 'coach-msg', '');
-  var pwHtml = '<div class="disc-pw-card">';
-  pwHtml += '<p style="font-size:13px;font-weight:600;color:var(--t1);margin:0 0 10px;">Your personalized plan includes:</p>';
-  var includes = [
-    'Opening scripts tailored to your leverage points',
-    'Counter-arguments for your specific weaknesses',
-    'Practice simulation against your manager type',
-    'AI coaching on every move you make'
-  ];
-  includes.forEach(function(inc) {
-    pwHtml += '<div class="disc-inc"><span style="color:#00c4a0;font-size:14px;flex-shrink:0;">\u2713</span> ' + inc + '</div>';
-  });
-  pwHtml += '</div>';
-  pwBubble.innerHTML = pwHtml;
-  chatArea.appendChild(pwBubble);
+  wrap.innerHTML = `
+    <div class="bubble paywall-bubble">
+      <p class="paywall-headline"><strong>Your negotiation position is mapped.</strong></p>
+      <div style="margin-bottom:16px;">
+        ${positionHtml}
+      </div>
+      <div class="paywall-includes-title">Your personalized plan includes</div>
+      <div class="paywall-includes">
+        <div class="paywall-inc-item">
+          <strong>Opening scripts for your leverage</strong>
+          <span class="paywall-inc-sub">Tailored to what makes your case strong</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>Counter-arguments for your weak spots</strong>
+          <span class="paywall-inc-sub">Prepared responses for every pushback</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>Practice simulation against your manager type</strong>
+          <span class="paywall-inc-sub">Tap through realistic scenarios</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>AI coaching on every move</strong>
+          <span class="paywall-inc-sub">Risk, signal, and what to watch for</span>
+        </div>
+      </div>
+      <button class="btn-pay" id="disc-btn-pay">
+        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
+      </button>
+      <div class="trust-row">
+        <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
+      </div>
+      <div class="paywall-closing">$${PRICE_USD} once, for a conversation that adds thousands to your salary.</div>
+    </div>
+  `;
+  chatArea.appendChild(wrap);
 
-  // CTA button
-  var ctaWrap = el('div', 'coach-msg', '');
-  ctaWrap.style.cssText = 'display:flex;flex-direction:column;align-items:stretch;';
-  var cta = el('button', 'disc-cta', '');
-  cta.textContent = 'Unlock your plan \u00b7 $19';
-  cta.onclick = function() {
-    if (typeof initiateCheckout === 'function') initiateCheckout();
+  // Wire up CTA
+  var btn = wrap.querySelector('#disc-btn-pay');
+  if (btn) btn.onclick = function() {
+    if (typeof startCheckout === 'function') startCheckout();
+    else if (typeof initiateCheckout === 'function') initiateCheckout();
   };
-  ctaWrap.appendChild(cta);
 
-  var trust = el('div', 'disc-trust', '');
-  trust.innerHTML = '<span>One-time payment</span><span>\u00b7</span><span>No subscription</span><span>\u00b7</span><span>Stripe secure</span>';
-  ctaWrap.appendChild(trust);
-
-  // Try practice free link
-  var tryLink = el('div', '', '');
-  tryLink.style.cssText = 'text-align:center;margin-top:12px;';
-  tryLink.innerHTML = '<a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a>';
-  ctaWrap.appendChild(tryLink);
-
-  chatArea.appendChild(ctaWrap);
+  // "Or try practice mode free" link below the paywall bubble
+  var tryWrap = el('div', 'coach-msg', '');
+  tryWrap.innerHTML = '<div style="text-align:center;padding:4px 0;"><a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a></div>';
+  chatArea.appendChild(tryWrap);
 
   setTimeout(function() {
-    var wrap = $('chat-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    var w = $('chat-wrap');
+    if (w) w.scrollTop = w.scrollHeight;
   }, 200);
 }
 
