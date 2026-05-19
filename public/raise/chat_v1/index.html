@@ -3117,31 +3117,6 @@ var DISC_QUESTIONS = [
 
 function initDiscoveryMode(container) {
   container.innerHTML = '';
-  
-  // Radar at the top — always visible
-  var radarSection = el('div', '', '');
-  radarSection.style.cssText = 'display:flex;flex-direction:column;align-items:center;margin-bottom:16px;';
-  var canvas = document.createElement('canvas');
-  canvas.id = 'disc-radar';
-  canvas.width = 200;
-  canvas.height = 200;
-  radarSection.appendChild(canvas);
-
-  // Dimension status row (horizontal on mobile)
-  var statusDiv = el('div', '', '');
-  statusDiv.id = 'disc-dim-status';
-  statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;margin-top:6px;';
-  var dimNames = ['evidence','timing','market','relationship','company'];
-  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
-  dimNames.forEach(function(d, i) {
-    var row = el('div', 'ds-row', '');
-    row.id = 'disc-ds-' + d;
-    row.style.padding = '0';
-    row.innerHTML = '<span class="ds-dot off"></span><span class="ds-label">' + dimLabels[i] + '</span><span class="ds-val" id="disc-dv-' + d + '">\u2014</span>';
-    statusDiv.appendChild(row);
-  });
-  radarSection.appendChild(statusDiv);
-  container.appendChild(radarSection);
 
   // Chat-style questions container
   var chatArea = el('div', '', '');
@@ -3153,10 +3128,138 @@ function initDiscoveryMode(container) {
   intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
   chatArea.appendChild(intro);
 
-  drawDiscRadar();
-
   // Start first question after a short delay
   setTimeout(function() { renderDiscQuestion(0); }, 600);
+}
+
+function insertDiscRadar() {
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Create a coach message with the radar
+  var radarMsg = el('div', 'coach-msg', '');
+  var radarWrap = el('div', '', '');
+  radarWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:8px 0;';
+
+  var canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  canvas.className = 'disc-radar-canvas';
+  radarWrap.appendChild(canvas);
+
+  // Dimension status
+  var statusDiv = el('div', '', '');
+  statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;';
+  var dimNames = ['evidence','timing','market','relationship','company'];
+  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
+  dimNames.forEach(function(d, i) {
+    var row = el('div', 'ds-row', '');
+    row.style.padding = '0';
+    var dot = el('span', 'ds-dot ' + (discActive[d] ? (discDims[d] >= 60 ? 'high' : discDims[d] >= 40 ? 'mid' : 'low') : 'off'), '');
+    var label = el('span', 'ds-label', dimLabels[i]);
+    var val = el('span', 'ds-val', '');
+    if (discActive[d]) {
+      var v = discDims[d];
+      val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
+      val.className = 'ds-val ' + (v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low');
+    } else {
+      val.textContent = '\u2014';
+    }
+    row.appendChild(dot);
+    row.appendChild(label);
+    row.appendChild(val);
+    statusDiv.appendChild(row);
+  });
+  radarWrap.appendChild(statusDiv);
+  radarMsg.appendChild(radarWrap);
+  chatArea.appendChild(radarMsg);
+
+  // Draw on this specific canvas
+  drawDiscRadarOnCanvas(canvas);
+
+  // Scroll to radar
+  setTimeout(function() {
+    var wrap = $('chat-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  }, 100);
+}
+
+function drawDiscRadarOnCanvas(canvas) {
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var w = 200, h = 200, cx = 100, cy = 100, r = 70;
+  ctx.clearRect(0, 0, w, h);
+
+  var labels = ['Evidence','Timing','Market','Relationship','Company'];
+  var keys = ['evidence','timing','market','relationship','company'];
+  var colors = ['#1D9E75','#378ADD','#BA7517','#7c3aed','#D85A30'];
+  var n = 5;
+
+  for (var ring = 3; ring >= 1; ring--) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var rr = r * ring / 3;
+      if (i === 0) ctx.moveTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+      else ctx.lineTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  for (var i = 0; i < n; i++) {
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+    var lx = cx + (r + 16) * Math.cos(a);
+    var ly = cy + (r + 16) * Math.sin(a);
+    ctx.fillStyle = discActive[keys[i]] ? colors[i] : 'rgba(128,128,128,0.3)';
+    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  var hasActive = keys.some(function(k) { return discActive[k]; });
+  if (hasActive) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var k = keys[i % n];
+      var v = discActive[k] ? (discDims[k] / 100) : 0;
+      var x = cx + r * v * Math.cos(a);
+      var y = cy + r * v * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(56,132,244,0.1)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56,132,244,0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    for (var i = 0; i < n; i++) {
+      if (!discActive[keys[i]]) continue;
+      var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var v = discDims[keys[i]] / 100;
+      ctx.beginPath();
+      ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
+      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
+      ctx.fill();
+    }
+  }
+
+  for (var i = 0; i < n; i++) {
+    if (discActive[keys[i]]) continue;
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(cx + r * 0.15 * Math.cos(a), cy + r * 0.15 * Math.sin(a), 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(128,128,128,0.2)';
+    ctx.fill();
+  }
 }
 
 function renderDiscQuestion(idx) {
@@ -3228,111 +3331,13 @@ function pickDiscAnswer(qIdx, opt, btn) {
     SIM_STATE.context[q.id] = opt.val;
   }
 
-  updateDiscDimStatus();
-  drawDiscRadar();
+  // Insert updated radar as coach message
+  insertDiscRadar();
   
   discStep++;
   setTimeout(function() {
     renderDiscQuestion(discStep);
-  }, 500);
-}
-
-function updateDiscDimStatus() {
-  ['evidence','timing','market','relationship','company'].forEach(function(d) {
-    var row = document.querySelector('#disc-ds-' + d + ' .ds-dot');
-    var val = document.getElementById('disc-dv-' + d);
-    if (!row || !val) return;
-    if (!discActive[d]) { row.className = 'ds-dot off'; val.textContent = '\u2014'; val.className = 'ds-val'; return; }
-    var v = discDims[d];
-    var cls = v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low';
-    row.className = 'ds-dot ' + cls;
-    val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
-    val.className = 'ds-val ' + cls;
-  });
-}
-
-function drawDiscRadar() {
-  var c = document.getElementById('disc-radar');
-  if (!c) return;
-  var ctx = c.getContext('2d');
-  var w = 200, h = 200, cx = 100, cy = 100, r = 70;
-  ctx.clearRect(0, 0, w, h);
-
-  var labels = ['Evidence','Timing','Market','Relationship','Company'];
-  var keys = ['evidence','timing','market','relationship','company'];
-  var colors = ['#1D9E75','#378ADD','#BA7517','#7c3aed','#D85A30'];
-  var n = 5;
-
-  // Grid rings
-  for (var ring = 3; ring >= 1; ring--) {
-    ctx.beginPath();
-    for (var i = 0; i <= n; i++) {
-      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
-      var rr = r * ring / 3;
-      if (i === 0) ctx.moveTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
-      else ctx.lineTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
-    }
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(128,128,128,0.12)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  }
-
-  // Axis lines + labels
-  for (var i = 0; i < n; i++) {
-    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
-    ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
-
-    var lx = cx + (r + 16) * Math.cos(a);
-    var ly = cy + (r + 16) * Math.sin(a);
-    ctx.fillStyle = discActive[keys[i]] ? colors[i] : 'rgba(128,128,128,0.3)';
-    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(labels[i], lx, ly);
-  }
-
-  // Data shape
-  var hasActive = keys.some(function(k) { return discActive[k]; });
-  if (hasActive) {
-    ctx.beginPath();
-    for (var i = 0; i <= n; i++) {
-      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
-      var k = keys[i % n];
-      var v = discActive[k] ? (discDims[k] / 100) : 0;
-      var x = cx + r * v * Math.cos(a);
-      var y = cy + r * v * Math.sin(a);
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-    }
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(56,132,244,0.1)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(56,132,244,0.4)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Active dots
-    for (var i = 0; i < n; i++) {
-      if (!discActive[keys[i]]) continue;
-      var a = (Math.PI * 2 * i / n) - Math.PI / 2;
-      var v = discDims[keys[i]] / 100;
-      ctx.beginPath();
-      ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
-      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
-      ctx.fill();
-    }
-  }
-
-  // Disabled dots (grey, at center-ish)
-  for (var i = 0; i < n; i++) {
-    if (discActive[keys[i]]) continue;
-    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
-    ctx.beginPath();
-    ctx.arc(cx + r * 0.15 * Math.cos(a), cy + r * 0.15 * Math.sin(a), 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(128,128,128,0.2)';
-    ctx.fill();
-  }
+  }, 700);
 }
 
 function showDiscPaywall() {
