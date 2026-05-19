@@ -854,12 +854,12 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
              switch modes. Replaces the older single-button toggle which
              made it unclear whether you were in coach or simulation mode. -->
         <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
-          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Discover your negotiation leverage and weaknesses">
+          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Assess your negotiation leverage and weaknesses">
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
               <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/>
               <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span>Discovery</span>
+            <span>Assess</span>
           </button>
           <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Practice scenarios — tap manager replies and your responses">
             <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
@@ -3069,14 +3069,6 @@ var discWeaks = [];
 var discStep = 0;
 
 var DISC_QUESTIONS = [
-  { id: 'blocker', label: 'What\u2019s the main thing holding you back from asking?', dimTag: null, options: [
-    { val: 'no_script', text: 'I don\u2019t know what to say', scores: {evidence:25,timing:40}, note: 'No prepared script', type: 'weak' },
-    { val: 'fear_no', text: 'I\u2019m worried they\u2019ll say no', scores: {evidence:35,relationship:30}, note: 'Fear of rejection', type: 'weak' },
-    { val: 'underpaid', text: 'I know I\u2019m underpaid but can\u2019t prove it', scores: {evidence:45,market:50}, note: 'Market awareness', type: 'lever' },
-    { val: 'quiet', text: 'I do great work but nobody notices', scores: {evidence:30,relationship:25}, note: 'Invisible contributions', type: 'weak' },
-    { val: 'timing', text: 'I\u2019m not sure it\u2019s the right time', scores: {timing:25,company:35}, note: 'Uncertain timing', type: 'weak' },
-    { val: 'no_advocate', text: 'My manager won\u2019t bring it up for me', scores: {relationship:20,evidence:30}, note: 'No internal advocate', type: 'weak' },
-  ]},
   { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
     { val: 'exceeded', text: 'I just delivered a big, visible result', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
     { val: 'competing', text: 'I have another offer on the table', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
@@ -3154,13 +3146,14 @@ function insertDiscRadar() {
   dimNames.forEach(function(d, i) {
     var row = el('div', 'ds-row', '');
     row.style.padding = '0';
-    var dot = el('span', 'ds-dot ' + (discActive[d] ? (discDims[d] >= 60 ? 'high' : discDims[d] >= 40 ? 'mid' : 'low') : 'off'), '');
+    var dot = el('span', 'ds-dot ' + (discActive[d] ? 'active' : 'off'), '');
+    if (discActive[d]) dot.style.background = 'rgba(30,61,114,0.85)';
     var label = el('span', 'ds-label', dimLabels[i]);
     var val = el('span', 'ds-val', '');
     if (discActive[d]) {
       var v = discDims[d];
       val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
-      val.className = 'ds-val ' + (v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low');
+      val.style.color = 'var(--navy)';
     } else {
       val.textContent = '\u2014';
     }
@@ -3191,7 +3184,8 @@ function drawDiscRadarOnCanvas(canvas) {
 
   var labels = ['Evidence','Timing','Market','Relationship','Company'];
   var keys = ['evidence','timing','market','relationship','company'];
-  var colors = ['#1D9E75','#378ADD','#BA7517','#7c3aed','#D85A30'];
+  var activeColor = 'rgba(30,61,114,0.85)';
+  var inactiveColor = 'rgba(128,128,128,0.3)';
   var n = 5;
 
   for (var ring = 3; ring >= 1; ring--) {
@@ -3216,7 +3210,7 @@ function drawDiscRadarOnCanvas(canvas) {
 
     var lx = cx + (r + 16) * Math.cos(a);
     var ly = cy + (r + 16) * Math.sin(a);
-    ctx.fillStyle = discActive[keys[i]] ? colors[i] : 'rgba(128,128,128,0.3)';
+    ctx.fillStyle = discActive[keys[i]] ? activeColor : inactiveColor;
     ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(labels[i], lx, ly);
@@ -3234,9 +3228,9 @@ function drawDiscRadarOnCanvas(canvas) {
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.closePath();
-    ctx.fillStyle = 'rgba(56,132,244,0.1)';
+    ctx.fillStyle = 'rgba(30,61,114,0.08)';
     ctx.fill();
-    ctx.strokeStyle = 'rgba(56,132,244,0.4)';
+    ctx.strokeStyle = 'rgba(30,61,114,0.35)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
@@ -3246,7 +3240,7 @@ function drawDiscRadarOnCanvas(canvas) {
       var v = discDims[keys[i]] / 100;
       ctx.beginPath();
       ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
-      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
+      ctx.fillStyle = 'rgba(30,61,114,0.85)';
       ctx.fill();
     }
   }
@@ -3358,32 +3352,44 @@ function showDiscPaywall() {
   if (!chatArea) return;
 
   var PRICE_USD = 19;
-  var wrap = el('div', 'coach-msg', '');
-  
-  // Build leverage/weakness HTML
-  var positionHtml = '';
+
+  // Insert final radar
+  insertDiscRadar();
+
+  // Coach summary of leverage and weaknesses
+  var summaryBubble = el('div', 'coach-msg', '');
+  var sHtml = '<div class="bubble"><p><strong>Here\u2019s where you stand:</strong></p>';
   discLevers.forEach(function(l) {
-    positionHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12.5px;"><span style="color:#00c4a0;font-weight:700;">+</span><span style="color:rgba(255,255,255,0.82);">' + l + '</span></div>';
+    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#00c4a0;font-weight:700;">+</span> ' + l + '</p>';
   });
   discWeaks.forEach(function(w) {
-    positionHtml += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:12.5px;"><span style="color:#E05555;font-weight:700;">\u2212</span><span style="color:rgba(255,255,255,0.82);">' + w + '</span></div>';
+    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
   });
+  sHtml += '<p style="margin:10px 0 0;font-size:13px;">With the full plan, you\u2019ll get a negotiation script built around your strengths \u2014 and prepared responses that cover every weak spot.</p>';
+  sHtml += '</div>';
+  summaryBubble.innerHTML = sHtml;
+  chatArea.appendChild(summaryBubble);
 
+  // Standard paywall bubble — matches Practice mode exactly
+  var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
-      <p class="paywall-headline"><strong>Your negotiation position is mapped.</strong></p>
-      <div style="margin-bottom:16px;">
-        ${positionHtml}
+      <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+      <button class="btn-pay" id="disc-btn-pay">
+        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
+      </button>
+      <div class="trust-row paywall-trust">
+        <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
       </div>
-      <div class="paywall-includes-title">Your personalized plan includes</div>
+      <div class="paywall-includes-title">Includes</div>
       <div class="paywall-includes">
         <div class="paywall-inc-item">
-          <strong>Opening scripts for your leverage</strong>
-          <span class="paywall-inc-sub">Tailored to what makes your case strong</span>
+          <strong>Personalized opening scripts</strong>
+          <span class="paywall-inc-sub">Built around your leverage points</span>
         </div>
         <div class="paywall-inc-item">
-          <strong>Counter-arguments for your weak spots</strong>
-          <span class="paywall-inc-sub">Prepared responses for every pushback</span>
+          <strong>Pushback responses for your weak spots</strong>
+          <span class="paywall-inc-sub">Prepared counters for every objection</span>
         </div>
         <div class="paywall-inc-item">
           <strong>Practice simulation against your manager type</strong>
@@ -3394,25 +3400,19 @@ function showDiscPaywall() {
           <span class="paywall-inc-sub">Risk, signal, and what to watch for</span>
         </div>
       </div>
-      <button class="btn-pay" id="disc-btn-pay">
-        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
-      </button>
-      <div class="trust-row">
-        <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
-      </div>
       <div class="paywall-closing">$${PRICE_USD} once, for a conversation that adds thousands to your salary.</div>
     </div>
   `;
   chatArea.appendChild(wrap);
 
-  // Wire up CTA
+  // Wire CTA
   var btn = wrap.querySelector('#disc-btn-pay');
   if (btn) btn.onclick = function() {
     if (typeof startCheckout === 'function') startCheckout();
     else if (typeof initiateCheckout === 'function') initiateCheckout();
   };
 
-  // "Or try practice mode free" link below the paywall bubble
+  // Try practice free link
   var tryWrap = el('div', 'coach-msg', '');
   tryWrap.innerHTML = '<div style="text-align:center;padding:4px 0;"><a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a></div>';
   chatArea.appendChild(tryWrap);
