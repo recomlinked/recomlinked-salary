@@ -407,6 +407,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   padding:10px 0 4px;
 }
 .chips-area:empty{padding:0;height:0;}
+.chips-area:has(.chips-area-scroll:empty){padding:0;height:0;}
 /* Right-edge fade gradient — signals scrollability */
 .chips-area::after{
   content:'';
@@ -654,7 +655,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
    when input was disabled, which also disabled the toolbar buttons. Now the
    toolbar lives in .bottom-panel but is excluded from `.dimmed` (see rule
    below) so context + tree are always interactive once unlocked. */
-.input-toolbar{display:flex;gap:6px;padding:0 0 6px;justify-content:flex-start;}
+.input-toolbar{display:flex;gap:6px;padding:0 0 4px;justify-content:flex-start;}
 /* When the bottom panel is dimmed (input disabled), keep the toolbar AND
    the chips-area (which hosts context + tree popovers) fully live — the
    user can still review explored scenarios or add context while the
@@ -2238,14 +2239,17 @@ function setMode(target) {
   const coachingEl = $('coaching-messages');
   const discoveryEl = $('discovery-messages');
 
-  // Hide all
+  // Hide all and remove active class
   practiceEl.style.display = 'none';
+  practiceEl.classList.remove('active-chat');
   coachingEl.style.display = 'none';
-  if (discoveryEl) discoveryEl.style.display = 'none';
+  coachingEl.classList.remove('active-chat');
+  if (discoveryEl) { discoveryEl.style.display = 'none'; discoveryEl.classList.remove('active-chat'); }
 
   if (target === 'discovery') {
     if (discoveryEl) {
       discoveryEl.style.display = 'block';
+      discoveryEl.classList.add('active-chat');
       if (!discoveryEl.dataset.initialized) {
         initDiscoveryMode(discoveryEl);
         discoveryEl.dataset.initialized = 'true';
@@ -2253,9 +2257,19 @@ function setMode(target) {
     }
     const input = $('chat-input');
     if (input) { input.placeholder = 'Tap to discover your position\u2026'; input.disabled = true; }
+    var sendBtn = $('send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    // Hide chips area in Assess mode
+    var chipsArea = $('chips-area');
+    if (chipsArea) chipsArea.style.display = 'none';
+    // Scroll to top so Assess content is visible
+    var chatWrap = $('chat-wrap');
+    if (chatWrap) setTimeout(function() { chatWrap.scrollTop = 0; }, 50);
   } else if (target === 'sim') {
     practiceEl.style.display = '';
     practiceEl.classList.add('active-chat');
+    var chipsArea2 = $('chips-area');
+    if (chipsArea2) chipsArea2.style.display = '';
     const input = $('chat-input');
     if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
     scrollChatToBottom();
