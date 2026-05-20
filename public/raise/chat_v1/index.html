@@ -804,7 +804,6 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 </style>
 </head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 
 <body>
 
@@ -3185,6 +3184,7 @@ function generateCanvasPDF() {
     return;
   }
   var jsPDF = window.jspdf.jsPDF;
+  try {
   var doc = new jsPDF('p', 'mm', 'a4');
   var W = 210, H = 297;
   var mx = 16, y = 0;
@@ -3289,9 +3289,7 @@ function generateCanvasPDF() {
       var blockH = 14;
       doc.setFillColor(240, 241, 245);
       doc.setDrawColor(200, 205, 215);
-      doc.setLineDashPattern([1.5, 1.5]);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-      doc.setLineDashPattern([]);
 
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
@@ -3391,6 +3389,10 @@ function generateCanvasPDF() {
 
   // ── Save ──
   doc.save('raise-negotiation-canvas.pdf');
+  } catch (e) {
+    console.error('PDF generation error:', e);
+    alert('PDF is loading. Please try again in a moment.');
+  }
 }
 
 function renderCanvasHTML() {
