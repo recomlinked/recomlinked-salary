@@ -3851,6 +3851,11 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
+  // Closing nudge after paywall
+  var nudge = el('div', 'coach-msg', '');
+  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>2 questions away from your complete negotiation plan PDF</div>';
+  chatArea.appendChild(nudge);
+
   // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
     var chatWrap = $('chat-wrap');
