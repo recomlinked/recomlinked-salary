@@ -753,20 +753,21 @@ The user is preparing to ask for a raise. Their main blocker: "${blockerContext}
 Their leverage points: ${leverList}
 Their weak spots: ${weakList}
 
-For each dimension below, write a 2-3 sentence insight that would surprise someone who has only read blog posts about asking for a raise. Be specific and tactical. Reference their exact situation.
+For each dimension below, write a 2-3 sentence insight that would surprise someone who has only read blog posts about asking for a raise. Be specific and tactical. Reference their exact situation. Use **bold** to highlight the single most important phrase or tactic in each insight.
 
-For WEAK dimensions (score < 40): also add a "If they say:" line with the most likely objection from their manager, and a "Your response:" line with the exact words to use.
+For WEAK dimensions (score < 40): also add a "**If they say:** '[most likely objection]'" line and a "**Your response:** '[exact words to use]'" line.
 
 For STRONG dimensions (score >= 60): tell them HOW to use this leverage — the specific tactic, not just "this is good."
 
+CRITICAL: You MUST return an insight for EVERY dimension listed below. Do not skip any.
+
 Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
 {
-  "evidence": "Your insight text here...",
-  "timing": "Your insight text here...",
-  "manager": "Your insight text here..."
+  "evidence": "Your insight with **bold key phrase** here...",
+  "timing": "Your insight with **bold key phrase** here..."
 }
 
-Only include dimensions that were answered. Each insight should be 2-4 sentences max.`;
+Only include dimensions that are listed below. Each insight should be 2-4 sentences max.`;
 
   const userMessage = `Here are my assessed dimensions:\n${answeredDims}\n\nGenerate insights for each.`;
 
