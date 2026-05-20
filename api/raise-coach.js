@@ -279,6 +279,9 @@ module.exports = async function handler(req, res) {
   if (body.mode === 'discovery') {
     return handleDiscoveryMode(body, res);
   }
+  if (body.mode === 'disc_insights') {
+    return handleDiscInsights(body, res);
+  }
   if (body.mode === 'simulate_openings') {
     return handleSimulateOpenings(body, res);
   }
@@ -710,6 +713,85 @@ async function handleDiscoveryMode(body, res) {
       mode: 'discovery',
       message_number: msgNum,
     });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ DISC INSIGHTS — AI-generated canvas insights           ══
+// ════════════════════════════════════════════════════════════
+async function handleDiscInsights(body, res) {
+  const { blocker, answers, dims, levers, weaks } = body;
+
+  if (!answers || typeof answers !== 'object') {
+    return res.status(400).json({ error: 'answers required' });
+  }
+
+  const dimDescriptions = {
+    evidence: { label: 'Evidence & Leverage' },
+    timing: { label: 'Timing & Window' },
+    manager: { label: 'Manager' },
+    company: { label: 'Company & Environment' },
+    market: { label: 'Market & Positioning' },
+  };
+
+  const answeredDims = Object.entries(dimDescriptions)
+    .filter(([k]) => answers[k])
+    .map(([k, v]) => {
+      const score = dims && dims[k] ? dims[k] : 50;
+      const strength = score >= 60 ? 'strong' : score >= 40 ? 'medium' : 'weak';
+      return `- ${v.label} (${k}): user answered "${answers[k]}" — rated ${strength} (score ${score}/100)`;
+    })
+    .join('\n');
+
+  const blockerContext = blocker || 'unknown';
+  const leverList = (levers || []).join(', ') || 'none identified';
+  const weakList = (weaks || []).join(', ') || 'none identified';
+
+  const system = `You are a senior salary negotiation coach with 20+ years of experience. You give advice that surprises people — counterintuitive, specific, tactical. Not generic blog advice.
+
+The user is preparing to ask for a raise. Their main blocker: "${blockerContext}".
+Their leverage points: ${leverList}
+Their weak spots: ${weakList}
+
+For each dimension below, write a 2-3 sentence insight that would surprise someone who has only read blog posts about asking for a raise. Be specific and tactical. Reference their exact situation.
+
+For WEAK dimensions (score < 40): also add a "If they say:" line with the most likely objection from their manager, and a "Your response:" line with the exact words to use.
+
+For STRONG dimensions (score >= 60): tell them HOW to use this leverage — the specific tactic, not just "this is good."
+
+Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
+{
+  "evidence": "Your insight text here...",
+  "timing": "Your insight text here...",
+  "manager": "Your insight text here..."
+}
+
+Only include dimensions that were answered. Each insight should be 2-4 sentences max.`;
+
+  const userMessage = `Here are my assessed dimensions:\n${answeredDims}\n\nGenerate insights for each.`;
+
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      system,
+      messages: [{ role: 'user', content: userMessage }],
+    });
+
+    const raw = (response.content[0]?.text || '').trim();
+    let insights = {};
+    try {
+      const cleaned = raw.replace(/```json|```/g, '').trim();
+      insights = JSON.parse(cleaned);
+    } catch (parseErr) {
+      console.error('[disc_insights] JSON parse error:', parseErr, 'raw:', raw);
+      insights = {};
+    }
+
+    return res.status(200).json({ insights, mode: 'disc_insights' });
+  } catch (err) {
+    console.error('[disc_insights] API error:', err);
+    return res.status(200).json({ insights: {}, mode: 'disc_insights' });
   }
 }
 
