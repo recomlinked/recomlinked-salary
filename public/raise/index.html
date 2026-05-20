@@ -1246,6 +1246,13 @@ h2.section-title {
 @keyframes stBlink{0%,100%{opacity:1;}50%{opacity:0;}}
 /* Demo visual — adapted from coach landing */
 .demo-section{padding:20px 20px 56px;}
+/* Canvas demo pills */
+.cvd-pill{border-radius:6px;padding:8px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;transition:all 0.5s ease,opacity 0.4s ease;display:flex;align-items:center;gap:5px;}
+.cvd-empty{background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1);color:rgba(255,255,255,0.25);}
+.cvd-strong{background:rgba(26,158,108,0.15);border:1px solid rgba(26,158,108,0.3);color:#5ddba8;}
+.cvd-weak{background:rgba(228,78,78,0.12);border:1px solid rgba(228,78,78,0.25);color:#f09595;}
+.cvd-medium{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);color:#e8c96a;}
+.cvd-plan{background:rgba(100,150,255,0.1);border:1px solid rgba(100,150,255,0.2);color:#8ab4ff;}
 .demo-visual{max-width:500px;margin:0 auto;background:rgba(10,10,15,0.97);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;color:#eeeee6;}
 .ds{display:flex;gap:12px;position:relative;opacity:0.4;transition:opacity 0.6s ease, transform 0.6s ease;transform:scale(0.95) translateX(-4px);}
 .ds.active{opacity:1;transform:scale(1.04) translateX(0);}
@@ -1304,7 +1311,7 @@ h2.section-title {
   <!-- Hero ─────────────────────────────────────────────── -->
   <section class="hero">
     <h1>How to ask for a <span class="accent">raise</span> <br><span class="hero-h1-line2">with a professional <span class="accent-soft">negotiation plan</span></span></h1>
-    <p class="hero-sub">Map every conversation path. Walk in ready for anything.</p>
+    <p class="hero-sub">Walk in ready for anything.</p>
 
     <div class="cta-stack">
       <a href="/raise/chat/?reason=no_script" class="cta-btn" id="cta-raise">
@@ -1320,30 +1327,30 @@ h2.section-title {
   <section class="section hiw-section" id="how-it-works">
     <h2 class="section-title">In <b style="color:var(--gold);">3 simple steps</b>, ask for a raise at work</h2>
 
-    <a href="#blockers" class="hiw-card" aria-label="Step 1: know what's stopping you">
+    <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 1: map your negotiation position">
       <div class="hiw-num">1</div>
       <div class="hiw-body">
+        <div class="hiw-title">Map your negotiation position</div>
+        <div class="hiw-desc">Before you ask for a raise, look at your <b>evidence</b>, <b>timing</b>, <b>manager</b>, <b>company situation</b>, and <b>market value</b> to understand your leverage and risks. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
+        <div class="hiw-cta">Map yours now <span class="hiw-cta-arrow">→</span></div>
+      </div>
+    </a>
+
+    <a href="#blockers" class="hiw-card" aria-label="Step 2: know what's stopping you">
+      <div class="hiw-num">2</div>
+      <div class="hiw-body">
         <div class="hiw-title">Know what's stopping you</div>
-        <div class="hiw-desc">Every raise negotiation has one thing that holds you back. Afraid they'll say no? That's <b>pushback responses</b>. Don't know what to say? That's your <b>opening script</b>. <span class="hiw-question">What's stopping you from asking for a raise?</span></div>
+        <div class="hiw-desc">Every raise conversation has one thing holding you back. Afraid they'll say no? That's <b>pushback responses</b>. Not sure what to say? That's your <b>opening script</b>. <span class="hiw-question">What's stopping you from asking for a raise?</span></div>
         <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
 
-    <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 2: practice the conversation">
-      <div class="hiw-num">2</div>
-      <div class="hiw-body">
-        <div class="hiw-title">Simulate the raise negotiation</div>
-        <div class="hiw-desc">Imagine you're about to request a raise — pick your opening, guess your manager's response, and try different paths. Repeat until nothing can surprise you. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
-        <div class="hiw-cta">Start practicing now <span class="hiw-cta-arrow">→</span></div>
-      </div>
-    </a>
-
-    <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 3: get AI coaching on every move">
+    <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 3: create your Raise Negotiation Canvas">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
-        <div class="hiw-title">Add an AI coach to your simulation</div>
-        <div class="hiw-desc">Your AI coach analyzes every move you make — what signal it sends and how to handle what comes next. <span class="hiw-question">Like having a negotiation expert beside you while asking for a raise.</span></div>
-        <div class="hiw-cta">Try it now <span class="hiw-cta-arrow">→</span></div>
+        <div class="hiw-title">Create your Raise Negotiation Canvas</div>
+        <div class="hiw-desc">Your canvas brings everything together in one document: your <b>opening script</b>, <b>pushback responses</b>, key points to emphasize, what to avoid, a <b>meeting request email</b>, and a <b>raise case brief</b> you can share with your manager. <span class="hiw-question">This is the most complete tool to professionally ask for a raise.</span></div>
+        <div class="hiw-cta">Build your canvas now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
@@ -1390,7 +1397,64 @@ h2.section-title {
       <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
     </div>
 
-    <!-- Demo visual section -->
+    <!-- Canvas demo section -->
+    <div class="divider"></div>
+    <div class="demo-section">
+      <h2 class="section-title">Raise Negotiation Canvas: <a href="/raise/chat/?reason=no_script" style="color:var(--gold);text-decoration:none;">The best way to ask for a raise</a></h2>
+
+      <div class="demo-visual" style="padding:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="font-size:12px;font-weight:600;color:#fff;">Raise negotiation canvas</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.35);">Sarah K. · Marketing Manager</span>
+        </div>
+
+        <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your position</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+          <div class="cvd-pill cvd-empty" id="cvd-ev"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Evidence</div>
+          <div class="cvd-pill cvd-empty" id="cvd-ti"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Timing</div>
+        </div>
+        <div class="cvd-pill cvd-empty" id="cvd-mg" style="margin-bottom:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> Manager</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;">
+          <div class="cvd-pill cvd-empty" id="cvd-co"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg> Company</div>
+          <div class="cvd-pill cvd-empty" id="cvd-mk"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Market</div>
+        </div>
+
+        <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px;"></div>
+        <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your strategy</div>
+        <div class="cvd-pill cvd-empty" id="cvd-lr" style="margin-bottom:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Leverage & risk</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;">
+          <div class="cvd-pill cvd-empty" id="cvd-em"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg> Emphasize</div>
+          <div class="cvd-pill cvd-empty" id="cvd-av"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Avoid</div>
+        </div>
+
+        <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px;"></div>
+        <div style="font-size:8px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Your plan</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+          <div class="cvd-pill cvd-empty" id="cvd-os"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Opening script</div>
+          <div class="cvd-pill cvd-empty" id="cvd-pb"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Pushback playbook</div>
+        </div>
+        <div class="cvd-pill cvd-empty" id="cvd-iy" style="margin-bottom:5px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> If they say yes</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;">
+          <div class="cvd-pill cvd-empty" id="cvd-me"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Meeting email</div>
+          <div class="cvd-pill cvd-empty" id="cvd-rc"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Raise case brief</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06);">
+          <span style="font-size:10px;color:rgba(255,255,255,0.3);">raise-negotiation-canvas.pdf</span>
+          <span style="font-size:10px;padding:3px 10px;background:rgba(201,168,76,0.15);color:#c9a84c;border-radius:5px;font-weight:600;">Download PDF</span>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--text2);">Answer 5 questions about your negotiation position. AI crafts the rest.</div>
+      <div style="text-align:center;margin-top:12px;margin-bottom:8px;"><a href="/raise/chat/?reason=no_script" class="demo-text-cta">Build your canvas now <span class="demo-text-cta-arrow">→</span></a></div>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;">
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Download as PDF</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> Opening scripts</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg> Meeting email draft</span>
+      </div>
+    </div>
+
+    <!-- Simulation demo section -->
     <div class="divider"></div>
     <div class="demo-section">
       <h2 class="section-title">How to professionally ask for a raise in 2026</h2>
@@ -2775,6 +2839,32 @@ function submitAssessment() {
   } else {
     rotateSteps();
   }
+})();
+</script>
+<script>
+(function(){
+var cvSteps=[
+{id:'cvd-ev',cls:'cvd-strong'},{id:'cvd-ti',cls:'cvd-strong'},
+{id:'cvd-mg',cls:'cvd-weak'},{id:'cvd-co',cls:'cvd-medium'},
+{id:'cvd-mk',cls:'cvd-strong'},{id:'cvd-lr',cls:'cvd-plan'},
+{id:'cvd-em',cls:'cvd-plan'},{id:'cvd-av',cls:'cvd-plan'},
+{id:'cvd-os',cls:'cvd-plan'},{id:'cvd-pb',cls:'cvd-plan'},
+{id:'cvd-iy',cls:'cvd-plan'},{id:'cvd-me',cls:'cvd-plan'},
+{id:'cvd-rc',cls:'cvd-plan'}
+];
+var ci=0;
+function cvReset(){document.querySelectorAll('.cvd-pill').forEach(function(b){b.className='cvd-pill cvd-empty';b.style.opacity=''})}
+function cvNext(){
+if(ci>=cvSteps.length){ci=0;cvReset();setTimeout(cvNext,1500);return}
+var s=cvSteps[ci];var el=document.getElementById(s.id);
+if(el){
+  document.querySelectorAll('.cvd-pill:not(.cvd-empty)').forEach(function(b){b.style.opacity='0.45'});
+  el.className='cvd-pill '+s.cls;
+  el.style.opacity='1';
+}
+ci++;setTimeout(cvNext,1000);
+}
+setTimeout(cvNext,800);
 })();
 </script>
 </body>
