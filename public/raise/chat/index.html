@@ -885,7 +885,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
           <span class="toolbar-badge" id="ctx-badge">4</span>
         </button>
         -->
-        <div class="scenarios-counter" id="scenarios-counter">
+        <div class="scenarios-counter" id="scenarios-counter" style="display:none;">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13"><path d="M10 2a5 5 0 00-2 9.58V14h4v-2.42A5 5 0 0010 2z" stroke="currentColor" stroke-width="1.3" fill="currentColor" fill-opacity="0.12"/><path d="M8 16h4M8.5 18h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           <span class="sc-num" id="sc-num">0</span> scenarios unlocked
         </div>
@@ -3371,9 +3371,9 @@ function showDiscPaywall() {
 
   var PRICE_USD = 19;
 
-  // Log paywall view
+  // Log paywall view — use same stage name as Practice mode so Sheet records it
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('disc_paywall', { levers: discLevers, weaks: discWeaks, dims: discDims });
+  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
 
   // Coach summary — personalized verdict based on their answers
   var summaryBubble = el('div', 'coach-msg', '');
