@@ -3498,9 +3498,11 @@ function insertDiscRadar() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Collapse all previous radar+canvas messages
+  // Collapse all previous radar+canvas messages and remove stale IDs
   chatArea.querySelectorAll('.disc-radar-msg').forEach(function(prev) {
     prev.style.display = 'none';
+    var oldCanvas = prev.querySelector('#disc-canvas-live');
+    if (oldCanvas) oldCanvas.removeAttribute('id');
   });
 
   // Create a coach message with radar + canvas
