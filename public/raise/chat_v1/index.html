@@ -577,12 +577,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .disc-qb{margin-bottom:14px;animation:discFade 0.4s ease;}
 @keyframes discFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .disc-ql{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;line-height:1.4;}
-.disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;}
-.disc-dim-evidence{background:rgba(93,202,165,0.12);color:#1D9E75;}
-.disc-dim-timing{background:rgba(56,132,244,0.12);color:#378ADD;}
-.disc-dim-market{background:rgba(201,168,76,0.12);color:#BA7517;}
-.disc-dim-relationship{background:rgba(124,58,237,0.12);color:#7c3aed;}
-.disc-dim-company{background:rgba(216,90,48,0.12);color:#D85A30;}
+.disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;background:rgba(30,61,114,0.1);color:var(--navy);}
 .disc-chip{display:flex;align-items:center;text-align:left;padding:10px 14px;background:var(--card);border:1.5px solid var(--divider);border-radius:10px;cursor:pointer;font-size:13px;color:var(--t1);width:100%;transition:all 0.15s;font-family:var(--sans);}
 .disc-chip:hover{border-color:var(--navy);background:rgba(30,61,114,0.03);}
 .disc-chip.selected{border-color:#185FA5;background:rgba(56,132,244,0.08);color:#185FA5;}
@@ -3119,8 +3114,12 @@ function initDiscoveryMode(container) {
   intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
   chatArea.appendChild(intro);
 
-  // Start first question after a short delay
-  setTimeout(function() { renderDiscQuestion(0); }, 600);
+  // Start first question after a short delay, then show empty radar
+  setTimeout(function() {
+    renderDiscQuestion(0);
+    // Show initial empty radar below first options
+    setTimeout(function() { insertDiscRadar(); }, 300);
+  }, 600);
 }
 
 function insertDiscRadar() {
@@ -3146,14 +3145,13 @@ function insertDiscRadar() {
   dimNames.forEach(function(d, i) {
     var row = el('div', 'ds-row', '');
     row.style.padding = '0';
-    var dot = el('span', 'ds-dot ' + (discActive[d] ? 'active' : 'off'), '');
-    if (discActive[d]) dot.style.background = 'rgba(30,61,114,0.85)';
+    var dot = el('span', 'ds-dot ' + (discActive[d] ? (discDims[d] >= 60 ? 'high' : discDims[d] >= 40 ? 'mid' : 'low') : 'off'), '');
     var label = el('span', 'ds-label', dimLabels[i]);
     var val = el('span', 'ds-val', '');
     if (discActive[d]) {
       var v = discDims[d];
       val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
-      val.style.color = 'var(--navy)';
+      val.className = 'ds-val ' + (v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low');
     } else {
       val.textContent = '\u2014';
     }
@@ -3240,7 +3238,7 @@ function drawDiscRadarOnCanvas(canvas) {
       var v = discDims[keys[i]] / 100;
       ctx.beginPath();
       ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(30,61,114,0.85)';
+      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
       ctx.fill();
     }
   }
@@ -3319,7 +3317,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
   // Show as user response bubble
   var chatArea = $('disc-chat');
   var userBubble = el('div', 'user-msg', '');
-  userBubble.innerHTML = '<div class="bubble">' + escapeHtml(opt.text) + '</div>';
+  userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(opt.text) + '</div>';
   chatArea.appendChild(userBubble);
 
   // Update scores
@@ -3356,16 +3354,39 @@ function showDiscPaywall() {
   // Insert final radar
   insertDiscRadar();
 
-  // Coach summary of leverage and weaknesses
+  // Coach summary — personalized verdict based on their answers
   var summaryBubble = el('div', 'coach-msg', '');
+  var strong = discLevers.length;
+  var weak = discWeaks.length;
+  
+  // Dynamic opening based on their balance
+  var verdict = '';
+  if (strong >= 3 && weak <= 1) {
+    verdict = 'You\u2019re in a strong position \u2014 stronger than most people who ask for a raise.';
+  } else if (strong >= 2 && weak <= 2) {
+    verdict = 'You have real leverage here \u2014 but a few gaps that could cost you if you\u2019re not prepared.';
+  } else if (strong >= 1) {
+    verdict = 'You have cards to play \u2014 but some real risks you need a strategy for.';
+  } else {
+    verdict = 'Your position has some challenges \u2014 but that doesn\u2019t mean you can\u2019t ask. It means you need the right approach.';
+  }
+
   var sHtml = '<div class="bubble"><p><strong>Here\u2019s where you stand:</strong></p>';
+  sHtml += '<p style="margin:8px 0 12px;font-size:13px;color:var(--t2);">' + verdict + '</p>';
   discLevers.forEach(function(l) {
     sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#00c4a0;font-weight:700;">+</span> ' + l + '</p>';
   });
   discWeaks.forEach(function(w) {
     sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
   });
-  sHtml += '<p style="margin:10px 0 0;font-size:13px;">With the full plan, you\u2019ll get a negotiation script built around your strengths \u2014 and prepared responses that cover every weak spot.</p>';
+
+  // Dynamic closing that references their specifics
+  var closingParts = [];
+  if (discLevers.length > 0) closingParts.push('an opening that leads with your ' + discLevers[0].toLowerCase());
+  if (discWeaks.length > 0) closingParts.push('prepared responses for when they push back on your ' + discWeaks[0].toLowerCase());
+  closingParts.push('a full script you can walk in with');
+
+  sHtml += '<p style="margin:12px 0 0;font-size:13px;">Your plan includes ' + closingParts.join(', ') + '.</p>';
   sHtml += '</div>';
   summaryBubble.innerHTML = sHtml;
   chatArea.appendChild(summaryBubble);
@@ -3390,10 +3411,6 @@ function showDiscPaywall() {
         <div class="paywall-inc-item">
           <strong>Pushback responses for your weak spots</strong>
           <span class="paywall-inc-sub">Prepared counters for every objection</span>
-        </div>
-        <div class="paywall-inc-item">
-          <strong>Practice simulation against your manager type</strong>
-          <span class="paywall-inc-sub">Tap through realistic scenarios</span>
         </div>
         <div class="paywall-inc-item">
           <strong>AI coaching on every move</strong>
