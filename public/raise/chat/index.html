@@ -3848,10 +3848,36 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
+  // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
-    var w = $('chat-wrap');
-    if (w) w.scrollTop = w.scrollHeight;
-  }, 200);
+    var chatWrap = $('chat-wrap');
+    if (!chatWrap) return;
+
+    // Find the last user answer
+    var userMsgs = chatArea.querySelectorAll('.user-msg');
+    var lastAnswer = userMsgs.length > 0 ? userMsgs[userMsgs.length - 1] : null;
+    if (!lastAnswer) { chatWrap.scrollTop = chatWrap.scrollHeight; return; }
+
+    // Step 1: Jump to user's answer
+    chatWrap.scrollTop = lastAnswer.offsetTop - 20;
+
+    // Step 2: After a pause, slowly scroll to bottom (through canvas + paywall)
+    setTimeout(function() {
+      var start = chatWrap.scrollTop;
+      var target = chatWrap.scrollHeight - chatWrap.clientHeight;
+      var distance = target - start;
+      var duration = Math.min(2500, Math.max(1200, distance * 1.5));
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        chatWrap.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, 800);
+  }, 300);
 }
 
 function showDiscPaywall() {
