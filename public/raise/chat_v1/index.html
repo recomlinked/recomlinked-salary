@@ -3319,9 +3319,13 @@ function showLockedPractice(container) {
   // Clear any existing content (prevents duplicate openings)
   container.innerHTML = '';
 
-  // Show disabled opening chips as preview
   var blockerCode = SIM_STATE.context.blocker_code || (SIM_STATE.blocker ? SIM_STATE.blocker.code : 'no_script');
   var openings = BLOCKER_OPENINGS[blockerCode] || BLOCKER_OPENINGS.no_script || [];
+
+  // Bridge text
+  var bridgeBubble = el('div', 'coach-msg', '');
+  bridgeBubble.innerHTML = '<div class="bubble"><p>These openings are built to protect you if they push back \u2014 <strong>Tap one to start.</strong></p></div>';
+  container.appendChild(bridgeBubble);
 
   // Show opening chips — disabled
   var chipsWrap = el('div', 'coach-msg', '');
@@ -3353,11 +3357,22 @@ function showLockedPractice(container) {
 
     row.appendChild(pill);
   }
+
+  // "+ X more options" indicator
+  var remaining = openings.length - showCount;
+  if (remaining > 0) {
+    var moreBtn = el('div', 'chips-expand', '');
+    moreBtn.style.opacity = '0.4';
+    moreBtn.style.pointerEvents = 'none';
+    moreBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + remaining + ' more options';
+    row.appendChild(moreBtn);
+  }
+
   inner.appendChild(row);
   chipsWrap.appendChild(inner);
   container.appendChild(chipsWrap);
 
-  // Standard paywall — same as Canvas mode
+  // Standard paywall
   appendStandardPaywall(container);
 }
 
