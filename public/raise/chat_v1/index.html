@@ -3746,15 +3746,17 @@ async function generateDiscInsights() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Step 1: Show static canvas immediately (blocks already have note text)
+  // Step 1: Show radar chart with loading below
   insertDiscRadar();
+  
+  var loadingWrap = el('div', 'coach-msg', '');
+  loadingWrap.id = 'disc-loading';
+  loadingWrap.innerHTML = '<div class="bubble"><p><span class="typed-text" style="color:var(--t3);font-style:italic;">Analyzing your negotiation position</span><span class="cursor"></span></p></div>';
+  chatArea.appendChild(loadingWrap);
+  var wrap = $('chat-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Step 2: Show paywall below
-  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
-  showDiscPaywall();
-
-  // Step 3: Call API in background to upgrade insights
+  // Step 2: Call API
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, DISC_FREE_QUESTIONS).forEach(function(q) {
@@ -3777,34 +3779,47 @@ async function generateDiscInsights() {
     var data = await resp.json();
 
     if (data && data.insights) {
-      // Upgrade canvas blocks one by one with animation
-      var dims = Object.keys(data.insights);
-      var delay = 0;
-      dims.forEach(function(dim) {
-        setTimeout(function() {
-          if (discCanvasBlocks[dim]) {
-            discCanvasBlocks[dim].insight = data.insights[dim];
-            discInsights[dim] = data.insights[dim];
-          }
-          // Update canvas in place (don't re-insert after paywall)
-          var liveCanvas = $('disc-canvas-live');
-          if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
-        }, delay);
-        delay += 800;
+      // Populate all canvas blocks with AI insights
+      Object.keys(data.insights).forEach(function(dim) {
+        if (discCanvasBlocks[dim]) {
+          discCanvasBlocks[dim].insight = data.insights[dim];
+          discInsights[dim] = data.insights[dim];
+        }
       });
 
-      // Save after all updates
-      setTimeout(function() {
-        try {
-          state.discovery.insights = discInsights;
-          state.discovery.canvasBlocks = discCanvasBlocks;
-          saveState();
-        } catch (e) {}
-      }, delay);
+      // Save insights
+      try {
+        state.discovery.insights = discInsights;
+        state.discovery.canvasBlocks = discCanvasBlocks;
+        saveState();
+      } catch (e) {}
     }
   } catch (e) {
-    // Fallback — static note text stays visible
+    // Fallback — static note text stays in blocks
   }
+
+  // Step 3: Remove loading, show canvas + summary + paywall
+  var loading = $('disc-loading');
+  if (loading) loading.remove();
+
+  // Update canvas in place with AI insights
+  var liveCanvas = $('disc-canvas-live');
+  if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
+
+  // Canvas intro bubble
+  var introBubble = el('div', 'coach-msg', '');
+  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is the most complete tool you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  chatArea.appendChild(introBubble);
+
+  // Log and show paywall
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
+  showDiscPaywall();
+
+  setTimeout(function() {
+    var w = $('chat-wrap');
+    if (w) w.scrollTop = w.scrollHeight;
+  }, 200);
 }
 
 function showDiscPaywall() {
