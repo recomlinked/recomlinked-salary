@@ -3468,6 +3468,7 @@ function showDiscPaywall() {
       <div class="trust-row paywall-trust">
         <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
       </div>
+      <div class="paywall-ticker"><div class="paywall-ticker-inner" id="disc-paywall-ticker-inner"></div></div>
       <div class="paywall-includes-title">Includes</div>
       <div class="paywall-includes">
         <div class="paywall-inc-item">
@@ -3487,6 +3488,9 @@ function showDiscPaywall() {
     </div>
   `;
   chatArea.appendChild(wrap);
+
+  // Populate ticker
+  populatePaywallTicker(wrap);
 
   // Wire CTA
   var btn = wrap.querySelector('#disc-btn-pay');
