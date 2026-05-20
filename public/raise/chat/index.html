@@ -3414,6 +3414,9 @@ function appendStandardPaywall(container) {
     if (typeof startCheckout === 'function') startCheckout();
     else if (typeof initiateCheckout === 'function') initiateCheckout();
   };
+
+  // Show header CTA
+  if (typeof showHeaderPurchaseButton === 'function') showHeaderPurchaseButton({});
 }
 
 function unlockAllModes() {
@@ -5671,7 +5674,7 @@ function showHeaderPurchaseButton(opts) {
     btn.style.textDecoration = 'none';
   } else {
     const showDiscount = opts.discounted && isPromoActive();
-    btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Practice every scenario';
+    btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Unlock full access';
     btn.onclick = startCheckout;
   }
   right.appendChild(btn);
