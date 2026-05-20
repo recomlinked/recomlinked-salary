@@ -3257,7 +3257,6 @@ function renderCanvasHTML() {
   var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
   html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
   html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
-  html += '<span style="font-size:10px;color:rgba(255,255,255,0.45);">' + filledCount + ' of 13</span>';
   html += '</div>';
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
@@ -3276,23 +3275,23 @@ function renderCanvasHTML() {
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'After all dimensions');
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Fills after all dimensions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'What to lead with');
-  html += planBlock('avoid', 'Avoid', 'What not to say');
+  html += planBlock('emphasize', 'Emphasize', 'Fills after all dimensions');
+  html += planBlock('avoid', 'Avoid', 'Fills after all dimensions');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('opening_script', 'Opening script', 'Your first words');
-  html += planBlock('pushback', 'Pushback playbook', 'Counter every objection');
+  html += planBlock('opening_script', 'Opening script', 'Fills after all dimensions');
+  html += planBlock('pushback', 'Pushback playbook', 'Fills after all dimensions');
   html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Your closing moves');
+  html += planBlock('if_yes', 'If they say yes', 'Fills after all dimensions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('meeting_email', 'Meeting email', 'Schedule the conversation');
-  html += planBlock('raise_case', 'Raise case brief', 'Bring to the meeting');
+  html += planBlock('meeting_email', 'Meeting email', 'Fills after all dimensions');
+  html += planBlock('raise_case', 'Raise case brief', 'Fills after all dimensions');
   html += '</div>';
 
   html += '</div>';
@@ -3394,12 +3393,13 @@ function appendStandardPaywall(container) {
     '<p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>' +
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Unlock full access \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
+    '<div class="paywall-closing">$' + PRICE_USD + ' once, for a conversation that adds thousands to your salary.</div>' +
     '<div class="paywall-ticker"><div class="paywall-ticker-inner"></div></div>' +
     '<div class="paywall-includes-title">Premium access includes</div>' +
     '<div style="display:flex;gap:8px;margin-top:8px;">' +
       '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
         '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
-        '<div style="font-size:11px;font-weight:600;color:#fff;">Canvas file</div>' +
+        '<div style="font-size:11px;font-weight:600;color:#fff;">Full canvas file</div>' +
         '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>' +
       '</div>' +
       '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
@@ -3413,14 +3413,11 @@ function appendStandardPaywall(container) {
         '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>' +
       '</div>' +
     '</div>' +
-    '<div class="paywall-closing">$' + PRICE_USD + ' once, for a conversation that adds thousands to your salary.</div>' +
   '</div>';
   container.appendChild(wrap);
 
-  // Populate ticker
   populatePaywallTicker(wrap);
 
-  // Wire CTA
   var btn = wrap.querySelector('.btn-pay');
   if (btn) btn.onclick = function() {
     if (typeof startCheckout === 'function') startCheckout();
@@ -3755,14 +3752,15 @@ async function generateDiscInsights() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Show typing indicator
-  var typingWrap = el('div', 'coach-msg', '');
-  typingWrap.innerHTML = '<div class="bubble"><p style="font-style:italic;color:var(--t3);">Analyzing your negotiation position\u2026</p></div>';
-  chatArea.appendChild(typingWrap);
-  var wrap = $('chat-wrap');
-  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  // Step 1: Show static canvas immediately (blocks already have note text)
+  insertDiscRadar();
 
-  // Build prompt with all answers
+  // Step 2: Show paywall below
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
+  showDiscPaywall();
+
+  // Step 3: Call API in background to upgrade insights
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, DISC_FREE_QUESTIONS).forEach(function(q) {
@@ -3784,11 +3782,8 @@ async function generateDiscInsights() {
     });
     var data = await resp.json();
 
-    // Remove typing indicator
-    typingWrap.remove();
-
     if (data && data.insights) {
-      // Populate canvas blocks with AI insights
+      // Upgrade canvas blocks with AI insights
       Object.keys(data.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim]) {
           discCanvasBlocks[dim].insight = data.insights[dim];
@@ -3803,28 +3798,17 @@ async function generateDiscInsights() {
         saveState();
       } catch (e) {}
 
-      // Re-render radar + canvas with AI insights
+      // Re-render canvas with AI insights (replace static version)
       insertDiscRadar();
     }
   } catch (e) {
-    typingWrap.remove();
-    // Fallback — use note text if API fails
+    // Fallback — static note text stays visible
   }
-
-  // Log paywall view
-  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
-
-  showDiscPaywall();
 }
 
 function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
-
-  // Log paywall view
-  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
 
   // Standard paywall — same across all modes
   appendStandardPaywall(chatArea);
