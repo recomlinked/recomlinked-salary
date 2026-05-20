@@ -3777,8 +3777,10 @@ async function generateDiscInsights() {
   
   var loadingWrap = el('div', 'coach-msg', '');
   loadingWrap.id = 'disc-loading';
-  loadingWrap.innerHTML = '<div class="bubble"><p><span class="typed-text" style="color:var(--t3);font-style:italic;">Analyzing your negotiation position</span><span class="cursor"></span></p></div>';
+  loadingWrap.innerHTML = '<div class="bubble typing-bubble"><div class="typing-indicator"><svg class="rl-typing-arc" width="28" height="28" viewBox="0 0 32 32"><circle class="rl-arc-track" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-opacity="0.12" stroke-width="2.5" stroke-linecap="round" transform="rotate(-210 16 16)"/><circle class="rl-arc-fill" cx="16" cy="16" r="11" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="69.1" stroke-dashoffset="35" transform="rotate(-210 16 16)"/></svg><span class="typing-phrase"></span></div></div>';
   chatArea.appendChild(loadingWrap);
+  startTypingArcAnimation(loadingWrap);
+  startTypingPhraseRotation(loadingWrap);
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
@@ -3826,7 +3828,11 @@ async function generateDiscInsights() {
 
   // Step 3: Remove loading, show canvas + summary + paywall
   var loading = $('disc-loading');
-  if (loading) loading.remove();
+  if (loading) {
+    if (loading._arcStop) loading._arcStop();
+    if (loading._phraseStop) loading._phraseStop();
+    loading.remove();
+  }
 
   // Update canvas in place with AI insights
   var liveCanvas = $('disc-canvas-live');
@@ -3834,7 +3840,7 @@ async function generateDiscInsights() {
 
   // Canvas intro bubble
   var introBubble = el('div', 'coach-msg', '');
-  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is the most complete tool you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is <strong>the most complete tool</strong> you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
   chatArea.appendChild(introBubble);
 
   // Log and show paywall
