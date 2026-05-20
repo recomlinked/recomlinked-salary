@@ -579,6 +579,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 @keyframes discFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .disc-ql{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;line-height:1.4;}
 .disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;background:rgba(30,61,114,0.1);color:var(--navy);}
+@keyframes canvasBlockIn{from{opacity:0.3;transform:scale(0.97);}to{opacity:1;transform:scale(1);}}
 .disc-chip{display:flex;align-items:center;text-align:left;padding:10px 14px;background:var(--card);border:1.5px solid var(--divider);border-radius:10px;cursor:pointer;font-size:13px;color:var(--t1);width:100%;transition:all 0.15s;font-family:var(--sans);}
 .disc-chip:hover{border-color:var(--navy);background:rgba(30,61,114,0.03);}
 .disc-chip.selected{border-color:#185FA5;background:rgba(56,132,244,0.08);color:#185FA5;}
@@ -850,12 +851,13 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
              switch modes. Replaces the older single-button toggle which
              made it unclear whether you were in coach or simulation mode. -->
         <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
-          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Assess your negotiation leverage and weaknesses">
+          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Build your Raise Negotiation Canvas">
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
-              <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/>
-              <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/>
+              <line x1="7" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <line x1="7" y1="10" x2="11" y2="10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
             </svg>
-            <span>Assess</span>
+            <span>Canvas</span>
           </button>
           <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Practice scenarios — tap manager replies and your responses">
             <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
@@ -2256,7 +2258,7 @@ function setMode(target) {
       }
     }
     const input = $('chat-input');
-    if (input) { input.placeholder = 'Tap to discover your position\u2026'; input.disabled = true; }
+    if (input) { input.placeholder = 'Building your canvas\u2026'; input.disabled = true; }
     var sendBtn = $('send-btn');
     if (sendBtn) sendBtn.disabled = true;
     // Hide chips area in Assess mode
@@ -2270,34 +2272,53 @@ function setMode(target) {
     practiceEl.classList.add('active-chat');
     var chipsArea2 = $('chips-area');
     if (chipsArea2) chipsArea2.style.display = '';
+
+    // If not paid and no simulation content yet, show locked preview
+    if (!state.paid && !practiceEl.querySelector('.user-msg') && !practiceEl.dataset.lockedShown) {
+      showLockedPractice(practiceEl);
+      practiceEl.dataset.lockedShown = 'true';
+    }
+
     const input = $('chat-input');
-    if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
+    if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
     scrollChatToBottom();
   } else {
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
+
+    // If not paid, show locked coaching preview
+    if (!state.paid && !coachingEl.querySelector('.user-msg') && !coachingEl.dataset.lockedShown) {
+      showLockedCoaching(coachingEl);
+      coachingEl.dataset.lockedShown = 'true';
+    }
+
     const input = $('chat-input');
     if (input) {
-      input.placeholder = 'Ask your coach anything\u2026';
-      input.disabled = false;
+      input.placeholder = state.paid ? 'Ask your coach anything\u2026' : 'Unlock full access to chat\u2026';
+      input.disabled = !state.paid;
     }
     const sendBtn = $('send-btn');
-    if (sendBtn) sendBtn.disabled = false;
-    renderCoachingUnseenHeader();
-    if (unseenCoachCount > 0) {
-      const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
-      const firstUnseen = allMsgs.length - unseenCoachCount;
-      if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
-        const scrollParent = $('chat-wrap');
-        if (scrollParent) {
-          scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 80;
+    if (sendBtn) sendBtn.disabled = !state.paid;
+    if (state.paid) {
+      renderCoachingUnseenHeader();
+      if (unseenCoachCount > 0) {
+        const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
+        const firstUnseen = allMsgs.length - unseenCoachCount;
+        if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
+          const scrollParent = $('chat-wrap');
+          if (scrollParent) {
+            scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 80;
+          }
         }
+      } else {
+        scrollCoachingToBottom();
       }
+      checkCoachingScrollSeen();
+      addBackToPracticeCTA();
     } else {
-      scrollCoachingToBottom();
+      var chatWrap2 = $('chat-wrap');
+      if (chatWrap2) chatWrap2.scrollTop = 0;
     }
-    checkCoachingScrollSeen();
-    addBackToPracticeCTA();
   }
 }
 
@@ -2945,9 +2966,8 @@ async function beginSimulationFlow(reasonParam) {
   // Don't reset simTapCount — it's restored from localStorage
   // so users can't get free taps by switching blockers
 
-  // If user already hit the paywall in a previous session (tried to
-  // bypass by picking a different blocker), show paywall immediately.
-  // But skip this entirely for paid users.
+  // If user already hit the paywall in a previous session,
+  // go straight to Canvas mode with locked Practice/Coaching.
   if (state.paywall_shown && !state.paid) {
     state.obstacle = blocker;
     state.current_exchange = 10;
@@ -2959,27 +2979,13 @@ async function beginSimulationFlow(reasonParam) {
     stopThinkingAnimation();
     const thinkBubble = document.querySelector('.thinking-bubble');
     if (thinkBubble) thinkBubble.remove();
+    const probCard = document.querySelector('.prob-card');
+    if (probCard) probCard.style.display = 'none';
 
-    await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full practice session.");
-    await sleep(300);
-
-    // Show promo discount banner for returning users
-    // No promo — clean $19 price
-    await sleep(200);
-
-    state.current_range = state.current_range || { floor: 45, ceiling: 70 };
-    state.initial_floor = state.initial_floor || 45;
-    await renderPaywallBubble({ animated: true, discounted: true });
-    var paywallHitNumber = incrementPaywallCount();
-    logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null, paywall_count: paywallHitNumber });
-    logSession('paywall', { paywall_seen: true, paywall_count: paywallHitNumber });
     showToolbar();
     showModeToggle();
-    showHeaderPurchaseButton({});
     unlockModeToggle();
-    setMode('sim');
-    enableInput('Ask your coach anything\u2026');
-    awaitFreeText(handlePostPaywallText);
+    setMode('discovery');
     return;
   }
 
@@ -3072,15 +3078,18 @@ const BLOCKER_PRO_TIPS = {
   other:           "The person who speaks first anchors the conversation. Your opening line shapes everything that follows.",
 };
 
-// ── Discovery mode — radar visualization + context questions ──
-var discDims = {evidence:0,timing:0,market:0,relationship:0,company:0};
-var discActive = {evidence:false,timing:false,market:false,relationship:false,company:false};
+// ── Discovery mode — radar + canvas + AI insights ──
+var discDims = {evidence:0,timing:0,market:0,manager:0,company:0};
+var discActive = {evidence:false,timing:false,market:false,manager:false,company:false};
 var discLevers = [];
 var discWeaks = [];
 var discStep = 0;
+var discInsights = {}; // AI-generated insights per dimension
+var discOrderedQuestions = []; // Questions reordered per blocker
 
-var DISC_QUESTIONS = [
-  { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
+// All questions keyed by dimension
+var DISC_Q_ALL = {
+  evidence: { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
     { val: 'exceeded', text: 'I just delivered a big, visible result', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
     { val: 'competing', text: 'I have another offer on the table', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
     { val: 'recruited', text: 'Recruiters keep reaching out to me', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
@@ -3088,33 +3097,331 @@ var DISC_QUESTIONS = [
     { val: 'met_overdue', text: 'I\u2019ve been solid for a while \u2014 nothing flashy', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
     { val: 'none', text: 'Honestly, I don\u2019t have strong evidence yet', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
   ]},
-  { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
+  last_raise: { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
     { val: 'lt_6mo', text: 'Less than 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky', type: 'weak' },
     { val: '6_12mo', text: 'About a year', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
     { val: '1_2yr', text: '1\u20132 years', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
     { val: 'gt_2yr', text: '3+ years', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
     { val: 'never', text: 'I\u2019ve never asked', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
   ]},
-  { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'relationship', options: [
-    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
-    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
-    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {relationship:25}, note: 'Distant manager', type: 'weak' },
-    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
-    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {relationship:30}, note: 'Tough manager', type: 'weak' },
+  manager_type: { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'manager', options: [
+    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {manager:85}, note: 'Manager is an ally', type: 'lever' },
+    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {manager:55}, note: 'Neutral manager', type: 'neutral' },
+    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {manager:25}, note: 'Distant manager', type: 'weak' },
+    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {manager:45}, note: 'Process-driven manager', type: 'neutral' },
+    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {manager:30}, note: 'Tough manager', type: 'weak' },
   ]},
-  { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
+  company: { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
     { val: 'growing', text: 'Growing \u2014 hiring, expanding, good energy', scores: {company:80}, note: 'Company thriving', type: 'lever' },
     { val: 'stable', text: 'Stable \u2014 not great, not bad', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
     { val: 'cautious', text: 'Cautious \u2014 hiring freeze, belt-tightening', scores: {company:30}, note: 'Cautious environment', type: 'weak' },
     { val: 'cutting', text: 'Cutting costs \u2014 layoffs, budget cuts', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
   ]},
-  { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
+  market: { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
     { val: 'researched', text: 'Yes \u2014 I\u2019ve researched it and I\u2019m underpaid', scores: {market:80}, note: 'Market data confirms underpaid', type: 'lever' },
     { val: 'recruiters', text: 'Recruiters have reached out with specific numbers', scores: {market:85}, note: 'External offers as proof', type: 'lever' },
     { val: 'roughly', text: 'Roughly \u2014 I\u2019ve seen some numbers but nothing exact', scores: {market:45}, note: 'Partial market awareness', type: 'neutral' },
     { val: 'no_idea', text: 'No idea \u2014 I haven\u2019t looked into it', scores: {market:15}, note: 'No market data', type: 'weak' },
   ]},
-];
+};
+
+// Blocker-specific question TEXT overrides
+var BLOCKER_Q_TEXT = {
+  no_script: { evidence: 'What\u2019s the strongest thing you could lead with in the conversation?', manager_type: 'How would you describe the manager you\u2019ll be talking to?', last_raise: 'How long has it been since your last raise?' },
+  fear_no: { manager_type: 'The manager you\u2019re worried will say no \u2014 how would you describe them?', evidence: 'If they push back, what\u2019s the strongest thing you can point to?', company: 'How is your company doing right now \u2014 is the environment on your side?' },
+  underpaid: { market: 'You feel underpaid \u2014 do you have the data to back it up?', evidence: 'Beyond the pay gap, what else strengthens your case?', last_raise: 'How long has it been since your last raise?' },
+  quiet: { evidence: 'What\u2019s the strongest thing you have going for you \u2014 even if no one\u2019s noticed yet?', manager_type: 'Does your manager actually see your work \u2014 how would you describe them?', company: 'How is your company doing right now \u2014 growing, stable, or cutting back?' },
+  timing: { company: 'Let\u2019s check \u2014 how is your company doing right now?', last_raise: 'How long has it been since your last raise?', evidence: 'If the timing were right, what would you lead with?' },
+  no_advocate: { manager_type: 'The manager who won\u2019t bring it up \u2014 how would you describe them?', evidence: 'Since no one\u2019s advocating for you, what\u2019s the strongest case you can make yourself?', last_raise: 'How long has it been since your last raise?' },
+};
+
+// Blocker-specific question ORDER
+var BLOCKER_DISC_ORDER = {
+  no_script:   ['evidence', 'manager_type', 'last_raise', 'company', 'market'],
+  fear_no:     ['manager_type', 'evidence', 'company', 'last_raise', 'market'],
+  underpaid:   ['market', 'evidence', 'last_raise', 'manager_type', 'company'],
+  quiet:       ['evidence', 'manager_type', 'company', 'market', 'last_raise'],
+  timing:      ['company', 'last_raise', 'evidence', 'manager_type', 'market'],
+  no_advocate: ['manager_type', 'evidence', 'last_raise', 'company', 'market'],
+};
+
+var DISC_FREE_QUESTIONS = 3; // paywall after this many
+
+function buildDiscQuestions(blockerCode) {
+  var order = BLOCKER_DISC_ORDER[blockerCode] || BLOCKER_DISC_ORDER.no_script;
+  var textOverrides = BLOCKER_Q_TEXT[blockerCode] || {};
+  return order.map(function(qId) {
+    var q = JSON.parse(JSON.stringify(DISC_Q_ALL[qId]));
+    if (textOverrides[qId]) q.label = textOverrides[qId];
+    return q;
+  });
+}
+
+// Canvas block state
+var discCanvasBlocks = {
+  evidence: { filled: false, strength: '', insight: '' },
+  timing: { filled: false, strength: '', insight: '' },
+  manager: { filled: false, strength: '', insight: '' },
+  company: { filled: false, strength: '', insight: '' },
+  market: { filled: false, strength: '', insight: '' },
+  leverage_risk: { filled: false, insight: '' },
+  emphasize: { filled: false, insight: '' },
+  avoid: { filled: false, insight: '' },
+  opening_script: { filled: false, insight: '' },
+  pushback: { filled: false, insight: '' },
+  if_yes: { filled: false, insight: '' },
+  meeting_email: { filled: false, insight: '' },
+  raise_case: { filled: false, insight: '' },
+};
+
+function renderCanvasHTML() {
+  // Parse **bold** markers in insight text
+  function formatInsight(text) {
+    if (!text) return '';
+    return text.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  var icons = {
+    evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 8 12 8s5-4 7.5-4a2.5 2.5 0 010 5H18"/><path d="M12 8v13"/><path d="M8 21h8"/></svg>',
+    timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    manager: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    company: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>',
+    market: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    leverage_risk: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    emphasize: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+    avoid: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    opening_script: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+    pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
+    raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  };
+
+  function block(key, label, subtitle) {
+    var b = discCanvasBlocks[key];
+    var ic = icons[key] || '';
+    if (b && b.filled) {
+      var bg = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FDF5E6' : '#E8F7F0';
+      var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
+      var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
+      var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+      var hasAI = b.insight && b.insight.length > 40;
+      var animStyle = hasAI ? 'animation:canvasBlockIn 0.5s ease;' : '';
+      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;' + animStyle + '">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="color:' + tc + ';">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+        '</div>' +
+        '<p style="font-size:11px;color:' + tc + ';line-height:1.55;margin:0;">' + formatInsight(b.insight || b.note || '') + '</p>' +
+        '</div>';
+    }
+    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+      '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="color:var(--t3);">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+      '</div>' +
+      (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      '</div>';
+  }
+
+  function planBlock(key, label, subtitle) {
+    var b = discCanvasBlocks[key];
+    var ic = icons[key] || '';
+    if (b && b.filled) {
+      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="color:var(--navy);">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '</div>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + formatInsight(b.insight) + '</p>' +
+        '</div>';
+    }
+    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+      '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="color:var(--t3);">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+      '</div>' +
+      (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      '</div>';
+  }
+
+  var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
+
+  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
+  html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
+  html += '</div>';
+  html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
+
+  // YOUR POSITION
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += block('evidence', 'Evidence');
+  html += block('timing', 'Timing');
+  html += '</div>';
+  html += block('manager', 'Manager');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += block('company', 'Company');
+  html += block('market', 'Market');
+  html += '</div>';
+
+  // YOUR STRATEGY
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Fills after all dimensions');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('emphasize', 'Emphasize', 'Fills after all dimensions');
+  html += planBlock('avoid', 'Avoid', 'Fills after all dimensions');
+  html += '</div>';
+
+  // YOUR PLAN
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('opening_script', 'Opening script', 'Fills after all dimensions');
+  html += planBlock('pushback', 'Pushback playbook', 'Fills after all dimensions');
+  html += '</div>';
+  html += planBlock('if_yes', 'If they say yes', 'Fills after all dimensions');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('meeting_email', 'Meeting email', 'Fills after all dimensions');
+  html += planBlock('raise_case', 'Raise case brief', 'Fills after all dimensions');
+  html += '</div>';
+
+  html += '</div>';
+
+  // Download bar
+  html += '<div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);">';
+  html += '<span style="font-size:10px;color:var(--t3);">raise-negotiation-canvas.pdf</span>';
+  if (filledCount >= 13) {
+    html += '<button onclick="downloadCanvas()" style="font-size:11px;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;">Download PDF</button>';
+  } else {
+    html += '<button disabled style="font-size:11px;padding:4px 10px;background:var(--muted);color:var(--t4);border:1px solid var(--divider);border-radius:6px;cursor:default;">Download PDF</button>';
+  }
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function lockFreeModes() {
+  // Tabs stay clickable — they show paywall content when tapped
+}
+
+function showLockedPractice(container) {
+  // Clear any existing content (prevents duplicate openings)
+  container.innerHTML = '';
+
+  var blockerCode = SIM_STATE.context.blocker_code || (SIM_STATE.blocker ? SIM_STATE.blocker.code : 'no_script');
+  var openings = BLOCKER_OPENINGS[blockerCode] || BLOCKER_OPENINGS.no_script || [];
+
+  // Bridge text
+  var bridgeBubble = el('div', 'coach-msg', '');
+  bridgeBubble.innerHTML = '<div class="bubble"><p>These openings are built to protect you if they push back \u2014 <strong>Tap one to start.</strong></p></div>';
+  container.appendChild(bridgeBubble);
+
+  // Show opening chips — disabled
+  var chipsWrap = el('div', 'coach-msg', '');
+  var inner = el('div', 'sim-pills-inner', '');
+  var row = el('div', 'sim-pills-row', '');
+  
+  var showCount = Math.min(openings.length, 3);
+  for (var i = 0; i < showCount; i++) {
+    var opener = openings[i];
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+    pill.style.opacity = '0.4';
+    pill.style.pointerEvents = 'none';
+    pill.disabled = true;
+
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+
+    var rank = el('div', 'chip-rank', '#' + (i + 1));
+    pill.appendChild(rank);
+
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    var clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
+    textSpan.textContent = '\u201c' + clean.slice(0, 67) + '...\u201d';
+    pill.appendChild(textSpan);
+
+    row.appendChild(pill);
+  }
+
+  // "+ X more options" indicator
+  var remaining = openings.length - showCount;
+  if (remaining > 0) {
+    var moreBtn = el('div', 'chips-expand', '');
+    moreBtn.style.opacity = '0.4';
+    moreBtn.style.pointerEvents = 'none';
+    moreBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg> ' + remaining + ' more options';
+    row.appendChild(moreBtn);
+  }
+
+  inner.appendChild(row);
+  chipsWrap.appendChild(inner);
+  container.appendChild(chipsWrap);
+
+  // Standard paywall
+  appendStandardPaywall(container);
+}
+
+function showLockedCoaching(container) {
+  container.innerHTML = '';
+
+  var coachBubble = el('div', 'coach-msg', '');
+  coachBubble.innerHTML = '<div class="bubble"><p>Your AI negotiation coach answers your questions, analyzes every move you make \u2014 what signal it sends, what risk it carries \u2014 and tells you exactly what to say next.</p></div>';
+  container.appendChild(coachBubble);
+
+  // Standard paywall — same as Canvas mode
+  appendStandardPaywall(container);
+}
+
+function appendStandardPaywall(container) {
+  var PRICE_USD = 19;
+  var wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = '<div class="bubble paywall-bubble">' +
+    '<p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>' +
+    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Unlock full access \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
+    '<div class="paywall-closing">$' + PRICE_USD + ' once, for a conversation that adds thousands to your salary.</div>' +
+    '<div class="paywall-includes-title">Premium access includes</div>' +
+    '<div style="display:flex;gap:8px;margin-top:8px;">' +
+      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
+        '<div style="font-size:11px;font-weight:600;color:#fff;">Full canvas file</div>' +
+        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>' +
+      '</div>' +
+      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>' +
+        '<div style="font-size:11px;font-weight:600;color:#fff;">Simulation</div>' +
+        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Practice every scenario</div>' +
+      '</div>' +
+      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>' +
+        '<div style="font-size:11px;font-weight:600;color:#fff;">AI coach</div>' +
+        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  container.appendChild(wrap);
+
+  var btn = wrap.querySelector('.btn-pay');
+  if (btn) btn.onclick = function() {
+    if (typeof startCheckout === 'function') startCheckout();
+    else if (typeof initiateCheckout === 'function') initiateCheckout();
+  };
+}
+
+function unlockAllModes() {
+  var simBtn = $('mode-btn-sim');
+  var coachBtn = $('mode-btn-coach');
+  if (simBtn) { simBtn.style.opacity = ''; simBtn.style.pointerEvents = ''; }
+  if (coachBtn) { coachBtn.style.opacity = ''; coachBtn.style.pointerEvents = ''; }
+}
 
 function initDiscoveryMode(container) {
   container.innerHTML = '';
@@ -3128,43 +3435,70 @@ function initDiscoveryMode(container) {
       discLevers = saved.levers || discLevers;
       discWeaks = saved.weaks || discWeaks;
       discStep = saved.step || 0;
+      discInsights = saved.insights || {};
+      if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
     }
   } catch (e) {}
+
+  // Build questions based on blocker
+  var blockerCode = SIM_STATE.context.blocker_code || (SIM_STATE.blocker ? SIM_STATE.blocker.code : 'no_script');
+  discOrderedQuestions = buildDiscQuestions(blockerCode);
 
   // Chat-style questions container
   var chatArea = el('div', '', '');
   chatArea.id = 'disc-chat';
   container.appendChild(chatArea);
 
-  // Opening coach message
-  var intro = el('div', 'coach-msg', '');
-  intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
-  chatArea.appendChild(intro);
-
-  // If assessment was completed, show final radar + paywall
-  if (discStep >= DISC_QUESTIONS.length) {
+  // If assessment was completed, show final canvas + paywall
+  if (discStep >= discOrderedQuestions.length || discStep >= DISC_FREE_QUESTIONS) {
+    // Instant restore — no typing
+    var intro = el('div', 'coach-msg', '');
+    intro.innerHTML = '<div class="bubble"><p>Let\u2019s map your negotiation position. Each answer fills a section of your Raise Negotiation Canvas.</p></div>';
+    chatArea.appendChild(intro);
     insertDiscRadar();
     showDiscPaywall();
     return;
   }
 
-  // Start from current step
-  setTimeout(function() {
+  // Opening coach message with typing animation
+  if (!SIM_STATE.unlocked) lockFreeModes();
+  var introWrap = el('div', 'coach-msg', '');
+  introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
+  chatArea.appendChild(introWrap);
+
+  var introText = 'Let\u2019s map your negotiation position. Each answer fills a section of your Raise Negotiation Canvas.';
+  var textEl = introWrap.querySelector('.typed-text');
+  var cursorEl = introWrap.querySelector('.cursor');
+
+  // Type the intro message
+  (async function() {
+    for (var i = 1; i <= introText.length; i++) {
+      textEl.textContent = introText.slice(0, i);
+      var ch = introText[i-1];
+      var delay = (ch === '.' || ch === '?' || ch === '!') ? 80 : 18;
+      await sleep(delay);
+    }
+    if (cursorEl) cursorEl.remove();
+    textEl.textContent = introText;
+
+    // Show first question directly — radar appears after first answer
+    await sleep(400);
     renderDiscQuestion(discStep);
-    setTimeout(function() { insertDiscRadar(); }, 300);
-  }, 600);
+  })();
 }
 
 function insertDiscRadar() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Collapse all previous radar messages
+  // Collapse all previous radar+canvas messages and remove stale IDs
   chatArea.querySelectorAll('.disc-radar-msg').forEach(function(prev) {
     prev.style.display = 'none';
+    var oldCanvas = prev.querySelector('#disc-canvas-live');
+    if (oldCanvas) oldCanvas.removeAttribute('id');
   });
 
-  // Create a coach message with the radar
+  // Create a coach message with radar + canvas
   var radarMsg = el('div', 'coach-msg disc-radar-msg', '');
   var radarWrap = el('div', '', '');
   radarWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:8px 0;';
@@ -3181,8 +3515,8 @@ function insertDiscRadar() {
   // Dimension status
   var statusDiv = el('div', '', '');
   statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;';
-  var dimNames = ['evidence','timing','market','relationship','company'];
-  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
+  var dimNames = ['evidence','timing','market','manager','company'];
+  var dimLabels = ['Evidence','Timing','Market','Manager','Company'];
   dimNames.forEach(function(d, i) {
     var row = el('div', 'ds-row', '');
     row.style.padding = '0';
@@ -3203,16 +3537,15 @@ function insertDiscRadar() {
   });
   radarWrap.appendChild(statusDiv);
   radarMsg.appendChild(radarWrap);
+
+  // Canvas below radar
+  var canvasDiv = el('div', '', '');
+  canvasDiv.id = 'disc-canvas-live';
+  canvasDiv.innerHTML = renderCanvasHTML();
+  radarMsg.appendChild(canvasDiv);
+
   chatArea.appendChild(radarMsg);
-
-  // Draw on this specific canvas
   drawDiscRadarOnCanvas(canvas);
-
-  // Scroll to radar
-  setTimeout(function() {
-    var wrap = $('chat-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
-  }, 100);
 }
 
 function drawDiscRadarOnCanvas(canvas) {
@@ -3224,8 +3557,8 @@ function drawDiscRadarOnCanvas(canvas) {
   ctx.save();
   ctx.scale(dpr, dpr);
 
-  var labels = ['Evidence','Timing','Market','Relationship','Company'];
-  var keys = ['evidence','timing','market','relationship','company'];
+  var labels = ['Evidence','Timing','Market','Manager','Company'];
+  var keys = ['evidence','timing','market','manager','company'];
   var activeColor = 'rgba(30,61,114,0.85)';
   var inactiveColor = 'rgba(128,128,128,0.3)';
   var n = 5;
@@ -3299,21 +3632,17 @@ function drawDiscRadarOnCanvas(canvas) {
 }
 
 function renderDiscQuestion(idx) {
-  if (idx >= DISC_QUESTIONS.length) { showDiscPaywall(); return; }
-  var q = DISC_QUESTIONS[idx];
+  if (idx >= discOrderedQuestions.length) { showDiscPaywall(); return; }
+  if (idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
+  var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Coach question bubble
   var coachBubble = el('div', 'coach-msg', '');
-  var labelHtml = '';
-  if (q.dimTag) {
-    labelHtml = '<span class="disc-dim-tag disc-dim-' + q.dimTag + '">' + q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) + '</span> ';
-  }
+  var labelHtml = '<span class="disc-dim-tag">' + (q.dimTag ? q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) : '') + '</span> ';
   coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
   chatArea.appendChild(coachBubble);
 
-  // Chip options — uses sim-pills-row and sim-reply-pill for consistency
   var chipsWrap = el('div', 'coach-msg', '');
   var opts = el('div', 'sim-pills-row', '');
   opts.id = 'disc-opts-' + idx;
@@ -3323,33 +3652,42 @@ function renderDiscQuestion(idx) {
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
     pill.style.gap = '10px';
-
     var radio = el('div', 'chip-radio', '');
     pill.appendChild(radio);
-
     var textSpan = el('span', '', '');
     textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
     textSpan.textContent = opt.text;
     pill.appendChild(textSpan);
-
     pill.onclick = function() { pickDiscAnswer(idx, opt, pill); };
     opts.appendChild(pill);
   });
   chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
 
-  // Scroll to new question
   setTimeout(function() {
     var wrap = $('chat-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
-  }, 100);
+    if (wrap && coachBubble) {
+      var target = coachBubble.offsetTop - 10;
+      var start = wrap.scrollTop;
+      var distance = target - start;
+      var duration = 600;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        wrap.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  }, 200);
 }
 
 function pickDiscAnswer(qIdx, opt, pill) {
   var opts = $('disc-opts-' + qIdx);
   if (!opts) return;
   
-  // Disable all pills, highlight selected — same as Practice mode
   opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
     p.disabled = true;
     p.style.opacity = '0.35';
@@ -3359,7 +3697,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
   pill.style.opacity = '1';
   pill.classList.add('active');
 
-  // Show as user response bubble
   var chatArea = $('disc-chat');
   var userBubble = el('div', 'user-msg', '');
   userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(opt.text) + '</div>';
@@ -3373,11 +3710,17 @@ function pickDiscAnswer(qIdx, opt, pill) {
   if (opt.type === 'lever') discLevers.push(opt.note);
   if (opt.type === 'weak') discWeaks.push(opt.note);
 
-  // Store in SIM_STATE context
-  var q = DISC_QUESTIONS[qIdx];
+  // Update canvas block for this dimension
+  var q = discOrderedQuestions[qIdx];
   SIM_STATE.context[q.id] = opt.val;
+  if (q.dimTag && discCanvasBlocks[q.dimTag]) {
+    discCanvasBlocks[q.dimTag].filled = true;
+    discCanvasBlocks[q.dimTag].strength = opt.type === 'lever' ? 'strong' : opt.type === 'weak' ? 'weak' : 'neutral';
+    discCanvasBlocks[q.dimTag].note = opt.note;
+    discCanvasBlocks[q.dimTag].insight = opt.note; // placeholder until AI generates
+  }
 
-  // Save discovery state to localStorage
+  // Save to localStorage
   try {
     state.discovery = {
       dims: JSON.parse(JSON.stringify(discDims)),
@@ -3385,18 +3728,38 @@ function pickDiscAnswer(qIdx, opt, pill) {
       levers: discLevers.slice(),
       weaks: discWeaks.slice(),
       step: discStep + 1,
+      insights: discInsights,
+      canvasBlocks: discCanvasBlocks,
       answers: state.discovery ? state.discovery.answers || {} : {}
     };
     state.discovery.answers[q.id] = opt.val;
     saveState();
-  } catch (e) { console.warn('[discovery] save failed:', e); }
+  } catch (e) {}
 
-  // Log for analytics
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
   logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
 
-  // Insert updated radar as coach message
   insertDiscRadar();
+
+  // Smooth scroll to user's answer
+  setTimeout(function() {
+    var chatWrap = $('chat-wrap');
+    if (chatWrap && userBubble) {
+      var target = userBubble.offsetTop - 20;
+      var start = chatWrap.scrollTop;
+      var distance = target - start;
+      var duration = 500;
+      var startTime = null;
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        chatWrap.scrollTop = start + distance * easeOut(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  }, 150);
   
   discStep++;
   setTimeout(function() {
@@ -3404,105 +3767,95 @@ function pickDiscAnswer(qIdx, opt, pill) {
   }, 700);
 }
 
+async function generateDiscInsights() {
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Step 1: Show radar chart with loading below
+  insertDiscRadar();
+  
+  var loadingWrap = el('div', 'coach-msg', '');
+  loadingWrap.id = 'disc-loading';
+  loadingWrap.innerHTML = '<div class="bubble"><p><span class="typed-text" style="color:var(--t3);font-style:italic;">Analyzing your negotiation position</span><span class="cursor"></span></p></div>';
+  chatArea.appendChild(loadingWrap);
+  var wrap = $('chat-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+
+  // Step 2: Call API
+  var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
+  var answers = {};
+  discOrderedQuestions.slice(0, DISC_FREE_QUESTIONS).forEach(function(q) {
+    answers[q.dimTag] = SIM_STATE.context[q.id] || '';
+  });
+
+  try {
+    var resp = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'disc_insights',
+        blocker: blockerCode,
+        answers: answers,
+        dims: discDims,
+        levers: discLevers,
+        weaks: discWeaks,
+      }),
+    });
+    var data = await resp.json();
+
+    if (data && data.insights) {
+      // Populate all canvas blocks with AI insights
+      Object.keys(data.insights).forEach(function(dim) {
+        if (discCanvasBlocks[dim]) {
+          discCanvasBlocks[dim].insight = data.insights[dim];
+          discInsights[dim] = data.insights[dim];
+        }
+      });
+
+      // Save insights
+      try {
+        state.discovery.insights = discInsights;
+        state.discovery.canvasBlocks = discCanvasBlocks;
+        saveState();
+      } catch (e) {}
+    }
+  } catch (e) {
+    // Fallback — static note text stays in blocks
+  }
+
+  // Step 3: Remove loading, show canvas + summary + paywall
+  var loading = $('disc-loading');
+  if (loading) loading.remove();
+
+  // Update canvas in place with AI insights
+  var liveCanvas = $('disc-canvas-live');
+  if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
+
+  // Canvas intro bubble
+  var introBubble = el('div', 'coach-msg', '');
+  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is the most complete tool you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  chatArea.appendChild(introBubble);
+
+  // Log and show paywall
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
+  showDiscPaywall();
+
+  setTimeout(function() {
+    var w = $('chat-wrap');
+    if (w) w.scrollTop = w.scrollHeight;
+  }, 200);
+}
+
 function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  var PRICE_USD = 19;
+  // Standard paywall — same across all modes
+  appendStandardPaywall(chatArea);
 
-  // Log paywall view — use same stage name as Practice mode so Sheet records it
-  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
-
-  // Coach summary — personalized verdict based on their answers
-  var summaryBubble = el('div', 'coach-msg', '');
-  var strong = discLevers.length;
-  var weak = discWeaks.length;
-  
-  // Dynamic opening based on their balance
-  var verdict = '';
-  if (strong >= 3 && weak <= 1) {
-    verdict = 'You\u2019re in a strong position \u2014 stronger than most people who ask for a raise.';
-  } else if (strong >= 2 && weak <= 2) {
-    verdict = 'You have real leverage here \u2014 but a few gaps that could cost you if you\u2019re not prepared.';
-  } else if (strong >= 1) {
-    verdict = 'You have cards to play \u2014 but some real risks you need a strategy for.';
-  } else {
-    verdict = 'Your position has some challenges \u2014 but that doesn\u2019t mean you can\u2019t ask. It means you need the right approach.';
-  }
-
-  var sHtml = '<div class="bubble"><p><strong>Here\u2019s where you stand:</strong></p>';
-  sHtml += '<p style="margin:8px 0 12px;font-size:13px;color:var(--t2);">' + verdict + '</p>';
-  discLevers.forEach(function(l) {
-    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#00c4a0;font-weight:700;">+</span> ' + l + '</p>';
-  });
-  discWeaks.forEach(function(w) {
-    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
-  });
-
-  // Dynamic closing based on their balance
-  var closing = '';
-  if (strong >= 3 && weak === 0) {
-    closing = 'You have strong leverage across the board. Your biggest risk is walking in without a script. Your plan gives you one \u2014 an opening that leads with your strongest cards, and a full negotiation playbook tailored to your situation.';
-  } else if (strong >= 2 && weak <= 1) {
-    closing = 'Your plan gives you an opening that leads with your strongest leverage, prepared counters for the one area where you\u2019re exposed, and a full script you can walk in with.';
-  } else if (strong >= 1 && weak >= 2) {
-    closing = 'Your plan gives you an opening built around what\u2019s working in your favor, specific responses for the ' + weak + ' areas where you\u2019re vulnerable, and a step-by-step script for the conversation.';
-  } else {
-    closing = 'Your plan gives you a strategy that works even from a tough position \u2014 the right opening, prepared responses for every pushback, and a script that protects you.';
-  }
-
-  sHtml += '<p style="margin:12px 0 0;font-size:13px;">' + closing + '</p>';
-  sHtml += '</div>';
-  summaryBubble.innerHTML = sHtml;
-  chatArea.appendChild(summaryBubble);
-
-  // Standard paywall bubble — matches Practice mode exactly
-  var wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = `
-    <div class="bubble paywall-bubble">
-      <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
-      <button class="btn-pay" id="disc-btn-pay">
-        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
-      </button>
-      <div class="trust-row paywall-trust">
-        <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
-      </div>
-      <div class="paywall-ticker"><div class="paywall-ticker-inner" id="disc-paywall-ticker-inner"></div></div>
-      <div class="paywall-includes-title">Includes</div>
-      <div class="paywall-includes">
-        <div class="paywall-inc-item">
-          <strong>Personalized opening scripts</strong>
-          <span class="paywall-inc-sub">Built around your leverage points</span>
-        </div>
-        <div class="paywall-inc-item">
-          <strong>Pushback responses for your weak spots</strong>
-          <span class="paywall-inc-sub">Prepared counters for every objection</span>
-        </div>
-        <div class="paywall-inc-item">
-          <strong>AI coaching on every move</strong>
-          <span class="paywall-inc-sub">Risk, signal, and what to watch for</span>
-        </div>
-      </div>
-      <div class="paywall-closing">$${PRICE_USD} once, for a conversation that adds thousands to your salary.</div>
-    </div>
-  `;
-  chatArea.appendChild(wrap);
-
-  // Populate ticker
-  populatePaywallTicker(wrap);
-
-  // Wire CTA
-  var btn = wrap.querySelector('#disc-btn-pay');
-  if (btn) btn.onclick = function() {
-    if (typeof startCheckout === 'function') startCheckout();
-    else if (typeof initiateCheckout === 'function') initiateCheckout();
-  };
-
-  // Try practice free link
-  var tryWrap = el('div', 'coach-msg', '');
-  tryWrap.innerHTML = '<div style="text-align:center;padding:4px 0;"><a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a></div>';
-  chatArea.appendChild(tryWrap);
+  // Lock Practice and Coaching tabs
+  lockFreeModes();
 
   setTimeout(function() {
     var w = $('chat-wrap');
@@ -5530,13 +5883,16 @@ async function resumeFromState() {
     SIM_STATE.blocker = blocker;
     SIM_STATE.context = {};
     SIM_STATE.branch_history = [];
-    // Don't reset simTapCount — restored from localStorage
     showToolbar();
     showModeToggle();
     unlockModeToggle();
 
-    // Resume in Practice mode (content was replayed into #messages)
-    setMode('sim');
+    // Free users go to Canvas mode; paid users resume in Practice
+    if (!state.paid) {
+      setMode('discovery');
+    } else {
+      setMode('sim');
+    }
 
     // Repopulate coaching mode with welcome + video
     // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
