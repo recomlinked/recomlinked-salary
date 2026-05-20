@@ -407,6 +407,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   padding:10px 0 4px;
 }
 .chips-area:empty{padding:0;height:0;}
+.chips-area:has(.chips-area-scroll:empty){padding:0;height:0;}
 /* Right-edge fade gradient — signals scrollability */
 .chips-area::after{
   content:'';
@@ -654,7 +655,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
    when input was disabled, which also disabled the toolbar buttons. Now the
    toolbar lives in .bottom-panel but is excluded from `.dimmed` (see rule
    below) so context + tree are always interactive once unlocked. */
-.input-toolbar{display:flex;gap:6px;padding:0 0 6px;justify-content:flex-start;}
+.input-toolbar{display:flex;gap:6px;padding:0 0 4px;justify-content:flex-start;}
 /* When the bottom panel is dimmed (input disabled), keep the toolbar AND
    the chips-area (which hosts context + tree popovers) fully live — the
    user can still review explored scenarios or add context while the
@@ -806,7 +807,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 <body>
 
 <header class="site-header">
-  <a href="/raise/coach/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
+  <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
 </header>
 
 <div class="page-wrap">
@@ -885,7 +886,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
           <span class="toolbar-badge" id="ctx-badge">4</span>
         </button>
         -->
-        <div class="scenarios-counter" id="scenarios-counter">
+        <div class="scenarios-counter" id="scenarios-counter" style="display:none;">
           <svg viewBox="0 0 20 20" fill="none" width="13" height="13"><path d="M10 2a5 5 0 00-2 9.58V14h4v-2.42A5 5 0 0010 2z" stroke="currentColor" stroke-width="1.3" fill="currentColor" fill-opacity="0.12"/><path d="M8 16h4M8.5 18h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           <span class="sc-num" id="sc-num">0</span> scenarios unlocked
         </div>
@@ -2238,14 +2239,17 @@ function setMode(target) {
   const coachingEl = $('coaching-messages');
   const discoveryEl = $('discovery-messages');
 
-  // Hide all
+  // Hide all and remove active class
   practiceEl.style.display = 'none';
+  practiceEl.classList.remove('active-chat');
   coachingEl.style.display = 'none';
-  if (discoveryEl) discoveryEl.style.display = 'none';
+  coachingEl.classList.remove('active-chat');
+  if (discoveryEl) { discoveryEl.style.display = 'none'; discoveryEl.classList.remove('active-chat'); }
 
   if (target === 'discovery') {
     if (discoveryEl) {
       discoveryEl.style.display = 'block';
+      discoveryEl.classList.add('active-chat');
       if (!discoveryEl.dataset.initialized) {
         initDiscoveryMode(discoveryEl);
         discoveryEl.dataset.initialized = 'true';
@@ -2253,9 +2257,19 @@ function setMode(target) {
     }
     const input = $('chat-input');
     if (input) { input.placeholder = 'Tap to discover your position\u2026'; input.disabled = true; }
+    var sendBtn = $('send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    // Hide chips area in Assess mode
+    var chipsArea = $('chips-area');
+    if (chipsArea) chipsArea.style.display = 'none';
+    // Scroll to top so Assess content is visible
+    var chatWrap = $('chat-wrap');
+    if (chatWrap) setTimeout(function() { chatWrap.scrollTop = 0; }, 50);
   } else if (target === 'sim') {
     practiceEl.style.display = '';
     practiceEl.classList.add('active-chat');
+    var chipsArea2 = $('chips-area');
+    if (chipsArea2) chipsArea2.style.display = '';
     const input = $('chat-input');
     if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
     scrollChatToBottom();
@@ -2962,6 +2976,8 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     showHeaderPurchaseButton({});
+    unlockModeToggle();
+    setMode('sim');
     enableInput('Ask your coach anything\u2026');
     awaitFreeText(handlePostPaywallText);
     return;
@@ -3056,15 +3072,18 @@ const BLOCKER_PRO_TIPS = {
   other:           "The person who speaks first anchors the conversation. Your opening line shapes everything that follows.",
 };
 
-// ── Discovery mode — radar visualization + context questions ──
-var discDims = {evidence:0,timing:0,market:0,relationship:0,company:0};
-var discActive = {evidence:false,timing:false,market:false,relationship:false,company:false};
+// ── Discovery mode — radar + canvas + AI insights ──
+var discDims = {evidence:0,timing:0,market:0,manager:0,company:0};
+var discActive = {evidence:false,timing:false,market:false,manager:false,company:false};
 var discLevers = [];
 var discWeaks = [];
 var discStep = 0;
+var discInsights = {}; // AI-generated insights per dimension
+var discOrderedQuestions = []; // Questions reordered per blocker
 
-var DISC_QUESTIONS = [
-  { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
+// All questions keyed by dimension
+var DISC_Q_ALL = {
+  evidence: { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
     { val: 'exceeded', text: 'I just delivered a big, visible result', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
     { val: 'competing', text: 'I have another offer on the table', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
     { val: 'recruited', text: 'Recruiters keep reaching out to me', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
@@ -3072,36 +3091,212 @@ var DISC_QUESTIONS = [
     { val: 'met_overdue', text: 'I\u2019ve been solid for a while \u2014 nothing flashy', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
     { val: 'none', text: 'Honestly, I don\u2019t have strong evidence yet', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
   ]},
-  { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
+  last_raise: { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
     { val: 'lt_6mo', text: 'Less than 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky', type: 'weak' },
     { val: '6_12mo', text: 'About a year', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
     { val: '1_2yr', text: '1\u20132 years', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
     { val: 'gt_2yr', text: '3+ years', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
     { val: 'never', text: 'I\u2019ve never asked', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
   ]},
-  { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'relationship', options: [
-    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
-    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
-    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {relationship:25}, note: 'Distant manager', type: 'weak' },
-    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
-    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {relationship:30}, note: 'Tough manager', type: 'weak' },
+  manager_type: { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'manager', options: [
+    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {manager:85}, note: 'Manager is an ally', type: 'lever' },
+    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {manager:55}, note: 'Neutral manager', type: 'neutral' },
+    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {manager:25}, note: 'Distant manager', type: 'weak' },
+    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {manager:45}, note: 'Process-driven manager', type: 'neutral' },
+    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {manager:30}, note: 'Tough manager', type: 'weak' },
   ]},
-  { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
+  company: { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
     { val: 'growing', text: 'Growing \u2014 hiring, expanding, good energy', scores: {company:80}, note: 'Company thriving', type: 'lever' },
     { val: 'stable', text: 'Stable \u2014 not great, not bad', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
     { val: 'cautious', text: 'Cautious \u2014 hiring freeze, belt-tightening', scores: {company:30}, note: 'Cautious environment', type: 'weak' },
     { val: 'cutting', text: 'Cutting costs \u2014 layoffs, budget cuts', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
   ]},
-  { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
+  market: { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
     { val: 'researched', text: 'Yes \u2014 I\u2019ve researched it and I\u2019m underpaid', scores: {market:80}, note: 'Market data confirms underpaid', type: 'lever' },
     { val: 'recruiters', text: 'Recruiters have reached out with specific numbers', scores: {market:85}, note: 'External offers as proof', type: 'lever' },
     { val: 'roughly', text: 'Roughly \u2014 I\u2019ve seen some numbers but nothing exact', scores: {market:45}, note: 'Partial market awareness', type: 'neutral' },
     { val: 'no_idea', text: 'No idea \u2014 I haven\u2019t looked into it', scores: {market:15}, note: 'No market data', type: 'weak' },
   ]},
-];
+};
+
+// Blocker-specific question TEXT overrides
+var BLOCKER_Q_TEXT = {
+  no_script: { evidence: 'Even without a script \u2014 what\u2019s the strongest card you\u2019re holding?', manager_type: 'Who will you be talking to?', last_raise: 'How long has it been since your pay last changed?' },
+  fear_no: { manager_type: 'The person who might say no \u2014 what are they like?', evidence: 'If they push back, what\u2019s your strongest counter?', company: 'Is the environment working for or against you?' },
+  underpaid: { market: 'You feel underpaid \u2014 do you have the data to back it up?', evidence: 'Beyond the pay gap, what else strengthens your case?', last_raise: 'How long have you been underpaid?' },
+  quiet: { evidence: 'Your work might be invisible \u2014 but what\u2019s the strongest thing you\u2019ve delivered?', manager_type: 'Does your manager actually see your contributions?', company: 'Is your company the kind of place that rewards visibility?' },
+  timing: { company: 'Let\u2019s check the environment \u2014 what\u2019s the vibe at your company?', last_raise: 'When was the last time your pay actually changed?', evidence: 'If the timing were right, what would you lead with?' },
+  no_advocate: { manager_type: 'The manager who won\u2019t bring it up \u2014 what are they like?', evidence: 'Since no one\u2019s advocating for you, what\u2019s your strongest self-case?', last_raise: 'How long have you been waiting for someone to notice?' },
+};
+
+// Blocker-specific question ORDER
+var BLOCKER_DISC_ORDER = {
+  no_script:   ['evidence', 'manager_type', 'last_raise', 'company', 'market'],
+  fear_no:     ['manager_type', 'evidence', 'company', 'last_raise', 'market'],
+  underpaid:   ['market', 'evidence', 'last_raise', 'manager_type', 'company'],
+  quiet:       ['evidence', 'manager_type', 'company', 'market', 'last_raise'],
+  timing:      ['company', 'last_raise', 'evidence', 'manager_type', 'market'],
+  no_advocate: ['manager_type', 'evidence', 'last_raise', 'company', 'market'],
+};
+
+var DISC_FREE_QUESTIONS = 3; // paywall after this many
+
+function buildDiscQuestions(blockerCode) {
+  var order = BLOCKER_DISC_ORDER[blockerCode] || BLOCKER_DISC_ORDER.no_script;
+  var textOverrides = BLOCKER_Q_TEXT[blockerCode] || {};
+  return order.map(function(qId) {
+    var q = JSON.parse(JSON.stringify(DISC_Q_ALL[qId]));
+    if (textOverrides[qId]) q.label = textOverrides[qId];
+    return q;
+  });
+}
+
+// Canvas block state
+var discCanvasBlocks = {
+  evidence: { filled: false, strength: '', insight: '' },
+  timing: { filled: false, strength: '', insight: '' },
+  manager: { filled: false, strength: '', insight: '' },
+  company: { filled: false, strength: '', insight: '' },
+  market: { filled: false, strength: '', insight: '' },
+  leverage_risk: { filled: false, insight: '' },
+  emphasize: { filled: false, insight: '' },
+  avoid: { filled: false, insight: '' },
+  opening_script: { filled: false, insight: '' },
+  pushback: { filled: false, insight: '' },
+  if_yes: { filled: false, insight: '' },
+  meeting_email: { filled: false, insight: '' },
+  raise_case: { filled: false, insight: '' },
+};
+
+function renderCanvasHTML() {
+  var dimMap = { evidence: 'Evidence', timing: 'Timing', manager: 'Manager', company: 'Company', market: 'Market' };
+  var dimIcons = { evidence: 'trophy', timing: 'clock', manager: 'users', company: 'building', market: 'chart-bar' };
+  
+  function block(key, label, icon, subtitle) {
+    var b = discCanvasBlocks[key];
+    if (b && b.filled) {
+      var color = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FAEEDA' : '#E1F5EE';
+      var textColor = b.strength === 'weak' ? '#791F1F' : b.strength === 'neutral' ? '#633806' : '#085041';
+      var badgeColor = b.strength === 'weak' ? '#A32D2D' : b.strength === 'neutral' ? '#BA7517' : '#0F6E56';
+      var badgeBg = b.strength === 'weak' ? 'rgba(163,45,45,0.1)' : b.strength === 'neutral' ? 'rgba(186,117,23,0.12)' : 'rgba(29,158,117,0.15)';
+      var badgeText = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+      return '<div style="background:' + color + ';border-radius:6px;padding:8px 10px;">' +
+        '<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">' +
+        '<i class="ti ti-' + icon + '" style="font-size:11px;color:' + textColor + ';" aria-hidden="true"></i>' +
+        '<span style="font-size:9px;font-weight:500;color:' + textColor + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '<span style="font-size:8px;color:' + badgeColor + ';margin-left:auto;font-weight:500;background:' + badgeBg + ';padding:1px 4px;border-radius:3px;">' + badgeText + '</span>' +
+        '</div>' +
+        '<p style="font-size:9.5px;color:' + textColor + ';line-height:1.5;margin:0;">' + (b.insight || b.note || '') + '</p>' +
+        '</div>';
+    }
+    return '<div style="border-radius:6px;padding:8px 10px;border:1px dashed var(--color-border-secondary);background:var(--color-background-secondary);">' +
+      '<div style="display:flex;align-items:center;gap:4px;">' +
+      '<i class="ti ti-' + icon + '" style="font-size:11px;color:var(--color-text-tertiary);" aria-hidden="true"></i>' +
+      '<span style="font-size:9px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;">' + label + '</span>' +
+      '</div>' +
+      (subtitle ? '<p style="font-size:8.5px;color:var(--color-text-tertiary);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      '</div>';
+  }
+
+  function planBlock(key, label, icon, subtitle) {
+    var b = discCanvasBlocks[key];
+    if (b && b.filled) {
+      return '<div style="background:#E6F1FB;border-radius:6px;padding:8px 10px;">' +
+        '<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">' +
+        '<i class="ti ti-' + icon + '" style="font-size:11px;color:#0C447C;" aria-hidden="true"></i>' +
+        '<span style="font-size:9px;font-weight:500;color:#0C447C;text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '</div>' +
+        '<p style="font-size:9.5px;color:#0C447C;line-height:1.5;margin:0;">' + b.insight + '</p>' +
+        '</div>';
+    }
+    return '<div style="border-radius:6px;padding:8px 10px;border:1px dashed var(--color-border-secondary);background:var(--color-background-secondary);">' +
+      '<div style="display:flex;align-items:center;gap:4px;">' +
+      '<i class="ti ti-' + icon + '" style="font-size:11px;color:var(--color-text-tertiary);" aria-hidden="true"></i>' +
+      '<span style="font-size:9px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;">' + label + '</span>' +
+      '</div>' +
+      (subtitle ? '<p style="font-size:8.5px;color:var(--color-text-tertiary);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      '</div>';
+  }
+
+  var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
+
+  var html = '<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-top:8px;">';
+  html += '<div style="background:#1E3D72;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<span style="font-size:12px;font-weight:500;color:#fff;">Raise negotiation canvas</span>';
+  html += '<span style="font-size:10px;color:rgba(255,255,255,0.5);">' + filledCount + ' of 13</span>';
+  html += '</div>';
+  html += '<div style="padding:6px;display:flex;flex-direction:column;gap:4px;">';
+
+  // YOUR POSITION
+  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px 0;">Your position</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += block('evidence', 'Evidence', 'trophy');
+  html += block('timing', 'Timing', 'clock');
+  html += '</div>';
+  html += block('manager', 'Manager', 'users');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += block('company', 'Company', 'building');
+  html += block('market', 'Market', 'chart-bar');
+  html += '</div>';
+
+  // YOUR STRATEGY
+  html += '<div style="height:0.5px;background:var(--color-border-tertiary);margin:2px 0;"></div>';
+  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">Your strategy</div>';
+  html += planBlock('leverage_risk', 'Leverage & risk', 'scale', 'After all dimensions');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += planBlock('emphasize', 'Emphasize', 'arrow-up', 'What to lead with');
+  html += planBlock('avoid', 'Avoid', 'alert-triangle', 'What not to say');
+  html += '</div>';
+
+  // YOUR PLAN
+  html += '<div style="height:0.5px;background:var(--color-border-tertiary);margin:2px 0;"></div>';
+  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">Your plan</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += planBlock('opening_script', 'Opening script', 'message', 'Your first words');
+  html += planBlock('pushback', 'Pushback playbook', 'shield', 'Counter every objection');
+  html += '</div>';
+  html += planBlock('if_yes', 'If they say yes', 'check', 'Your closing moves');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += planBlock('meeting_email', 'Meeting email', 'mail', 'Schedule the conversation');
+  html += planBlock('raise_case', 'Raise case brief', 'file-text', 'Bring to the meeting');
+  html += '</div>';
+
+  html += '</div>'; // padding container
+
+  // Download bar
+  html += '<div style="padding:6px 10px;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--color-border-tertiary);">';
+  html += '<span style="font-size:9px;color:var(--color-text-tertiary);"><i class="ti ti-file" style="font-size:10px;margin-right:3px;" aria-hidden="true"></i>raise-negotiation-canvas.pdf</span>';
+  if (filledCount >= 13) {
+    html += '<button onclick="downloadCanvas()" style="font-size:10px;padding:3px 8px;"><i class="ti ti-download" style="font-size:10px;margin-right:2px;" aria-hidden="true"></i>Download</button>';
+  } else {
+    html += '<button disabled style="font-size:10px;padding:3px 8px;opacity:0.35;"><i class="ti ti-download" style="font-size:10px;margin-right:2px;" aria-hidden="true"></i>Download</button>';
+  }
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
 
 function initDiscoveryMode(container) {
   container.innerHTML = '';
+
+  // Restore discovery state from localStorage if available
+  try {
+    var saved = state.discovery;
+    if (saved && saved.step > 0) {
+      discDims = saved.dims || discDims;
+      discActive = saved.active || discActive;
+      discLevers = saved.levers || discLevers;
+      discWeaks = saved.weaks || discWeaks;
+      discStep = saved.step || 0;
+      discInsights = saved.insights || {};
+      if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
+    }
+  } catch (e) {}
+
+  // Build questions based on blocker
+  var blockerCode = SIM_STATE.context.blocker_code || (SIM_STATE.blocker ? SIM_STATE.blocker.code : 'no_script');
+  discOrderedQuestions = buildDiscQuestions(blockerCode);
 
   // Chat-style questions container
   var chatArea = el('div', '', '');
@@ -3113,10 +3308,23 @@ function initDiscoveryMode(container) {
   intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
   chatArea.appendChild(intro);
 
-  // Start first question after a short delay, then show empty radar
+  // If assessment was completed, show final canvas + paywall
+  if (discStep >= discOrderedQuestions.length) {
+    insertDiscRadar();
+    showDiscPaywall();
+    return;
+  }
+
+  // If past paywall point (Q3+), show paywall
+  if (discStep >= DISC_FREE_QUESTIONS) {
+    insertDiscRadar();
+    showDiscPaywall();
+    return;
+  }
+
+  // Start from current step
   setTimeout(function() {
-    renderDiscQuestion(0);
-    // Show initial empty radar below first options
+    renderDiscQuestion(discStep);
     setTimeout(function() { insertDiscRadar(); }, 300);
   }, 600);
 }
@@ -3125,22 +3333,30 @@ function insertDiscRadar() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Create a coach message with the radar
-  var radarMsg = el('div', 'coach-msg', '');
+  // Collapse all previous radar+canvas messages
+  chatArea.querySelectorAll('.disc-radar-msg').forEach(function(prev) {
+    prev.style.display = 'none';
+  });
+
+  // Create a coach message with radar + canvas
+  var radarMsg = el('div', 'coach-msg disc-radar-msg', '');
   var radarWrap = el('div', '', '');
   radarWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:8px 0;';
 
   var canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = 200 * dpr;
+  canvas.height = 200 * dpr;
+  canvas.style.width = '200px';
+  canvas.style.height = '200px';
   canvas.className = 'disc-radar-canvas';
   radarWrap.appendChild(canvas);
 
   // Dimension status
   var statusDiv = el('div', '', '');
   statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;';
-  var dimNames = ['evidence','timing','market','relationship','company'];
-  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
+  var dimNames = ['evidence','timing','market','manager','company'];
+  var dimLabels = ['Evidence','Timing','Market','Manager','Company'];
   dimNames.forEach(function(d, i) {
     var row = el('div', 'ds-row', '');
     row.style.padding = '0';
@@ -3161,12 +3377,15 @@ function insertDiscRadar() {
   });
   radarWrap.appendChild(statusDiv);
   radarMsg.appendChild(radarWrap);
-  chatArea.appendChild(radarMsg);
 
-  // Draw on this specific canvas
+  // Canvas below radar
+  var canvasDiv = el('div', '', '');
+  canvasDiv.innerHTML = renderCanvasHTML();
+  radarMsg.appendChild(canvasDiv);
+
+  chatArea.appendChild(radarMsg);
   drawDiscRadarOnCanvas(canvas);
 
-  // Scroll to radar
   setTimeout(function() {
     var wrap = $('chat-wrap');
     if (wrap) wrap.scrollTop = wrap.scrollHeight;
@@ -3176,11 +3395,14 @@ function insertDiscRadar() {
 function drawDiscRadarOnCanvas(canvas) {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
   var w = 200, h = 200, cx = 100, cy = 100, r = 70;
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.scale(dpr, dpr);
 
-  var labels = ['Evidence','Timing','Market','Relationship','Company'];
-  var keys = ['evidence','timing','market','relationship','company'];
+  var labels = ['Evidence','Timing','Market','Manager','Company'];
+  var keys = ['evidence','timing','market','manager','company'];
   var activeColor = 'rgba(30,61,114,0.85)';
   var inactiveColor = 'rgba(128,128,128,0.3)';
   var n = 5;
@@ -3208,7 +3430,7 @@ function drawDiscRadarOnCanvas(canvas) {
     var lx = cx + (r + 16) * Math.cos(a);
     var ly = cy + (r + 16) * Math.sin(a);
     ctx.fillStyle = discActive[keys[i]] ? activeColor : inactiveColor;
-    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
+    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '11px system-ui';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(labels[i], lx, ly);
   }
@@ -3250,24 +3472,21 @@ function drawDiscRadarOnCanvas(canvas) {
     ctx.fillStyle = 'rgba(128,128,128,0.2)';
     ctx.fill();
   }
+  ctx.restore();
 }
 
 function renderDiscQuestion(idx) {
-  if (idx >= DISC_QUESTIONS.length) { showDiscPaywall(); return; }
-  var q = DISC_QUESTIONS[idx];
+  if (idx >= discOrderedQuestions.length) { showDiscPaywall(); return; }
+  if (idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
+  var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Coach question bubble
   var coachBubble = el('div', 'coach-msg', '');
-  var labelHtml = '';
-  if (q.dimTag) {
-    labelHtml = '<span class="disc-dim-tag disc-dim-' + q.dimTag + '">' + q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) + '</span> ';
-  }
+  var labelHtml = '<span class="disc-dim-tag">' + (q.dimTag ? q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) : '') + '</span> ';
   coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
   chatArea.appendChild(coachBubble);
 
-  // Chip options — uses sim-pills-row and sim-reply-pill for consistency
   var chipsWrap = el('div', 'coach-msg', '');
   var opts = el('div', 'sim-pills-row', '');
   opts.id = 'disc-opts-' + idx;
@@ -3277,22 +3496,18 @@ function renderDiscQuestion(idx) {
     pill.style.flexDirection = 'row';
     pill.style.alignItems = 'center';
     pill.style.gap = '10px';
-
     var radio = el('div', 'chip-radio', '');
     pill.appendChild(radio);
-
     var textSpan = el('span', '', '');
     textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
     textSpan.textContent = opt.text;
     pill.appendChild(textSpan);
-
     pill.onclick = function() { pickDiscAnswer(idx, opt, pill); };
     opts.appendChild(pill);
   });
   chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
 
-  // Scroll to new question
   setTimeout(function() {
     var wrap = $('chat-wrap');
     if (wrap) wrap.scrollTop = wrap.scrollHeight;
@@ -3303,7 +3518,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
   var opts = $('disc-opts-' + qIdx);
   if (!opts) return;
   
-  // Disable all pills, highlight selected — same as Practice mode
   opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
     p.disabled = true;
     p.style.opacity = '0.35';
@@ -3313,7 +3527,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
   pill.style.opacity = '1';
   pill.classList.add('active');
 
-  // Show as user response bubble
   var chatArea = $('disc-chat');
   var userBubble = el('div', 'user-msg', '');
   userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(opt.text) + '</div>';
@@ -3327,11 +3540,17 @@ function pickDiscAnswer(qIdx, opt, pill) {
   if (opt.type === 'lever') discLevers.push(opt.note);
   if (opt.type === 'weak') discWeaks.push(opt.note);
 
-  // Store in SIM_STATE context
-  var q = DISC_QUESTIONS[qIdx];
+  // Update canvas block for this dimension
+  var q = discOrderedQuestions[qIdx];
   SIM_STATE.context[q.id] = opt.val;
+  if (q.dimTag && discCanvasBlocks[q.dimTag]) {
+    discCanvasBlocks[q.dimTag].filled = true;
+    discCanvasBlocks[q.dimTag].strength = opt.type === 'lever' ? 'strong' : opt.type === 'weak' ? 'weak' : 'neutral';
+    discCanvasBlocks[q.dimTag].note = opt.note;
+    discCanvasBlocks[q.dimTag].insight = opt.note; // placeholder until AI generates
+  }
 
-  // Save discovery state to localStorage
+  // Save to localStorage
   try {
     state.discovery = {
       dims: JSON.parse(JSON.stringify(discDims)),
@@ -3339,17 +3558,17 @@ function pickDiscAnswer(qIdx, opt, pill) {
       levers: discLevers.slice(),
       weaks: discWeaks.slice(),
       step: discStep + 1,
+      insights: discInsights,
+      canvasBlocks: discCanvasBlocks,
       answers: state.discovery ? state.discovery.answers || {} : {}
     };
     state.discovery.answers[q.id] = opt.val;
     saveState();
-  } catch (e) { console.warn('[discovery] save failed:', e); }
+  } catch (e) {}
 
-  // Log for analytics
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
   logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
 
-  // Insert updated radar as coach message
   insertDiscRadar();
   
   discStep++;
@@ -3358,18 +3577,82 @@ function pickDiscAnswer(qIdx, opt, pill) {
   }, 700);
 }
 
+async function generateDiscInsights() {
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Show typing indicator
+  var typingWrap = el('div', 'coach-msg', '');
+  typingWrap.innerHTML = '<div class="bubble"><p style="font-style:italic;color:var(--t3);">Analyzing your negotiation position\u2026</p></div>';
+  chatArea.appendChild(typingWrap);
+  var wrap = $('chat-wrap');
+  if (wrap) wrap.scrollTop = wrap.scrollHeight;
+
+  // Build prompt with all answers
+  var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
+  var answers = {};
+  discOrderedQuestions.slice(0, DISC_FREE_QUESTIONS).forEach(function(q) {
+    answers[q.dimTag] = SIM_STATE.context[q.id] || '';
+  });
+
+  try {
+    var resp = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'disc_insights',
+        blocker: blockerCode,
+        answers: answers,
+        dims: discDims,
+        levers: discLevers,
+        weaks: discWeaks,
+      }),
+    });
+    var data = await resp.json();
+
+    // Remove typing indicator
+    typingWrap.remove();
+
+    if (data && data.insights) {
+      // Populate canvas blocks with AI insights
+      Object.keys(data.insights).forEach(function(dim) {
+        if (discCanvasBlocks[dim]) {
+          discCanvasBlocks[dim].insight = data.insights[dim];
+          discInsights[dim] = data.insights[dim];
+        }
+      });
+
+      // Save insights
+      try {
+        state.discovery.insights = discInsights;
+        state.discovery.canvasBlocks = discCanvasBlocks;
+        saveState();
+      } catch (e) {}
+
+      // Re-render radar + canvas with AI insights
+      insertDiscRadar();
+    }
+  } catch (e) {
+    typingWrap.remove();
+    // Fallback — use note text if API fails
+  }
+
+  // Log paywall view
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
+
+  showDiscPaywall();
+}
+
 function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
   var PRICE_USD = 19;
 
-  // Log paywall view
+  // Log paywall view — use same stage name as Practice mode so Sheet records it
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('disc_paywall', { levers: discLevers, weaks: discWeaks, dims: discDims });
-
-  // Insert final radar
-  insertDiscRadar();
+  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
 
   // Coach summary — personalized verdict based on their answers
   var summaryBubble = el('div', 'coach-msg', '');
@@ -3425,6 +3708,7 @@ function showDiscPaywall() {
       <div class="trust-row paywall-trust">
         <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
       </div>
+      <div class="paywall-ticker"><div class="paywall-ticker-inner" id="disc-paywall-ticker-inner"></div></div>
       <div class="paywall-includes-title">Includes</div>
       <div class="paywall-includes">
         <div class="paywall-inc-item">
@@ -3444,6 +3728,9 @@ function showDiscPaywall() {
     </div>
   `;
   chatArea.appendChild(wrap);
+
+  // Populate ticker
+  populatePaywallTicker(wrap);
 
   // Wire CTA
   var btn = wrap.querySelector('#disc-btn-pay');
@@ -5487,6 +5774,9 @@ async function resumeFromState() {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
+
+    // Resume in Practice mode (content was replayed into #messages)
+    setMode('sim');
 
     // Repopulate coaching mode with welcome + video
     // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
