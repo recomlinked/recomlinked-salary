@@ -565,8 +565,48 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .mode-toggle-btn.active{color:#07090f;}
 .mode-toggle-btn.active.sim{background:rgba(30,61,114,0.12);color:var(--navy);}
 .mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
+.mode-toggle-btn.active.disc{background:rgba(56,132,244,0.12);color:#185FA5;}
 .mode-toggle-btn svg{flex-shrink:0;}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
+
+/* ── Discovery mode ── */
+.discovery-chat{padding:16px 0;}
+.disc-layout{display:flex;gap:16px;align-items:flex-start;}
+.disc-questions{flex:1;min-width:0;}
+.disc-radar-wrap{width:200px;flex-shrink:0;position:sticky;top:8px;}
+.disc-qb{margin-bottom:14px;animation:discFade 0.4s ease;}
+@keyframes discFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.disc-ql{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;line-height:1.4;}
+.disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;background:rgba(30,61,114,0.1);color:var(--navy);}
+.disc-chip{display:flex;align-items:center;text-align:left;padding:10px 14px;background:var(--card);border:1.5px solid var(--divider);border-radius:10px;cursor:pointer;font-size:13px;color:var(--t1);width:100%;transition:all 0.15s;font-family:var(--sans);}
+.disc-chip:hover{border-color:var(--navy);background:rgba(30,61,114,0.03);}
+.disc-chip.selected{border-color:#185FA5;background:rgba(56,132,244,0.08);color:#185FA5;}
+.disc-chip.dimmed{opacity:0.35;pointer-events:none;}
+.disc-opts{display:flex;flex-direction:column;gap:6px;}
+.ds-row{display:flex;align-items:center;gap:6px;padding:3px 0;}
+.ds-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:all 0.4s;}
+.ds-dot.off{background:var(--divider);}
+.ds-dot.low{background:#E05555;}
+.ds-dot.mid{background:#c9a84c;}
+.ds-dot.high{background:#00c4a0;}
+.ds-label{font-size:11px;color:var(--t3);flex:1;}
+.ds-val{font-size:11px;font-weight:600;color:var(--t3);}
+.ds-val.low{color:#E05555;}
+.ds-val.mid{color:#c9a84c;}
+.ds-val.high{color:#00c4a0;}
+.disc-paywall{margin-top:16px;animation:discFade 0.5s ease;}
+.disc-pw-card{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:16px 18px;margin-bottom:12px;}
+.disc-pw-item{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:13px;color:var(--t1);}
+.disc-pw-plus{color:#00c4a0;font-size:16px;font-weight:600;}
+.disc-pw-minus{color:#E05555;font-size:16px;font-weight:600;}
+.disc-inc{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t2);padding:4px 0;}
+.disc-cta{width:100%;padding:14px;border-radius:10px;border:none;background:var(--navy);color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:14px;font-family:var(--sans);}
+.disc-cta:hover{opacity:0.9;}
+.disc-trust{display:flex;justify-content:center;gap:10px;font-size:11px;color:var(--t3);margin-top:8px;}
+@media(max-width:600px){
+  .disc-layout{flex-direction:column-reverse;}
+  .disc-radar-wrap{width:100%;position:static;display:flex;flex-direction:column;align-items:center;}
+}
 
 /* ── Mode banner ── shown in chat when user switches mode, makes the
    current mode crystal clear. Inline message that says what's happening. */
@@ -788,7 +828,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
     <!-- Coach messages and card render into this area -->
     <!-- DUAL MODE: Practice and Coaching are separate containers -->
-    <div id="messages" class="active-chat"></div>
+    <div id="discovery-messages" class="discovery-chat" style="display:none;"></div>
+    <div id="messages" class="active-chat" style="display:none;"></div>
     <div id="coaching-messages" class="coaching-chat" style="display:none;"></div>
 
   </div>
@@ -808,7 +849,14 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
              switch modes. Replaces the older single-button toggle which
              made it unclear whether you were in coach or simulation mode. -->
         <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
-          <button class="mode-toggle-btn sim active" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="true" title="Practice scenarios — tap manager replies and your responses">
+          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Assess your negotiation leverage and weaknesses">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4"/>
+              <path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Assess</span>
+          </button>
+          <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Practice scenarios — tap manager replies and your responses">
             <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
               <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
@@ -1794,6 +1842,7 @@ const SIM_STATE = {
   scenarios_unlocked_count: 0,
   scenarios_total: 0,
   simMode: true,
+  currentMode: 'discovery',
   unlocked: false,
 };
 
@@ -2179,31 +2228,40 @@ let unseenCoachCount = 0;    // how many coaching messages user hasn't seen
 let currentCoachPreview = null; // the preview card in practice mode
 
 function setMode(target) {
-  if (target !== 'sim' && target !== 'coach') return;
+  if (target !== 'sim' && target !== 'coach' && target !== 'discovery') return;
 
-  const wantSim = target === 'sim';
-  SIM_STATE.simMode = wantSim;
+  SIM_STATE.simMode = (target === 'sim');
+  SIM_STATE.currentMode = target;
   updateModeToggleUI();
 
   const practiceEl = $('messages');
   const coachingEl = $('coaching-messages');
+  const discoveryEl = $('discovery-messages');
 
-  if (wantSim) {
-    // Show practice, hide coaching
+  // Hide all
+  practiceEl.style.display = 'none';
+  coachingEl.style.display = 'none';
+  if (discoveryEl) discoveryEl.style.display = 'none';
+
+  if (target === 'discovery') {
+    if (discoveryEl) {
+      discoveryEl.style.display = 'block';
+      if (!discoveryEl.dataset.initialized) {
+        initDiscoveryMode(discoveryEl);
+        discoveryEl.dataset.initialized = 'true';
+      }
+    }
+    const input = $('chat-input');
+    if (input) { input.placeholder = 'Tap to discover your position\u2026'; input.disabled = true; }
+  } else if (target === 'sim') {
     practiceEl.style.display = '';
     practiceEl.classList.add('active-chat');
-    coachingEl.style.display = 'none';
-    // Input placeholder for practice
     const input = $('chat-input');
-    if (input) input.placeholder = 'Tap an opening or type your own\u2026';
+    if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
     scrollChatToBottom();
   } else {
-    // Show coaching, hide practice
-    practiceEl.style.display = 'none';
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
-    // Don't reset unseen count yet — only when user scrolls to bottom
-    // Input placeholder for coaching
     const input = $('chat-input');
     if (input) {
       input.placeholder = 'Ask your coach anything\u2026';
@@ -2211,9 +2269,7 @@ function setMode(target) {
     }
     const sendBtn = $('send-btn');
     if (sendBtn) sendBtn.disabled = false;
-    // Show unseen indicator if needed
     renderCoachingUnseenHeader();
-    // Scroll to first unseen message, not bottom
     if (unseenCoachCount > 0) {
       const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
       const firstUnseen = allMsgs.length - unseenCoachCount;
@@ -2226,9 +2282,7 @@ function setMode(target) {
     } else {
       scrollCoachingToBottom();
     }
-    // Check if already at bottom (short content) — mark as seen
     checkCoachingScrollSeen();
-    // Add "Back to practice" CTA at bottom
     addBackToPracticeCTA();
   }
 }
@@ -2268,19 +2322,26 @@ function scrollCoachingToBottom() {
 function updateModeToggleUI() {
   const simBtn   = $('mode-btn-sim');
   const coachBtn = $('mode-btn-coach');
+  const discBtn  = $('mode-btn-disc');
   if (!simBtn || !coachBtn) return;
-  if (SIM_STATE.simMode) {
+  
+  // Reset all
+  [simBtn, coachBtn, discBtn].forEach(function(b) {
+    if (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); }
+  });
+  document.body.classList.remove('sim-mode');
+
+  var mode = SIM_STATE.currentMode || 'discovery';
+  if (mode === 'sim') {
     simBtn.classList.add('active');
     simBtn.setAttribute('aria-selected', 'true');
-    coachBtn.classList.remove('active');
-    coachBtn.setAttribute('aria-selected', 'false');
     document.body.classList.add('sim-mode');
-  } else {
+  } else if (mode === 'coach') {
     coachBtn.classList.add('active');
     coachBtn.setAttribute('aria-selected', 'true');
-    simBtn.classList.remove('active');
-    simBtn.setAttribute('aria-selected', 'false');
-    document.body.classList.remove('sim-mode');
+  } else if (mode === 'discovery' && discBtn) {
+    discBtn.classList.add('active');
+    discBtn.setAttribute('aria-selected', 'true');
   }
 }
 
@@ -2688,7 +2749,6 @@ function showModeToggle() {
   if (toggle) {
     toggle.style.display = '';
   }
-  SIM_STATE.simMode = true;
   updateModeToggleUI();
 }
 
@@ -2996,6 +3056,413 @@ const BLOCKER_PRO_TIPS = {
   other:           "The person who speaks first anchors the conversation. Your opening line shapes everything that follows.",
 };
 
+// ── Discovery mode — radar visualization + context questions ──
+var discDims = {evidence:0,timing:0,market:0,relationship:0,company:0};
+var discActive = {evidence:false,timing:false,market:false,relationship:false,company:false};
+var discLevers = [];
+var discWeaks = [];
+var discStep = 0;
+
+var DISC_QUESTIONS = [
+  { id: 'evidence', label: 'What\u2019s the strongest thing you have going for you right now?', dimTag: 'evidence', options: [
+    { val: 'exceeded', text: 'I just delivered a big, visible result', scores: {evidence:85}, note: 'Recent strong win', type: 'lever' },
+    { val: 'competing', text: 'I have another offer on the table', scores: {evidence:80,market:75}, note: 'Competing offer in hand', type: 'lever' },
+    { val: 'recruited', text: 'Recruiters keep reaching out to me', scores: {evidence:65,market:60}, note: 'Being actively recruited', type: 'lever' },
+    { val: 'underpaid', text: 'I\u2019ve researched it \u2014 I\u2019m clearly underpaid', scores: {evidence:55,market:55}, note: 'Underpaid with data', type: 'lever' },
+    { val: 'met_overdue', text: 'I\u2019ve been solid for a while \u2014 nothing flashy', scores: {evidence:50}, note: 'Consistent but overdue', type: 'neutral' },
+    { val: 'none', text: 'Honestly, I don\u2019t have strong evidence yet', scores: {evidence:20}, note: 'Weak evidence base', type: 'weak' },
+  ]},
+  { id: 'last_raise', label: 'How long has it been since your last raise or promotion?', dimTag: 'timing', options: [
+    { val: 'lt_6mo', text: 'Less than 6 months', scores: {timing:15}, note: 'Raised recently \u2014 risky', type: 'weak' },
+    { val: '6_12mo', text: 'About a year', scores: {timing:45}, note: 'Moderate timing', type: 'neutral' },
+    { val: '1_2yr', text: '1\u20132 years', scores: {timing:70}, note: 'Reasonable gap', type: 'lever' },
+    { val: 'gt_2yr', text: '3+ years', scores: {timing:85}, note: 'Long overdue', type: 'lever' },
+    { val: 'never', text: 'I\u2019ve never asked', scores: {timing:75}, note: 'First ask \u2014 strong opener', type: 'lever' },
+  ]},
+  { id: 'manager_type', label: 'How would you describe your manager?', dimTag: 'relationship', options: [
+    { val: 'supportive', text: 'Supportive \u2014 they go to bat for me', scores: {relationship:85}, note: 'Manager is an ally', type: 'lever' },
+    { val: 'neutral', text: 'Fair but won\u2019t bring it up first', scores: {relationship:55}, note: 'Neutral manager', type: 'neutral' },
+    { val: 'distant', text: 'Distant \u2014 hard to read', scores: {relationship:25}, note: 'Distant manager', type: 'weak' },
+    { val: 'by_book', text: 'By-the-book \u2014 everything goes through process', scores: {relationship:45}, note: 'Process-driven manager', type: 'neutral' },
+    { val: 'tough', text: 'Tough \u2014 they push back on everything', scores: {relationship:30}, note: 'Tough manager', type: 'weak' },
+  ]},
+  { id: 'company', label: 'What\u2019s the vibe at your company right now?', dimTag: 'company', options: [
+    { val: 'growing', text: 'Growing \u2014 hiring, expanding, good energy', scores: {company:80}, note: 'Company thriving', type: 'lever' },
+    { val: 'stable', text: 'Stable \u2014 not great, not bad', scores: {company:55}, note: 'Stable environment', type: 'neutral' },
+    { val: 'cautious', text: 'Cautious \u2014 hiring freeze, belt-tightening', scores: {company:30}, note: 'Cautious environment', type: 'weak' },
+    { val: 'cutting', text: 'Cutting costs \u2014 layoffs, budget cuts', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
+  ]},
+  { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
+    { val: 'researched', text: 'Yes \u2014 I\u2019ve researched it and I\u2019m underpaid', scores: {market:80}, note: 'Market data confirms underpaid', type: 'lever' },
+    { val: 'recruiters', text: 'Recruiters have reached out with specific numbers', scores: {market:85}, note: 'External offers as proof', type: 'lever' },
+    { val: 'roughly', text: 'Roughly \u2014 I\u2019ve seen some numbers but nothing exact', scores: {market:45}, note: 'Partial market awareness', type: 'neutral' },
+    { val: 'no_idea', text: 'No idea \u2014 I haven\u2019t looked into it', scores: {market:15}, note: 'No market data', type: 'weak' },
+  ]},
+];
+
+function initDiscoveryMode(container) {
+  container.innerHTML = '';
+
+  // Chat-style questions container
+  var chatArea = el('div', '', '');
+  chatArea.id = 'disc-chat';
+  container.appendChild(chatArea);
+
+  // Opening coach message
+  var intro = el('div', 'coach-msg', '');
+  intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
+  chatArea.appendChild(intro);
+
+  // Start first question after a short delay, then show empty radar
+  setTimeout(function() {
+    renderDiscQuestion(0);
+    // Show initial empty radar below first options
+    setTimeout(function() { insertDiscRadar(); }, 300);
+  }, 600);
+}
+
+function insertDiscRadar() {
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Create a coach message with the radar
+  var radarMsg = el('div', 'coach-msg', '');
+  var radarWrap = el('div', '', '');
+  radarWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:8px 0;';
+
+  var canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  canvas.className = 'disc-radar-canvas';
+  radarWrap.appendChild(canvas);
+
+  // Dimension status
+  var statusDiv = el('div', '', '');
+  statusDiv.style.cssText = 'display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:6px;';
+  var dimNames = ['evidence','timing','market','relationship','company'];
+  var dimLabels = ['Evidence','Timing','Market','Relationship','Company'];
+  dimNames.forEach(function(d, i) {
+    var row = el('div', 'ds-row', '');
+    row.style.padding = '0';
+    var dot = el('span', 'ds-dot ' + (discActive[d] ? (discDims[d] >= 60 ? 'high' : discDims[d] >= 40 ? 'mid' : 'low') : 'off'), '');
+    var label = el('span', 'ds-label', dimLabels[i]);
+    var val = el('span', 'ds-val', '');
+    if (discActive[d]) {
+      var v = discDims[d];
+      val.textContent = v >= 60 ? 'Strong' : v >= 40 ? 'Medium' : 'Weak';
+      val.className = 'ds-val ' + (v >= 60 ? 'high' : v >= 40 ? 'mid' : 'low');
+    } else {
+      val.textContent = '\u2014';
+    }
+    row.appendChild(dot);
+    row.appendChild(label);
+    row.appendChild(val);
+    statusDiv.appendChild(row);
+  });
+  radarWrap.appendChild(statusDiv);
+  radarMsg.appendChild(radarWrap);
+  chatArea.appendChild(radarMsg);
+
+  // Draw on this specific canvas
+  drawDiscRadarOnCanvas(canvas);
+
+  // Scroll to radar
+  setTimeout(function() {
+    var wrap = $('chat-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  }, 100);
+}
+
+function drawDiscRadarOnCanvas(canvas) {
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var w = 200, h = 200, cx = 100, cy = 100, r = 70;
+  ctx.clearRect(0, 0, w, h);
+
+  var labels = ['Evidence','Timing','Market','Relationship','Company'];
+  var keys = ['evidence','timing','market','relationship','company'];
+  var activeColor = 'rgba(30,61,114,0.85)';
+  var inactiveColor = 'rgba(128,128,128,0.3)';
+  var n = 5;
+
+  for (var ring = 3; ring >= 1; ring--) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var rr = r * ring / 3;
+      if (i === 0) ctx.moveTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+      else ctx.lineTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a));
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  for (var i = 0; i < n; i++) {
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
+    ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
+
+    var lx = cx + (r + 16) * Math.cos(a);
+    var ly = cy + (r + 16) * Math.sin(a);
+    ctx.fillStyle = discActive[keys[i]] ? activeColor : inactiveColor;
+    ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '9px system-ui';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(labels[i], lx, ly);
+  }
+
+  var hasActive = keys.some(function(k) { return discActive[k]; });
+  if (hasActive) {
+    ctx.beginPath();
+    for (var i = 0; i <= n; i++) {
+      var a = (Math.PI * 2 * (i % n) / n) - Math.PI / 2;
+      var k = keys[i % n];
+      var v = discActive[k] ? (discDims[k] / 100) : 0;
+      var x = cx + r * v * Math.cos(a);
+      var y = cy + r * v * Math.sin(a);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(30,61,114,0.08)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(30,61,114,0.35)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    for (var i = 0; i < n; i++) {
+      if (!discActive[keys[i]]) continue;
+      var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+      var v = discDims[keys[i]] / 100;
+      ctx.beginPath();
+      ctx.arc(cx + r * v * Math.cos(a), cy + r * v * Math.sin(a), 4, 0, Math.PI * 2);
+      ctx.fillStyle = discDims[keys[i]] >= 60 ? '#00c4a0' : discDims[keys[i]] >= 40 ? '#c9a84c' : '#E05555';
+      ctx.fill();
+    }
+  }
+
+  for (var i = 0; i < n; i++) {
+    if (discActive[keys[i]]) continue;
+    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+    ctx.beginPath();
+    ctx.arc(cx + r * 0.15 * Math.cos(a), cy + r * 0.15 * Math.sin(a), 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(128,128,128,0.2)';
+    ctx.fill();
+  }
+}
+
+function renderDiscQuestion(idx) {
+  if (idx >= DISC_QUESTIONS.length) { showDiscPaywall(); return; }
+  var q = DISC_QUESTIONS[idx];
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  // Coach question bubble
+  var coachBubble = el('div', 'coach-msg', '');
+  var labelHtml = '';
+  if (q.dimTag) {
+    labelHtml = '<span class="disc-dim-tag disc-dim-' + q.dimTag + '">' + q.dimTag.charAt(0).toUpperCase() + q.dimTag.slice(1) + '</span> ';
+  }
+  coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
+  chatArea.appendChild(coachBubble);
+
+  // Chip options — uses sim-pills-row and sim-reply-pill for consistency
+  var chipsWrap = el('div', 'coach-msg', '');
+  var opts = el('div', 'sim-pills-row', '');
+  opts.id = 'disc-opts-' + idx;
+  opts.style.alignItems = 'flex-start';
+  q.options.forEach(function(opt) {
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    textSpan.textContent = opt.text;
+    pill.appendChild(textSpan);
+
+    pill.onclick = function() { pickDiscAnswer(idx, opt, pill); };
+    opts.appendChild(pill);
+  });
+  chipsWrap.appendChild(opts);
+  chatArea.appendChild(chipsWrap);
+
+  // Scroll to new question
+  setTimeout(function() {
+    var wrap = $('chat-wrap');
+    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+  }, 100);
+}
+
+function pickDiscAnswer(qIdx, opt, pill) {
+  var opts = $('disc-opts-' + qIdx);
+  if (!opts) return;
+  
+  // Disable all pills, highlight selected — same as Practice mode
+  opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
+    p.disabled = true;
+    p.style.opacity = '0.35';
+    p.style.pointerEvents = 'none';
+    p.classList.remove('active');
+  });
+  pill.style.opacity = '1';
+  pill.classList.add('active');
+
+  // Show as user response bubble
+  var chatArea = $('disc-chat');
+  var userBubble = el('div', 'user-msg', '');
+  userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(opt.text) + '</div>';
+  chatArea.appendChild(userBubble);
+
+  // Update scores
+  Object.keys(opt.scores).forEach(function(k) {
+    discDims[k] = Math.max(discDims[k], opt.scores[k]);
+    discActive[k] = true;
+  });
+  if (opt.type === 'lever') discLevers.push(opt.note);
+  if (opt.type === 'weak') discWeaks.push(opt.note);
+
+  // Store in SIM_STATE context
+  var q = DISC_QUESTIONS[qIdx];
+  SIM_STATE.context[q.id] = opt.val;
+
+  // Save discovery state to localStorage
+  try {
+    state.discovery = {
+      dims: JSON.parse(JSON.stringify(discDims)),
+      active: JSON.parse(JSON.stringify(discActive)),
+      levers: discLevers.slice(),
+      weaks: discWeaks.slice(),
+      step: discStep + 1,
+      answers: state.discovery ? state.discovery.answers || {} : {}
+    };
+    state.discovery.answers[q.id] = opt.val;
+    saveState();
+  } catch (e) { console.warn('[discovery] save failed:', e); }
+
+  // Log for analytics
+  logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
+  logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
+
+  // Insert updated radar as coach message
+  insertDiscRadar();
+  
+  discStep++;
+  setTimeout(function() {
+    renderDiscQuestion(discStep);
+  }, 700);
+}
+
+function showDiscPaywall() {
+  var chatArea = $('disc-chat');
+  if (!chatArea) return;
+
+  var PRICE_USD = 19;
+
+  // Log paywall view
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('disc_paywall', { levers: discLevers, weaks: discWeaks, dims: discDims });
+
+  // Insert final radar
+  insertDiscRadar();
+
+  // Coach summary — personalized verdict based on their answers
+  var summaryBubble = el('div', 'coach-msg', '');
+  var strong = discLevers.length;
+  var weak = discWeaks.length;
+  
+  // Dynamic opening based on their balance
+  var verdict = '';
+  if (strong >= 3 && weak <= 1) {
+    verdict = 'You\u2019re in a strong position \u2014 stronger than most people who ask for a raise.';
+  } else if (strong >= 2 && weak <= 2) {
+    verdict = 'You have real leverage here \u2014 but a few gaps that could cost you if you\u2019re not prepared.';
+  } else if (strong >= 1) {
+    verdict = 'You have cards to play \u2014 but some real risks you need a strategy for.';
+  } else {
+    verdict = 'Your position has some challenges \u2014 but that doesn\u2019t mean you can\u2019t ask. It means you need the right approach.';
+  }
+
+  var sHtml = '<div class="bubble"><p><strong>Here\u2019s where you stand:</strong></p>';
+  sHtml += '<p style="margin:8px 0 12px;font-size:13px;color:var(--t2);">' + verdict + '</p>';
+  discLevers.forEach(function(l) {
+    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#00c4a0;font-weight:700;">+</span> ' + l + '</p>';
+  });
+  discWeaks.forEach(function(w) {
+    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
+  });
+
+  // Dynamic closing based on their balance
+  var closing = '';
+  if (strong >= 3 && weak === 0) {
+    closing = 'You have strong leverage across the board. Your biggest risk is walking in without a script. Your plan gives you one \u2014 an opening that leads with your strongest cards, and a full negotiation playbook tailored to your situation.';
+  } else if (strong >= 2 && weak <= 1) {
+    closing = 'Your plan gives you an opening that leads with your strongest leverage, prepared counters for the one area where you\u2019re exposed, and a full script you can walk in with.';
+  } else if (strong >= 1 && weak >= 2) {
+    closing = 'Your plan gives you an opening built around what\u2019s working in your favor, specific responses for the ' + weak + ' areas where you\u2019re vulnerable, and a step-by-step script for the conversation.';
+  } else {
+    closing = 'Your plan gives you a strategy that works even from a tough position \u2014 the right opening, prepared responses for every pushback, and a script that protects you.';
+  }
+
+  sHtml += '<p style="margin:12px 0 0;font-size:13px;">' + closing + '</p>';
+  sHtml += '</div>';
+  summaryBubble.innerHTML = sHtml;
+  chatArea.appendChild(summaryBubble);
+
+  // Standard paywall bubble — matches Practice mode exactly
+  var wrap = el('div', 'coach-msg', '');
+  wrap.innerHTML = `
+    <div class="bubble paywall-bubble">
+      <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+      <button class="btn-pay" id="disc-btn-pay">
+        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
+      </button>
+      <div class="trust-row paywall-trust">
+        <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
+      </div>
+      <div class="paywall-includes-title">Includes</div>
+      <div class="paywall-includes">
+        <div class="paywall-inc-item">
+          <strong>Personalized opening scripts</strong>
+          <span class="paywall-inc-sub">Built around your leverage points</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>Pushback responses for your weak spots</strong>
+          <span class="paywall-inc-sub">Prepared counters for every objection</span>
+        </div>
+        <div class="paywall-inc-item">
+          <strong>AI coaching on every move</strong>
+          <span class="paywall-inc-sub">Risk, signal, and what to watch for</span>
+        </div>
+      </div>
+      <div class="paywall-closing">$${PRICE_USD} once, for a conversation that adds thousands to your salary.</div>
+    </div>
+  `;
+  chatArea.appendChild(wrap);
+
+  // Wire CTA
+  var btn = wrap.querySelector('#disc-btn-pay');
+  if (btn) btn.onclick = function() {
+    if (typeof startCheckout === 'function') startCheckout();
+    else if (typeof initiateCheckout === 'function') initiateCheckout();
+  };
+
+  // Try practice free link
+  var tryWrap = el('div', 'coach-msg', '');
+  tryWrap.innerHTML = '<div style="text-align:center;padding:4px 0;"><a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a></div>';
+  chatArea.appendChild(tryWrap);
+
+  setTimeout(function() {
+    var w = $('chat-wrap');
+    if (w) w.scrollTop = w.scrollHeight;
+  }, 200);
+}
+
 // ── Start simulation at the specific blocker moment ──
 async function startSimulationAtBlocker() {
   const blocker = SIM_STATE.blocker;
@@ -3073,6 +3540,9 @@ async function startSimulationAtBlocker() {
     }
   }
   unlockModeToggle();
+
+  // Start in Discovery mode by default
+  setMode('discovery');
 }
 
 // ── Blocker-specific opening lines ──
