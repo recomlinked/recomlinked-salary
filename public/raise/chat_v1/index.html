@@ -3481,31 +3481,9 @@ function initDiscoveryMode(container) {
     if (cursorEl) cursorEl.remove();
     textEl.textContent = introText;
 
-    // Show empty canvas first
-    await sleep(300);
-    insertDiscRadar();
-
-    // Then first question — scroll to it so users see chips, not input
+    // Show first question directly — radar appears after first answer
     await sleep(400);
     renderDiscQuestion(discStep);
-    await sleep(300);
-    var chatWrap = $('chat-wrap');
-    if (chatWrap) {
-      // Scroll to bottom where the question + chips are
-      var target = chatWrap.scrollHeight - chatWrap.clientHeight;
-      var start = chatWrap.scrollTop;
-      var distance = target - start;
-      var duration = 600;
-      var startTime = null;
-      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
-      function scrollStep(ts) {
-        if (!startTime) startTime = ts;
-        var progress = Math.min((ts - startTime) / duration, 1);
-        chatWrap.scrollTop = start + distance * easeOut(progress);
-        if (progress < 1) requestAnimationFrame(scrollStep);
-      }
-      requestAnimationFrame(scrollStep);
-    }
   })();
 }
 
