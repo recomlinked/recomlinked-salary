@@ -3176,6 +3176,14 @@ var discCanvasBlocks = {
 };
 
 function generateCanvasPDF() {
+  if (!window.jspdf) {
+    // Load jsPDF dynamically if not loaded
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
+    s.onload = function() { generateCanvasPDF(); };
+    document.head.appendChild(s);
+    return;
+  }
   var jsPDF = window.jspdf.jsPDF;
   var doc = new jsPDF('p', 'mm', 'a4');
   var W = 210, H = 297;
@@ -3462,7 +3470,6 @@ function renderCanvasHTML() {
   var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
   html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
   html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
-  html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;background:var(--gold);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10px;font-weight:600;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</button>';
   html += '</div>';
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
@@ -3502,14 +3509,10 @@ function renderCanvasHTML() {
 
   html += '</div>';
 
-  // Download bar
-  html += '<div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);">';
-  html += '<span style="font-size:10px;color:var(--t3);">raise-negotiation-canvas.pdf</span>';
-  if (filledCount >= 13) {
-    html += '<button onclick="downloadCanvas()" style="font-size:11px;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;">Download PDF</button>';
-  } else {
-    html += '<button disabled style="font-size:11px;padding:4px 10px;background:var(--muted);color:var(--t4);border:1px solid var(--divider);border-radius:6px;cursor:default;">Download PDF</button>';
-  }
+  // Download bar — always active
+  html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
+  html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-canvas.pdf</span>';
+  html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
   html += '</div>';
 
   html += '</div>';
