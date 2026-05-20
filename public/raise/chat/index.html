@@ -3139,8 +3139,13 @@ function insertDiscRadar() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
+  // Collapse all previous radar messages
+  chatArea.querySelectorAll('.disc-radar-msg').forEach(function(prev) {
+    prev.style.display = 'none';
+  });
+
   // Create a coach message with the radar
-  var radarMsg = el('div', 'coach-msg', '');
+  var radarMsg = el('div', 'coach-msg disc-radar-msg', '');
   var radarWrap = el('div', '', '');
   radarWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:8px 0;';
 
