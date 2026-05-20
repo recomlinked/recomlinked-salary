@@ -3117,6 +3117,18 @@ var DISC_QUESTIONS = [
 function initDiscoveryMode(container) {
   container.innerHTML = '';
 
+  // Restore discovery state from localStorage if available
+  try {
+    var saved = state.discovery;
+    if (saved && saved.step > 0) {
+      discDims = saved.dims || discDims;
+      discActive = saved.active || discActive;
+      discLevers = saved.levers || discLevers;
+      discWeaks = saved.weaks || discWeaks;
+      discStep = saved.step || 0;
+    }
+  } catch (e) {}
+
   // Chat-style questions container
   var chatArea = el('div', '', '');
   chatArea.id = 'disc-chat';
@@ -3127,10 +3139,16 @@ function initDiscoveryMode(container) {
   intro.innerHTML = '<div class="bubble"><p>Before any raise negotiation, you need to know where you stand \u2014 your leverage and your weak spots. Let\u2019s map your position in a few taps.</p></div>';
   chatArea.appendChild(intro);
 
-  // Start first question after a short delay, then show empty radar
+  // If assessment was completed, show final radar + paywall
+  if (discStep >= DISC_QUESTIONS.length) {
+    insertDiscRadar();
+    showDiscPaywall();
+    return;
+  }
+
+  // Start from current step
   setTimeout(function() {
-    renderDiscQuestion(0);
-    // Show initial empty radar below first options
+    renderDiscQuestion(discStep);
     setTimeout(function() { insertDiscRadar(); }, 300);
   }, 600);
 }
@@ -5510,6 +5528,9 @@ async function resumeFromState() {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
+
+    // Resume in Practice mode (content was replayed into #messages)
+    setMode('sim');
 
     // Repopulate coaching mode with welcome + video
     // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
