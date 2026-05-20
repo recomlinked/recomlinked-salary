@@ -3488,14 +3488,23 @@ function initDiscoveryMode(container) {
     // Then first question — scroll to it so users see chips, not input
     await sleep(400);
     renderDiscQuestion(discStep);
-    await sleep(200);
-    var firstQ = chatArea.querySelector('.disc-dim-tag');
-    if (firstQ) {
-      var chatWrap = $('chat-wrap');
-      var target = firstQ.closest('.coach-msg');
-      if (chatWrap && target) {
-        chatWrap.scrollTo({ top: target.offsetTop - 10, behavior: 'smooth' });
+    await sleep(300);
+    var chatWrap = $('chat-wrap');
+    if (chatWrap) {
+      // Scroll to bottom where the question + chips are
+      var target = chatWrap.scrollHeight - chatWrap.clientHeight;
+      var start = chatWrap.scrollTop;
+      var distance = target - start;
+      var duration = 600;
+      var startTime = null;
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function scrollStep(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        chatWrap.scrollTop = start + distance * easeOut(progress);
+        if (progress < 1) requestAnimationFrame(scrollStep);
       }
+      requestAnimationFrame(scrollStep);
     }
   })();
 }
