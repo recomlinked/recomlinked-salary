@@ -3212,35 +3212,59 @@ function _generatePDFPrintFallback() {
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
   html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
   html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
-  html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}';
-  html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;float:right;}';
+  html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;}';
+  html += '.block-label svg{flex-shrink:0;}';
+  html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;}';
   html += '.block-text{font-size:12px;line-height:1.6;margin-top:6px;}';
   html += '.strong{background:#E8F7F0;border:1px solid rgba(26,158,108,0.2);} .strong .block-label{color:#0a5c3a;} .strong .block-badge{background:rgba(26,158,108,0.15);color:#1a9e6c;}';
   html += '.weak{background:#FCEBEB;border:1px solid rgba(204,68,68,0.2);} .weak .block-label{color:#7a2020;} .weak .block-badge{background:rgba(204,68,68,0.1);color:#c44;}';
   html += '.neutral{background:#FDF5E6;border:1px solid rgba(201,168,76,0.2);} .neutral .block-label{color:#6a4a10;} .neutral .block-badge{background:rgba(201,168,76,0.12);color:#c9a84c;}';
   html += '.plan{background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);} .plan .block-label{color:#1e3d72;}';
   html += '.empty{background:#f0f1f5;border:1px solid #cccdd5;} .empty .block-label{color:#a0a5b4;} .empty .block-text{color:#b0b5c0;font-style:italic;}';
+  html += '.cta-bar{text-align:center;padding:16px 20px;margin-top:16px;background:#f8f6f0;border:1px solid rgba(201,168,76,0.2);border-radius:8px;}';
+  html += '.cta-bar p{margin:0;font-size:13px;color:#4a5068;line-height:1.6;} .cta-bar a{color:#c9a84c;font-weight:600;text-decoration:none;}';
   html += '.footer{background:#1e3d72;color:#b0b8d0;padding:10px 20px;border-radius:0 0 8px 8px;font-size:11px;display:flex;justify-content:space-between;margin-top:12px;}';
   html += '.footer .gold{color:#c9a84c;} @media print{body{padding:0;}}';
   html += '</style></head><body>';
   html += '<div class="header"><h1>Raise Negotiation Canvas</h1><small>salary.recomlinked.com/raise</small></div>';
 
+  var icons = {
+    evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+    timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    manager: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    company: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>',
+    market: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    leverage_risk: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    emphasize: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+    avoid: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    opening_script: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+    pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
+    raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
+  };
+
   blocks.forEach(function(sec) {
     html += '<div class="section-title">' + sec.section + '</div>';
     sec.items.forEach(function(item) {
       var b = discCanvasBlocks[item.key];
+      var icon = icons[item.key] || '';
       if (b && b.filled) {
         var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
         var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
         var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-        html += '<div class="block ' + cls + '"><div class="block-label">' + item.label;
+        html += '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
         if (badge) html += '<span class="block-badge">' + badge + '</span>';
         html += '</div><div class="block-text">' + text + '</div></div>';
       } else {
-        html += '<div class="block empty"><div class="block-label">' + item.label + '</div><div class="block-text">Unlock to complete</div></div>';
+        html += '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">Unlock to complete</div></div>';
       }
     });
   });
+
+  if (!isPaid) {
+    html += '<div class="cta-bar"><p>Answer all 5 questions about your negotiation position and AI will analyze your situation, fill all 13 sections, and generate your complete negotiation plan.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas at salary.recomlinked.com/raise →</a></p></div>';
+  }
 
   html += '<div class="footer"><span>salary.recomlinked.com/raise</span><span class="gold">' + (isPaid ? 'Full version' : 'Free preview') + '</span></div>';
   html += '</body></html>';
@@ -3376,10 +3400,9 @@ function _generatePDFWithJsPDF() {
   }
 
   function drawRow(blocks, labels) {
-    var colW = (W - mx * 2 - 4) / blocks.length;
+    var colW = blocks.length === 1 ? (W - mx * 2) : ((W - mx * 2 - 4) / blocks.length);
     var maxH = 0;
-    // Calculate max height first
-    blocks.forEach(function(block, i) {
+    blocks.forEach(function(block) {
       var b = discCanvasBlocks[block];
       if (b && b.filled) {
         doc.setFontSize(7.5);
@@ -3392,7 +3415,6 @@ function _generatePDFWithJsPDF() {
       }
     });
 
-    // Check page break
     if (y + maxH > H - 20) {
       drawFooter();
       doc.addPage();
@@ -3402,20 +3424,29 @@ function _generatePDFWithJsPDF() {
     var savedY = y;
     blocks.forEach(function(block, i) {
       y = savedY;
-      drawBlock(block, labels[i], mx + i * (colW + (blocks.length > 1 ? 4 / (blocks.length - 1) : 0)), colW - (blocks.length > 1 ? 2 : 0));
+      var xPos = mx + i * (colW + (blocks.length > 1 ? 4 / (blocks.length - 1) : 0));
+      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0));
     });
     y = savedY + maxH + 2;
   }
 
   function drawFullWidth(block, label) {
     var fullW = W - mx * 2;
-    var h = drawBlock(block, label, mx, fullW);
-    if (y + h > H - 20) {
+    var b = discCanvasBlocks[block];
+    var estH = 14;
+    if (b && b.filled) {
+      doc.setFontSize(7.5);
+      var text = (b.insight || b.note || '').replace(/\*\*/g, '');
+      var lines = wrapText(text, fullW - 10);
+      estH = 8 + lines.length * 3.5 + 5;
+    }
+    if (y + estH > H - 20) {
       drawFooter();
       doc.addPage();
       y = 16;
     }
-    y += 0;
+    var h = drawBlock(block, label, mx, fullW);
+    y += h;
   }
 
   function drawFooter() {
@@ -3453,6 +3484,24 @@ function _generatePDFWithJsPDF() {
   drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook']);
   drawFullWidth('if_yes', 'If They Say Yes');
   drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief']);
+
+  // ── CTA for free users ──
+  if (!isPaid) {
+    y += 6;
+    if (y + 20 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    doc.setFillColor(248, 246, 240);
+    doc.setDrawColor(201, 168, 76);
+    doc.roundedRect(mx, y, W - mx * 2, 22, 3, 3, 'FD');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(74, 80, 104);
+    doc.text('Answer all 5 questions about your negotiation position and AI will analyze your', mx + 6, y + 7);
+    doc.text('situation, fill all 13 sections, and generate your complete negotiation plan.', mx + 6, y + 12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text('Complete your canvas at salary.recomlinked.com/raise', mx + 6, y + 18);
+    y += 26;
+  }
 
   // ── Footer ──
   drawFooter();
