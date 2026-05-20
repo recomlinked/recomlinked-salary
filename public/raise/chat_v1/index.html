@@ -3092,12 +3092,11 @@ var DISC_QUESTIONS = [
     { val: 'cautious', text: 'Cautious \u2014 hiring freeze, belt-tightening', scores: {company:30}, note: 'Cautious environment', type: 'weak' },
     { val: 'cutting', text: 'Cutting costs \u2014 layoffs, budget cuts', scores: {company:15}, note: 'Cost cutting \u2014 high risk', type: 'weak' },
   ]},
-  { id: 'target', label: 'Do you have a number in mind for what you\u2019d ask for?', dimTag: 'market', options: [
-    { val: 'lt_5', text: 'Under 5% \u2014 something small is fine', scores: {market:30}, note: 'Low target \u2014 easy ask', type: 'neutral' },
-    { val: '5_10', text: '5\u201310%', scores: {market:50}, note: 'Standard range', type: 'neutral' },
-    { val: '10_15', text: '10\u201315% \u2014 I know my worth', scores: {market:60}, note: 'Ambitious but achievable', type: 'lever' },
-    { val: '15_plus', text: '15%+ \u2014 big gap to close', scores: {market:45}, note: 'High target \u2014 needs strong case', type: 'neutral' },
-    { val: 'no_idea', text: 'I have no idea what to ask for', scores: {market:20}, note: 'No target number', type: 'weak' },
+  { id: 'market', label: 'Do you know what people in your role earn elsewhere?', dimTag: 'market', options: [
+    { val: 'researched', text: 'Yes \u2014 I\u2019ve researched it and I\u2019m underpaid', scores: {market:80}, note: 'Market data confirms underpaid', type: 'lever' },
+    { val: 'recruiters', text: 'Recruiters have reached out with specific numbers', scores: {market:85}, note: 'External offers as proof', type: 'lever' },
+    { val: 'roughly', text: 'Roughly \u2014 I\u2019ve seen some numbers but nothing exact', scores: {market:45}, note: 'Partial market awareness', type: 'neutral' },
+    { val: 'no_idea', text: 'No idea \u2014 I haven\u2019t looked into it', scores: {market:15}, note: 'No market data', type: 'weak' },
   ]},
 ];
 
@@ -3380,13 +3379,19 @@ function showDiscPaywall() {
     sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
   });
 
-  // Dynamic closing that references their specifics
-  var closingParts = [];
-  if (discLevers.length > 0) closingParts.push('an opening that leads with your ' + discLevers[0].toLowerCase());
-  if (discWeaks.length > 0) closingParts.push('prepared responses for when they push back on your ' + discWeaks[0].toLowerCase());
-  closingParts.push('a full script you can walk in with');
+  // Dynamic closing based on their balance
+  var closing = '';
+  if (strong >= 3 && weak === 0) {
+    closing = 'You have strong leverage across the board. Your biggest risk is walking in without a script. Your plan gives you one \u2014 an opening that leads with your strongest cards, and a full negotiation playbook tailored to your situation.';
+  } else if (strong >= 2 && weak <= 1) {
+    closing = 'Your plan gives you an opening that leads with your strongest leverage, prepared counters for the one area where you\u2019re exposed, and a full script you can walk in with.';
+  } else if (strong >= 1 && weak >= 2) {
+    closing = 'Your plan gives you an opening built around what\u2019s working in your favor, specific responses for the ' + weak + ' areas where you\u2019re vulnerable, and a step-by-step script for the conversation.';
+  } else {
+    closing = 'Your plan gives you a strategy that works even from a tough position \u2014 the right opening, prepared responses for every pushback, and a script that protects you.';
+  }
 
-  sHtml += '<p style="margin:12px 0 0;font-size:13px;">Your plan includes ' + closingParts.join(', ') + '.</p>';
+  sHtml += '<p style="margin:12px 0 0;font-size:13px;">' + closing + '</p>';
   sHtml += '</div>';
   summaryBubble.innerHTML = sHtml;
   chatArea.appendChild(summaryBubble);
