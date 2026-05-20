@@ -2270,34 +2270,53 @@ function setMode(target) {
     practiceEl.classList.add('active-chat');
     var chipsArea2 = $('chips-area');
     if (chipsArea2) chipsArea2.style.display = '';
+
+    // If not paid and no simulation content yet, show locked preview
+    if (!state.paid && !practiceEl.querySelector('.user-msg') && !practiceEl.dataset.lockedShown) {
+      showLockedPractice(practiceEl);
+      practiceEl.dataset.lockedShown = 'true';
+    }
+
     const input = $('chat-input');
-    if (input) { input.placeholder = 'Tap an opening or type your own\u2026'; input.disabled = false; }
+    if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
     scrollChatToBottom();
   } else {
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
+
+    // If not paid, show locked coaching preview
+    if (!state.paid && !coachingEl.querySelector('.user-msg') && !coachingEl.dataset.lockedShown) {
+      showLockedCoaching(coachingEl);
+      coachingEl.dataset.lockedShown = 'true';
+    }
+
     const input = $('chat-input');
     if (input) {
-      input.placeholder = 'Ask your coach anything\u2026';
-      input.disabled = false;
+      input.placeholder = state.paid ? 'Ask your coach anything\u2026' : 'Unlock full access to chat\u2026';
+      input.disabled = !state.paid;
     }
     const sendBtn = $('send-btn');
-    if (sendBtn) sendBtn.disabled = false;
-    renderCoachingUnseenHeader();
-    if (unseenCoachCount > 0) {
-      const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
-      const firstUnseen = allMsgs.length - unseenCoachCount;
-      if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
-        const scrollParent = $('chat-wrap');
-        if (scrollParent) {
-          scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 80;
+    if (sendBtn) sendBtn.disabled = !state.paid;
+    if (state.paid) {
+      renderCoachingUnseenHeader();
+      if (unseenCoachCount > 0) {
+        const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
+        const firstUnseen = allMsgs.length - unseenCoachCount;
+        if (firstUnseen >= 0 && allMsgs[firstUnseen]) {
+          const scrollParent = $('chat-wrap');
+          if (scrollParent) {
+            scrollParent.scrollTop = allMsgs[firstUnseen].offsetTop - 80;
+          }
         }
+      } else {
+        scrollCoachingToBottom();
       }
+      checkCoachingScrollSeen();
+      addBackToPracticeCTA();
     } else {
-      scrollCoachingToBottom();
+      var chatWrap2 = $('chat-wrap');
+      if (chatWrap2) chatWrap2.scrollTop = 0;
     }
-    checkCoachingScrollSeen();
-    addBackToPracticeCTA();
   }
 }
 
@@ -3169,8 +3188,25 @@ var discCanvasBlocks = {
 };
 
 function renderCanvasHTML() {
-  function block(key, label, icon, subtitle) {
+  var icons = {
+    evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 8 12 8s5-4 7.5-4a2.5 2.5 0 010 5H18"/><path d="M12 8v13"/><path d="M8 21h8"/></svg>',
+    timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    manager: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    company: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>',
+    market: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+    leverage_risk: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    emphasize: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+    avoid: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    opening_script: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+    pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
+    raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  };
+
+  function block(key, label, subtitle) {
     var b = discCanvasBlocks[key];
+    var ic = icons[key] || '';
     if (b && b.filled) {
       var bg = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FDF5E6' : '#E8F7F0';
       var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
@@ -3178,6 +3214,7 @@ function renderCanvasHTML() {
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
       return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="color:' + tc + ';">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
         '</div>' +
@@ -3186,17 +3223,20 @@ function renderCanvasHTML() {
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
       '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="color:var(--t3);">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
       '</div>' +
       (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
       '</div>';
   }
 
-  function planBlock(key, label, icon, subtitle) {
+  function planBlock(key, label, subtitle) {
     var b = discCanvasBlocks[key];
+    var ic = icons[key] || '';
     if (b && b.filled) {
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
         '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + b.insight + '</p>' +
@@ -3204,6 +3244,7 @@ function renderCanvasHTML() {
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
       '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="color:var(--t3);">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
       '</div>' +
       (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
@@ -3222,35 +3263,35 @@ function renderCanvasHTML() {
   // YOUR POSITION
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('evidence', 'Evidence', 'trophy');
-  html += block('timing', 'Timing', 'clock');
+  html += block('evidence', 'Evidence');
+  html += block('timing', 'Timing');
   html += '</div>';
-  html += block('manager', 'Manager', 'users');
+  html += block('manager', 'Manager');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('company', 'Company', 'building');
-  html += block('market', 'Market', 'chart-bar');
+  html += block('company', 'Company');
+  html += block('market', 'Market');
   html += '</div>';
 
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'scale', 'After all dimensions');
+  html += planBlock('leverage_risk', 'Leverage & risk', 'After all dimensions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'arrow-up', 'What to lead with');
-  html += planBlock('avoid', 'Avoid', 'alert-triangle', 'What not to say');
+  html += planBlock('emphasize', 'Emphasize', 'What to lead with');
+  html += planBlock('avoid', 'Avoid', 'What not to say');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('opening_script', 'Opening script', 'message', 'Your first words');
-  html += planBlock('pushback', 'Pushback playbook', 'shield', 'Counter every objection');
+  html += planBlock('opening_script', 'Opening script', 'Your first words');
+  html += planBlock('pushback', 'Pushback playbook', 'Counter every objection');
   html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'check', 'Your closing moves');
+  html += planBlock('if_yes', 'If they say yes', 'Your closing moves');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('meeting_email', 'Meeting email', 'mail', 'Schedule the conversation');
-  html += planBlock('raise_case', 'Raise case brief', 'file-text', 'Bring to the meeting');
+  html += planBlock('meeting_email', 'Meeting email', 'Schedule the conversation');
+  html += planBlock('raise_case', 'Raise case brief', 'Bring to the meeting');
   html += '</div>';
 
   html += '</div>';
@@ -3270,18 +3311,75 @@ function renderCanvasHTML() {
 }
 
 function lockFreeModes() {
-  var simBtn = $('mode-btn-sim');
-  var coachBtn = $('mode-btn-coach');
-  if (simBtn) {
-    simBtn.style.opacity = '0.35';
-    simBtn.style.pointerEvents = 'none';
-    simBtn.title = 'Available with premium access';
+  // Tabs stay clickable — they show paywall content when tapped
+}
+
+function showLockedPractice(container) {
+  // Show disabled opening chips as preview
+  var blockerCode = SIM_STATE.context.blocker_code || (SIM_STATE.blocker ? SIM_STATE.blocker.code : 'no_script');
+  var openings = BLOCKER_OPENINGS[blockerCode] || BLOCKER_OPENINGS.no_script || [];
+
+  var coachBubble = el('div', 'coach-msg', '');
+  coachBubble.innerHTML = '<div class="bubble"><p>Practice your raise conversation with realistic manager responses. Pick an opening, see how your manager reacts, and try different paths.</p></div>';
+  container.appendChild(coachBubble);
+
+  // Show opening chips — disabled
+  var chipsWrap = el('div', 'coach-msg', '');
+  var inner = el('div', 'sim-pills-inner', '');
+  var row = el('div', 'sim-pills-row', '');
+  
+  var showCount = Math.min(openings.length, 3);
+  for (var i = 0; i < showCount; i++) {
+    var opener = openings[i];
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+    pill.style.opacity = '0.4';
+    pill.style.pointerEvents = 'none';
+    pill.disabled = true;
+
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+
+    var rank = el('div', 'chip-rank', '#' + (i + 1));
+    pill.appendChild(rank);
+
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    var clean = opener.text.replace(/^["'\u201c]+|["'\u201d]+$/g, '');
+    textSpan.textContent = '\u201c' + clean.slice(0, 67) + '...\u201d';
+    pill.appendChild(textSpan);
+
+    row.appendChild(pill);
   }
-  if (coachBtn) {
-    coachBtn.style.opacity = '0.35';
-    coachBtn.style.pointerEvents = 'none';
-    coachBtn.title = 'Available with premium access';
-  }
+  inner.appendChild(row);
+  chipsWrap.appendChild(inner);
+  container.appendChild(chipsWrap);
+
+  // Paywall CTA
+  var pwWrap = el('div', 'coach-msg', '');
+  pwWrap.innerHTML = '<div class="bubble paywall-bubble" style="padding:16px;">' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.8);margin:0 0 12px;">Unlock full access to practice every opening and handle every pushback.</p>' +
+    '<button class="btn-pay" onclick="if(typeof startCheckout===\'function\')startCheckout();else if(typeof initiateCheckout===\'function\')initiateCheckout();">Unlock full access \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row" style="margin-top:8px;"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span></div>' +
+    '</div>';
+  container.appendChild(pwWrap);
+}
+
+function showLockedCoaching(container) {
+  var coachBubble = el('div', 'coach-msg', '');
+  coachBubble.innerHTML = '<div class="bubble"><p>Your AI coach analyzes every move you make \u2014 what signal it sends, what risk it carries, and what to say next. Like having a negotiation expert beside you.</p></div>';
+  container.appendChild(coachBubble);
+
+  // Paywall CTA
+  var pwWrap = el('div', 'coach-msg', '');
+  pwWrap.innerHTML = '<div class="bubble paywall-bubble" style="padding:16px;">' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.8);margin:0 0 12px;">Unlock full access to get personalized AI coaching on every negotiation move.</p>' +
+    '<button class="btn-pay" onclick="if(typeof startCheckout===\'function\')startCheckout();else if(typeof initiateCheckout===\'function\')initiateCheckout();">Unlock full access \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row" style="margin-top:8px;"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span></div>' +
+    '</div>';
+  container.appendChild(pwWrap);
 }
 
 function unlockAllModes() {
@@ -3665,62 +3763,11 @@ function showDiscPaywall() {
 
   var PRICE_USD = 19;
 
-  // Log paywall view
-  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
-
-  // Coach summary — personalized verdict
-  var summaryBubble = el('div', 'coach-msg', '');
-  var strong = discLevers.length;
-  var weak = discWeaks.length;
-  
-  var verdict = '';
-  if (strong >= 3 && weak <= 1) {
-    verdict = 'You\u2019re in a strong position \u2014 stronger than most people who ask for a raise.';
-  } else if (strong >= 2 && weak <= 2) {
-    verdict = 'You have real leverage here \u2014 but a few gaps that could cost you if you\u2019re not prepared.';
-  } else if (strong >= 1) {
-    verdict = 'You have cards to play \u2014 but some real risks you need a strategy for.';
-  } else {
-    verdict = 'Your position has some challenges \u2014 but that doesn\u2019t mean you can\u2019t ask. It means you need the right approach.';
-  }
-
-  var sHtml = '<div class="bubble"><p><strong>Here\u2019s where you stand:</strong></p>';
-  sHtml += '<p style="margin:8px 0 12px;font-size:13px;color:var(--t2);">' + verdict + '</p>';
-  discLevers.forEach(function(l) {
-    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#00c4a0;font-weight:700;">+</span> ' + l + '</p>';
-  });
-  discWeaks.forEach(function(w) {
-    sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
-  });
-
-  var closing = '';
-  if (strong >= 3 && weak === 0) {
-    closing = 'You have strong leverage across the board. Your biggest risk is walking in without a script. Your plan gives you one \u2014 an opening that leads with your strongest cards, and a full negotiation playbook tailored to your situation.';
-  } else if (strong >= 2 && weak <= 1) {
-    closing = 'Your plan gives you an opening that leads with your strongest leverage, prepared counters for the one area where you\u2019re exposed, and a full script you can walk in with.';
-  } else if (strong >= 1 && weak >= 2) {
-    closing = 'Your plan gives you an opening built around what\u2019s working in your favor, specific responses for the ' + weak + ' areas where you\u2019re vulnerable, and a step-by-step script for the conversation.';
-  } else {
-    closing = 'Your plan gives you a strategy that works even from a tough position \u2014 the right opening, prepared responses for every pushback, and a script that protects you.';
-  }
-
-  sHtml += '<p style="margin:12px 0 0;font-size:13px;">' + closing + '</p>';
-  sHtml += '</div>';
-  summaryBubble.innerHTML = sHtml;
-  chatArea.appendChild(summaryBubble);
-
-  // Canvas intro bubble
-  var canvasIntro = el('div', 'coach-msg', '');
-  canvasIntro.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is the most complete tool you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
-  chatArea.appendChild(canvasIntro);
-
-  // Paywall bubble
+  // Paywall bubble — standard design
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
-      <p class="paywall-headline"><strong>Complete your Raise Negotiation Canvas</strong></p>
-      <p style="font-size:12.5px;color:rgba(255,255,255,0.7);margin-bottom:14px;">Unlock full access \u2014 your canvas, practice simulation, and AI coaching.</p>
+      <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
       <button class="btn-pay" id="disc-btn-pay">
         Unlock full access \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
       </button>
@@ -3731,17 +3778,17 @@ function showDiscPaywall() {
       <div class="paywall-includes-title">Premium access includes</div>
       <div style="display:flex;gap:8px;margin-top:8px;">
         <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
-          <div style="font-size:20px;margin-bottom:4px;">📄</div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <div style="font-size:11px;font-weight:600;color:#fff;">Canvas file</div>
           <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>
         </div>
         <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
-          <div style="font-size:20px;margin-bottom:4px;">🎯</div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
           <div style="font-size:11px;font-weight:600;color:#fff;">Simulation</div>
           <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Practice every scenario</div>
         </div>
         <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
-          <div style="font-size:20px;margin-bottom:4px;">🧠</div>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           <div style="font-size:11px;font-weight:600;color:#fff;">AI coach</div>
           <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>
         </div>
