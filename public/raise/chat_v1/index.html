@@ -3175,14 +3175,84 @@ var discCanvasBlocks = {
 };
 
 function generateCanvasPDF() {
-  if (!window.jspdf) {
-    // Load jsPDF dynamically if not loaded
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js';
-    s.onload = function() { generateCanvasPDF(); };
-    document.head.appendChild(s);
-    return;
+  if (window.jspdf) {
+    return _generatePDFWithJsPDF();
   }
+  // Load jsPDF dynamically
+  var s = document.createElement('script');
+  s.crossOrigin = 'anonymous';
+  s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+  s.onload = function() { _generatePDFWithJsPDF(); };
+  s.onerror = function() {
+    // Fallback: print-friendly page
+    _generatePDFPrintFallback();
+  };
+  document.head.appendChild(s);
+}
+
+function _generatePDFPrintFallback() {
+  var isPaid = state.paid;
+  var blocks = [
+    { section: 'YOUR POSITION', items: [
+      { key: 'evidence', label: 'Evidence' }, { key: 'timing', label: 'Timing' },
+      { key: 'manager', label: 'Manager' }, { key: 'company', label: 'Company' }, { key: 'market', label: 'Market' }
+    ]},
+    { section: 'YOUR STRATEGY', items: [
+      { key: 'leverage_risk', label: 'Leverage & Risk' }, { key: 'emphasize', label: 'Emphasize' }, { key: 'avoid', label: 'Avoid' }
+    ]},
+    { section: 'YOUR PLAN', items: [
+      { key: 'opening_script', label: 'Opening Script' }, { key: 'pushback', label: 'Pushback Playbook' },
+      { key: 'if_yes', label: 'If They Say Yes' }, { key: 'meeting_email', label: 'Meeting Email' }, { key: 'raise_case', label: 'Raise Case Brief' }
+    ]}
+  ];
+
+  var html = '<html><head><title>Raise Negotiation Canvas</title><style>';
+  html += 'body{font-family:-apple-system,sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#1a1d2e;}';
+  html += '.header{background:#1e3d72;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}';
+  html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
+  html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
+  html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
+  html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}';
+  html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;float:right;}';
+  html += '.block-text{font-size:12px;line-height:1.6;margin-top:6px;}';
+  html += '.strong{background:#E8F7F0;border:1px solid rgba(26,158,108,0.2);} .strong .block-label{color:#0a5c3a;} .strong .block-badge{background:rgba(26,158,108,0.15);color:#1a9e6c;}';
+  html += '.weak{background:#FCEBEB;border:1px solid rgba(204,68,68,0.2);} .weak .block-label{color:#7a2020;} .weak .block-badge{background:rgba(204,68,68,0.1);color:#c44;}';
+  html += '.neutral{background:#FDF5E6;border:1px solid rgba(201,168,76,0.2);} .neutral .block-label{color:#6a4a10;} .neutral .block-badge{background:rgba(201,168,76,0.12);color:#c9a84c;}';
+  html += '.plan{background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);} .plan .block-label{color:#1e3d72;}';
+  html += '.empty{background:#f0f1f5;border:1px solid #cccdd5;} .empty .block-label{color:#a0a5b4;} .empty .block-text{color:#b0b5c0;font-style:italic;}';
+  html += '.footer{background:#1e3d72;color:#b0b8d0;padding:10px 20px;border-radius:0 0 8px 8px;font-size:11px;display:flex;justify-content:space-between;margin-top:12px;}';
+  html += '.footer .gold{color:#c9a84c;} @media print{body{padding:0;}}';
+  html += '</style></head><body>';
+  html += '<div class="header"><h1>Raise Negotiation Canvas</h1><small>salary.recomlinked.com/raise</small></div>';
+
+  blocks.forEach(function(sec) {
+    html += '<div class="section-title">' + sec.section + '</div>';
+    sec.items.forEach(function(item) {
+      var b = discCanvasBlocks[item.key];
+      if (b && b.filled) {
+        var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
+        var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
+        var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+        html += '<div class="block ' + cls + '"><div class="block-label">' + item.label;
+        if (badge) html += '<span class="block-badge">' + badge + '</span>';
+        html += '</div><div class="block-text">' + text + '</div></div>';
+      } else {
+        html += '<div class="block empty"><div class="block-label">' + item.label + '</div><div class="block-text">Unlock to complete</div></div>';
+      }
+    });
+  });
+
+  html += '<div class="footer"><span>salary.recomlinked.com/raise</span><span class="gold">' + (isPaid ? 'Full version' : 'Free preview') + '</span></div>';
+  html += '</body></html>';
+
+  var w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function() { w.print(); }, 500);
+}
+
+function _generatePDFWithJsPDF() {
   var jsPDF = window.jspdf.jsPDF;
   try {
   var doc = new jsPDF('p', 'mm', 'a4');
