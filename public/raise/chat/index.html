@@ -3269,23 +3269,23 @@ function renderCanvasHTML() {
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'Fills after all dimensions');
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after completing your position');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'Fills after all dimensions');
-  html += planBlock('avoid', 'Avoid', 'Fills after all dimensions');
+  html += planBlock('emphasize', 'Emphasize', 'Will fill after completing your position');
+  html += planBlock('avoid', 'Avoid', 'Will fill after completing your position');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('opening_script', 'Opening script', 'Fills after all dimensions');
-  html += planBlock('pushback', 'Pushback playbook', 'Fills after all dimensions');
+  html += planBlock('opening_script', 'Opening script', 'Will fill after completing your position');
+  html += planBlock('pushback', 'Pushback playbook', 'Will fill after completing your position');
   html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Fills after all dimensions');
+  html += planBlock('if_yes', 'If they say yes', 'Will fill after completing your position');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('meeting_email', 'Meeting email', 'Fills after all dimensions');
-  html += planBlock('raise_case', 'Raise case brief', 'Fills after all dimensions');
+  html += planBlock('meeting_email', 'Meeting email', 'Will fill after completing your position');
+  html += planBlock('raise_case', 'Raise case brief', 'Will fill after completing your position');
   html += '</div>';
 
   html += '</div>';
