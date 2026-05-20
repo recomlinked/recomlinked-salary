@@ -3259,14 +3259,36 @@ function renderCanvasHTML() {
   html += '<div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);">';
   html += '<span style="font-size:10px;color:var(--t3);">raise-negotiation-canvas.pdf</span>';
   if (filledCount >= 13) {
-    html += '<button onclick="downloadCanvas()" style="font-size:11px;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;">Download</button>';
+    html += '<button onclick="downloadCanvas()" style="font-size:11px;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;">Download PDF</button>';
   } else {
-    html += '<button disabled style="font-size:11px;padding:4px 10px;background:var(--muted);color:var(--t4);border:1px solid var(--divider);border-radius:6px;cursor:default;">Download</button>';
+    html += '<button disabled style="font-size:11px;padding:4px 10px;background:var(--muted);color:var(--t4);border:1px solid var(--divider);border-radius:6px;cursor:default;">Download PDF</button>';
   }
   html += '</div>';
 
   html += '</div>';
   return html;
+}
+
+function lockFreeModes() {
+  var simBtn = $('mode-btn-sim');
+  var coachBtn = $('mode-btn-coach');
+  if (simBtn) {
+    simBtn.style.opacity = '0.35';
+    simBtn.style.pointerEvents = 'none';
+    simBtn.title = 'Available with premium access';
+  }
+  if (coachBtn) {
+    coachBtn.style.opacity = '0.35';
+    coachBtn.style.pointerEvents = 'none';
+    coachBtn.title = 'Available with premium access';
+  }
+}
+
+function unlockAllModes() {
+  var simBtn = $('mode-btn-sim');
+  var coachBtn = $('mode-btn-coach');
+  if (simBtn) { simBtn.style.opacity = ''; simBtn.style.pointerEvents = ''; }
+  if (coachBtn) { coachBtn.style.opacity = ''; coachBtn.style.pointerEvents = ''; }
 }
 
 function initDiscoveryMode(container) {
@@ -3315,6 +3337,7 @@ function initDiscoveryMode(container) {
   }
 
   // Start from current step
+  if (!SIM_STATE.unlocked) lockFreeModes();
   setTimeout(function() {
     renderDiscQuestion(discStep);
     setTimeout(function() { insertDiscRadar(); }, 300);
@@ -3642,16 +3665,15 @@ function showDiscPaywall() {
 
   var PRICE_USD = 19;
 
-  // Log paywall view — use same stage name as Practice mode so Sheet records it
+  // Log paywall view
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
   logSession('paywall', { source: 'assess', levers: discLevers, weaks: discWeaks, dims: discDims });
 
-  // Coach summary — personalized verdict based on their answers
+  // Coach summary — personalized verdict
   var summaryBubble = el('div', 'coach-msg', '');
   var strong = discLevers.length;
   var weak = discWeaks.length;
   
-  // Dynamic opening based on their balance
   var verdict = '';
   if (strong >= 3 && weak <= 1) {
     verdict = 'You\u2019re in a strong position \u2014 stronger than most people who ask for a raise.';
@@ -3672,7 +3694,6 @@ function showDiscPaywall() {
     sHtml += '<p style="margin:4px 0;font-size:13px;"><span style="color:#E05555;font-weight:700;">\u2212</span> ' + w + '</p>';
   });
 
-  // Dynamic closing based on their balance
   var closing = '';
   if (strong >= 3 && weak === 0) {
     closing = 'You have strong leverage across the board. Your biggest risk is walking in without a script. Your plan gives you one \u2014 an opening that leads with your strongest cards, and a full negotiation playbook tailored to your situation.';
@@ -3689,31 +3710,40 @@ function showDiscPaywall() {
   summaryBubble.innerHTML = sHtml;
   chatArea.appendChild(summaryBubble);
 
-  // Standard paywall bubble — matches Practice mode exactly
+  // Canvas intro bubble
+  var canvasIntro = el('div', 'coach-msg', '');
+  canvasIntro.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is the most complete tool you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  chatArea.appendChild(canvasIntro);
+
+  // Paywall bubble
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
     <div class="bubble paywall-bubble">
-      <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+      <p class="paywall-headline"><strong>Complete your Raise Negotiation Canvas</strong></p>
+      <p style="font-size:12.5px;color:rgba(255,255,255,0.7);margin-bottom:14px;">Unlock full access \u2014 your canvas, practice simulation, and AI coaching.</p>
       <button class="btn-pay" id="disc-btn-pay">
-        Unlock your plan \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
+        Unlock full access \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
       </button>
       <div class="trust-row paywall-trust">
         <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
       </div>
       <div class="paywall-ticker"><div class="paywall-ticker-inner" id="disc-paywall-ticker-inner"></div></div>
-      <div class="paywall-includes-title">Includes</div>
-      <div class="paywall-includes">
-        <div class="paywall-inc-item">
-          <strong>Personalized opening scripts</strong>
-          <span class="paywall-inc-sub">Built around your leverage points</span>
+      <div class="paywall-includes-title">Premium access includes</div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
+          <div style="font-size:20px;margin-bottom:4px;">📄</div>
+          <div style="font-size:11px;font-weight:600;color:#fff;">Canvas file</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>
         </div>
-        <div class="paywall-inc-item">
-          <strong>Pushback responses for your weak spots</strong>
-          <span class="paywall-inc-sub">Prepared counters for every objection</span>
+        <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
+          <div style="font-size:20px;margin-bottom:4px;">🎯</div>
+          <div style="font-size:11px;font-weight:600;color:#fff;">Simulation</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Practice every scenario</div>
         </div>
-        <div class="paywall-inc-item">
-          <strong>AI coaching on every move</strong>
-          <span class="paywall-inc-sub">Risk, signal, and what to watch for</span>
+        <div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">
+          <div style="font-size:20px;margin-bottom:4px;">🧠</div>
+          <div style="font-size:11px;font-weight:600;color:#fff;">AI coach</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>
         </div>
       </div>
       <div class="paywall-closing">$${PRICE_USD} once, for a conversation that adds thousands to your salary.</div>
@@ -3731,10 +3761,8 @@ function showDiscPaywall() {
     else if (typeof initiateCheckout === 'function') initiateCheckout();
   };
 
-  // Try practice free link
-  var tryWrap = el('div', 'coach-msg', '');
-  tryWrap.innerHTML = '<div style="text-align:center;padding:4px 0;"><a href="javascript:void(0)" style="font-size:12px;color:var(--navy);font-weight:600;text-decoration:none;" onclick="setMode(\'sim\')">Or try practice mode free \u2192</a></div>';
-  chatArea.appendChild(tryWrap);
+  // Lock Practice and Coaching tabs
+  lockFreeModes();
 
   setTimeout(function() {
     var w = $('chat-wrap');
