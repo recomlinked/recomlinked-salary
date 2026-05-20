@@ -3169,107 +3169,99 @@ var discCanvasBlocks = {
 };
 
 function renderCanvasHTML() {
-  var dimMap = { evidence: 'Evidence', timing: 'Timing', manager: 'Manager', company: 'Company', market: 'Market' };
-  var dimIcons = { evidence: 'trophy', timing: 'clock', manager: 'users', company: 'building', market: 'chart-bar' };
-  
   function block(key, label, icon, subtitle) {
     var b = discCanvasBlocks[key];
     if (b && b.filled) {
-      var color = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FAEEDA' : '#E1F5EE';
-      var textColor = b.strength === 'weak' ? '#791F1F' : b.strength === 'neutral' ? '#633806' : '#085041';
-      var badgeColor = b.strength === 'weak' ? '#A32D2D' : b.strength === 'neutral' ? '#BA7517' : '#0F6E56';
-      var badgeBg = b.strength === 'weak' ? 'rgba(163,45,45,0.1)' : b.strength === 'neutral' ? 'rgba(186,117,23,0.12)' : 'rgba(29,158,117,0.15)';
-      var badgeText = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
-      return '<div style="background:' + color + ';border-radius:6px;padding:8px 10px;">' +
-        '<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">' +
-        '<i class="ti ti-' + icon + '" style="font-size:11px;color:' + textColor + ';" aria-hidden="true"></i>' +
-        '<span style="font-size:9px;font-weight:500;color:' + textColor + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
-        '<span style="font-size:8px;color:' + badgeColor + ';margin-left:auto;font-weight:500;background:' + badgeBg + ';padding:1px 4px;border-radius:3px;">' + badgeText + '</span>' +
+      var bg = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FDF5E6' : '#E8F7F0';
+      var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
+      var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
+      var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
         '</div>' +
-        '<p style="font-size:9.5px;color:' + textColor + ';line-height:1.5;margin:0;">' + (b.insight || b.note || '') + '</p>' +
+        '<p style="font-size:11px;color:' + tc + ';line-height:1.55;margin:0;">' + (b.insight || b.note || '') + '</p>' +
         '</div>';
     }
-    return '<div style="border-radius:6px;padding:8px 10px;border:1px dashed var(--color-border-secondary);background:var(--color-background-secondary);">' +
-      '<div style="display:flex;align-items:center;gap:4px;">' +
-      '<i class="ti ti-' + icon + '" style="font-size:11px;color:var(--color-text-tertiary);" aria-hidden="true"></i>' +
-      '<span style="font-size:9px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;">' + label + '</span>' +
+    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+      '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
       '</div>' +
-      (subtitle ? '<p style="font-size:8.5px;color:var(--color-text-tertiary);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
       '</div>';
   }
 
   function planBlock(key, label, icon, subtitle) {
     var b = discCanvasBlocks[key];
     if (b && b.filled) {
-      return '<div style="background:#E6F1FB;border-radius:6px;padding:8px 10px;">' +
-        '<div style="display:flex;align-items:center;gap:4px;margin-bottom:5px;">' +
-        '<i class="ti ti-' + icon + '" style="font-size:11px;color:#0C447C;" aria-hidden="true"></i>' +
-        '<span style="font-size:9px;font-weight:500;color:#0C447C;text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
-        '<p style="font-size:9.5px;color:#0C447C;line-height:1.5;margin:0;">' + b.insight + '</p>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + b.insight + '</p>' +
         '</div>';
     }
-    return '<div style="border-radius:6px;padding:8px 10px;border:1px dashed var(--color-border-secondary);background:var(--color-background-secondary);">' +
-      '<div style="display:flex;align-items:center;gap:4px;">' +
-      '<i class="ti ti-' + icon + '" style="font-size:11px;color:var(--color-text-tertiary);" aria-hidden="true"></i>' +
-      '<span style="font-size:9px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;">' + label + '</span>' +
+    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+      '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
       '</div>' +
-      (subtitle ? '<p style="font-size:8.5px;color:var(--color-text-tertiary);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
+      (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') +
       '</div>';
   }
 
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
 
-  var html = '<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-top:8px;">';
-  html += '<div style="background:#1E3D72;padding:8px 14px;display:flex;align-items:center;justify-content:space-between;">';
-  html += '<span style="font-size:12px;font-weight:500;color:#fff;">Raise negotiation canvas</span>';
-  html += '<span style="font-size:10px;color:rgba(255,255,255,0.5);">' + filledCount + ' of 13</span>';
+  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
+  html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
+  html += '<span style="font-size:10px;color:rgba(255,255,255,0.45);">' + filledCount + ' of 13</span>';
   html += '</div>';
-  html += '<div style="padding:6px;display:flex;flex-direction:column;gap:4px;">';
+  html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
   // YOUR POSITION
-  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px 0;">Your position</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += block('evidence', 'Evidence', 'trophy');
   html += block('timing', 'Timing', 'clock');
   html += '</div>';
   html += block('manager', 'Manager', 'users');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += block('company', 'Company', 'building');
   html += block('market', 'Market', 'chart-bar');
   html += '</div>';
 
   // YOUR STRATEGY
-  html += '<div style="height:0.5px;background:var(--color-border-tertiary);margin:2px 0;"></div>';
-  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">Your strategy</div>';
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
   html += planBlock('leverage_risk', 'Leverage & risk', 'scale', 'After all dimensions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('emphasize', 'Emphasize', 'arrow-up', 'What to lead with');
   html += planBlock('avoid', 'Avoid', 'alert-triangle', 'What not to say');
   html += '</div>';
 
   // YOUR PLAN
-  html += '<div style="height:0.5px;background:var(--color-border-tertiary);margin:2px 0;"></div>';
-  html += '<div style="font-size:8px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;padding:0 4px;">Your plan</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('opening_script', 'Opening script', 'message', 'Your first words');
   html += planBlock('pushback', 'Pushback playbook', 'shield', 'Counter every objection');
   html += '</div>';
   html += planBlock('if_yes', 'If they say yes', 'check', 'Your closing moves');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('meeting_email', 'Meeting email', 'mail', 'Schedule the conversation');
   html += planBlock('raise_case', 'Raise case brief', 'file-text', 'Bring to the meeting');
   html += '</div>';
 
-  html += '</div>'; // padding container
+  html += '</div>';
 
   // Download bar
-  html += '<div style="padding:6px 10px;display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--color-border-tertiary);">';
-  html += '<span style="font-size:9px;color:var(--color-text-tertiary);"><i class="ti ti-file" style="font-size:10px;margin-right:3px;" aria-hidden="true"></i>raise-negotiation-canvas.pdf</span>';
+  html += '<div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);">';
+  html += '<span style="font-size:10px;color:var(--t3);">raise-negotiation-canvas.pdf</span>';
   if (filledCount >= 13) {
-    html += '<button onclick="downloadCanvas()" style="font-size:10px;padding:3px 8px;"><i class="ti ti-download" style="font-size:10px;margin-right:2px;" aria-hidden="true"></i>Download</button>';
+    html += '<button onclick="downloadCanvas()" style="font-size:11px;padding:4px 10px;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer;">Download</button>';
   } else {
-    html += '<button disabled style="font-size:10px;padding:3px 8px;opacity:0.35;"><i class="ti ti-download" style="font-size:10px;margin-right:2px;" aria-hidden="true"></i>Download</button>';
+    html += '<button disabled style="font-size:11px;padding:4px 10px;background:var(--muted);color:var(--t4);border:1px solid var(--divider);border-radius:6px;cursor:default;">Download</button>';
   }
   html += '</div>';
 
