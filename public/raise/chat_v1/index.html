@@ -3550,11 +3550,6 @@ function insertDiscRadar() {
 
   chatArea.appendChild(radarMsg);
   drawDiscRadarOnCanvas(canvas);
-
-  setTimeout(function() {
-    var wrap = $('chat-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
-  }, 100);
 }
 
 function drawDiscRadarOnCanvas(canvas) {
@@ -3675,7 +3670,9 @@ function renderDiscQuestion(idx) {
 
   setTimeout(function() {
     var wrap = $('chat-wrap');
-    if (wrap) wrap.scrollTop = wrap.scrollHeight;
+    if (wrap && coachBubble) {
+      wrap.scrollTo({ top: coachBubble.offsetTop - 10, behavior: 'smooth' });
+    }
   }, 100);
 }
 
@@ -3735,6 +3732,14 @@ function pickDiscAnswer(qIdx, opt, pill) {
   logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
 
   insertDiscRadar();
+
+  // Scroll to user's answer so they see it + radar + canvas below
+  setTimeout(function() {
+    var chatWrap = $('chat-wrap');
+    if (chatWrap && userBubble) {
+      chatWrap.scrollTo({ top: userBubble.offsetTop - 20, behavior: 'smooth' });
+    }
+  }, 150);
   
   discStep++;
   setTimeout(function() {
