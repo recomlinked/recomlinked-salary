@@ -3671,9 +3671,21 @@ function renderDiscQuestion(idx) {
   setTimeout(function() {
     var wrap = $('chat-wrap');
     if (wrap && coachBubble) {
-      wrap.scrollTo({ top: coachBubble.offsetTop - 10, behavior: 'smooth' });
+      var target = coachBubble.offsetTop - 10;
+      var start = wrap.scrollTop;
+      var distance = target - start;
+      var duration = 600;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        wrap.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
-  }, 100);
+  }, 200);
 }
 
 function pickDiscAnswer(qIdx, opt, pill) {
@@ -3733,11 +3745,23 @@ function pickDiscAnswer(qIdx, opt, pill) {
 
   insertDiscRadar();
 
-  // Scroll to user's answer so they see it + radar + canvas below
+  // Smooth scroll to user's answer
   setTimeout(function() {
     var chatWrap = $('chat-wrap');
     if (chatWrap && userBubble) {
-      chatWrap.scrollTo({ top: userBubble.offsetTop - 20, behavior: 'smooth' });
+      var target = userBubble.offsetTop - 20;
+      var start = chatWrap.scrollTop;
+      var distance = target - start;
+      var duration = 500;
+      var startTime = null;
+      function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        chatWrap.scrollTop = start + distance * easeOut(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }
   }, 150);
   
