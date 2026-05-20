@@ -3545,6 +3545,7 @@ function insertDiscRadar() {
 
   // Canvas below radar
   var canvasDiv = el('div', '', '');
+  canvasDiv.id = 'disc-canvas-live';
   canvasDiv.innerHTML = renderCanvasHTML();
   radarMsg.appendChild(canvasDiv);
 
@@ -3786,8 +3787,9 @@ async function generateDiscInsights() {
             discCanvasBlocks[dim].insight = data.insights[dim];
             discInsights[dim] = data.insights[dim];
           }
-          // Re-render canvas with updated block
-          insertDiscRadar();
+          // Update canvas in place (don't re-insert after paywall)
+          var liveCanvas = $('disc-canvas-live');
+          if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
         }, delay);
         delay += 800;
       });
