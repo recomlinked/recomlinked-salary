@@ -3485,9 +3485,18 @@ function initDiscoveryMode(container) {
     await sleep(300);
     insertDiscRadar();
 
-    // Then first question
+    // Then first question — scroll to it so users see chips, not input
     await sleep(400);
     renderDiscQuestion(discStep);
+    await sleep(200);
+    var firstQ = chatArea.querySelector('.disc-dim-tag');
+    if (firstQ) {
+      var chatWrap = $('chat-wrap');
+      var target = firstQ.closest('.coach-msg');
+      if (chatWrap && target) {
+        chatWrap.scrollTo({ top: target.offsetTop - 10, behavior: 'smooth' });
+      }
+    }
   })();
 }
 
