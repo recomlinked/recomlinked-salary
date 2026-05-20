@@ -2976,6 +2976,8 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     showHeaderPurchaseButton({});
+    unlockModeToggle();
+    setMode('sim');
     enableInput('Ask your coach anything\u2026');
     awaitFreeText(handlePostPaywallText);
     return;
