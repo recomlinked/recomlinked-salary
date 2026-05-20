@@ -3406,11 +3406,8 @@ function appendStandardPaywall(container) {
         '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>' +
       '</div>' +
     '</div>' +
-    '<div class="paywall-ticker"><div class="paywall-ticker-inner"></div></div>' +
   '</div>';
   container.appendChild(wrap);
-
-  populatePaywallTicker(wrap);
 
   var btn = wrap.querySelector('.btn-pay');
   if (btn) btn.onclick = function() {
