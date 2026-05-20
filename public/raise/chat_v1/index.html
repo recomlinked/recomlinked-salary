@@ -3329,11 +3329,25 @@ function pickDiscAnswer(qIdx, opt, pill) {
 
   // Store in SIM_STATE context
   var q = DISC_QUESTIONS[qIdx];
-  if (q.id === 'blocker') {
-    SIM_STATE.context.blocker_code = opt.val;
-  } else {
-    SIM_STATE.context[q.id] = opt.val;
-  }
+  SIM_STATE.context[q.id] = opt.val;
+
+  // Save discovery state to localStorage
+  try {
+    state.discovery = {
+      dims: JSON.parse(JSON.stringify(discDims)),
+      active: JSON.parse(JSON.stringify(discActive)),
+      levers: discLevers.slice(),
+      weaks: discWeaks.slice(),
+      step: discStep + 1,
+      answers: state.discovery ? state.discovery.answers || {} : {}
+    };
+    state.discovery.answers[q.id] = opt.val;
+    saveState();
+  } catch (e) { console.warn('[discovery] save failed:', e); }
+
+  // Log for analytics
+  logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
+  logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
 
   // Insert updated radar as coach message
   insertDiscRadar();
@@ -3349,6 +3363,10 @@ function showDiscPaywall() {
   if (!chatArea) return;
 
   var PRICE_USD = 19;
+
+  // Log paywall view
+  logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
+  logSession('disc_paywall', { levers: discLevers, weaks: discWeaks, dims: discDims });
 
   // Insert final radar
   insertDiscRadar();
