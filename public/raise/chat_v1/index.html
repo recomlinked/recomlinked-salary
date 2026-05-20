@@ -579,6 +579,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 @keyframes discFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .disc-ql{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:10px;line-height:1.4;}
 .disc-dim-tag{display:inline-block;font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;margin-right:4px;text-transform:uppercase;letter-spacing:0.03em;background:rgba(30,61,114,0.1);color:var(--navy);}
+@keyframes canvasBlockIn{from{opacity:0.3;transform:scale(0.97);}to{opacity:1;transform:scale(1);}}
 .disc-chip{display:flex;align-items:center;text-align:left;padding:10px 14px;background:var(--card);border:1.5px solid var(--divider);border-radius:10px;cursor:pointer;font-size:13px;color:var(--t1);width:100%;transition:all 0.15s;font-family:var(--sans);}
 .disc-chip:hover{border-color:var(--navy);background:rgba(30,61,114,0.03);}
 .disc-chip.selected{border-color:#185FA5;background:rgba(56,132,244,0.08);color:#185FA5;}
@@ -2965,9 +2966,8 @@ async function beginSimulationFlow(reasonParam) {
   // Don't reset simTapCount — it's restored from localStorage
   // so users can't get free taps by switching blockers
 
-  // If user already hit the paywall in a previous session (tried to
-  // bypass by picking a different blocker), show paywall immediately.
-  // But skip this entirely for paid users.
+  // If user already hit the paywall in a previous session,
+  // go straight to Canvas mode with locked Practice/Coaching.
   if (state.paywall_shown && !state.paid) {
     state.obstacle = blocker;
     state.current_exchange = 10;
@@ -2979,27 +2979,13 @@ async function beginSimulationFlow(reasonParam) {
     stopThinkingAnimation();
     const thinkBubble = document.querySelector('.thinking-bubble');
     if (thinkBubble) thinkBubble.remove();
+    const probCard = document.querySelector('.prob-card');
+    if (probCard) probCard.style.display = 'none';
 
-    await typeCoachBubble("You've already explored the free preview. Pick up where you left off with the full practice session.");
-    await sleep(300);
-
-    // Show promo discount banner for returning users
-    // No promo — clean $19 price
-    await sleep(200);
-
-    state.current_range = state.current_range || { floor: 45, ceiling: 70 };
-    state.initial_floor = state.initial_floor || 45;
-    await renderPaywallBubble({ animated: true, discounted: true });
-    var paywallHitNumber = incrementPaywallCount();
-    logEntry('paywall', { promo: isPromoActive() ? PROMO_CODE : null, paywall_count: paywallHitNumber });
-    logSession('paywall', { paywall_seen: true, paywall_count: paywallHitNumber });
     showToolbar();
     showModeToggle();
-    showHeaderPurchaseButton({});
     unlockModeToggle();
-    setMode('sim');
-    enableInput('Ask your coach anything\u2026');
-    awaitFreeText(handlePostPaywallText);
+    setMode('discovery');
     return;
   }
 
@@ -3189,6 +3175,12 @@ var discCanvasBlocks = {
 };
 
 function renderCanvasHTML() {
+  // Parse **bold** markers in insight text
+  function formatInsight(text) {
+    if (!text) return '';
+    return text.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  }
+
   var icons = {
     evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9H4.5a2.5 2.5 0 010-5C7 4 7 8 12 8s5-4 7.5-4a2.5 2.5 0 010 5H18"/><path d="M12 8v13"/><path d="M8 21h8"/></svg>',
     timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
@@ -3213,13 +3205,15 @@ function renderCanvasHTML() {
       var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
       var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
-      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;">' +
+      var hasAI = b.insight && b.insight.length > 40;
+      var animStyle = hasAI ? 'animation:canvasBlockIn 0.5s ease;' : '';
+      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;' + animStyle + '">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
         '<span style="color:' + tc + ';">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
         '</div>' +
-        '<p style="font-size:11px;color:' + tc + ';line-height:1.55;margin:0;">' + (b.insight || b.note || '') + '</p>' +
+        '<p style="font-size:11px;color:' + tc + ';line-height:1.55;margin:0;">' + formatInsight(b.insight || b.note || '') + '</p>' +
         '</div>';
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
@@ -3240,7 +3234,7 @@ function renderCanvasHTML() {
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + b.insight + '</p>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + formatInsight(b.insight) + '</p>' +
         '</div>';
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
@@ -3394,7 +3388,6 @@ function appendStandardPaywall(container) {
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Unlock full access \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '<div class="paywall-closing">$' + PRICE_USD + ' once, for a conversation that adds thousands to your salary.</div>' +
-    '<div class="paywall-ticker"><div class="paywall-ticker-inner"></div></div>' +
     '<div class="paywall-includes-title">Premium access includes</div>' +
     '<div style="display:flex;gap:8px;margin-top:8px;">' +
       '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
@@ -3413,6 +3406,7 @@ function appendStandardPaywall(container) {
         '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>' +
       '</div>' +
     '</div>' +
+    '<div class="paywall-ticker"><div class="paywall-ticker-inner"></div></div>' +
   '</div>';
   container.appendChild(wrap);
 
@@ -3783,23 +3777,29 @@ async function generateDiscInsights() {
     var data = await resp.json();
 
     if (data && data.insights) {
-      // Upgrade canvas blocks with AI insights
-      Object.keys(data.insights).forEach(function(dim) {
-        if (discCanvasBlocks[dim]) {
-          discCanvasBlocks[dim].insight = data.insights[dim];
-          discInsights[dim] = data.insights[dim];
-        }
+      // Upgrade canvas blocks one by one with animation
+      var dims = Object.keys(data.insights);
+      var delay = 0;
+      dims.forEach(function(dim) {
+        setTimeout(function() {
+          if (discCanvasBlocks[dim]) {
+            discCanvasBlocks[dim].insight = data.insights[dim];
+            discInsights[dim] = data.insights[dim];
+          }
+          // Re-render canvas with updated block
+          insertDiscRadar();
+        }, delay);
+        delay += 800;
       });
 
-      // Save insights
-      try {
-        state.discovery.insights = discInsights;
-        state.discovery.canvasBlocks = discCanvasBlocks;
-        saveState();
-      } catch (e) {}
-
-      // Re-render canvas with AI insights (replace static version)
-      insertDiscRadar();
+      // Save after all updates
+      setTimeout(function() {
+        try {
+          state.discovery.insights = discInsights;
+          state.discovery.canvasBlocks = discCanvasBlocks;
+          saveState();
+        } catch (e) {}
+      }, delay);
     }
   } catch (e) {
     // Fallback — static note text stays visible
@@ -5842,13 +5842,16 @@ async function resumeFromState() {
     SIM_STATE.blocker = blocker;
     SIM_STATE.context = {};
     SIM_STATE.branch_history = [];
-    // Don't reset simTapCount — restored from localStorage
     showToolbar();
     showModeToggle();
     unlockModeToggle();
 
-    // Resume in Practice mode (content was replayed into #messages)
-    setMode('sim');
+    // Free users go to Canvas mode; paid users resume in Practice
+    if (!state.paid) {
+      setMode('discovery');
+    } else {
+      setMode('sim');
+    }
 
     // Repopulate coaching mode with welcome + video
     // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
