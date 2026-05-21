@@ -4238,6 +4238,36 @@ function pickDiscAnswer(qIdx, opt, pill) {
 }
 
 async function generateDiscInsights() {
+  // Client-side fallback if API fails
+  function generateClientFallbacks() {
+    var strongDims = discLevers.join(', ') || 'your recent achievements';
+    var weakDims = discWeaks.join(', ') || 'potential objections';
+    var fallbacks = {
+      leverage_risk: 'Your leverage: ' + strongDims + '. Main risk: ' + weakDims + '. Lead with strength, prepare for the gap.',
+      emphasize: 'Lead with ' + strongDims + '. Frame your ask around value delivered, not time served.',
+      avoid: 'Don\'t apologize for asking. Don\'t give a range — give one number. Don\'t mention other offers unless you\'re ready to walk.',
+      opening_script: '"I wanted to check in on my compensation. Based on my contributions and where the market is, I believe an adjustment is overdue..."',
+      pushback: '**If they say:** "Budgets are tight right now." **Your response:** "I understand. When does the next cycle open? I\'d like to be first in line."',
+      if_yes: 'Get the number and timeline confirmed in writing. Send a same-day email summarizing what was agreed.',
+      meeting_email: 'Subject: Quick check-in on compensation. "Hi [Manager], I\'d love to schedule 20 minutes to discuss my compensation. Would [date] work?"',
+      raise_case: 'A one-page summary of your role growth, key achievements, market data, and proposed adjustment.'
+    };
+    Object.keys(fallbacks).forEach(function(key) {
+      if (discCanvasBlocks[key]) {
+        discCanvasBlocks[key].insight = fallbacks[key];
+        discCanvasBlocks[key].filled = true;
+        discCanvasBlocks[key].strength = 'plan';
+        discCanvasBlocks[key].teaser = true;
+        discInsights[key] = fallbacks[key];
+      }
+    });
+    try {
+      state.discovery.insights = discInsights;
+      state.discovery.canvasBlocks = discCanvasBlocks;
+      saveState();
+    } catch (e) {}
+  }
+
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
@@ -4253,19 +4283,22 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Step 2: Call API
+  // Step 2: Call API — position insights first, then strategy/plan
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, 5).forEach(function(q) {
     answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
+  console.log('[disc_insights] Sending:', JSON.stringify({ blocker: blockerCode, answers: answers, dims: discDims }));
 
+  // API Call 1: Position insights
   try {
     var resp = await fetch('/api/raise-coach', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         mode: 'disc_insights',
+        part: 'position',
         blocker: blockerCode,
         answers: answers,
         dims: discDims,
@@ -4274,15 +4307,54 @@ async function generateDiscInsights() {
       }),
     });
     var data = await resp.json();
+    console.log('[disc_insights] Position response:', JSON.stringify(data).slice(0, 200));
 
-    if (data && data.insights) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
-      // Populate all canvas blocks with AI insights
+    if (data && data.insights && Object.keys(data.insights).length > 0) {
       Object.keys(data.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim]) {
           discCanvasBlocks[dim].insight = data.insights[dim];
           discInsights[dim] = data.insights[dim];
-          // Strategy/plan blocks: mark as teaser (show first sentence only)
+        }
+      });
+    }
+  } catch (e) {
+    console.error('[disc_insights] Position API error:', e);
+  }
+
+  // Remove loading, show canvas with position insights
+  var loading = $('disc-loading');
+  if (loading) {
+    if (loading._arcStop) loading._arcStop();
+    if (loading._phraseStop) loading._phraseStop();
+    loading.remove();
+  }
+  var liveCanvas = $('disc-canvas-live');
+  if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
+
+  // API Call 2: Strategy & plan (runs while user reads position)
+  try {
+    var resp2 = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'disc_insights',
+        part: 'strategy',
+        blocker: blockerCode,
+        answers: answers,
+        dims: discDims,
+        levers: discLevers,
+        weaks: discWeaks,
+      }),
+    });
+    var data2 = await resp2.json();
+    console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
+
+    if (data2 && data2.insights && Object.keys(data2.insights).length > 0) {
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      Object.keys(data2.insights).forEach(function(dim) {
+        if (discCanvasBlocks[dim]) {
+          discCanvasBlocks[dim].insight = data2.insights[dim];
+          discInsights[dim] = data2.insights[dim];
           if (stratPlanKeys.indexOf(dim) >= 0) {
             discCanvasBlocks[dim].filled = true;
             discCanvasBlocks[dim].strength = 'plan';
@@ -4290,29 +4362,28 @@ async function generateDiscInsights() {
           }
         }
       });
-
-      // Save insights
-      try {
-        state.discovery.insights = discInsights;
-        state.discovery.canvasBlocks = discCanvasBlocks;
-        saveState();
-      } catch (e) {}
+      // Re-render canvas with strategy teasers
+      var lc2 = $('disc-canvas-live');
+      if (lc2) lc2.innerHTML = renderCanvasHTML();
+    } else {
+      console.warn('[disc_insights] Empty strategy response, generating fallbacks');
+      generateClientFallbacks();
+      var lc2 = $('disc-canvas-live');
+      if (lc2) lc2.innerHTML = renderCanvasHTML();
     }
   } catch (e) {
-    // Fallback — static note text stays in blocks
+    console.error('[disc_insights] Strategy API error:', e);
+    generateClientFallbacks();
+    var lc2 = $('disc-canvas-live');
+    if (lc2) lc2.innerHTML = renderCanvasHTML();
   }
 
-  // Step 3: Remove loading, show canvas + summary + paywall
-  var loading = $('disc-loading');
-  if (loading) {
-    if (loading._arcStop) loading._arcStop();
-    if (loading._phraseStop) loading._phraseStop();
-    loading.remove();
-  }
-
-  // Update canvas in place with AI insights
-  var liveCanvas = $('disc-canvas-live');
-  if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
+  // Save all insights
+  try {
+    state.discovery.insights = discInsights;
+    state.discovery.canvasBlocks = discCanvasBlocks;
+    saveState();
+  } catch (e) {}
 
   // Canvas intro bubble
   var introBubble = el('div', 'coach-msg', '');
