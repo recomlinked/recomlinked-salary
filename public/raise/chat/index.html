@@ -3329,20 +3329,20 @@ function _generatePDFPrintFallback() {
   html += '<div class="block" style="background:#f8f9fc;border:1px solid #dde0e8;">';
   html += '<div class="block-label" style="color:#1e3d72;margin-bottom:10px;font-size:11px;">Before the meeting</div>';
   html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
-  html += '<div>\u2610 Practice opening script out loud</div>';
-  html += '<div>\u2610 Prepare responses for top 3 pushbacks</div>';
-  html += '<div>\u2610 Print raise case brief</div>';
-  html += '<div>\u2610 Send meeting request email</div>';
-  html += '<div>\u2610 Confirm market rate from 2+ sources</div>';
-  html += '<div>\u2610 Schedule meeting (not Friday, not Monday morning)</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Practice opening script out loud</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Prepare responses for top 3 pushbacks</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Print raise case brief</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Send meeting request email</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Confirm market rate from 2+ sources</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Schedule meeting (not Friday, not Monday morning)</div>';
   html += '</div>';
   html += '<div class="block-label" style="color:#1e3d72;margin:14px 0 10px;font-size:11px;">After the meeting</div>';
   html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
-  html += '<div>\u2610 Send confirmation email within 24 hours</div>';
-  html += '<div>\u2610 If \u201cyes\u201d \u2014 get amount and timeline in writing</div>';
-  html += '<div>\u2610 If \u201clet me think\u201d \u2014 follow up in exactly 5 business days</div>';
-  html += '<div>\u2610 If \u201cno\u201d \u2014 ask \u201cWhat would change this?\u201d and set review date</div>';
-  html += '<div>\u2610 Document everything discussed</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Send confirmation email within 24 hours</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>If \u201cyes\u201d \u2014 get amount and timeline in writing</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>If \u201clet me think\u201d \u2014 follow up in exactly 5 business days</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>If \u201cno\u201d \u2014 ask \u201cWhat would change this?\u201d and set review date</div>';
+  html += '<div><span style="display:inline-block;width:12px;height:12px;border:1.5px solid #8a90a8;border-radius:2px;margin-right:6px;vertical-align:middle;"></span>Document everything discussed</div>';
   html += '</div>';
   html += '</div>';
 
@@ -3720,7 +3720,9 @@ function _generatePDFWithJsPDF() {
     'Confirm market rate from 2+ sources',
   ];
   beforeItems.forEach(function(item, i) {
-    doc.text('\u2610  ' + item, mx + 5, y + 9.5 + i * 3.5);
+    doc.setDrawColor(160, 165, 180);
+    doc.rect(mx + 5, y + 6.5 + i * 3.5, 2.5, 2.5, 'S');
+    doc.text('  ' + item, mx + 8, y + 9.5 + i * 3.5);
   });
   var afterY = y + 9.5 + beforeItems.length * 3.5 + 3;
   doc.setFont('helvetica', 'bold');
@@ -3735,7 +3737,9 @@ function _generatePDFWithJsPDF() {
     'If "no" \u2014 ask "What would change this?" and set review date'
   ];
   afterItems.forEach(function(item, i) {
-    doc.text('\u2610  ' + item, mx + 5, afterY + 4 + i * 3.5);
+    doc.setDrawColor(160, 165, 180);
+    doc.rect(mx + 5, afterY + 1 + i * 3.5, 2.5, 2.5, 'S');
+    doc.text('  ' + item, mx + 8, afterY + 4 + i * 3.5);
   });
   var totalChecklistH = (afterY - clY) + 4 + afterItems.length * 3.5 + 4;
   // Redraw box with correct height
@@ -4027,6 +4031,7 @@ function renderCanvasHTML() {
     html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Practice opening script out loud</div>';
     html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Prepare responses for top 3 pushbacks</div>';
     html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Send meeting request email</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;color:var(--t4);">&#9744; ...</div>';
     html += '</div>';
     html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);font-style:italic;">Full checklist with after-meeting steps in your PDF download</div>';
     html += '</div>';
