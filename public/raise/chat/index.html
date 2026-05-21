@@ -3284,7 +3284,7 @@ function _generatePDFPrintFallback() {
   html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan') + renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan') + '</div>';
 
   if (!isPaid) {
-    html += '<div class="cta-bar"><p>This is your partial canvas. Complete 2 more questions and AI writes your opening script, every pushback response, your meeting email, and a raise case brief you can hand to your manager.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas →</a></p></div>';
+    html += '<div class="cta-bar"><p>This is your partial canvas. Complete 2 more questions and we will write your opening script, every pushback response, your meeting email, and a raise case brief you can hand to your manager.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas →</a></p></div>';
   }
 
   html += '<div class="footer"><span>salary.recomlinked.com/raise</span><span class="gold">' + (isPaid ? 'Full version' : 'Free preview') + '</span></div>';
@@ -3540,7 +3540,7 @@ function _generatePDFWithJsPDF() {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(74, 80, 104);
-    doc.text('This is your partial canvas. Complete 2 more questions and AI writes your', mx + 6, y + 7);
+    doc.text('This is your partial canvas. Complete 2 more questions and we will write your', mx + 6, y + 7);
     doc.text('opening script, pushback responses, meeting email, and raise case brief.', mx + 6, y + 12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(gold[0], gold[1], gold[2]);
