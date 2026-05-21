@@ -3676,27 +3676,57 @@ function renderCanvasHTML() {
   function getFirstSentence(text) {
     if (!text) return '';
     var clean = text.replace(/\*\*/g, '');
-    // Find first sentence end
     var match = clean.match(/^[^.!?]*[.!?]/);
     if (match && match[0].length < clean.length - 5) return match[0];
-    // Fallback: first 80 chars
     if (clean.length > 80) return clean.slice(0, 80) + '...';
     return clean;
+  }
+
+  function getTeaserForBlock(key, text) {
+    if (!text) return { preview: '', badge: '' };
+    var clean = text.replace(/\*\*/g, '');
+
+    if (key === 'leverage_risk') {
+      // Full first sentence for leverage & risk
+      var match = clean.match(/^[^.!?]*[.!?]/);
+      return { preview: match ? match[0] : clean.slice(0, 100), badge: '' };
+    }
+    if (key === 'emphasize' || key === 'avoid') {
+      return { preview: clean.slice(0, 45) + '...', badge: '3 key points' };
+    }
+    if (key === 'opening_script') {
+      return { preview: clean.slice(0, 50) + '...', badge: 'Full script ready' };
+    }
+    if (key === 'pushback') {
+      return { preview: clean.slice(0, 45) + '...', badge: '4 prepared responses' };
+    }
+    if (key === 'if_yes') {
+      return { preview: clean.slice(0, 50) + '...', badge: '' };
+    }
+    if (key === 'meeting_email') {
+      var subMatch = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+      return { preview: subMatch ? subMatch[0] : clean.slice(0, 40) + '...', badge: 'Ready to send' };
+    }
+    if (key === 'raise_case') {
+      return { preview: clean.slice(0, 45) + '...', badge: 'One-page brief' };
+    }
+    return { preview: clean.slice(0, 60) + '...', badge: '' };
   }
 
   function planBlock(key, label, subtitle) {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
     if (b && b.filled && b.teaser) {
-      // Teaser mode: first sentence + fade + unlock
-      var firstSentence = getFirstSentence(b.insight);
+      // Teaser mode: short preview + badge + unlock
+      var t = getTeaserForBlock(key, b.insight);
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;position:relative;overflow:hidden;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
         '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + firstSentence + '</p>' +
-        '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:24px;margin-top:-12px;position:relative;"></div>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + t.preview + '</p>' +
+        '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
         '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
         '</div>';
     }
