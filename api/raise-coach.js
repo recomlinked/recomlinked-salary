@@ -753,28 +753,49 @@ The user is preparing to ask for a raise. Their main blocker: "${blockerContext}
 Their leverage points: ${leverList}
 Their weak spots: ${weakList}
 
+PART 1 — POSITION INSIGHTS:
 For each dimension below, write a 2-3 sentence insight that would surprise someone who has only read blog posts about asking for a raise. Be specific and tactical. Reference their exact situation. Use **bold** to highlight the single most important phrase or tactic in each insight.
 
 For WEAK dimensions (score < 40): also add a "**If they say:** '[most likely objection]'" line and a "**Your response:** '[exact words to use]'" line.
 
 For STRONG dimensions (score >= 60): tell them HOW to use this leverage — the specific tactic, not just "this is good."
 
-CRITICAL: You MUST return an insight for EVERY dimension listed below. Do not skip any.
+PART 2 — STRATEGY & PLAN:
+Based on the user's full position, also generate these sections:
+- leverage_risk: Summarize their leverage points vs risks. 2-3 sentences.
+- emphasize: What to lead with and why. 2-3 sentences.
+- avoid: What NOT to say or do. 2-3 sentences.
+- opening_script: Write the exact opening words (2-3 sentences) they should use to start the raise conversation. In first person, as if they're saying it.
+- pushback: The 2 most likely pushback lines from their manager, with exact responses. Use "**If they say:** '...'" and "**Your response:** '...'" format.
+- if_yes: What to do and say if the manager agrees. 2-3 sentences.
+- meeting_email: Write a short email (3-4 sentences) to request the meeting. Subject line included.
+- raise_case: A brief one-paragraph summary they could print and hand to their manager.
+
+CRITICAL: You MUST return ALL keys listed. Do not skip any.
 
 Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
 {
-  "evidence": "Your insight with **bold key phrase** here...",
-  "timing": "Your insight with **bold key phrase** here..."
-}
+  "evidence": "...",
+  "timing": "...",
+  "manager": "...",
+  "company": "...",
+  "market": "...",
+  "leverage_risk": "...",
+  "emphasize": "...",
+  "avoid": "...",
+  "opening_script": "...",
+  "pushback": "...",
+  "if_yes": "...",
+  "meeting_email": "...",
+  "raise_case": "..."
+}`;
 
-Only include dimensions that are listed below. Each insight should be 2-4 sentences max.`;
-
-  const userMessage = `Here are my assessed dimensions:\n${answeredDims}\n\nGenerate insights for each.`;
+  const userMessage = `Here are my assessed dimensions:\n${answeredDims}\n\nGenerate position insights AND strategy/plan sections for each.`;
 
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 800,
+      max_tokens: 2000,
       system,
       messages: [{ role: 'user', content: userMessage }],
     });
