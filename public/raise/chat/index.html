@@ -3304,6 +3304,15 @@ function _generatePDFPrintFallback() {
   html += renderBlock({key:'manager',label:'Manager'}, 'position');
   html += '<div class="row">' + renderBlock({key:'company',label:'Company'}, 'position') + renderBlock({key:'market',label:'Market'}, 'position') + '</div>';
 
+  // Overall Negotiation Position
+  var nScore = calculateNegotiationScore();
+  var nLabel = getNegotiationLabel(nScore);
+  html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:14px 16px;margin:8px 0;">';
+  html += '<div style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Overall Negotiation Position</div>';
+  html += '<div style="font-size:14px;font-weight:700;color:' + nLabel.color + ';margin-bottom:4px;">' + nLabel.label + '</div>';
+  html += '<div style="font-size:12px;color:' + nLabel.color + ';opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</div>';
+  html += '</div>';
+
   // YOUR STRATEGY
   html += '<div class="section-title">YOUR STRATEGY</div>';
   html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'}, 'strategy');
@@ -3314,6 +3323,28 @@ function _generatePDFPrintFallback() {
   html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}, 'plan') + renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan') + '</div>';
   html += renderBlock({key:'if_yes',label:'If They Say Yes'}, 'plan');
   html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan') + renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan') + '</div>';
+
+  // FULL CHECKLIST
+  html += '<div class="section-title">YOUR CHECKLIST</div>';
+  html += '<div class="block" style="background:#f8f9fc;border:1px solid #dde0e8;">';
+  html += '<div class="block-label" style="color:#1e3d72;margin-bottom:10px;font-size:11px;">Before the meeting</div>';
+  html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
+  html += '<div>\u2610 Practice opening script out loud</div>';
+  html += '<div>\u2610 Prepare responses for top 3 pushbacks</div>';
+  html += '<div>\u2610 Print raise case brief</div>';
+  html += '<div>\u2610 Send meeting request email</div>';
+  html += '<div>\u2610 Confirm market rate from 2+ sources</div>';
+  html += '<div>\u2610 Schedule meeting (not Friday, not Monday morning)</div>';
+  html += '</div>';
+  html += '<div class="block-label" style="color:#1e3d72;margin:14px 0 10px;font-size:11px;">After the meeting</div>';
+  html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
+  html += '<div>\u2610 Send confirmation email within 24 hours</div>';
+  html += '<div>\u2610 If \u201cyes\u201d \u2014 get amount and timeline in writing</div>';
+  html += '<div>\u2610 If \u201clet me think\u201d \u2014 follow up in exactly 5 business days</div>';
+  html += '<div>\u2610 If \u201cno\u201d \u2014 ask \u201cWhat would change this?\u201d and set review date</div>';
+  html += '<div>\u2610 Document everything discussed</div>';
+  html += '</div>';
+  html += '</div>';
 
   if (!isPaid) {
     html += '<div class="cta-bar"><p>Your negotiation position is mapped and your strategy preview is ready. Unlock full access to reveal your complete opening script, every pushback response, meeting email, and raise case brief.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Unlock your full canvas →</a></p></div>';
@@ -3624,6 +3655,29 @@ function _generatePDFWithJsPDF() {
   drawFullWidth('manager', 'Manager', 'position');
   drawRow(['company', 'market'], ['Company', 'Market'], 'position');
 
+  // Overall Negotiation Position card
+  var nScore = calculateNegotiationScore();
+  var nLabel = getNegotiationLabel(nScore);
+  var npColors = nScore >= 72 ? [232,247,240] : nScore >= 40 ? [253,245,230] : nScore >= 25 ? [255,244,230] : [252,235,235];
+  var npText = nScore >= 72 ? [10,92,58] : nScore >= 40 ? [106,74,16] : nScore >= 25 ? [180,90,0] : [122,32,32];
+  var npBorder = nScore >= 72 ? [26,158,108] : nScore >= 40 ? [201,168,76] : nScore >= 25 ? [200,120,20] : [204,68,68];
+  y += 2;
+  if (y + 20 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  doc.setFillColor(npColors[0], npColors[1], npColors[2]);
+  doc.setDrawColor(npBorder[0], npBorder[1], npBorder[2]);
+  doc.roundedRect(mx, y, W - mx * 2, 20, 2, 2, 'FD');
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(npText[0], npText[1], npText[2]);
+  doc.text('OVERALL NEGOTIATION POSITION', mx + 5, y + 5);
+  doc.setFontSize(9);
+  doc.text(nLabel.label, mx + 5, y + 10.5);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Your target: ' + nLabel.target.slice(0, 90), mx + 5, y + 15.5);
+  if (nLabel.target.length > 90) doc.text(nLabel.target.slice(90), mx + 5, y + 19);
+  y += 24;
+
   y += 4;
   doc.setDrawColor(220, 225, 235);
   doc.line(mx, y, W - mx, y);
@@ -3642,6 +3696,53 @@ function _generatePDFWithJsPDF() {
   drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook'], 'plan');
   drawFullWidth('if_yes', 'If They Say Yes', 'plan');
   drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief'], 'plan');
+
+  // ── CHECKLIST ──
+  y += 4;
+  if (y + 50 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  drawSectionTitle('Your checklist');
+  doc.setFillColor(248, 249, 252);
+  doc.setDrawColor(220, 224, 232);
+  var clY = y;
+  doc.roundedRect(mx, y, W - mx * 2, 52, 2, 2, 'FD');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 61, 114);
+  doc.text('BEFORE THE MEETING', mx + 5, y + 5.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(74, 80, 104);
+  var beforeItems = [
+    'Practice opening script out loud',
+    'Prepare responses for top 3 pushbacks',
+    'Print raise case brief',
+    'Send meeting request email',
+    'Confirm market rate from 2+ sources',
+  ];
+  beforeItems.forEach(function(item, i) {
+    doc.text('\u2610  ' + item, mx + 5, y + 9.5 + i * 3.5);
+  });
+  var afterY = y + 9.5 + beforeItems.length * 3.5 + 3;
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 61, 114);
+  doc.text('AFTER THE MEETING', mx + 5, afterY);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(74, 80, 104);
+  var afterItems = [
+    'Send confirmation email within 24 hours',
+    'If "yes" \u2014 get amount and timeline in writing',
+    'If "let me think" \u2014 follow up in exactly 5 business days',
+    'If "no" \u2014 ask "What would change this?" and set review date'
+  ];
+  afterItems.forEach(function(item, i) {
+    doc.text('\u2610  ' + item, mx + 5, afterY + 4 + i * 3.5);
+  });
+  var totalChecklistH = (afterY - clY) + 4 + afterItems.length * 3.5 + 4;
+  // Redraw box with correct height
+  doc.setFillColor(248, 249, 252);
+  doc.setDrawColor(220, 224, 232);
+  doc.roundedRect(mx, clY, W - mx * 2, totalChecklistH, 2, 2, 'S');
+  y = clY + totalChecklistH + 4;
 
   // ── CTA for free users ──
   if (!isPaid) {
@@ -3671,6 +3772,44 @@ function _generatePDFWithJsPDF() {
     // Fallback to print version
     _generatePDFPrintFallback();
   }
+}
+
+function calculateNegotiationScore() {
+  var e = discDims.evidence || 0;
+  var m = discDims.manager || 0;
+  var t = discDims.timing || 0;
+  var c = discDims.company || 0;
+  var k = discDims.market || 0;
+
+  // Step 1: Weighted base
+  var base = (e * 0.25) + (m * 0.25) + (t * 0.20) + (c * 0.15) + (k * 0.15);
+
+  // Step 2: Weak penalty (dims < 40)
+  var weakCount = [e,m,t,c,k].filter(function(d) { return d < 40; }).length;
+  var weakPenalty = weakCount === 0 ? 0 : weakCount === 1 ? -5 : weakCount === 2 ? -8 : -10;
+
+  // Step 3: Strength bonus (dims >= 70)
+  var strongCount = [e,m,t,c,k].filter(function(d) { return d >= 70; }).length;
+  var strongBonus = strongCount <= 1 ? 0 : strongCount === 2 ? 3 : strongCount === 3 ? 5 : 8;
+
+  // Step 4: Critical combos
+  var comboBonus = 0;
+  if (e >= 70 && m >= 60) comboBonus += 4;
+  if (e < 40 && m < 40) comboBonus -= 6;
+  if (t < 30) comboBonus -= 3;
+  if (e >= 70 && k >= 70) comboBonus += 3;
+
+  // Step 5: Clamp
+  var final = Math.max(10, Math.min(95, base + weakPenalty + strongBonus + comboBonus));
+  return Math.round(final);
+}
+
+function getNegotiationLabel(score) {
+  if (score >= 72) return { label: 'Strong negotiating position', color: '#1a9e6c', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.' };
+  if (score >= 55) return { label: 'Solid position \u2014 preparation needed', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Secure a specific raise with a committed timeline in writing.' };
+  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#8a6d20', bg: '#FDF5E6', border: 'rgba(201,168,76,0.25)', target: 'Open the conversation seriously and lock in a review date within 90 days.' };
+  if (score >= 25) return { label: 'Challenging \u2014 strategy is everything', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'Build your case with your manager and establish a clear path to a raise.' };
+  return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
 }
 
 function renderCanvasHTML() {
@@ -3830,6 +3969,22 @@ function renderCanvasHTML() {
   html += block('market', 'Market', 'Your next question');
   html += '</div>';
 
+  // OVERALL NEGOTIATION POSITION card
+  var answeredCount = Object.values(discActive).filter(Boolean).length;
+  if (answeredCount >= 3) {
+    var nScore = calculateNegotiationScore();
+    var nLabel = getNegotiationLabel(nScore);
+    html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;margin-top:4px;">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
+    
+    html += '</div>';
+    html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '</div>';
+  }
+
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
@@ -3851,6 +4006,24 @@ function renderCanvasHTML() {
   html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
   html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
   html += '</div>';
+
+  // CHECKLIST card (web preview)
+  if (answeredCount >= 3) {
+    html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+    html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your checklist</div>';
+    html += '<div style="border-radius:8px;padding:10px 12px;background:var(--muted);border:1px solid var(--divider);">';
+    html += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">';
+    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">Pre-meeting checklist</span>';
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--t2);line-height:1.8;">';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Practice opening script out loud</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Prepare responses for top 3 pushbacks</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Send meeting request email</div>';
+    html += '</div>';
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);font-style:italic;">Full checklist with after-meeting steps in your PDF download</div>';
+    html += '</div>';
+  }
 
   html += '</div>';
 
