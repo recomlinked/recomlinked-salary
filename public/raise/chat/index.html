@@ -4707,7 +4707,17 @@ async function generateDiscInsights() {
 
   // Canvas intro bubble
   var introBubble = el('div', 'coach-msg', '');
-  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>negotiation position is mapped</strong>. We\u2019ve generated a preview of your <strong>Raise Negotiation Canvas</strong> \u2014 your opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief are ready. Unlock to reveal your <strong>complete negotiation plan</strong>, personalized to your situation.</p></div>';
+  var introScore = calculateNegotiationScore();
+  var introLabel = getNegotiationLabel(introScore);
+  var introLines = {
+    strong: 'Your negotiation position is <strong>strong</strong>. Your target: <strong>negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.</strong>',
+    solid: 'Your negotiation position is <strong>solid \u2014 but preparation is key</strong>. Your target: <strong>secure a specific raise with a committed timeline in writing.</strong>',
+    viable: 'Your negotiation position is <strong>viable \u2014 the right approach matters</strong>. Your target: <strong>open the conversation seriously and lock in a review date.</strong>',
+    challenging: 'Your negotiation position is <strong>challenging \u2014 but strategy changes everything</strong>. Your target: <strong>build your case with your manager and establish a clear path to a raise.</strong>',
+    early: 'Your negotiation position is <strong>early stage \u2014 but there\u2019s a path</strong>. Your target: <strong>plant the seed, increase visibility, and create conditions for 2\u20133 months from now.</strong>'
+  };
+  var introKey = introScore >= 72 ? 'strong' : introScore >= 55 ? 'solid' : introScore >= 40 ? 'viable' : introScore >= 25 ? 'challenging' : 'early';
+  introBubble.innerHTML = '<div class="bubble"><p>' + introLines[introKey] + ' Your Raise Negotiation Canvas is ready above \u2014 opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief. Unlock to reveal your complete plan.</p></div>';
   chatArea.appendChild(introBubble);
 
   // Log and show paywall
