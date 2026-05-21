@@ -3212,7 +3212,7 @@ function _generatePDFPrintFallback() {
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
   html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
   html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
-  html += '.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;} .row .block{margin-bottom:0;}';
+  html += '.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;align-items:stretch;} .row .block{margin-bottom:0;height:auto;min-height:100%;}';
   html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;}';
   html += '.block-label svg{flex-shrink:0;}';
   html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;}';
