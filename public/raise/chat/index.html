@@ -3215,12 +3215,12 @@ function _generatePDFPrintFallback() {
   html += '.header{background:#1e3d72;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}';
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
   html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
-  html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
+  html += '.block{border-radius:8px;padding:14px 16px;margin-bottom:6px;}';
   html += '.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;align-items:stretch;} .row .block{margin-bottom:0;height:auto;min-height:100%;}';
   html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;}';
   html += '.block-label svg{flex-shrink:0;}';
   html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;}';
-  html += '.block-text{font-size:12px;line-height:1.6;margin-top:6px;}';
+  html += '.block-text{font-size:12px;line-height:1.6;margin-top:10px;}';
   html += '.strong{background:#E8F7F0;border:1px solid rgba(26,158,108,0.2);} .strong .block-label{color:#0a5c3a;} .strong .block-badge{background:rgba(26,158,108,0.15);color:#1a9e6c;}';
   html += '.weak{background:#FCEBEB;border:1px solid rgba(204,68,68,0.2);} .weak .block-label{color:#7a2020;} .weak .block-badge{background:rgba(204,68,68,0.1);color:#c44;}';
   html += '.neutral{background:#FDF5E6;border:1px solid rgba(201,168,76,0.2);} .neutral .block-label{color:#6a4a10;} .neutral .block-badge{background:rgba(201,168,76,0.12);color:#c9a84c;}';
@@ -3249,9 +3249,10 @@ function _generatePDFPrintFallback() {
     raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
   };
 
-  function renderBlock(item) {
+  function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
+    var emptyText = section === 'position' ? 'Answer the next question to fill' : 'Will fill after completing your position';
     if (b && b.filled) {
       var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
       var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
@@ -3261,26 +3262,26 @@ function _generatePDFPrintFallback() {
       h += '</div><div class="block-text">' + text + '</div></div>';
       return h;
     } else {
-      return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">Will fill after completing your position</div></div>';
+      return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">' + emptyText + '</div></div>';
     }
   }
 
   // YOUR POSITION
   html += '<div class="section-title">YOUR POSITION</div>';
-  html += '<div class="row">' + renderBlock({key:'evidence',label:'Evidence'}) + renderBlock({key:'timing',label:'Timing'}) + '</div>';
-  html += renderBlock({key:'manager',label:'Manager'});
-  html += '<div class="row">' + renderBlock({key:'company',label:'Company'}) + renderBlock({key:'market',label:'Market'}) + '</div>';
+  html += '<div class="row">' + renderBlock({key:'evidence',label:'Evidence'}, 'position') + renderBlock({key:'timing',label:'Timing'}, 'position') + '</div>';
+  html += renderBlock({key:'manager',label:'Manager'}, 'position');
+  html += '<div class="row">' + renderBlock({key:'company',label:'Company'}, 'position') + renderBlock({key:'market',label:'Market'}, 'position') + '</div>';
 
   // YOUR STRATEGY
   html += '<div class="section-title">YOUR STRATEGY</div>';
-  html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'});
-  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}) + renderBlock({key:'avoid',label:'Avoid'}) + '</div>';
+  html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'}, 'strategy');
+  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}, 'strategy') + renderBlock({key:'avoid',label:'Avoid'}, 'strategy') + '</div>';
 
   // YOUR PLAN
   html += '<div class="section-title">YOUR PLAN</div>';
-  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}) + renderBlock({key:'pushback',label:'Pushback Playbook'}) + '</div>';
-  html += renderBlock({key:'if_yes',label:'If They Say Yes'});
-  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}) + renderBlock({key:'raise_case',label:'Raise Case Brief'}) + '</div>';
+  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}, 'plan') + renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan') + '</div>';
+  html += renderBlock({key:'if_yes',label:'If They Say Yes'}, 'plan');
+  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan') + renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan') + '</div>';
 
   if (!isPaid) {
     html += '<div class="cta-bar"><p>Answer all 5 questions about your negotiation position and AI will analyze your situation, fill all sections and generate your complete negotiation plan.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas at salary.recomlinked.com/raise →</a></p></div>';
@@ -3358,30 +3359,63 @@ function _generatePDFWithJsPDF() {
   // Icons not supported in jsPDF - labels are clear enough
   function drawIcon() {}
 
-  function drawBlock(block, label, x, blockW, forceH) {
+  function drawBoldText(doc, text, x, y, maxWidth, color) {
+    var parts = text.split(/(\*\*[^*]+?\*\*)/g);
+    var lines = [];
+    var currentLine = [];
+    var currentWidth = 0;
+    parts.forEach(function(part) {
+      var isBold = part.startsWith('**') && part.endsWith('**');
+      var clean = isBold ? part.slice(2, -2) : part;
+      var words = clean.split(' ');
+      words.forEach(function(word) {
+        if (!word) return;
+        var prefix = currentLine.length > 0 ? ' ' : '';
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        var w = doc.getTextWidth(prefix + word);
+        if (currentWidth + w > maxWidth && currentLine.length > 0) {
+          lines.push(currentLine.slice());
+          currentLine = [{ text: word, bold: isBold }];
+          currentWidth = doc.getTextWidth(word);
+        } else {
+          currentLine.push({ text: prefix + word, bold: isBold });
+          currentWidth += w;
+        }
+      });
+    });
+    if (currentLine.length > 0) lines.push(currentLine);
+    lines.forEach(function(line, li) {
+      var cx = x;
+      line.forEach(function(seg) {
+        doc.setFont('helvetica', seg.bold ? 'bold' : 'normal');
+        doc.setTextColor(color[0], color[1], color[2]);
+        doc.text(seg.text, cx, y + li * 3.5);
+        cx += doc.getTextWidth(seg.text);
+      });
+    });
+    return lines.length;
+  }
+
+  function drawBlock(block, label, x, blockW, forceH, section) {
     var b = discCanvasBlocks[block];
     var filled = b && b.filled;
     var insight = filled ? (b.insight || b.note || '') : '';
     var padX = 5, padY = 3;
+    var emptyText = section === 'position' ? 'Answer the next question to fill' : 'Will fill after completing your position';
 
     if (filled) {
       var c = getBlockColors(b.strength);
       doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
       doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
-
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       var textLines = wrapText(insight, blockW - padX * 2 - 2);
       var blockH = forceH || (8 + textLines.length * 3.5 + padY);
-
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-      drawIcon(doc, block, x + 3, y + 5.5, c.text);
-
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
       doc.text(label.toUpperCase(), x + padX, y + 5);
-
       if (c.badge) {
         var bw = doc.getTextWidth(c.badge) + 4;
         doc.setFillColor(c.border[0], c.border[1], c.border[2]);
@@ -3390,37 +3424,27 @@ function _generatePDFWithJsPDF() {
         doc.setTextColor(255, 255, 255);
         doc.text(c.badge, x + blockW - 4 - bw / 2, y + 4.8, { align: 'center' });
       }
-
       doc.setFontSize(7.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(c.text[0], c.text[1], c.text[2]);
-      textLines.forEach(function(line, i) {
-        doc.text(line, x + padX, y + 9 + i * 3.5);
-      });
-
+      drawBoldText(doc, insight, x + padX, y + 9, blockW - padX * 2 - 2, c.text);
       return blockH + 2;
     } else {
       var blockH = forceH || 14;
       doc.setFillColor(240, 241, 245);
       doc.setDrawColor(200, 205, 215);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-      drawIcon(doc, block, x + 3, y + 5.5, [160, 165, 180]);
-
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(160, 165, 180);
       doc.text(label.toUpperCase(), x + padX, y + 5.5);
-
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(180, 185, 195);
-      doc.text('Will fill after completing your position', x + padX, y + 10);
-
+      doc.text(emptyText, x + padX, y + 10);
       return blockH + 2;
     }
   }
 
-  function drawRow(blocks, labels) {
+  function drawRow(blocks, labels, section) {
     var colW = blocks.length === 1 ? (W - mx * 2) : ((W - mx * 2 - 4) / blocks.length);
     var maxH = 0;
     blocks.forEach(function(block) {
@@ -3446,12 +3470,12 @@ function _generatePDFWithJsPDF() {
     blocks.forEach(function(block, i) {
       y = savedY;
       var xPos = mx + i * (colW + (blocks.length > 1 ? 4 / (blocks.length - 1) : 0));
-      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0), maxH);
+      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0), maxH, section);
     });
     y = savedY + maxH + 2;
   }
 
-  function drawFullWidth(block, label) {
+  function drawFullWidth(block, label, section) {
     var fullW = W - mx * 2;
     var b = discCanvasBlocks[block];
     var estH = 14;
@@ -3466,7 +3490,7 @@ function _generatePDFWithJsPDF() {
       doc.addPage();
       y = 16;
     }
-    var h = drawBlock(block, label, mx, fullW);
+    var h = drawBlock(block, label, mx, fullW, null, section);
     y += h;
   }
 
@@ -3483,9 +3507,9 @@ function _generatePDFWithJsPDF() {
 
   // ── Build sections ──
   drawSectionTitle('Your position');
-  drawRow(['evidence', 'timing'], ['Evidence', 'Timing']);
-  drawFullWidth('manager', 'Manager');
-  drawRow(['company', 'market'], ['Company', 'Market']);
+  drawRow(['evidence', 'timing'], ['Evidence', 'Timing'], 'position');
+  drawFullWidth('manager', 'Manager', 'position');
+  drawRow(['company', 'market'], ['Company', 'Market'], 'position');
 
   y += 4;
   doc.setDrawColor(220, 225, 235);
@@ -3493,8 +3517,8 @@ function _generatePDFWithJsPDF() {
   y += 6;
 
   drawSectionTitle('Your strategy');
-  drawFullWidth('leverage_risk', 'Leverage & Risk');
-  drawRow(['emphasize', 'avoid'], ['Emphasize', 'Avoid']);
+  drawFullWidth('leverage_risk', 'Leverage & Risk', 'strategy');
+  drawRow(['emphasize', 'avoid'], ['Emphasize', 'Avoid'], 'strategy');
 
   y += 4;
   doc.setDrawColor(220, 225, 235);
@@ -3502,9 +3526,9 @@ function _generatePDFWithJsPDF() {
   y += 6;
 
   drawSectionTitle('Your plan');
-  drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook']);
-  drawFullWidth('if_yes', 'If They Say Yes');
-  drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief']);
+  drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook'], 'plan');
+  drawFullWidth('if_yes', 'If They Say Yes', 'plan');
+  drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief'], 'plan');
 
   // ── CTA for free users ──
   if (!isPaid) {
