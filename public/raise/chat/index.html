@@ -3252,7 +3252,7 @@ function _generatePDFPrintFallback() {
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var emptyText = section === 'position' ? 'Answer the next question to fill' : 'Will fill after completing your position';
+    var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
     if (b && b.filled) {
       var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
       var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
@@ -3401,7 +3401,7 @@ function _generatePDFWithJsPDF() {
     var filled = b && b.filled;
     var insight = filled ? (b.insight || b.note || '') : '';
     var padX = 5, padY = 3;
-    var emptyText = section === 'position' ? 'Answer the next question to fill' : 'Will fill after completing your position';
+    var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
 
     if (filled) {
       var c = getBlockColors(b.strength);
@@ -3643,35 +3643,35 @@ function renderCanvasHTML() {
   // YOUR POSITION
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('evidence', 'Evidence');
-  html += block('timing', 'Timing');
+  html += block('evidence', 'Evidence', 'Your next question');
+  html += block('timing', 'Timing', 'Your next question');
   html += '</div>';
-  html += block('manager', 'Manager');
+  html += block('manager', 'Manager', 'Your next question');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('company', 'Company');
-  html += block('market', 'Market');
+  html += block('company', 'Company', 'Your next question');
+  html += block('market', 'Market', 'Your next question');
   html += '</div>';
 
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after completing your position');
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'Will fill after completing your position');
-  html += planBlock('avoid', 'Avoid', 'Will fill after completing your position');
+  html += planBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
+  html += planBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('opening_script', 'Opening script', 'Will fill after completing your position');
-  html += planBlock('pushback', 'Pushback playbook', 'Will fill after completing your position');
+  html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
+  html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
   html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Will fill after completing your position');
+  html += planBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('meeting_email', 'Meeting email', 'Will fill after completing your position');
-  html += planBlock('raise_case', 'Raise case brief', 'Will fill after completing your position');
+  html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
+  html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
   html += '</div>';
 
   html += '</div>';
@@ -4225,7 +4225,7 @@ async function generateDiscInsights() {
 
   // Canvas intro bubble
   var introBubble = el('div', 'coach-msg', '');
-  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is <strong>the most complete tool</strong> you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  introBubble.innerHTML = '<div class="bubble"><p>You answered <strong>3 of 5 questions</strong>. Answer 2 more and we will complete your <strong>Raise Negotiation Canvas</strong> based on your negotiation position \u2014 opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief. <strong>The most complete tool</strong> you can bring to a raise conversation, personalized to your situation.</p></div>';
   chatArea.appendChild(introBubble);
 
   // Log and show paywall
