@@ -4140,7 +4140,7 @@ function appendStandardPaywall(container) {
   var PRICE_USD = 19;
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
-    '<p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>' +
+    '<p class="paywall-headline"><strong>No one can say no when you walk in with a complete plan.</strong></p>' +
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Unlock full access \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '<div class="paywall-closing">$' + PRICE_USD + ' once, for a conversation that adds thousands to your salary.</div>' +
@@ -7558,7 +7558,7 @@ async function renderPaywallBubble(opts) {
   const displayPrice = PRICE_USD;
   const ctaPrice = `$${PRICE_USD}`;
 
-  const headline = `Walk into the negotiation ready.`;
+  const headline = `No one can say no when you walk in with a complete plan.`;
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
@@ -7878,7 +7878,7 @@ async function handleCoachingChat(userText) {
     const ctaPrice = `$${PRICE_USD}`;
     limitWrap.innerHTML = `
       <div class="bubble paywall-bubble">
-        <p class="paywall-headline"><strong>Walk into the negotiation ready.</strong></p>
+        <p class="paywall-headline"><strong>No one can say no when you walk in with a complete plan.</strong></p>
         <div class="paywall-pitch"></div>
         <button class="btn-pay paywall-cta" onclick="startCheckout()">
           Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
