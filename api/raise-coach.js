@@ -720,7 +720,7 @@ async function handleDiscoveryMode(body, res) {
 // ══ DISC INSIGHTS — AI-generated canvas insights           ══
 // ════════════════════════════════════════════════════════════
 async function handleDiscInsights(body, res) {
-  const { blocker, answers, dims, levers, weaks } = body;
+  const { blocker, answers, dims, levers, weaks, part } = body;
 
   if (!answers || typeof answers !== 'object') {
     return res.status(400).json({ error: 'answers required' });
@@ -747,55 +747,51 @@ async function handleDiscInsights(body, res) {
   const leverList = (levers || []).join(', ') || 'none identified';
   const weakList = (weaks || []).join(', ') || 'none identified';
 
-  const system = `You are a senior salary negotiation coach with 20+ years of experience. You give advice that surprises people — counterintuitive, specific, tactical. Not generic blog advice.
+  let system, userMessage, maxTokens;
 
-The user is preparing to ask for a raise. Their main blocker: "${blockerContext}".
-Their leverage points: ${leverList}
-Their weak spots: ${weakList}
+  if (part === 'strategy') {
+    system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
 
-PART 1 — POSITION INSIGHTS:
-For each dimension below, write a 2-3 sentence insight that would surprise someone who has only read blog posts about asking for a raise. Be specific and tactical. Reference their exact situation. Use **bold** to highlight the single most important phrase or tactic in each insight.
+User preparing to ask for a raise. Blocker: "${blockerContext}".
+Leverage: ${leverList}. Weak spots: ${weakList}.
 
-For WEAK dimensions (score < 40): also add a "**If they say:** '[most likely objection]'" line and a "**Your response:** '[exact words to use]'" line.
+Based on user's position below, generate strategy and plan. Use **bold** for key tactics.
 
-For STRONG dimensions (score >= 60): tell them HOW to use this leverage — the specific tactic, not just "this is good."
+Sections:
+- leverage_risk: Leverage points vs risks. 2-3 sentences.
+- emphasize: What to lead with. 2-3 sentences.
+- avoid: What NOT to say. 2-3 sentences.
+- opening_script: Exact opening words in first person. 2-3 sentences.
+- pushback: 2 likely manager objections with responses. "**If they say:** '...'" / "**Your response:** '...'" format.
+- if_yes: What to do if manager agrees. 2-3 sentences.
+- meeting_email: Short email to request meeting. Include subject line.
+- raise_case: One-paragraph summary to hand to manager.
 
-PART 2 — STRATEGY & PLAN:
-Based on the user's full position, also generate these sections:
-- leverage_risk: Summarize their leverage points vs risks. 2-3 sentences.
-- emphasize: What to lead with and why. 2-3 sentences.
-- avoid: What NOT to say or do. 2-3 sentences.
-- opening_script: Write the exact opening words (2-3 sentences) they should use to start the raise conversation. In first person, as if they're saying it.
-- pushback: The 2 most likely pushback lines from their manager, with exact responses. Use "**If they say:** '...'" and "**Your response:** '...'" format.
-- if_yes: What to do and say if the manager agrees. 2-3 sentences.
-- meeting_email: Write a short email (3-4 sentences) to request the meeting. Subject line included.
-- raise_case: A brief one-paragraph summary they could print and hand to their manager.
+Return ALL 8 keys. Respond ONLY with valid JSON (no markdown, no backticks):
+{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","if_yes":"...","meeting_email":"...","raise_case":"..."}`;
+    userMessage = `Position:\n${answeredDims}\n\nGenerate strategy and plan.`;
+    maxTokens = 1500;
 
-CRITICAL: You MUST return ALL keys listed. Do not skip any.
+  } else {
+    system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
 
-Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
-{
-  "evidence": "...",
-  "timing": "...",
-  "manager": "...",
-  "company": "...",
-  "market": "...",
-  "leverage_risk": "...",
-  "emphasize": "...",
-  "avoid": "...",
-  "opening_script": "...",
-  "pushback": "...",
-  "if_yes": "...",
-  "meeting_email": "...",
-  "raise_case": "..."
-}`;
+User preparing to ask for a raise. Blocker: "${blockerContext}".
+Leverage: ${leverList}. Weak spots: ${weakList}.
 
-  const userMessage = `Here are my assessed dimensions:\n${answeredDims}\n\nGenerate position insights AND strategy/plan sections for each.`;
+For each dimension, write 2-3 sentence insight. Use **bold** for the key tactic.
+WEAK (score < 40): add "**If they say:** '...'" and "**Your response:** '...'" lines.
+STRONG (score >= 60): tell HOW to use this leverage — specific tactic.
+
+Return ALL dimensions. Respond ONLY with valid JSON (no markdown, no backticks):
+{"evidence":"...","timing":"...","manager":"...","company":"...","market":"..."}`;
+    userMessage = `Dimensions:\n${answeredDims}\n\nGenerate insights.`;
+    maxTokens = 800;
+  }
 
   try {
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      max_tokens: maxTokens,
       system,
       messages: [{ role: 'user', content: userMessage }],
     });
@@ -803,17 +799,17 @@ Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
     const raw = (response.content[0]?.text || '').trim();
     let insights = {};
     try {
-      const cleaned = raw.replace(/```json|```/g, '').trim();
+      const cleaned = raw.replace(/\`\`\`json|\`\`\`/g, '').trim();
       insights = JSON.parse(cleaned);
     } catch (parseErr) {
-      console.error('[disc_insights] JSON parse error:', parseErr, 'raw:', raw);
+      console.error('[disc_insights] JSON parse error:', parseErr, 'raw:', raw.slice(0, 200));
       insights = {};
     }
 
-    return res.status(200).json({ insights, mode: 'disc_insights' });
+    return res.status(200).json({ insights, mode: 'disc_insights', part: part || 'position' });
   } catch (err) {
     console.error('[disc_insights] API error:', err);
-    return res.status(200).json({ insights: {}, mode: 'disc_insights' });
+    return res.status(200).json({ insights: {}, mode: 'disc_insights', part: part || 'position' });
   }
 }
 
