@@ -3212,6 +3212,7 @@ function _generatePDFPrintFallback() {
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
   html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
   html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
+  html += '.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;} .row .block{margin-bottom:0;}';
   html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;}';
   html += '.block-label svg{flex-shrink:0;}';
   html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;}';
@@ -3244,23 +3245,38 @@ function _generatePDFPrintFallback() {
     raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
   };
 
-  blocks.forEach(function(sec) {
-    html += '<div class="section-title">' + sec.section + '</div>';
-    sec.items.forEach(function(item) {
-      var b = discCanvasBlocks[item.key];
-      var icon = icons[item.key] || '';
-      if (b && b.filled) {
-        var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
-        var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
-        var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-        html += '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
-        if (badge) html += '<span class="block-badge">' + badge + '</span>';
-        html += '</div><div class="block-text">' + text + '</div></div>';
-      } else {
-        html += '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">Will fill after completing your position</div></div>';
-      }
-    });
-  });
+  function renderBlock(item) {
+    var b = discCanvasBlocks[item.key];
+    var icon = icons[item.key] || '';
+    if (b && b.filled) {
+      var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
+      var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
+      var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+      var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
+      if (badge) h += '<span class="block-badge">' + badge + '</span>';
+      h += '</div><div class="block-text">' + text + '</div></div>';
+      return h;
+    } else {
+      return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">Will fill after completing your position</div></div>';
+    }
+  }
+
+  // YOUR POSITION
+  html += '<div class="section-title">YOUR POSITION</div>';
+  html += '<div class="row">' + renderBlock({key:'evidence',label:'Evidence'}) + renderBlock({key:'timing',label:'Timing'}) + '</div>';
+  html += renderBlock({key:'manager',label:'Manager'});
+  html += '<div class="row">' + renderBlock({key:'company',label:'Company'}) + renderBlock({key:'market',label:'Market'}) + '</div>';
+
+  // YOUR STRATEGY
+  html += '<div class="section-title">YOUR STRATEGY</div>';
+  html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'});
+  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}) + renderBlock({key:'avoid',label:'Avoid'}) + '</div>';
+
+  // YOUR PLAN
+  html += '<div class="section-title">YOUR PLAN</div>';
+  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}) + renderBlock({key:'pushback',label:'Pushback Playbook'}) + '</div>';
+  html += renderBlock({key:'if_yes',label:'If They Say Yes'});
+  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}) + renderBlock({key:'raise_case',label:'Raise Case Brief'}) + '</div>';
 
   if (!isPaid) {
     html += '<div class="cta-bar"><p>Answer all 5 questions about your negotiation position and AI will analyze your situation, fill all 13 sections, and generate your complete negotiation plan.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas at salary.recomlinked.com/raise →</a></p></div>';
@@ -3356,7 +3372,7 @@ function _generatePDFWithJsPDF() {
     doc.setLineWidth(0.2);
   }
 
-  function drawBlock(block, label, x, blockW) {
+  function drawBlock(block, label, x, blockW, forceH) {
     var b = discCanvasBlocks[block];
     var filled = b && b.filled;
     var insight = filled ? (b.insight || b.note || '') : '';
@@ -3370,14 +3386,11 @@ function _generatePDFWithJsPDF() {
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       var textLines = wrapText(insight, blockW - padX * 2 - 2);
-      var blockH = 8 + textLines.length * 3.5 + padY;
+      var blockH = forceH || (8 + textLines.length * 3.5 + padY);
 
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-
-      // Icon
       drawIcon(doc, block, x + 3, y + 5.5, c.text);
 
-      // Label + badge
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
@@ -3401,12 +3414,10 @@ function _generatePDFWithJsPDF() {
 
       return blockH + 2;
     } else {
-      var blockH = 14;
+      var blockH = forceH || 14;
       doc.setFillColor(240, 241, 245);
       doc.setDrawColor(200, 205, 215);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-
-      // Icon
       drawIcon(doc, block, x + 3, y + 5.5, [160, 165, 180]);
 
       doc.setFontSize(7);
@@ -3449,7 +3460,7 @@ function _generatePDFWithJsPDF() {
     blocks.forEach(function(block, i) {
       y = savedY;
       var xPos = mx + i * (colW + (blocks.length > 1 ? 4 / (blocks.length - 1) : 0));
-      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0));
+      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0), maxH);
     });
     y = savedY + maxH + 2;
   }
