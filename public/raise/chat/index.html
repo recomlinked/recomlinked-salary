@@ -323,7 +323,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .typing-dots span:nth-child(2){animation-delay:0.2s;}
 .typing-dots span:nth-child(3){animation-delay:0.4s;}
 @keyframes typingDot{0%,100%{opacity:0.3;}50%{opacity:1;}}
-@keyframes shimmer{0%{background-position:-200px 0;}100%{background-position:200px 0;}}
+@keyframes cvDotPulse{0%,100%{opacity:0.2;}50%{opacity:0.8;}}
 
 /* Coaching analysis card */
 .coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;}
@@ -3935,13 +3935,24 @@ function renderCanvasHTML() {
         '</div>';
     }
     if (discStrategyLoading) {
+      var loadingMessages = {
+        leverage_risk: 'Analyzing your leverage points',
+        emphasize: 'Identifying what to lead with',
+        avoid: 'Flagging what not to say',
+        opening_script: 'Writing your opening script',
+        pushback: 'Preparing pushback responses',
+        if_yes: 'Planning your closing moves',
+        meeting_email: 'Drafting your meeting email',
+        raise_case: 'Building your raise case brief'
+      };
+      var loadMsg = loadingMessages[key] || 'Generating';
+      var dots = '<span style="display:inline-flex;gap:3px;margin-right:6px;"><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.2s;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.4s;"></span></span>';
       return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;background:var(--muted);border:1px solid var(--divider);">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">' +
         '<span style="color:var(--t3);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
-        '<div style="height:8px;border-radius:4px;background:linear-gradient(90deg,var(--divider) 25%,#e8e9ee 50%,var(--divider) 75%);background-size:400px 100%;animation:shimmer 1.5s infinite linear;margin-bottom:5px;width:90%;"></div>' +
-        '<div style="height:8px;border-radius:4px;background:linear-gradient(90deg,var(--divider) 25%,#e8e9ee 50%,var(--divider) 75%);background-size:400px 100%;animation:shimmer 1.5s infinite linear 0.2s;width:70%;"></div>' +
+        '<div style="font-size:11px;color:var(--t3);font-style:italic;display:flex;align-items:center;">' + dots + loadMsg + '...</div>' +
         '</div>';
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
