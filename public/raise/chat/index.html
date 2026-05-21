@@ -3175,6 +3175,10 @@ var discCanvasBlocks = {
 };
 
 function generateCanvasPDF() {
+  var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
+  logEntry('pdf_download', { filled: filledCount, paid: !!state.paid });
+  logSession('pdf_download', { filled: filledCount });
+
   if (window.jspdf) {
     return _generatePDFWithJsPDF();
   }
