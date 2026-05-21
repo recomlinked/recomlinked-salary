@@ -3265,9 +3265,27 @@ function _generatePDFPrintFallback() {
       // Teaser for strategy/plan blocks (free users)
       if (isStratPlan && b.teaser) {
         var clean = (b.insight || '').replace(/\*\*/g, '');
-        var match = clean.match(/^[^.!?]*[.!?]/);
-        var teaser = match ? match[0] : (clean.length > 80 ? clean.slice(0, 80) + '...' : clean);
-        return '<div class="block plan" style="position:relative;overflow:hidden;"><div class="block-label">' + icon + item.label + '</div><div class="block-text">' + teaser + '</div><div style="background:linear-gradient(transparent,#E8EFF8);height:20px;margin-top:-16px;position:relative;"></div></div>';
+        var teaserText = '', teaserBadge = '';
+        if (item.key === 'leverage_risk') {
+          var m = clean.match(/^[^.!?]*[.!?]/);
+          teaserText = m ? m[0] : clean.slice(0, 100);
+        } else if (item.key === 'emphasize' || item.key === 'avoid') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '3 key points';
+        } else if (item.key === 'opening_script') {
+          teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
+        } else if (item.key === 'pushback') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '4 prepared responses';
+        } else if (item.key === 'if_yes') {
+          teaserText = clean.slice(0, 50) + '...';
+        } else if (item.key === 'meeting_email') {
+          var sm = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+          teaserText = sm ? sm[0] : clean.slice(0, 40) + '...'; teaserBadge = 'Ready to send';
+        } else if (item.key === 'raise_case') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'One-page brief';
+        } else {
+          teaserText = clean.slice(0, 60) + '...';
+        }
+        return '<div class="block plan" style="position:relative;overflow:hidden;"><div class="block-label">' + icon + item.label + (teaserBadge ? '<span class="block-badge" style="background:rgba(30,61,114,0.1);color:#1e3d72;">' + teaserBadge + '</span>' : '') + '</div><div class="block-text">' + teaserText + '</div><div style="background:linear-gradient(transparent,#E8EFF8);height:20px;margin-top:-16px;position:relative;"></div></div>';
       }
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
@@ -3427,12 +3445,33 @@ function _generatePDFWithJsPDF() {
     var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
 
     if (filled && b.teaser) {
-      // Teaser mode: first sentence + unlock text
+      // Teaser mode: short preview + badge + unlock
       var c = getBlockColors(b.strength);
-      var teaser = getFirstSentencePDF(insight);
+      var clean = insight.replace(/\*\*/g, '');
+      var teaserText = '', teaserBadge = '';
+      if (block === 'leverage_risk') {
+        var m = clean.match(/^[^.!?]*[.!?]/);
+        teaserText = m ? m[0] : clean.slice(0, 100);
+      } else if (block === 'emphasize' || block === 'avoid') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = '3 key points';
+      } else if (block === 'opening_script') {
+        teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
+      } else if (block === 'pushback') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = '4 prepared responses';
+      } else if (block === 'if_yes') {
+        teaserText = clean.slice(0, 50) + '...';
+      } else if (block === 'meeting_email') {
+        var sm = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+        teaserText = sm ? sm[0] : clean.slice(0, 40) + '...'; teaserBadge = 'Ready to send';
+      } else if (block === 'raise_case') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'One-page brief';
+      } else {
+        teaserText = clean.slice(0, 60) + '...';
+      }
+
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
-      var teaserLines = wrapText(teaser, blockW - padX * 2 - 2);
+      var teaserLines = wrapText(teaserText, blockW - padX * 2 - 2);
       var blockH = forceH || (8 + teaserLines.length * 3.5 + 8 + padY);
 
       doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
@@ -3442,6 +3481,18 @@ function _generatePDFWithJsPDF() {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
       doc.text(label.toUpperCase(), x + padX, y + 5);
+
+      // Badge
+      if (teaserBadge) {
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'bold');
+        var bw = doc.getTextWidth(teaserBadge) + 4;
+        doc.setFillColor(c.bg[0] - 15, c.bg[1] - 15, c.bg[2] - 15);
+        doc.roundedRect(x + blockW - padX - bw - 1, y + 1.5, bw + 2, 4.5, 1, 1, 'F');
+        doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+        doc.text(teaserBadge, x + blockW - padX - bw / 2, y + 4.5, { align: 'center' });
+      }
+
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
@@ -4313,7 +4364,8 @@ async function generateDiscInsights() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Step 1: Show radar chart with loading below
+  // Step 1: Show radar + canvas with strategy/plan shimmer immediately
+  discStrategyLoading = true; // Shimmer in strategy/plan blocks from the start
   insertDiscRadar();
   
   var loadingWrap = el('div', 'coach-msg', '');
@@ -4325,7 +4377,7 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Step 2: Call API — position insights first, then strategy/plan
+  // Step 2: Fire BOTH API calls in parallel
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, 5).forEach(function(q) {
@@ -4333,21 +4385,30 @@ async function generateDiscInsights() {
   });
   console.log('[disc_insights] Sending:', JSON.stringify({ blocker: blockerCode, answers: answers, dims: discDims }));
 
-  // API Call 1: Position insights
+  var apiBody = {
+    mode: 'disc_insights',
+    blocker: blockerCode,
+    answers: answers,
+    dims: discDims,
+    levers: discLevers,
+    weaks: discWeaks,
+  };
+
+  // Start both requests simultaneously
+  var positionFetch = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({}, apiBody, { part: 'position' })),
+  });
+  var strategyFetch = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({}, apiBody, { part: 'strategy' })),
+  });
+
+  // Handle position (usually returns first — faster, smaller)
   try {
-    var resp = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'disc_insights',
-        part: 'position',
-        blocker: blockerCode,
-        answers: answers,
-        dims: discDims,
-        levers: discLevers,
-        weaks: discWeaks,
-      }),
-    });
+    var resp = await positionFetch;
     var data = await resp.json();
     console.log('[disc_insights] Position response:', JSON.stringify(data).slice(0, 200));
 
@@ -4363,32 +4424,20 @@ async function generateDiscInsights() {
     console.error('[disc_insights] Position API error:', e);
   }
 
-  // Remove loading spinner, show canvas with position insights
+  // Remove loading spinner, show canvas with position insights (strategy still shimmering)
   var loading = $('disc-loading');
   if (loading) {
     if (loading._arcStop) loading._arcStop();
     if (loading._phraseStop) loading._phraseStop();
     loading.remove();
   }
-  discStrategyLoading = true; // Show shimmer in strategy/plan blocks
+  // Strategy shimmer already running — just update position blocks
   var liveCanvas = $('disc-canvas-live');
   if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
 
-  // API Call 2: Strategy & plan (runs while user reads position)
+  // Handle strategy (may already be done or still in flight)
   try {
-    var resp2 = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'disc_insights',
-        part: 'strategy',
-        blocker: blockerCode,
-        answers: answers,
-        dims: discDims,
-        levers: discLevers,
-        weaks: discWeaks,
-      }),
-    });
+    var resp2 = await strategyFetch;
     var data2 = await resp2.json();
     console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
 
