@@ -3971,17 +3971,24 @@ function renderCanvasHTML() {
 
   // OVERALL NEGOTIATION POSITION card
   var answeredCount = Object.values(discActive).filter(Boolean).length;
-  if (answeredCount >= 3) {
+  if (answeredCount >= 5) {
     var nScore = calculateNegotiationScore();
     var nLabel = getNegotiationLabel(nScore);
     html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;margin-top:4px;">';
     html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
     html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
-    
     html += '</div>';
     html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
     html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '</div>';
+  } else {
+    html += '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);margin-top:4px;">';
+    html += '<div style="display:flex;align-items:center;gap:5px;">';
+    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
+    html += '</div>';
+    html += '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">Will fill after answering your 5 questions</p>';
     html += '</div>';
   }
 
@@ -4008,7 +4015,7 @@ function renderCanvasHTML() {
   html += '</div>';
 
   // CHECKLIST card (web preview)
-  if (answeredCount >= 3) {
+  if (answeredCount >= 5) {
     html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
     html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your checklist</div>';
     html += '<div style="border-radius:8px;padding:10px 12px;background:var(--muted);border:1px solid var(--divider);">';
