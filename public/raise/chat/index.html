@@ -4102,8 +4102,7 @@ function drawDiscRadarOnCanvas(canvas) {
 }
 
 function renderDiscQuestion(idx) {
-  if (idx >= discOrderedQuestions.length) { showDiscPaywall(); return; }
-  if (idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
+  if (idx >= discOrderedQuestions.length || idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
   var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
