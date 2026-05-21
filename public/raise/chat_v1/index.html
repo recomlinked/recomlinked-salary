@@ -323,6 +323,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .typing-dots span:nth-child(2){animation-delay:0.2s;}
 .typing-dots span:nth-child(3){animation-delay:0.4s;}
 @keyframes typingDot{0%,100%{opacity:0.3;}50%{opacity:1;}}
+@keyframes shimmer{0%{background-position:-200px 0;}100%{background-position:200px 0;}}
 
 /* Coaching analysis card */
 .coaching-analysis-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;padding:14px 16px;}
@@ -3145,7 +3146,7 @@ var BLOCKER_DISC_ORDER = {
   no_advocate: ['manager_type', 'evidence', 'last_raise', 'company', 'market'],
 };
 
-var DISC_FREE_QUESTIONS = 3; // paywall after this many
+var DISC_FREE_QUESTIONS = 5; // paywall after this many
 
 function buildDiscQuestions(blockerCode) {
   var order = BLOCKER_DISC_ORDER[blockerCode] || BLOCKER_DISC_ORDER.no_script;
@@ -3173,8 +3174,13 @@ var discCanvasBlocks = {
   meeting_email: { filled: false, insight: '' },
   raise_case: { filled: false, insight: '' },
 };
+var discStrategyLoading = false;
 
 function generateCanvasPDF() {
+  var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
+  logEntry('pdf_download', { filled: filledCount, paid: !!state.paid });
+  logSession('pdf_download', { filled: filledCount });
+
   if (window.jspdf) {
     return _generatePDFWithJsPDF();
   }
@@ -3211,12 +3217,12 @@ function _generatePDFPrintFallback() {
   html += '.header{background:#1e3d72;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}';
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
   html += '.section-title{font-size:11px;font-weight:700;color:#1e3d72;text-transform:uppercase;letter-spacing:0.08em;margin:16px 0 8px;}';
-  html += '.block{border-radius:8px;padding:12px 14px;margin-bottom:6px;}';
+  html += '.block{border-radius:8px;padding:14px 16px;margin-bottom:6px;}';
   html += '.row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;align-items:stretch;} .row .block{margin-bottom:0;height:auto;min-height:100%;}';
   html += '.block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;display:flex;align-items:center;gap:4px;}';
   html += '.block-label svg{flex-shrink:0;}';
   html += '.block-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;margin-left:auto;}';
-  html += '.block-text{font-size:12px;line-height:1.6;margin-top:6px;}';
+  html += '.block-text{font-size:12px;line-height:1.6;margin-top:10px;}';
   html += '.strong{background:#E8F7F0;border:1px solid rgba(26,158,108,0.2);} .strong .block-label{color:#0a5c3a;} .strong .block-badge{background:rgba(26,158,108,0.15);color:#1a9e6c;}';
   html += '.weak{background:#FCEBEB;border:1px solid rgba(204,68,68,0.2);} .weak .block-label{color:#7a2020;} .weak .block-badge{background:rgba(204,68,68,0.1);color:#c44;}';
   html += '.neutral{background:#FDF5E6;border:1px solid rgba(201,168,76,0.2);} .neutral .block-label{color:#6a4a10;} .neutral .block-badge{background:rgba(201,168,76,0.12);color:#c9a84c;}';
@@ -3245,41 +3251,103 @@ function _generatePDFPrintFallback() {
     raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
   };
 
-  function renderBlock(item) {
+  function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
+    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+    var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
+
     if (b && b.filled) {
       var cls = b.strength === 'strong' ? 'strong' : b.strength === 'weak' ? 'weak' : b.strength === 'neutral' ? 'neutral' : 'plan';
       var badge = b.strength === 'strong' ? 'Strong' : b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : '';
       var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+
+      // Teaser for strategy/plan blocks (free users)
+      if (isStratPlan && b.teaser) {
+        var clean = (b.insight || '').replace(/\*\*/g, '');
+        var teaserText = '', teaserBadge = '';
+        if (item.key === 'leverage_risk') {
+          var m = clean.match(/^[^.!?]*[.!?]/);
+          teaserText = m ? m[0] : clean.slice(0, 100);
+        } else if (item.key === 'emphasize' || item.key === 'avoid') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '3 key points';
+        } else if (item.key === 'opening_script') {
+          teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
+        } else if (item.key === 'pushback') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '4 prepared responses';
+        } else if (item.key === 'if_yes') {
+          teaserText = clean.slice(0, 50) + '...';
+        } else if (item.key === 'meeting_email') {
+          var sm = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+          teaserText = sm ? sm[0] : clean.slice(0, 40) + '...'; teaserBadge = 'Ready to send';
+        } else if (item.key === 'raise_case') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'One-page brief';
+        } else {
+          teaserText = clean.slice(0, 60) + '...';
+        }
+        return '<div class="block plan" style="position:relative;overflow:hidden;"><div class="block-label">' + icon + item.label + (teaserBadge ? '<span class="block-badge" style="background:rgba(30,61,114,0.1);color:#1e3d72;">' + teaserBadge + '</span>' : '') + '</div><div class="block-text">' + teaserText + '</div><div style="background:linear-gradient(transparent,#E8EFF8);height:20px;margin-top:-16px;position:relative;"></div></div>';
+      }
+
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
       h += '</div><div class="block-text">' + text + '</div></div>';
       return h;
     } else {
-      return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">Will fill after completing your position</div></div>';
+      var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
+      return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">' + emptyText + '</div></div>';
     }
   }
 
   // YOUR POSITION
   html += '<div class="section-title">YOUR POSITION</div>';
-  html += '<div class="row">' + renderBlock({key:'evidence',label:'Evidence'}) + renderBlock({key:'timing',label:'Timing'}) + '</div>';
-  html += renderBlock({key:'manager',label:'Manager'});
-  html += '<div class="row">' + renderBlock({key:'company',label:'Company'}) + renderBlock({key:'market',label:'Market'}) + '</div>';
+  html += '<div class="row">' + renderBlock({key:'evidence',label:'Evidence'}, 'position') + renderBlock({key:'timing',label:'Timing'}, 'position') + '</div>';
+  html += renderBlock({key:'manager',label:'Manager'}, 'position');
+  html += '<div class="row">' + renderBlock({key:'company',label:'Company'}, 'position') + renderBlock({key:'market',label:'Market'}, 'position') + '</div>';
+
+  // Overall Negotiation Position
+  var nScore = calculateNegotiationScore();
+  var nLabel = getNegotiationLabel(nScore);
+  html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:14px 16px;margin:8px 0;">';
+  html += '<div style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Overall Negotiation Position</div>';
+  html += '<div style="font-size:14px;font-weight:700;color:' + nLabel.color + ';margin-bottom:4px;">' + nLabel.label + '</div>';
+  html += '<div style="font-size:12px;color:' + nLabel.color + ';opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</div>';
+  html += '</div>';
 
   // YOUR STRATEGY
   html += '<div class="section-title">YOUR STRATEGY</div>';
-  html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'});
-  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}) + renderBlock({key:'avoid',label:'Avoid'}) + '</div>';
+  html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'}, 'strategy');
+  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}, 'strategy') + renderBlock({key:'avoid',label:'Avoid'}, 'strategy') + '</div>';
 
   // YOUR PLAN
   html += '<div class="section-title">YOUR PLAN</div>';
-  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}) + renderBlock({key:'pushback',label:'Pushback Playbook'}) + '</div>';
-  html += renderBlock({key:'if_yes',label:'If They Say Yes'});
-  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}) + renderBlock({key:'raise_case',label:'Raise Case Brief'}) + '</div>';
+  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}, 'plan') + renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan') + '</div>';
+  html += renderBlock({key:'if_yes',label:'If They Say Yes'}, 'plan');
+  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan') + renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan') + '</div>';
+
+  // FULL CHECKLIST
+  html += '<div class="section-title">YOUR CHECKLIST</div>';
+  html += '<div class="block" style="background:#f8f9fc;border:1px solid #dde0e8;">';
+  html += '<div class="block-label" style="color:#1e3d72;margin-bottom:10px;font-size:11px;">Before the meeting</div>';
+  html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
+  html += '<div>\u2610 Practice opening script out loud</div>';
+  html += '<div>\u2610 Prepare responses for top 3 pushbacks</div>';
+  html += '<div>\u2610 Print raise case brief</div>';
+  html += '<div>\u2610 Send meeting request email</div>';
+  html += '<div>\u2610 Confirm market rate from 2+ sources</div>';
+  html += '<div>\u2610 Schedule meeting (not Friday, not Monday morning)</div>';
+  html += '</div>';
+  html += '<div class="block-label" style="color:#1e3d72;margin:14px 0 10px;font-size:11px;">After the meeting</div>';
+  html += '<div style="font-size:12px;color:#4a5068;line-height:2;">';
+  html += '<div>\u2610 Send confirmation email within 24 hours</div>';
+  html += '<div>\u2610 If \u201cyes\u201d \u2014 get amount and timeline in writing</div>';
+  html += '<div>\u2610 If \u201clet me think\u201d \u2014 follow up in exactly 5 business days</div>';
+  html += '<div>\u2610 If \u201cno\u201d \u2014 ask \u201cWhat would change this?\u201d and set review date</div>';
+  html += '<div>\u2610 Document everything discussed</div>';
+  html += '</div>';
+  html += '</div>';
 
   if (!isPaid) {
-    html += '<div class="cta-bar"><p>Answer all 5 questions about your negotiation position and AI will analyze your situation, fill all 13 sections, and generate your complete negotiation plan.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Complete your canvas at salary.recomlinked.com/raise →</a></p></div>';
+    html += '<div class="cta-bar"><p>Your negotiation position is mapped and your strategy preview is ready. Unlock full access to reveal your complete opening script, every pushback response, meeting email, and raise case brief.</p><p style="margin-top:8px;"><a href="https://salary.recomlinked.com/raise/chat/">Unlock your full canvas →</a></p></div>';
   }
 
   html += '<div class="footer"><span>salary.recomlinked.com/raise</span><span class="gold">' + (isPaid ? 'Full version' : 'Free preview') + '</span></div>';
@@ -3354,30 +3422,133 @@ function _generatePDFWithJsPDF() {
   // Icons not supported in jsPDF - labels are clear enough
   function drawIcon() {}
 
-  function drawBlock(block, label, x, blockW, forceH) {
+  function drawBoldText(doc, text, x, y, maxWidth, color) {
+    var parts = text.split(/(\*\*[^*]+?\*\*)/g);
+    var lines = [];
+    var currentLine = [];
+    var currentWidth = 0;
+    parts.forEach(function(part) {
+      var isBold = part.startsWith('**') && part.endsWith('**');
+      var clean = isBold ? part.slice(2, -2) : part;
+      var words = clean.split(' ');
+      words.forEach(function(word) {
+        if (!word) return;
+        var prefix = currentLine.length > 0 ? ' ' : '';
+        doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+        var w = doc.getTextWidth(prefix + word);
+        if (currentWidth + w > maxWidth && currentLine.length > 0) {
+          lines.push(currentLine.slice());
+          currentLine = [{ text: word, bold: isBold }];
+          currentWidth = doc.getTextWidth(word);
+        } else {
+          currentLine.push({ text: prefix + word, bold: isBold });
+          currentWidth += w;
+        }
+      });
+    });
+    if (currentLine.length > 0) lines.push(currentLine);
+    lines.forEach(function(line, li) {
+      var cx = x;
+      line.forEach(function(seg) {
+        doc.setFont('helvetica', seg.bold ? 'bold' : 'normal');
+        doc.setTextColor(color[0], color[1], color[2]);
+        doc.text(seg.text, cx, y + li * 3.5);
+        cx += doc.getTextWidth(seg.text);
+      });
+    });
+    return lines.length;
+  }
+
+  function getFirstSentencePDF(text) {
+    if (!text) return '';
+    var clean = text.replace(/\*\*/g, '');
+    var match = clean.match(/^[^.!?]*[.!?]/);
+    if (match && match[0].length < clean.length - 5) return match[0];
+    if (clean.length > 80) return clean.slice(0, 80) + '...';
+    return clean;
+  }
+
+  function drawBlock(block, label, x, blockW, forceH, section) {
     var b = discCanvasBlocks[block];
     var filled = b && b.filled;
     var insight = filled ? (b.insight || b.note || '') : '';
     var padX = 5, padY = 3;
+    var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
 
-    if (filled) {
+    if (filled && b.teaser) {
+      // Teaser mode: short preview + badge + unlock
       var c = getBlockColors(b.strength);
-      doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
-      doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
+      var clean = insight.replace(/\*\*/g, '');
+      var teaserText = '', teaserBadge = '';
+      if (block === 'leverage_risk') {
+        var m = clean.match(/^[^.!?]*[.!?]/);
+        teaserText = m ? m[0] : clean.slice(0, 100);
+      } else if (block === 'emphasize' || block === 'avoid') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = '3 key points';
+      } else if (block === 'opening_script') {
+        teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
+      } else if (block === 'pushback') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = '4 prepared responses';
+      } else if (block === 'if_yes') {
+        teaserText = clean.slice(0, 50) + '...';
+      } else if (block === 'meeting_email') {
+        var sm = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+        teaserText = sm ? sm[0] : clean.slice(0, 40) + '...'; teaserBadge = 'Ready to send';
+      } else if (block === 'raise_case') {
+        teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'One-page brief';
+      } else {
+        teaserText = clean.slice(0, 60) + '...';
+      }
 
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
-      var textLines = wrapText(insight, blockW - padX * 2 - 2);
-      var blockH = forceH || (8 + textLines.length * 3.5 + padY);
+      var teaserLines = wrapText(teaserText, blockW - padX * 2 - 2);
+      var blockH = forceH || (8 + teaserLines.length * 3.5 + 8 + padY);
 
+      doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+      doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-      drawIcon(doc, block, x + 3, y + 5.5, c.text);
-
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
       doc.text(label.toUpperCase(), x + padX, y + 5);
 
+      // Badge
+      if (teaserBadge) {
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'bold');
+        var bw = doc.getTextWidth(teaserBadge) + 4;
+        doc.setFillColor(c.bg[0] - 15, c.bg[1] - 15, c.bg[2] - 15);
+        doc.roundedRect(x + blockW - padX - bw - 1, y + 1.5, bw + 2, 4.5, 1, 1, 'F');
+        doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+        doc.text(teaserBadge, x + blockW - padX - bw / 2, y + 4.5, { align: 'center' });
+      }
+
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+      teaserLines.forEach(function(line, i) {
+        doc.text(line, x + padX, y + 9 + i * 3.5);
+      });
+      // Unlock text
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(gold[0], gold[1], gold[2]);
+      doc.text('Unlock full ' + label.toLowerCase() + ' \u2192', x + padX, y + 9 + teaserLines.length * 3.5 + 3);
+      return blockH + 2;
+    } else if (filled) {
+      var c = getBlockColors(b.strength);
+      doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+      doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
+      doc.setFontSize(7.5);
+      doc.setFont('helvetica', 'normal');
+      var textLines = wrapText(insight, blockW - padX * 2 - 2);
+      var blockH = forceH || (8 + textLines.length * 3.5 + padY);
+      doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+      doc.text(label.toUpperCase(), x + padX, y + 5);
       if (c.badge) {
         var bw = doc.getTextWidth(c.badge) + 4;
         doc.setFillColor(c.border[0], c.border[1], c.border[2]);
@@ -3386,42 +3557,38 @@ function _generatePDFWithJsPDF() {
         doc.setTextColor(255, 255, 255);
         doc.text(c.badge, x + blockW - 4 - bw / 2, y + 4.8, { align: 'center' });
       }
-
       doc.setFontSize(7.5);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(c.text[0], c.text[1], c.text[2]);
-      textLines.forEach(function(line, i) {
-        doc.text(line, x + padX, y + 9 + i * 3.5);
-      });
-
+      drawBoldText(doc, insight, x + padX, y + 9, blockW - padX * 2 - 2, c.text);
       return blockH + 2;
     } else {
       var blockH = forceH || 14;
       doc.setFillColor(240, 241, 245);
       doc.setDrawColor(200, 205, 215);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
-      drawIcon(doc, block, x + 3, y + 5.5, [160, 165, 180]);
-
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(160, 165, 180);
       doc.text(label.toUpperCase(), x + padX, y + 5.5);
-
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(180, 185, 195);
-      doc.text('Will fill after completing your position', x + padX, y + 10);
-
+      doc.text(emptyText, x + padX, y + 10);
       return blockH + 2;
     }
   }
 
-  function drawRow(blocks, labels) {
+  function drawRow(blocks, labels, section) {
     var colW = blocks.length === 1 ? (W - mx * 2) : ((W - mx * 2 - 4) / blocks.length);
     var maxH = 0;
     blocks.forEach(function(block) {
       var b = discCanvasBlocks[block];
-      if (b && b.filled) {
+      if (b && b.filled && b.teaser) {
+        doc.setFontSize(7.5);
+        var teaser = getFirstSentencePDF(b.insight || '');
+        var lines = wrapText(teaser, colW - 10);
+        var h = 8 + lines.length * 3.5 + 8 + 5;
+        if (h > maxH) maxH = h;
+      } else if (b && b.filled) {
         doc.setFontSize(7.5);
         var text = (b.insight || b.note || '').replace(/\*\*/g, '');
         var lines = wrapText(text, colW - 10);
@@ -3442,16 +3609,21 @@ function _generatePDFWithJsPDF() {
     blocks.forEach(function(block, i) {
       y = savedY;
       var xPos = mx + i * (colW + (blocks.length > 1 ? 4 / (blocks.length - 1) : 0));
-      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0), maxH);
+      drawBlock(block, labels[i], xPos, colW - (blocks.length > 1 ? 2 : 0), maxH, section);
     });
     y = savedY + maxH + 2;
   }
 
-  function drawFullWidth(block, label) {
+  function drawFullWidth(block, label, section) {
     var fullW = W - mx * 2;
     var b = discCanvasBlocks[block];
     var estH = 14;
-    if (b && b.filled) {
+    if (b && b.filled && b.teaser) {
+      doc.setFontSize(7.5);
+      var teaser = getFirstSentencePDF(b.insight || '');
+      var lines = wrapText(teaser, fullW - 10);
+      estH = 8 + lines.length * 3.5 + 8 + 5;
+    } else if (b && b.filled) {
       doc.setFontSize(7.5);
       var text = (b.insight || b.note || '').replace(/\*\*/g, '');
       var lines = wrapText(text, fullW - 10);
@@ -3462,7 +3634,7 @@ function _generatePDFWithJsPDF() {
       doc.addPage();
       y = 16;
     }
-    var h = drawBlock(block, label, mx, fullW);
+    var h = drawBlock(block, label, mx, fullW, null, section);
     y += h;
   }
 
@@ -3479,9 +3651,32 @@ function _generatePDFWithJsPDF() {
 
   // ── Build sections ──
   drawSectionTitle('Your position');
-  drawRow(['evidence', 'timing'], ['Evidence', 'Timing']);
-  drawFullWidth('manager', 'Manager');
-  drawRow(['company', 'market'], ['Company', 'Market']);
+  drawRow(['evidence', 'timing'], ['Evidence', 'Timing'], 'position');
+  drawFullWidth('manager', 'Manager', 'position');
+  drawRow(['company', 'market'], ['Company', 'Market'], 'position');
+
+  // Overall Negotiation Position card
+  var nScore = calculateNegotiationScore();
+  var nLabel = getNegotiationLabel(nScore);
+  var npColors = nScore >= 72 ? [232,247,240] : nScore >= 40 ? [253,245,230] : nScore >= 25 ? [255,244,230] : [252,235,235];
+  var npText = nScore >= 72 ? [10,92,58] : nScore >= 40 ? [106,74,16] : nScore >= 25 ? [180,90,0] : [122,32,32];
+  var npBorder = nScore >= 72 ? [26,158,108] : nScore >= 40 ? [201,168,76] : nScore >= 25 ? [200,120,20] : [204,68,68];
+  y += 2;
+  if (y + 20 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  doc.setFillColor(npColors[0], npColors[1], npColors[2]);
+  doc.setDrawColor(npBorder[0], npBorder[1], npBorder[2]);
+  doc.roundedRect(mx, y, W - mx * 2, 20, 2, 2, 'FD');
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(npText[0], npText[1], npText[2]);
+  doc.text('OVERALL NEGOTIATION POSITION', mx + 5, y + 5);
+  doc.setFontSize(9);
+  doc.text(nLabel.label, mx + 5, y + 10.5);
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.text('Your target: ' + nLabel.target.slice(0, 90), mx + 5, y + 15.5);
+  if (nLabel.target.length > 90) doc.text(nLabel.target.slice(90), mx + 5, y + 19);
+  y += 24;
 
   y += 4;
   doc.setDrawColor(220, 225, 235);
@@ -3489,8 +3684,8 @@ function _generatePDFWithJsPDF() {
   y += 6;
 
   drawSectionTitle('Your strategy');
-  drawFullWidth('leverage_risk', 'Leverage & Risk');
-  drawRow(['emphasize', 'avoid'], ['Emphasize', 'Avoid']);
+  drawFullWidth('leverage_risk', 'Leverage & Risk', 'strategy');
+  drawRow(['emphasize', 'avoid'], ['Emphasize', 'Avoid'], 'strategy');
 
   y += 4;
   doc.setDrawColor(220, 225, 235);
@@ -3498,9 +3693,56 @@ function _generatePDFWithJsPDF() {
   y += 6;
 
   drawSectionTitle('Your plan');
-  drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook']);
-  drawFullWidth('if_yes', 'If They Say Yes');
-  drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief']);
+  drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook'], 'plan');
+  drawFullWidth('if_yes', 'If They Say Yes', 'plan');
+  drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief'], 'plan');
+
+  // ── CHECKLIST ──
+  y += 4;
+  if (y + 50 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  drawSectionTitle('Your checklist');
+  doc.setFillColor(248, 249, 252);
+  doc.setDrawColor(220, 224, 232);
+  var clY = y;
+  doc.roundedRect(mx, y, W - mx * 2, 52, 2, 2, 'FD');
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 61, 114);
+  doc.text('BEFORE THE MEETING', mx + 5, y + 5.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(74, 80, 104);
+  var beforeItems = [
+    'Practice opening script out loud',
+    'Prepare responses for top 3 pushbacks',
+    'Print raise case brief',
+    'Send meeting request email',
+    'Confirm market rate from 2+ sources',
+  ];
+  beforeItems.forEach(function(item, i) {
+    doc.text('\u2610  ' + item, mx + 5, y + 9.5 + i * 3.5);
+  });
+  var afterY = y + 9.5 + beforeItems.length * 3.5 + 3;
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 61, 114);
+  doc.text('AFTER THE MEETING', mx + 5, afterY);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(74, 80, 104);
+  var afterItems = [
+    'Send confirmation email within 24 hours',
+    'If "yes" \u2014 get amount and timeline in writing',
+    'If "let me think" \u2014 follow up in exactly 5 business days',
+    'If "no" \u2014 ask "What would change this?" and set review date'
+  ];
+  afterItems.forEach(function(item, i) {
+    doc.text('\u2610  ' + item, mx + 5, afterY + 4 + i * 3.5);
+  });
+  var totalChecklistH = (afterY - clY) + 4 + afterItems.length * 3.5 + 4;
+  // Redraw box with correct height
+  doc.setFillColor(248, 249, 252);
+  doc.setDrawColor(220, 224, 232);
+  doc.roundedRect(mx, clY, W - mx * 2, totalChecklistH, 2, 2, 'S');
+  y = clY + totalChecklistH + 4;
 
   // ── CTA for free users ──
   if (!isPaid) {
@@ -3512,11 +3754,11 @@ function _generatePDFWithJsPDF() {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(74, 80, 104);
-    doc.text('Answer all 5 questions about your negotiation position and AI will analyze your', mx + 6, y + 7);
-    doc.text('situation, fill all 13 sections, and generate your complete negotiation plan.', mx + 6, y + 12);
+    doc.text('Your position is mapped and your strategy preview is ready. Unlock full', mx + 6, y + 7);
+    doc.text('access to reveal your complete opening script, pushback responses, and more.', mx + 6, y + 12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.text('Complete your canvas at salary.recomlinked.com/raise', mx + 6, y + 18);
+    doc.text('Unlock your full canvas at salary.recomlinked.com/raise', mx + 6, y + 18);
     y += 26;
   }
 
@@ -3530,6 +3772,44 @@ function _generatePDFWithJsPDF() {
     // Fallback to print version
     _generatePDFPrintFallback();
   }
+}
+
+function calculateNegotiationScore() {
+  var e = discDims.evidence || 0;
+  var m = discDims.manager || 0;
+  var t = discDims.timing || 0;
+  var c = discDims.company || 0;
+  var k = discDims.market || 0;
+
+  // Step 1: Weighted base
+  var base = (e * 0.25) + (m * 0.25) + (t * 0.20) + (c * 0.15) + (k * 0.15);
+
+  // Step 2: Weak penalty (dims < 40)
+  var weakCount = [e,m,t,c,k].filter(function(d) { return d < 40; }).length;
+  var weakPenalty = weakCount === 0 ? 0 : weakCount === 1 ? -5 : weakCount === 2 ? -8 : -10;
+
+  // Step 3: Strength bonus (dims >= 70)
+  var strongCount = [e,m,t,c,k].filter(function(d) { return d >= 70; }).length;
+  var strongBonus = strongCount <= 1 ? 0 : strongCount === 2 ? 3 : strongCount === 3 ? 5 : 8;
+
+  // Step 4: Critical combos
+  var comboBonus = 0;
+  if (e >= 70 && m >= 60) comboBonus += 4;
+  if (e < 40 && m < 40) comboBonus -= 6;
+  if (t < 30) comboBonus -= 3;
+  if (e >= 70 && k >= 70) comboBonus += 3;
+
+  // Step 5: Clamp
+  var final = Math.max(10, Math.min(95, base + weakPenalty + strongBonus + comboBonus));
+  return Math.round(final);
+}
+
+function getNegotiationLabel(score) {
+  if (score >= 72) return { label: 'Strong negotiating position', color: '#1a9e6c', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.' };
+  if (score >= 55) return { label: 'Solid position \u2014 preparation needed', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Secure a specific raise with a committed timeline in writing.' };
+  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#8a6d20', bg: '#FDF5E6', border: 'rgba(201,168,76,0.25)', target: 'Open the conversation seriously and lock in a review date within 90 days.' };
+  if (score >= 25) return { label: 'Challenging \u2014 strategy is everything', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'Build your case with your manager and establish a clear path to a raise.' };
+  return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
 }
 
 function renderCanvasHTML() {
@@ -3583,16 +3863,81 @@ function renderCanvasHTML() {
       '</div>';
   }
 
+  function getFirstSentence(text) {
+    if (!text) return '';
+    var clean = text.replace(/\*\*/g, '');
+    var match = clean.match(/^[^.!?]*[.!?]/);
+    if (match && match[0].length < clean.length - 5) return match[0];
+    if (clean.length > 80) return clean.slice(0, 80) + '...';
+    return clean;
+  }
+
+  function getTeaserForBlock(key, text) {
+    if (!text) return { preview: '', badge: '' };
+    var clean = text.replace(/\*\*/g, '');
+
+    if (key === 'leverage_risk') {
+      // Full first sentence for leverage & risk
+      var match = clean.match(/^[^.!?]*[.!?]/);
+      return { preview: match ? match[0] : clean.slice(0, 100), badge: '' };
+    }
+    if (key === 'emphasize' || key === 'avoid') {
+      return { preview: clean.slice(0, 45) + '...', badge: '3 key points' };
+    }
+    if (key === 'opening_script') {
+      return { preview: clean.slice(0, 50) + '...', badge: 'Full script ready' };
+    }
+    if (key === 'pushback') {
+      return { preview: clean.slice(0, 45) + '...', badge: '4 prepared responses' };
+    }
+    if (key === 'if_yes') {
+      return { preview: clean.slice(0, 50) + '...', badge: '' };
+    }
+    if (key === 'meeting_email') {
+      var subMatch = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
+      return { preview: subMatch ? subMatch[0] : clean.slice(0, 40) + '...', badge: 'Ready to send' };
+    }
+    if (key === 'raise_case') {
+      return { preview: clean.slice(0, 45) + '...', badge: 'One-page brief' };
+    }
+    return { preview: clean.slice(0, 60) + '...', badge: '' };
+  }
+
   function planBlock(key, label, subtitle) {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
-    if (b && b.filled) {
+    if (b && b.filled && b.teaser) {
+      // Teaser mode: short preview + badge + unlock
+      var t = getTeaserForBlock(key, b.insight);
+      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;position:relative;overflow:hidden;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+        '<span style="color:var(--navy);">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
+        '</div>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + t.preview + '</p>' +
+        '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
+        '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
+        '</div>';
+    }
+    if (b && b.filled && !b.teaser) {
+      // Full mode (paid)
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
         '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + formatInsight(b.insight) + '</p>' +
+        '</div>';
+    }
+    if (discStrategyLoading) {
+      return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;background:var(--muted);border:1px solid var(--divider);">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">' +
+        '<span style="color:var(--t3);">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+        '</div>' +
+        '<div style="height:8px;border-radius:4px;background:linear-gradient(90deg,var(--divider) 25%,#e8e9ee 50%,var(--divider) 75%);background-size:400px 100%;animation:shimmer 1.5s infinite linear;margin-bottom:5px;width:90%;"></div>' +
+        '<div style="height:8px;border-radius:4px;background:linear-gradient(90deg,var(--divider) 25%,#e8e9ee 50%,var(--divider) 75%);background-size:400px 100%;animation:shimmer 1.5s infinite linear 0.2s;width:70%;"></div>' +
         '</div>';
     }
     return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
@@ -3615,36 +3960,70 @@ function renderCanvasHTML() {
   // YOUR POSITION
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('evidence', 'Evidence');
-  html += block('timing', 'Timing');
+  html += block('evidence', 'Evidence', 'Your next question');
+  html += block('timing', 'Timing', 'Your next question');
   html += '</div>';
-  html += block('manager', 'Manager');
+  html += block('manager', 'Manager', 'Your next question');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += block('company', 'Company');
-  html += block('market', 'Market');
+  html += block('company', 'Company', 'Your next question');
+  html += block('market', 'Market', 'Your next question');
   html += '</div>';
+
+  // OVERALL NEGOTIATION POSITION card
+  var answeredCount = Object.values(discActive).filter(Boolean).length;
+  if (answeredCount >= 3) {
+    var nScore = calculateNegotiationScore();
+    var nLabel = getNegotiationLabel(nScore);
+    html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;margin-top:4px;">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
+    
+    html += '</div>';
+    html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '</div>';
+  }
 
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after completing your position');
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'Will fill after completing your position');
-  html += planBlock('avoid', 'Avoid', 'Will fill after completing your position');
+  html += planBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
+  html += planBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('opening_script', 'Opening script', 'Will fill after completing your position');
-  html += planBlock('pushback', 'Pushback playbook', 'Will fill after completing your position');
+  html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
+  html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
   html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Will fill after completing your position');
+  html += planBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += planBlock('meeting_email', 'Meeting email', 'Will fill after completing your position');
-  html += planBlock('raise_case', 'Raise case brief', 'Will fill after completing your position');
+  html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
+  html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
   html += '</div>';
+
+  // CHECKLIST card (web preview)
+  if (answeredCount >= 3) {
+    html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+    html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your checklist</div>';
+    html += '<div style="border-radius:8px;padding:10px 12px;background:var(--muted);border:1px solid var(--divider);">';
+    html += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">';
+    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">Pre-meeting checklist</span>';
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--t2);line-height:1.8;">';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Practice opening script out loud</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Prepare responses for top 3 pushbacks</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Send meeting request email</div>';
+    html += '</div>';
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);font-style:italic;">Full checklist with after-meeting steps in your PDF download</div>';
+    html += '</div>';
+  }
 
   html += '</div>';
 
@@ -3989,8 +4368,7 @@ function drawDiscRadarOnCanvas(canvas) {
 }
 
 function renderDiscQuestion(idx) {
-  if (idx >= discOrderedQuestions.length) { showDiscPaywall(); return; }
-  if (idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
+  if (idx >= discOrderedQuestions.length || idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
   var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
@@ -4126,10 +4504,41 @@ function pickDiscAnswer(qIdx, opt, pill) {
 }
 
 async function generateDiscInsights() {
+  // Client-side fallback if API fails
+  function generateClientFallbacks() {
+    var strongDims = discLevers.join(', ') || 'your recent achievements';
+    var weakDims = discWeaks.join(', ') || 'potential objections';
+    var fallbacks = {
+      leverage_risk: 'Your leverage: ' + strongDims + '. Main risk: ' + weakDims + '. Lead with strength, prepare for the gap.',
+      emphasize: 'Lead with ' + strongDims + '. Frame your ask around value delivered, not time served.',
+      avoid: 'Don\'t apologize for asking. Don\'t give a range — give one number. Don\'t mention other offers unless you\'re ready to walk.',
+      opening_script: '"I wanted to check in on my compensation. Based on my contributions and where the market is, I believe an adjustment is overdue..."',
+      pushback: '**If they say:** "Budgets are tight right now." **Your response:** "I understand. When does the next cycle open? I\'d like to be first in line."',
+      if_yes: 'Get the number and timeline confirmed in writing. Send a same-day email summarizing what was agreed.',
+      meeting_email: 'Subject: Quick check-in on compensation. "Hi [Manager], I\'d love to schedule 20 minutes to discuss my compensation. Would [date] work?"',
+      raise_case: 'A one-page summary of your role growth, key achievements, market data, and proposed adjustment.'
+    };
+    Object.keys(fallbacks).forEach(function(key) {
+      if (discCanvasBlocks[key]) {
+        discCanvasBlocks[key].insight = fallbacks[key];
+        discCanvasBlocks[key].filled = true;
+        discCanvasBlocks[key].strength = 'plan';
+        discCanvasBlocks[key].teaser = true;
+        discInsights[key] = fallbacks[key];
+      }
+    });
+    try {
+      state.discovery.insights = discInsights;
+      state.discovery.canvasBlocks = discCanvasBlocks;
+      saveState();
+    } catch (e) {}
+  }
+
   var chatArea = $('disc-chat');
   if (!chatArea) return;
 
-  // Step 1: Show radar chart with loading below
+  // Step 1: Show radar + canvas with strategy/plan shimmer immediately
+  discStrategyLoading = true; // Shimmer in strategy/plan blocks from the start
   insertDiscRadar();
   
   var loadingWrap = el('div', 'coach-msg', '');
@@ -4141,63 +4550,112 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Step 2: Call API
+  // Step 2: Fire BOTH API calls in parallel
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
-  discOrderedQuestions.slice(0, DISC_FREE_QUESTIONS).forEach(function(q) {
+  discOrderedQuestions.slice(0, 5).forEach(function(q) {
     answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
+  console.log('[disc_insights] Sending:', JSON.stringify({ blocker: blockerCode, answers: answers, dims: discDims }));
 
+  var apiBody = {
+    mode: 'disc_insights',
+    blocker: blockerCode,
+    answers: answers,
+    dims: discDims,
+    levers: discLevers,
+    weaks: discWeaks,
+  };
+
+  // Start both requests simultaneously
+  var positionFetch = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({}, apiBody, { part: 'position' })),
+  });
+  var strategyFetch = fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({}, apiBody, { part: 'strategy' })),
+  });
+
+  // Handle position (usually returns first — faster, smaller)
   try {
-    var resp = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        mode: 'disc_insights',
-        blocker: blockerCode,
-        answers: answers,
-        dims: discDims,
-        levers: discLevers,
-        weaks: discWeaks,
-      }),
-    });
+    var resp = await positionFetch;
     var data = await resp.json();
+    console.log('[disc_insights] Position response:', JSON.stringify(data).slice(0, 200));
 
-    if (data && data.insights) {
-      // Populate all canvas blocks with AI insights
+    if (data && data.insights && Object.keys(data.insights).length > 0) {
       Object.keys(data.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim]) {
           discCanvasBlocks[dim].insight = data.insights[dim];
           discInsights[dim] = data.insights[dim];
         }
       });
-
-      // Save insights
-      try {
-        state.discovery.insights = discInsights;
-        state.discovery.canvasBlocks = discCanvasBlocks;
-        saveState();
-      } catch (e) {}
     }
   } catch (e) {
-    // Fallback — static note text stays in blocks
+    console.error('[disc_insights] Position API error:', e);
   }
 
-  // Step 3: Remove loading, show canvas + summary + paywall
+  // Remove loading spinner, show canvas with position insights (strategy still shimmering)
   var loading = $('disc-loading');
   if (loading) {
     if (loading._arcStop) loading._arcStop();
     if (loading._phraseStop) loading._phraseStop();
     loading.remove();
   }
-
-  // Update canvas in place with AI insights
+  // Strategy shimmer already running — just update position blocks
   var liveCanvas = $('disc-canvas-live');
   if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
 
+  // Handle strategy (may already be done or still in flight)
+  try {
+    var resp2 = await strategyFetch;
+    var data2 = await resp2.json();
+    console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
+
+    if (data2 && data2.insights && Object.keys(data2.insights).length > 0) {
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      Object.keys(data2.insights).forEach(function(dim) {
+        if (discCanvasBlocks[dim]) {
+          discCanvasBlocks[dim].insight = data2.insights[dim];
+          discInsights[dim] = data2.insights[dim];
+          if (stratPlanKeys.indexOf(dim) >= 0) {
+            discCanvasBlocks[dim].filled = true;
+            discCanvasBlocks[dim].strength = 'plan';
+            discCanvasBlocks[dim].teaser = true;
+          }
+        }
+      });
+      // Re-render canvas with strategy teasers
+      discStrategyLoading = false;
+      var lc2 = $('disc-canvas-live');
+      if (lc2) lc2.innerHTML = renderCanvasHTML();
+    } else {
+      console.warn('[disc_insights] Empty strategy response, generating fallbacks');
+      generateClientFallbacks();
+      discStrategyLoading = false;
+      var lc2 = $('disc-canvas-live');
+      if (lc2) lc2.innerHTML = renderCanvasHTML();
+    }
+  } catch (e) {
+    console.error('[disc_insights] Strategy API error:', e);
+    generateClientFallbacks();
+    discStrategyLoading = false;
+    var lc2 = $('disc-canvas-live');
+    if (lc2) lc2.innerHTML = renderCanvasHTML();
+  }
+
+  // Save all insights
+  try {
+    state.discovery.insights = discInsights;
+    state.discovery.canvasBlocks = discCanvasBlocks;
+    saveState();
+  } catch (e) {}
+
   // Canvas intro bubble
   var introBubble = el('div', 'coach-msg', '');
-  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>Raise Negotiation Canvas</strong> is <strong>the most complete tool</strong> you can bring to a raise conversation \u2014 your position mapped, your strategy defined, your opening script written, pushback responses ready, meeting email drafted, and a raise case brief you can hand to your manager. Everything in one document, personalized to your situation.</p></div>';
+  introBubble.innerHTML = '<div class="bubble"><p>Your <strong>negotiation position is mapped</strong>. We\u2019ve generated a preview of your <strong>Raise Negotiation Canvas</strong> \u2014 your opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief are ready. Unlock to reveal your <strong>complete negotiation plan</strong>, personalized to your situation.</p></div>';
   chatArea.appendChild(introBubble);
 
   // Log and show paywall
@@ -4207,7 +4665,7 @@ async function generateDiscInsights() {
 
   // Closing nudge after paywall
   var nudge = el('div', 'coach-msg', '');
-  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>2 questions away from your complete negotiation plan PDF</div>';
+  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Your complete negotiation plan is ready \u2014 unlock to reveal it</div>';
   chatArea.appendChild(nudge);
 
   // Smooth scroll reveal: user answer → canvas → intro → paywall
