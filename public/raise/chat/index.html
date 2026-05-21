@@ -4445,15 +4445,25 @@ function pickDiscAnswer(qIdx, opt, pill) {
   chatArea.appendChild(userBubble);
 
   // Update scores
+  var q = discOrderedQuestions[qIdx];
+  var primaryDim = q.dimTag;
   Object.keys(opt.scores).forEach(function(k) {
-    discDims[k] = Math.max(discDims[k], opt.scores[k]);
-    discActive[k] = true;
+    if (k === primaryDim) {
+      // Direct answer: OVERRIDE score (don't Math.max)
+      discDims[k] = opt.scores[k];
+      discActive[k] = true;
+    } else {
+      // Cross-dimension hint: only boost if not directly answered yet
+      if (!discActive[k]) {
+        discDims[k] = Math.max(discDims[k] || 0, opt.scores[k]);
+        // Don't set discActive — this dimension hasn't been directly answered
+      }
+    }
   });
   if (opt.type === 'lever') discLevers.push(opt.note);
   if (opt.type === 'weak') discWeaks.push(opt.note);
 
   // Update canvas block for this dimension
-  var q = discOrderedQuestions[qIdx];
   SIM_STATE.context[q.id] = opt.val;
   if (q.dimTag && discCanvasBlocks[q.dimTag]) {
     discCanvasBlocks[q.dimTag].filled = true;
