@@ -242,8 +242,8 @@ async function init(){
       if(cs.sim_branch_history&&cs.sim_branch_history.length>0){
         showScreen('dashboard');
         $('welcome-card').style.display='none';$('days-pill').hidden=true;
-        $('header-cta').textContent='Practice every scenario · $39';$('header-cta').href='/raise/chat/';
-        $('cta-continue').textContent='Practice every scenario · $39 →';$('cta-continue').href='/raise/chat/';
+        $('header-cta').textContent='Practice every scenario · $19';$('header-cta').href='/raise/chat/';
+        $('cta-continue').textContent='Practice every scenario · $19 →';$('cta-continue').href='/raise/chat/';
         $('stat-days').textContent='—';$('stat-explored').textContent=(cs.sim_branch_history||[]).length;
         renderTree(cs.sim_branch_history||[]);renderContext(cs.sim_context||{});
         document.querySelector('.footer-links').style.display='none';return;
@@ -273,10 +273,10 @@ async function init(){
     var pk='raise_paid_tracked_'+urlSession;
     if(!sessionStorage.getItem(pk)){sessionStorage.setItem(pk,'1');
       var fire=function(){try{if(typeof window.gtag==='function'){
-        window.gtag('event','RAISE_PAID',{value:39,currency:'USD',transaction_id:urlSession});
-        window.gtag('event','purchase',{transaction_id:urlSession,value:39,currency:'USD',items:[{item_id:'salary_coach_39',item_name:'Salary Negotiation Coach',price:39,quantity:1}]});
+        window.gtag('event','RAISE_PAID',{value:19,currency:'USD',transaction_id:urlSession});
+        window.gtag('event','purchase',{transaction_id:urlSession,value:19,currency:'USD',items:[{item_id:'salary_coach_19',item_name:'Salary Negotiation Coach',price:19,quantity:1}]});
         // Google Ads — uncomment with your IDs:
-        // window.gtag('event','conversion',{send_to:'AW-XXXXXXXXX/YYYYYY',value:39.0,currency:'USD',transaction_id:urlSession});
+        // window.gtag('event','conversion',{send_to:'AW-XXXXXXXXX/YYYYYY',value:19.0,currency:'USD',transaction_id:urlSession});
       }if(typeof window.clarity==='function'){window.clarity('set','funnel_stage','paid');window.clarity('event','RAISE_PAID');window.clarity('upgrade','paid_user');}}catch(e){}};
       if(typeof window.gtag==='function')fire();else{var att=0,iv=setInterval(function(){att++;if(typeof window.gtag==='function'||att>20){clearInterval(iv);fire();}},100);}
     }
