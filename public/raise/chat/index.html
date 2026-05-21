@@ -3807,7 +3807,7 @@ function calculateNegotiationScore() {
 function getNegotiationLabel(score) {
   if (score >= 72) return { label: 'Strong negotiating position', color: '#1a9e6c', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.' };
   if (score >= 55) return { label: 'Solid position \u2014 preparation needed', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Secure a specific raise with a committed timeline in writing.' };
-  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#8a6d20', bg: '#FDF5E6', border: 'rgba(201,168,76,0.25)', target: 'Open the conversation seriously and lock in a review date within 90 days.' };
+  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#8a6d20', bg: '#FDF5E6', border: 'rgba(201,168,76,0.25)', target: 'Open the conversation seriously and lock in a review date.' };
   if (score >= 25) return { label: 'Challenging \u2014 strategy is everything', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'Build your case with your manager and establish a clear path to a raise.' };
   return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
 }
