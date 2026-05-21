@@ -4208,19 +4208,38 @@ function initDiscoveryMode(container) {
   chatArea.id = 'disc-chat';
   container.appendChild(chatArea);
 
-  // If assessment was completed, show final canvas + paywall
+  // If assessment was completed, show final canvas + paywall (or full canvas if paid)
   if (discStep >= discOrderedQuestions.length || discStep >= DISC_FREE_QUESTIONS) {
+
+    // If paid: strip teaser flags so full content shows
+    if (state.paid) {
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      stratPlanKeys.forEach(function(key) {
+        if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
+          discCanvasBlocks[key].teaser = false;
+        }
+      });
+    }
+
     // Instant restore — no typing
     var intro = el('div', 'coach-msg', '');
     intro.innerHTML = '<div class="bubble"><p>Let\u2019s map your negotiation position. Each answer fills a section of your Raise Negotiation Canvas.</p></div>';
     chatArea.appendChild(intro);
     insertDiscRadar();
-    showDiscPaywall();
+
+    if (state.paid) {
+      // Paid user: show success message, no paywall
+      var successBubble = el('div', 'coach-msg', '');
+      successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Raise Negotiation Canvas</strong> is ready. All sections are unlocked \u2014 opening script, pushback responses, meeting email, and raise case brief. Download your full PDF anytime.</p></div>';
+      chatArea.appendChild(successBubble);
+    } else {
+      showDiscPaywall();
+    }
     return;
   }
 
   // Opening coach message with typing animation
-  if (!SIM_STATE.unlocked) lockFreeModes();
+  if (!SIM_STATE.unlocked && !state.paid) lockFreeModes();
   var introWrap = el('div', 'coach-msg', '');
   introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
   chatArea.appendChild(introWrap);
