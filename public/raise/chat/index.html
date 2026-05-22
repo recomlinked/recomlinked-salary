@@ -3867,16 +3867,16 @@ function renderCanvasHTML() {
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
       var hasAI = b.insight && b.insight.length > 40;
       var animStyle = hasAI ? 'animation:canvasBlockIn 0.5s ease;' : '';
-      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 12px;min-height:48px;' + animStyle + '">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+      return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:14px 16px;min-height:48px;' + animStyle + '">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
         '<span style="color:' + tc + ';">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
         '</div>' +
-        '<p style="font-size:11px;color:' + tc + ';line-height:1.55;margin:0;">' + formatInsight(b.insight || b.note || '') + '</p>' +
+        '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0;">' + formatInsight(b.insight || b.note || '') + '</p>' +
         '</div>';
     }
-    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+    return '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
       '<div style="display:flex;align-items:center;gap:5px;">' +
       '<span style="color:var(--t3);">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
@@ -3931,25 +3931,25 @@ function renderCanvasHTML() {
     if (b && b.filled && b.teaser) {
       // Teaser mode: short preview + badge + unlock
       var t = getTeaserForBlock(key, b.insight);
-      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;position:relative;overflow:hidden;">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
         '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + t.preview + '</p>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + t.preview + '</p>' +
         '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
         '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
         '</div>';
     }
     if (b && b.filled && !b.teaser) {
       // Full mode (paid)
-      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:10px 12px;min-height:48px;">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">' +
+      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;">' +
+        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.55;margin:0;">' + formatInsight(b.insight) + '</p>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + formatInsight(b.insight) + '</p>' +
         '</div>';
     }
     if (discStrategyLoading) {
@@ -3965,7 +3965,7 @@ function renderCanvasHTML() {
       };
       var loadMsg = loadingMessages[key] || 'Generating';
       var dots = '<span style="display:inline-flex;gap:3px;margin-right:6px;"><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.2s;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.4s;"></span></span>';
-      return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;background:var(--muted);border:1px solid var(--divider);">' +
+      return '<div style="border-radius:8px;padding:14px 16px;min-height:48px;background:var(--muted);border:1px solid var(--divider);">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">' +
         '<span style="color:var(--t3);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
@@ -3973,7 +3973,7 @@ function renderCanvasHTML() {
         '<div style="font-size:11px;color:var(--t3);font-style:italic;display:flex;align-items:center;">' + dots + loadMsg + '...</div>' +
         '</div>';
     }
-    return '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
+    return '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);">' +
       '<div style="display:flex;align-items:center;gap:5px;">' +
       '<span style="color:var(--t3);">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
@@ -4016,7 +4016,7 @@ function renderCanvasHTML() {
     html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
     html += '</div>';
   } else {
-    html += '<div style="border-radius:8px;padding:10px 12px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);margin-top:4px;">';
+    html += '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);margin-top:4px;">';
     html += '<div style="display:flex;align-items:center;gap:5px;">';
     html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
     html += '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
