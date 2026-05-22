@@ -913,6 +913,24 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 // Hide any footer injected by shared.js — chat page uses full-height layout
 document.addEventListener('DOMContentLoaded', function() {
+
+  // Handle back-button from Stripe: re-apply teasers
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      try {
+        var s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
+        if (!s.paid) {
+          ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+            if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
+              discCanvasBlocks[k].teaser = true;
+            }
+          });
+          var lc = document.getElementById('disc-canvas-live');
+          if (lc) lc.innerHTML = renderCanvasHTML();
+        }
+      } catch(e) {}
+    }
+  });
   var footer = document.querySelector('footer');
   if (footer) {
     var wrap = footer.parentElement;
@@ -4196,6 +4214,15 @@ function initDiscoveryMode(container) {
       discStep = saved.step || 0;
       discInsights = saved.insights || {};
       if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
+
+      // Force teaser on strategy/plan blocks for free users
+      if (!state.paid) {
+        ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+          if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
+            discCanvasBlocks[k].teaser = true;
+          }
+        });
+      }
     }
   } catch (e) {}
 
