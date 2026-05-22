@@ -3470,7 +3470,7 @@ function _generatePDFWithJsPDF() {
       line.forEach(function(seg) {
         doc.setFont('helvetica', seg.bold ? 'bold' : 'normal');
         doc.setTextColor(color[0], color[1], color[2]);
-        doc.text(seg.text, cx, y + li * 3.5);
+        doc.text(seg.text, cx, y + li * 4.2);
         cx += doc.getTextWidth(seg.text);
       });
     });
@@ -3490,7 +3490,7 @@ function _generatePDFWithJsPDF() {
     var b = discCanvasBlocks[block];
     var filled = b && b.filled;
     var insight = filled ? (b.insight || b.note || '') : '';
-    var padX = 5, padY = 3;
+    var padX = 5, padY = 6;
     var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
 
     if (filled && b.teaser) {
@@ -3521,7 +3521,7 @@ function _generatePDFWithJsPDF() {
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       var teaserLines = wrapText(teaserText, blockW - padX * 2 - 2);
-      var blockH = forceH || (8 + teaserLines.length * 3.5 + 8 + padY);
+      var blockH = forceH || (12 + teaserLines.length * 4.2 + 10 + padY);
 
       doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
       doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
@@ -3529,7 +3529,7 @@ function _generatePDFWithJsPDF() {
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
-      doc.text(label.toUpperCase(), x + padX, y + 5);
+      doc.text(label.toUpperCase(), x + padX, y + 6.5);
 
       // Badge
       if (teaserBadge) {
@@ -3537,22 +3537,22 @@ function _generatePDFWithJsPDF() {
         doc.setFont('helvetica', 'bold');
         var bw = doc.getTextWidth(teaserBadge) + 4;
         doc.setFillColor(c.bg[0] - 15, c.bg[1] - 15, c.bg[2] - 15);
-        doc.roundedRect(x + blockW - padX - bw - 1, y + 1.5, bw + 2, 4.5, 1, 1, 'F');
+        doc.roundedRect(x + blockW - padX - bw - 1, y + 2.5, bw + 2, 4.5, 1, 1, 'F');
         doc.setTextColor(c.text[0], c.text[1], c.text[2]);
-        doc.text(teaserBadge, x + blockW - padX - bw / 2, y + 4.5, { align: 'center' });
+        doc.text(teaserBadge, x + blockW - padX - bw / 2, y + 5.5, { align: 'center' });
       }
 
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
       teaserLines.forEach(function(line, i) {
-        doc.text(line, x + padX, y + 9 + i * 3.5);
+        doc.text(line, x + padX, y + 12 + i * 4.2);
       });
       // Unlock text
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(gold[0], gold[1], gold[2]);
-      doc.text('Unlock full ' + label.toLowerCase() + ' \u2192', x + padX, y + 9 + teaserLines.length * 3.5 + 3);
+      doc.text('Unlock full ' + label.toLowerCase() + ' >>', x + padX, y + 12 + teaserLines.length * 4.2 + 4);
       return blockH + 2;
     } else if (filled) {
       var c = getBlockColors(b.strength);
@@ -3561,36 +3561,36 @@ function _generatePDFWithJsPDF() {
       doc.setFontSize(7.5);
       doc.setFont('helvetica', 'normal');
       var textLines = wrapText(insight, blockW - padX * 2 - 2);
-      var blockH = forceH || (8 + textLines.length * 3.5 + padY);
+      var blockH = forceH || (12 + textLines.length * 4.2 + padY);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(c.text[0], c.text[1], c.text[2]);
-      doc.text(label.toUpperCase(), x + padX, y + 5);
+      doc.text(label.toUpperCase(), x + padX, y + 6.5);
       if (c.badge) {
         var bw = doc.getTextWidth(c.badge) + 4;
         doc.setFillColor(c.border[0], c.border[1], c.border[2]);
-        doc.roundedRect(x + blockW - 4 - bw - 1, y + 1.5, bw + 2, 5, 1, 1, 'F');
+        doc.roundedRect(x + blockW - 4 - bw - 1, y + 2.5, bw + 2, 5, 1, 1, 'F');
         doc.setFontSize(6);
         doc.setTextColor(255, 255, 255);
-        doc.text(c.badge, x + blockW - 4 - bw / 2, y + 4.8, { align: 'center' });
+        doc.text(c.badge, x + blockW - 4 - bw / 2, y + 5.8, { align: 'center' });
       }
       doc.setFontSize(7.5);
-      drawBoldText(doc, insight, x + padX, y + 9, blockW - padX * 2 - 2, c.text);
+      drawBoldText(doc, insight, x + padX, y + 12, blockW - padX * 2 - 2, c.text);
       return blockH + 2;
     } else {
-      var blockH = forceH || 14;
+      var blockH = forceH || 18;
       doc.setFillColor(240, 241, 245);
       doc.setDrawColor(200, 205, 215);
       doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
       doc.setFontSize(7);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(160, 165, 180);
-      doc.text(label.toUpperCase(), x + padX, y + 5.5);
+      doc.text(label.toUpperCase(), x + padX, y + 6.5);
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(180, 185, 195);
-      doc.text(emptyText, x + padX, y + 10);
+      doc.text(emptyText, x + padX, y + 12);
       return blockH + 2;
     }
   }
@@ -3604,16 +3604,16 @@ function _generatePDFWithJsPDF() {
         doc.setFontSize(7.5);
         var teaser = getFirstSentencePDF(b.insight || '');
         var lines = wrapText(teaser, colW - 10);
-        var h = 8 + lines.length * 3.5 + 8 + 5;
+        var h = 12 + lines.length * 4.2 + 10 + 6;
         if (h > maxH) maxH = h;
       } else if (b && b.filled) {
         doc.setFontSize(7.5);
         var text = (b.insight || b.note || '').replace(/\*\*/g, '');
         var lines = wrapText(text, colW - 10);
-        var h = 8 + lines.length * 3.5 + 5;
+        var h = 12 + lines.length * 4.2 + 6;
         if (h > maxH) maxH = h;
       } else {
-        if (14 > maxH) maxH = 14;
+        if (18 > maxH) maxH = 18;
       }
     });
 
@@ -3635,17 +3635,17 @@ function _generatePDFWithJsPDF() {
   function drawFullWidth(block, label, section) {
     var fullW = W - mx * 2;
     var b = discCanvasBlocks[block];
-    var estH = 14;
+    var estH = 18;
     if (b && b.filled && b.teaser) {
       doc.setFontSize(7.5);
       var teaser = getFirstSentencePDF(b.insight || '');
       var lines = wrapText(teaser, fullW - 10);
-      estH = 8 + lines.length * 3.5 + 8 + 5;
+      estH = 12 + lines.length * 4.2 + 10 + 6;
     } else if (b && b.filled) {
       doc.setFontSize(7.5);
       var text = (b.insight || b.note || '').replace(/\*\*/g, '');
       var lines = wrapText(text, fullW - 10);
-      estH = 8 + lines.length * 3.5 + 5;
+      estH = 12 + lines.length * 4.2 + 6;
     }
     if (y + estH > H - 20) {
       drawFooter();
@@ -3680,21 +3680,21 @@ function _generatePDFWithJsPDF() {
   var npText = nScore >= 72 ? [10,92,58] : nScore >= 55 ? [61,107,30] : nScore >= 40 ? [106,74,16] : nScore >= 25 ? [180,90,0] : [122,32,32];
   var npBorder = nScore >= 72 ? [26,158,108] : nScore >= 55 ? [80,140,40] : nScore >= 40 ? [201,168,76] : nScore >= 25 ? [200,120,20] : [204,68,68];
   y += 2;
-  if (y + 20 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  if (y + 26 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
   doc.setFillColor(npColors[0], npColors[1], npColors[2]);
   doc.setDrawColor(npBorder[0], npBorder[1], npBorder[2]);
-  doc.roundedRect(mx, y, W - mx * 2, 20, 2, 2, 'FD');
+  doc.roundedRect(mx, y, W - mx * 2, 26, 2, 2, 'FD');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(npText[0], npText[1], npText[2]);
-  doc.text('OVERALL NEGOTIATION POSITION', mx + 5, y + 5);
+  doc.text('OVERALL NEGOTIATION POSITION', mx + 5, y + 6);
   doc.setFontSize(9);
-  doc.text(nLabel.label, mx + 5, y + 10.5);
+  doc.text(nLabel.label, mx + 5, y + 12);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
-  doc.text('Your target: ' + nLabel.target.slice(0, 90), mx + 5, y + 15.5);
-  if (nLabel.target.length > 90) doc.text(nLabel.target.slice(90), mx + 5, y + 19);
-  y += 24;
+  doc.text('Your target: ' + nLabel.target.slice(0, 90), mx + 5, y + 18);
+  if (nLabel.target.length > 90) doc.text(nLabel.target.slice(90), mx + 5, y + 22.5);
+  y += 30;
 
   y += 4;
   doc.setDrawColor(220, 225, 235);
@@ -3738,9 +3738,11 @@ function _generatePDFWithJsPDF() {
     'Confirm market rate from 2+ sources',
   ];
   beforeItems.forEach(function(item, i) {
-    doc.setDrawColor(160, 165, 180);
-    doc.rect(mx + 5, y + 6.5 + i * 3.5, 2.5, 2.5, 'S');
-    doc.text('  ' + item, mx + 8, y + 9.5 + i * 3.5);
+    doc.setDrawColor(100, 105, 130);
+    doc.setLineWidth(0.4);
+    doc.rect(mx + 5, y + 6.5 + i * 3.5, 3, 3, 'S');
+    doc.setLineWidth(0.2);
+    doc.text(item, mx + 10, y + 9.5 + i * 3.5);
   });
   var afterY = y + 9.5 + beforeItems.length * 3.5 + 3;
   doc.setFont('helvetica', 'bold');
@@ -3755,9 +3757,11 @@ function _generatePDFWithJsPDF() {
     'If "no" \u2014 ask "What would change this?" and set review date'
   ];
   afterItems.forEach(function(item, i) {
-    doc.setDrawColor(160, 165, 180);
-    doc.rect(mx + 5, afterY + 1 + i * 3.5, 2.5, 2.5, 'S');
-    doc.text('  ' + item, mx + 8, afterY + 4 + i * 3.5);
+    doc.setDrawColor(100, 105, 130);
+    doc.setLineWidth(0.4);
+    doc.rect(mx + 5, afterY + 1 + i * 3.5, 3, 3, 'S');
+    doc.setLineWidth(0.2);
+    doc.text(item, mx + 10, afterY + 4 + i * 3.5);
   });
   var totalChecklistH = (afterY - clY) + 4 + afterItems.length * 3.5 + 4;
   // Redraw box with correct height
@@ -3987,6 +3991,7 @@ function renderCanvasHTML() {
   var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
   html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
   html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
+  html += '<a href="#" onclick="event.preventDefault();generateCanvasPDF();" style="margin-left:auto;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>';
   html += '</div>';
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
