@@ -4479,7 +4479,7 @@ function renderDiscQuestion(idx) {
       var target = coachBubble.offsetTop - 10;
       var start = wrap.scrollTop;
       var distance = target - start;
-      var duration = 600;
+      var duration = 1800;
       var startTime = null;
       function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
       function step(ts) {
@@ -4490,7 +4490,7 @@ function renderDiscQuestion(idx) {
       }
       requestAnimationFrame(step);
     }
-  }, 200);
+  }, 300);
 }
 
 function pickDiscAnswer(qIdx, opt, pill) {
@@ -4568,7 +4568,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
       var target = userBubble.offsetTop - 20;
       var start = chatWrap.scrollTop;
       var distance = target - start;
-      var duration = 500;
+      var duration = 1500;
       var startTime = null;
       function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
       function step(ts) {
@@ -4579,12 +4579,12 @@ function pickDiscAnswer(qIdx, opt, pill) {
       }
       requestAnimationFrame(step);
     }
-  }, 150);
+  }, 200);
   
   discStep++;
   setTimeout(function() {
     renderDiscQuestion(discStep);
-  }, 700);
+  }, 2200);
 }
 
 async function generateDiscInsights() {
@@ -4780,7 +4780,7 @@ async function generateDiscInsights() {
       var start = chatWrap.scrollTop;
       var target = chatWrap.scrollHeight - chatWrap.clientHeight;
       var distance = target - start;
-      var duration = Math.min(2500, Math.max(1200, distance * 1.5));
+      var duration = Math.min(4000, Math.max(2000, distance * 2));
       var startTime = null;
       function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
       function step(ts) {
