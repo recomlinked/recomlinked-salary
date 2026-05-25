@@ -32,1267 +32,403 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png"/>
 <link rel="manifest" href="/manifest.json"/>
 <style>
-/* ── Variables (FA visual system) ─────────────────────── */
+/* ═══════════════════════════════════════════
+   RAISE WOMEN — Clean CSS
+   Color system: Purple brand + Gold CTAs
+   ═══════════════════════════════════════════ */
+
+/* ── 1. VARIABLES ─────────────────────────── */
 :root {
-  --bg:      #07090f;
-  --bg2:     #0f1117;
-  --bg3:     #141722;
-  --bg4:     #1c2030;
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --gold:    #c9a84c;
-  --gold2:   #d8b75a;
-  --teal:    #00c4a0;
-  --red:     #e05555;
-  --text:    #e8eaf2;
-  --text2:   #8a90a8;
-  --text3:   #454d60;
-  --sans:    -apple-system, 'Segoe UI', system-ui, sans-serif;
-  --radius:  6px;
+  --bg: #f8f6fa;
+  --card: #ffffff;
+  --text: #2c2438;
+  --text2: #6b5f7a;
+  --text3: #9a8faa;
+  --purple: #7B5CFC;
+  --purple-hover: #6A4CE8;
+  --purple-light: #f0e8f6;
+  --gold: #F5CF56;
+  --gold-hover: #E8C044;
+  --gold-text: #1a1520;
+  --border: rgba(139,111,165,0.1);
+  --border-hover: rgba(123,92,252,0.3);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-gold: 0 2px 12px rgba(232,184,76,0.25);
+  --shadow-gold-hover: 0 4px 20px rgba(232,184,76,0.35);
+  --radius: 12px;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'Playfair Display', Georgia, serif;
 }
+
+/* ── 2. RESET & BASE ──────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
+html { scroll-behavior: smooth; background: #f5e6d8; }
+body {
   background: var(--bg);
+  margin: 0;
+  padding: 0;
   color: var(--text);
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
-  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
 }
-a { color: var(--gold); text-decoration: none; }
+a { color: var(--purple); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button { font-family: var(--sans); cursor: pointer; }
 
-/* ── Header ────────────────────────────────────────────── */
+/* ── 3. LAYOUT ────────────────────────────── */
+.main { max-width: 640px; margin: 0 auto; padding: 0 24px 64px; }
+
+@media (max-width: 480px) { .main { padding: 0 20px 48px; } }
+
+
+/* ── 4. HEADER ────────────────────────────── */
 .site-header {
-  padding: 16px 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-}
-.logo-wrap {
-  display: flex; align-items: center;
-  font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
-  text-decoration: none;
-}
-.logo-recom  { background: var(--gold); color: #07090f; padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
-.logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--bg4); border-radius: 0 3px 3px 0; }
-
-/* ── Layout ────────────────────────────────────────────── */
-.main {
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 32px 24px 64px;
-}
-@media (max-width: 480px) {
-  .main { padding: 24px 20px 48px; }
-  .site-header { padding: 14px 20px; }
-}
-
-/* ── Hero ──────────────────────────────────────────────── */
-.hero {
-  text-align: center;
-  padding: 20px 0 28px;
-}
-.hero h1 {
-  font-size: clamp(26px, 5.2vw, 40px);
-  line-height: 1.25;
-  font-weight: 800;
-  letter-spacing: -0.8px;
-  margin-bottom: 20px;
-  color: var(--text);
-}
-.hero h1 .accent {
-  color: var(--gold);
-  font-size: 1.35em;
-  line-height: 1;
-  vertical-align: baseline;
-}
-.hero h1 .accent-soft {
-  color: var(--gold);
-}
-.hero h1 .hero-h1-line2 {
-  font-weight: 500;
-  display: inline-block;
-  margin-top: 4px;
-}
-.hero-sub {
-  font-size: clamp(15px, 2.6vw, 18px);
-  line-height: 1.5;
-  font-weight: 400;
-  font-style: italic;
-  color: var(--text);
-  max-width: 520px;
-  margin: 0 auto 8px;
-}
-.hero-trust {
-  font-size: 11px; color: var(--text2); letter-spacing: 0.04em;
-  margin-top: 24px; text-transform: uppercase;
-}
-.hero-trust span { margin: 0 6px; }
-
-@media (max-width: 480px) {
-  .hero h1 { letter-spacing: -0.6px; }
-}
-
-/* ── CTAs ──────────────────────────────────────────────── */
-.cta-stack {
-  display: flex; flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
-  margin: 48px auto 0;
-}
-.cta-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  background: var(--gold); color: #07090f;
-  border: none; border-radius: 8px;
-  padding: 17px 34px;
-  font-size: 15px; font-weight: 700;
-  text-decoration: none;
-  transition: transform 0.12s, opacity 0.12s, background 0.12s;
-  line-height: 1.3; text-align: center;
-  white-space: nowrap;
-}
-.cta-btn:hover { opacity: 0.92; text-decoration: none; }
-.cta-btn:active { transform: translateY(1px); }
-.cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
-.cta-btn.secondary {
   background: transparent;
-  color: var(--text2);
-  border: 1.5px solid rgba(255,255,255,0.22);
-  opacity: 1;
-}
-.cta-btn.secondary:hover { background: var(--bg3); color: var(--text); border-color: rgba(255,255,255,0.35); }
-.cta-btn.outline-gold {
-  background: transparent;
-  color: var(--gold);
-  border: 1.5px solid rgba(201,168,76,0.4);
-  padding: 13px 26px;
-  font-size: 14.5px;
-}
-.cta-btn.outline-gold:hover {
-  background: rgba(201,168,76,0.08);
-  border-color: rgba(201,168,76,0.7);
-}
-
-/* Inline CTA below How it works */
-.hiw-continue {
-  text-align: center;
-  margin: 20px 0 8px;
-}
-.hiw-continue-hint {
-  font-size: 11px;
-  color: var(--text2);
-  letter-spacing: 0.04em;
-  margin-top: 10px;
-  text-transform: uppercase;
-}
-@media (max-width: 420px) {
-  .cta-btn { padding: 15px 26px; font-size: 14.5px; white-space: normal; }
-  .cta-stack { gap: 10px; margin-top: 24px; }
-}
-
-/* ── Sample report card — probability + factors + checklist ─── */
-.rep-section {
-  margin: 32px 0 32px;
-}
-.rep-link {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-}
-.rep-link:hover { text-decoration: none; }
-.rep-card {
-  background: var(--bg3);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 14px 16px;
-  transition: opacity 300ms ease, border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-}
-.rep-card.fading { opacity: 0; }
-.rep-link:hover .rep-card {
-  border-color: rgba(201,168,76,0.45);
-  box-shadow: 0 0 0 1px rgba(201,168,76,0.15);
-}
-.rep-link:hover .rep-cta-text { text-decoration: underline; }
-.rep-link:active .rep-card { transform: translateY(1px); }
-
-.rep-header {
-  display: flex; align-items: center; gap: 8px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  margin-bottom: 14px;
-}
-.rep-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--teal); flex-shrink: 0;
-}
-.rep-hlabel {
-  font-size: 12px; font-weight: 600;
-  color: var(--text);
-  line-height: 1.35;
-  flex: 1;
-}
-.rep-example-tag {
-  font-size: 9px; font-weight: 700;
-  color: var(--text3);
-  letter-spacing: 0.04em; text-transform: uppercase;
-  background: rgba(255,255,255,0.04);
-  border-radius: 3px;
-  padding: 3px 7px;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-/* Probability card (inside rep-card) */
-.rep-prob {
-  background: var(--bg);
-  border-radius: 6px;
-  padding: 16px 14px;
-}
-.rep-prob-stage {
-  font-size: 10px; font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 0.09em; text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.rep-prob-row {
-  display: flex; align-items: flex-end; gap: 10px;
-  margin-bottom: 12px;
-}
-.rep-range {
-  font-size: 28px; font-weight: 800;
-  letter-spacing: -1.2px; line-height: 1;
-  opacity: 0; transition: opacity 400ms ease;
-}
-.rep-range.show { opacity: 1; }
-.rep-verdict-lbl {
-  font-size: 10px; font-weight: 700;
-  padding-bottom: 4px;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  opacity: 0; transition: opacity 400ms ease 100ms;
-}
-.rep-verdict-lbl.show { opacity: 1; }
-.rep-range.red, .rep-verdict-lbl.red { color: var(--red); }
-.rep-range.amber, .rep-verdict-lbl.amber { color: var(--gold); }
-.rep-range.green, .rep-verdict-lbl.green { color: var(--teal); }
-.rep-track {
-  background: rgba(255,255,255,0.08);
-  border-radius: 3px; height: 6px; overflow: hidden;
-}
-.rep-fill {
-  height: 100%; border-radius: 3px; width: 0%;
-  transition: width 900ms cubic-bezier(0.22,1,0.36,1) 200ms;
-}
-.rep-fill.red   { background: var(--red); }
-.rep-fill.amber { background: var(--gold); }
-.rep-fill.green { background: var(--teal); }
-.rep-persona-label {
-  margin-top: 14px;
-  font-size: 12px; color: var(--text2); line-height: 1.45;
-  opacity: 0; transition: opacity 400ms ease 300ms;
-}
-.rep-persona-label.show { opacity: 1; }
-.rep-persona-label .rep-prole {
-  color: #b8bcce; font-weight: 600;
-}
-
-/* Section headers (factors / plan) */
-.rep-section-head {
-  margin-top: 18px;
-  font-size: 10px; font-weight: 700;
-  color: rgba(255,255,255,0.55);
-  letter-spacing: 0.09em; text-transform: uppercase;
-  margin-bottom: 10px;
+  padding: 14px 24px;
   display: flex; align-items: center; justify-content: space-between;
+  border-bottom: none;
+  position: relative; top: 0; z-index: 100;
 }
-.rep-section-count {
-  font-size: 10px; color: var(--text2);
-  font-weight: 500; letter-spacing: 0; text-transform: none;
-}
-
-/* Factors list — REMOVED (we now show only the prep plan checklist) */
-
-.rep-show-more {
-  margin-top: 10px;
-  font-size: 11px; color: var(--text2);
-  opacity: 0; transition: opacity 400ms ease;
-}
-.rep-show-more.show { opacity: 1; }
-.rep-show-more .plus {
-  color: var(--gold); font-weight: 700; margin-right: 4px;
-}
-
-/* Checklist */
-.rep-checklist { display: flex; flex-direction: column; gap: 7px; }
-.rep-clitem {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; line-height: 1.3;
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
-.rep-clitem.show { opacity: 1; }
-.rep-clmark {
-  width: 16px; height: 16px; border-radius: 50%;
-  flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 10px; font-weight: 700;
-  transform: scale(0.6);
-  transition: transform 260ms cubic-bezier(0.34,1.56,0.64,1);
-}
-.rep-clitem.show .rep-clmark { transform: scale(1); }
-.rep-clmark.done { background: var(--teal); color: var(--bg); }
-.rep-clmark.pending {
-  background: transparent; color: var(--text3);
-  border: 1.3px solid rgba(255,255,255,0.18);
-}
-.rep-cltext { flex: 1; }
-.rep-clitem.done .rep-cltext { color: #b8bcce; }
-.rep-clitem.pending .rep-cltext { color: var(--text2); }
-.rep-clpill {
-  display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.14);
-  color: var(--text2);
-  font-size: 11px; font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-/* Chat-with-AI row — sits between checklist and CTA */
-.rep-chat-row {
-  margin-top: 14px;
-  padding: 11px 13px;
-  background: rgba(0,196,160,0.04);
-  border: 1px solid rgba(0,196,160,0.18);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 350ms ease, transform 350ms ease;
-}
-.rep-chat-row.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-.rep-chat-icon {
-  flex-shrink: 0;
-  width: 28px;
-  height: 28px;
-  background: rgba(0,196,160,0.12);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--teal);
-}
-.rep-chat-text {
-  flex: 1;
-  min-width: 0;
-}
-.rep-chat-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.2;
-  margin-bottom: 2px;
-}
-.rep-chat-sub {
-  font-size: 11px;
-  color: var(--teal);
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-}
-.rep-chat-pill {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--teal);
-  background: rgba(0,196,160,0.1);
-  padding: 3px 8px;
-  border-radius: 3px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  flex-shrink: 0;
-}
-
-.rep-cta {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  text-align: right;
-}
-.rep-cta-text {
-  font-size: 12px; color: var(--gold); font-weight: 700;
-  cursor: pointer;
-}
-
-/* Persona indicator dots */
-.rep-indicator {
-  display: flex; gap: 6px; justify-content: center;
-  margin-top: 12px;
-}
-.rep-pi-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: background 300ms ease;
-}
-.rep-pi-dot.active { background: var(--gold); }
-
-/* ── Section ──────────────────────────────────────────── */
-.section {
-  margin: 64px 0 20px;
-}
-@media (max-width: 480px) {
-  .section { margin: 48px 0 16px; }
-}
-.section h2 {
-  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
-  margin-bottom: 6px; color: var(--text);
-}
-h2.section-title {
-  font-size: 20px; font-weight: 800; letter-spacing: -0.4px;
-  color: var(--text);
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-.hiw-section h2.section-title {
-  margin-top: 0;
-}
-.section .section-sub {
-  font-size: 13px; color: var(--text2); line-height: 1.55;
-  margin-bottom: 20px;
-}
-
-/* ── Proof bar ────────────────────────────────────────── */
-.proof-bar {
-  margin: 48px 0;
-  padding: 18px 20px;
-  background: linear-gradient(180deg, rgba(0,196,160,0.06) 0%, rgba(0,196,160,0.02) 100%);
-  border: 1px solid rgba(0,196,160,0.22);
-  border-radius: 10px;
-  text-align: center;
-}
-@media (max-width: 480px) {
-  .proof-bar { margin: 40px 0; }
-}
-.proof-stat {
-  font-size: 15.5px; font-weight: 800;
-  color: var(--text); line-height: 1.5;
-  margin-bottom: 6px;
-}
-.proof-stat .proof-num { color: var(--teal); }
-.proof-src {
-  font-size: 10.5px; color: var(--text3);
-  letter-spacing: 0.04em; text-transform: uppercase;
-}
-
-/* ── Reasons grid (Which one sounds like you?) ─────────── */
-.reasons-section {
-  scroll-margin-top: 40px;
-  margin-top: 0;
-  padding-bottom: 32px;
-}
-.reasons-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-@media (max-width: 480px) {
-  .reasons-grid { grid-template-columns: 1fr; }
-}
-.reason-chip {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: 12px 14px;
-  font-size: 13px; color: var(--text); font-weight: 600;
-  text-decoration: none;
-  transition: border-color 0.15s, background 0.15s, transform 0.1s;
-  line-height: 1.4;
-  gap: 10px;
-}
-.reason-chip:hover {
-  border-color: rgba(201,168,76,0.5);
-  background: var(--bg3);
-  text-decoration: none;
-}
-.reason-chip:active { transform: translateY(1px); }
-.reason-chip .reason-arrow {
-  font-size: 14px; color: var(--gold);
-  flex-shrink: 0; opacity: 0.6;
-  transition: opacity 0.15s, transform 0.15s;
-}
-.reason-chip:hover .reason-arrow {
-  opacity: 1; transform: translateX(2px);
-}
-
-/* CTA variant — same layout as regular chips, gold accent color */
-.reason-chip-cta {
-  border-color: rgba(201,168,76,0.45);
-  color: var(--gold);
-}
-.reason-chip-cta:hover {
-  border-color: var(--gold);
-  background: var(--bg3);
-  color: var(--gold);
-}
-.reason-chip-cta .reason-arrow {
-  color: var(--gold); opacity: 1;
-}
-
-/* ── Closing CTA (positioning block) ───────────────────── */
-/* ── SEO guide content — genuine advice for Google QS + readers ── */
-.seo-guide{margin:40px 0 0;}
-.seo-content{margin-top:16px;}
-.seo-content h3{font-size:15px;font-weight:700;color:var(--text);margin:24px 0 8px;letter-spacing:-0.2px;}
-.seo-content h3:first-child{margin-top:0;}
-.seo-content p{font-size:13px;color:#b8bcce;line-height:1.7;margin-bottom:0;}
-
-.closing-pitch {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-top: 1px solid rgba(201,168,76,0.35);
-  border-radius: 10px;
-  padding: 28px 24px;
-  margin: 64px 0 20px;
-  text-align: center;
-}
-@media (max-width: 480px) {
-  .closing-pitch { margin: 48px 0 16px; }
-}
-.closing-pitch h3 {
-  font-size: 18px; font-weight: 800;
-  color: var(--text); margin-bottom: 10px;
-  letter-spacing: -0.3px;
-}
-.closing-pitch h3 .accent { color: var(--gold); }
-.closing-pitch p {
-  font-size: 13.5px; color: var(--text2);
-  line-height: 1.6; margin: 0 auto 18px;
-  max-width: 440px;
-}
-.closing-pitch .cta-btn {
-  max-width: 380px; margin: 0 auto;
-}
-.closing-pitch .mini-trust {
-  margin-top: 14px;
-}
-
-/* ── FAQ ──────────────────────────────────────────────── */
-.faq-item {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 8px; overflow: hidden;
-}
-.faq-q {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; cursor: pointer;
-  font-size: 13px; font-weight: 600; color: var(--text);
-  gap: 12px; user-select: none;
+.logo-wrap { display: flex; align-items: center; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; }
+.logo-wrap:hover { text-decoration: none; }
+.logo-recom { background: var(--gold); color: var(--gold-text); padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
+.logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--purple-light); border-radius: 0 3px 3px 0; }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.header-cta {
+  background: var(--gold); color: var(--gold-text);
+  padding: 8px 20px; border-radius: 10px;
+  font-size: 13px; font-weight: 700; text-decoration: none;
   transition: background 0.15s;
 }
-.faq-q:hover { background: var(--bg3); }
-.faq-q.open { background: var(--bg3); }
-.faq-icon {
-  font-size: 16px; color: var(--text3); flex-shrink: 0;
-  transition: transform 0.2s;
-}
-.faq-q.open .faq-icon { transform: rotate(45deg); color: var(--gold); }
-.faq-a {
-  display: none;
-  padding: 0 18px 16px;
-  font-size: 13px; color: var(--text2); line-height: 1.75;
-  border-top: 1px solid var(--border);
-}
-.faq-a.open { display: block; }
-.faq-a a { color: var(--gold); }
+.header-cta:hover { background: var(--gold-hover); text-decoration: none; }
+@media (max-width: 480px) { .site-header { padding: 12px 16px; } }
 
-/* ── Progress indicator (assessment) ───────────────────── */
-.progress {
-  display: flex; gap: 4px;
-  max-width: 640px; margin: 0 auto 22px;
-}
-.pseg {
-  height: 3px; flex: 1;
-  background: rgba(255,255,255,0.07);
-  border-radius: 2px;
-  transition: background 0.25s;
-}
-.pseg.done { background: var(--gold); }
-
-/* Assessment container — generous bottom space so the Continue button
-   sits well above any footer on mobile. Landing keeps the default `.main` padding. */
-#assessment-content {
-  padding-bottom: 140px;
-}
-@media (max-width: 480px) {
-  #assessment-content { padding-bottom: 120px; }
-}
-
-/* ── Step / question styles ───────────────────────────── */
-.step { display: none; }
-.step.active { display: block; animation: fadeUp 0.28s ease both; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.step-meta {
-  font-size: 11px; color: var(--text3);
-  letter-spacing: 0.06em; text-transform: uppercase;
-  margin-bottom: 8px; font-weight: 600;
-}
-.step h2 {
-  font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
-  margin-bottom: 8px; color: var(--text); line-height: 1.25;
-}
-.step .sub {
-  font-size: 13.5px; color: var(--text2); line-height: 1.55;
-  margin-bottom: 22px;
-}
-
-/* ── Chip / option grids ───────────────────────────────── */
-.opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
-.opts.row { flex-direction: row; flex-wrap: wrap; }
-.opt {
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  padding: 14px 16px;
-  font-size: 14px; color: var(--text); font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  line-height: 1.35;
-}
-.opts.row .opt {
-  flex: 1 1 auto; min-width: 0;
-  padding: 12px 14px; font-size: 13px;
-}
-.opt small {
-  display: block; font-size: 11.5px; color: var(--text3);
-  margin-top: 3px; font-weight: 400;
-}
-.opt.sel {
-  border-color: var(--gold);
-  background: rgba(201,168,76,0.06);
-}
-.opt.sel small { color: var(--text2); }
-.opt:hover { border-color: var(--border2); background: var(--bg3); }
-.opt.sel:hover { border-color: var(--gold); background: rgba(201,168,76,0.1); }
-
-/* ── Nav ──────────────────────────────────────────────── */
-.step-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 22px; padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-.step-counter { font-size: 12px; color: var(--text3); font-weight: 500; }
-.nav-right { display: flex; gap: 10px; }
-.btn-back, .btn-continue {
-  border: none; border-radius: 8px;
-  padding: 11px 18px; font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--sans);
-  transition: opacity 0.15s, background 0.15s, transform 0.1s;
-}
-.btn-back {
-  background: transparent; color: var(--text2);
-  border: 1px solid var(--border2);
-}
-.btn-back:hover { background: var(--bg3); color: var(--text); }
-.btn-continue {
-  background: var(--gold); color: #07090f;
-  opacity: 0.4; cursor: not-allowed;
-}
-.btn-continue.active {
-  opacity: 1; cursor: pointer;
-}
-.btn-continue.active:hover { background: var(--gold2); }
-.btn-continue:active { transform: translateY(1px); }
-.err {
-  display: none;
-  color: var(--red); font-size: 12px; margin-top: 8px;
-  padding: 6px 10px;
-  background: rgba(224,85,85,0.08);
-  border-left: 2px solid var(--red);
-  border-radius: 4px;
-}
-.err.show { display: block; animation: errShake 0.35s cubic-bezier(0.36,0.07,0.19,0.97); }
-@keyframes errShake {
-  10%,90% { transform: translateX(-1px); }
-  20%,80% { transform: translateX(2px); }
-  30%,50%,70% { transform: translateX(-3px); }
-  40%,60% { transform: translateX(3px); }
-}
-
-/* ── Jump button from landing to assessment ───────────── */
-.scroll-cue {
-  text-align: center; margin-top: 24px;
-  font-size: 12px; color: var(--text3);
-}
-
-/* ── Proof rotator (typewriter between sample card and how-it-works) ── */
-.proof-rotator {
-  margin: 36px 0 36px;
+/* ── 5. HERO ──────────────────────────────── */
+.hero {
+  background: linear-gradient(160deg, #f5e6d8 0%, #eddce8 40%, #d8c4e8 70%, #c4aade 100%);
   text-align: center;
-  min-height: 72px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 12px;
-}
-.proof-rotator-text {
-  font-size: 17px;
-  line-height: 1.45;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: -0.2px;
-  max-width: 520px;
-}
-.proof-rotator-text .emph {
-  color: var(--gold);
-  font-weight: 700;
-}
-.proof-rotator-text .cursor {
-  display: inline-block;
-  width: 2px;
-  background: var(--gold);
-  margin-left: 2px;
-  animation: proof-blink 0.9s steps(2, end) infinite;
-  height: 1em;
-  vertical-align: text-bottom;
-}
-@keyframes proof-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-@media (max-width: 480px) {
-  .proof-rotator-text { font-size: 15px; }
-}
-
-/* ── How it works (vertical cards) ────────────────────── */
-.hiw-section {
-  margin: 32px 0 32px;
-}
-.hiw-card,
-.hiw-card *,
-.hiw-card:hover,
-.hiw-card:hover *,
-.hiw-card:focus,
-.hiw-card:focus * {
-  text-decoration: none !important;
-}
-.hiw-card {
-  background: var(--bg2);
-  border: none;
-  border-radius: 10px;
-  padding: 16px 16px 18px;
-  margin-bottom: 12px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  color: inherit;
-  cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.hiw-card:hover,
-.hiw-card:focus-visible {
-  background: rgba(20,23,34,0.9);
-  outline: none;
-}
-.hiw-card:active {
-  transform: scale(0.995);
-}
-.hiw-num {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  background: rgba(201,168,76,0.1);
-  border: 1px solid rgba(201,168,76,0.3);
-  color: var(--gold);
-  font-size: 14px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.hiw-body { flex: 1; min-width: 0; }
-.hiw-title {
-  font-size: 15px; font-weight: 700;
-  color: var(--text);
-  margin-bottom: 4px;
-}
-.hiw-desc {
-  font-size: 13px;
-  color: #b8bcce;
-  line-height: 1.5;
-  margin-bottom: 10px;
-}
-.hiw-desc b {
-  color: inherit;
-  font-weight: 400;
-}
-.hiw-desc .range {
-  color: inherit;
-  font-weight: 400;
-}
-.hiw-meta {
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.hiw-meta .pill {
-  display: inline-block;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
-  padding: 2px 8px;
-  border-radius: 3px;
-  font-size: 11px;
-  color: var(--text2);
-  font-weight: 500;
-}
-.hiw-meta .pill.free {
-  background: rgba(0,196,160,0.08);
-  border-color: rgba(0,196,160,0.3);
-  color: var(--teal);
-}
-/* Inline CTA at the end of each card body — visually mimics a link, but
-   is just a styled div (the whole card is already an <a>). */
-.hiw-cta {
-  font-size: 12.5px;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 0.01em;
-  margin-top: 2px;
-}
-.hiw-cta-arrow {
-  display: inline-block;
-  margin-left: 4px;
-  transition: transform 220ms ease;
-}
-.hiw-card:hover .hiw-cta-arrow,
-.hiw-card:focus-visible .hiw-cta-arrow {
-  transform: translateX(3px);
-}
-/* ── Step card question + icon buttons ─────────────────── */
-.hiw-sep{display:none;}
-.hiw-question{font-weight:600;color:#b8bcce;}
-.hiw-icons{display:flex;gap:12px;justify-content:center;margin-bottom:10px;}
-.hiw-icon-btn{
-  width:44px;height:44px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all 0.15s;border:none;background:none;padding:0;
-}
-.hiw-icon-btn:hover{transform:scale(1.12);}
-.hiw-icon-btn svg{width:30px;height:30px;}
-.hiw-icon-btn.ic-green{border:1.5px solid rgba(94,201,154,0.35);background:rgba(94,201,154,0.06);}
-.hiw-icon-btn.ic-green:hover{border-color:rgba(94,201,154,0.6);background:rgba(94,201,154,0.12);}
-.hiw-icon-btn.ic-yellow{border:1.5px solid rgba(212,196,74,0.35);background:rgba(212,196,74,0.06);}
-.hiw-icon-btn.ic-yellow:hover{border-color:rgba(212,196,74,0.6);background:rgba(212,196,74,0.12);}
-.hiw-icon-btn.ic-red{border:1.5px solid rgba(224,90,122,0.35);background:rgba(224,90,122,0.06);}
-.hiw-icon-btn.ic-red:hover{border-color:rgba(224,90,122,0.6);background:rgba(224,90,122,0.12);}
-
-/* ── Section dividers (below-fold) ─────────────────────── */
-.divider {
-  height: 1px; background: var(--border);
-  margin: 32px 0;
-}
-
-/* ── Footer micro trust line ──────────────────────────── */
-.mini-trust {
-  text-align: center;
-  font-size: 11px; color: var(--text3);
-  margin-top: 32px; letter-spacing: 0.02em;
-}
-.mini-trust strong { color: var(--text2); }
-
-/* ══════════════════════════════════════════════════════════════ */
-/* ── Compound-raise calculator                                ── */
-/* ══════════════════════════════════════════════════════════════ */
-.calc-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  text-align: center;
-  margin-bottom: 16px;
-  letter-spacing: -0.2px;
-}
-.calc-inputs {
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: stretch;
-  margin-bottom: 20px;
-  max-width: 340px;
-  margin-left: auto;
-  margin-right: auto;
-}
-.calc-field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-.calc-field:first-child {
-  flex: 1;
-}
-.calc-field-salary {
-  flex: 1.4;
-}
-.calc-field-years {
-  flex: 0 0 88px;
-}
-.calc-micro-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text2);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding-left: 2px;
-}
-.calc-input-wrap {
+  padding: 100px 24px 56px;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-top: -58px;
+  margin-bottom: 32px;
   position: relative;
-  width: 100%;
-  min-width: 0;
+  overflow: hidden;
 }
-.calc-input {
-  width: 100%;
-  background: rgba(20,23,34,0.7);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--text);
-  font-size: 16px; /* iOS Safari auto-zooms inputs < 16px on focus */
-  font-weight: 700;
-  padding: 9px 12px;
-  line-height: 1.25;
-  border-radius: 6px;
-  outline: none;
-  font-family: inherit;
-  -moz-appearance: textfield;
-  box-sizing: border-box;
-}
-/* Raise input: extra right padding to clear the % suffix */
-.calc-input-raise {
-  padding-right: 26px;
-}
-/* When an input is preceded by a prefix ($), shift text right to clear the prefix */
-.calc-input-prefix + .calc-input {
-  padding-left: 24px;
-}
-.calc-input::-webkit-outer-spin-button,
-.calc-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-.calc-input:focus {
-  border-color: rgba(201,168,76,0.5);
-  background: rgba(20,23,34,0.95);
-}
-.calc-input-prefix {
-  position: absolute;
-  left: 12px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text2);
-  font-size: 14px; font-weight: 700;
-  pointer-events: none;
-}
-.calc-input-suffix {
-  position: absolute;
-  right: 12px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text2);
-  font-size: 13px; font-weight: 700;
-  pointer-events: none;
-}
-.calc-year-select {
-  width: 100%;
-  background: rgba(20,23,34,0.7);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--text);
-  font-size: 16px; /* iOS Safari auto-zooms selects < 16px on focus */
-  font-weight: 700;
-  padding: 9px 28px 9px 12px;
-  line-height: 1.25;
-  border-radius: 6px;
-  font-family: inherit;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  cursor: pointer;
-  outline: none;
-  box-sizing: border-box;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a90a8' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-}
-.calc-year-select:focus {
-  border-color: rgba(201,168,76,0.5);
-  background-color: rgba(20,23,34,0.95);
-}
-
-/* Interactive calculator — two-bar chart */
-.calc-chart-wrap {
-  position: relative;
-  margin: 0 -4px 8px;
-}
-.bars-chart {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 40px;
-  height: 240px;
-  padding: 30px 20px 0;
-  margin: 0 auto;
-  max-width: 340px;
-}
-.bar-col {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 90px;
-  position: relative;
-  padding-top: 30px;
-  padding-bottom: 44px;
-}
-.bar-total {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 16px;
+.hero::before { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at 80% 30%, rgba(232,184,76,0.08) 0%, transparent 50%); pointer-events: none; }
+.hero::after { content: ''; position: absolute; bottom: 0; left: 0; width: 40%; height: 80%; background: radial-gradient(circle at 20% 80%, rgba(123,92,252,0.06) 0%, transparent 50%); pointer-events: none; }
+.hero h1 {
+  font-family: var(--sans);
+  font-size: clamp(30px, 5.5vw, 44px);
+  line-height: 1.2;
   font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.3px;
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 600ms ease-out, transform 600ms ease-out;
-}
-.bar-col-nego .bar-total { color: var(--teal); }
-.bar-stack {
-  width: 72px;
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: flex-start;
-  position: relative;
-}
-.bar-segment {
-  width: 100%;
-  transform: scaleY(0);
-  transform-origin: bottom;
-}
-.bar-gray {
-  background: linear-gradient(180deg, #8a90a8 0%, #5b6075 100%);
-  border-radius: 4px 4px 0 0;
-  transition: height 1800ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.bar-col-nego .bar-gray {
-  border-radius: 0;
-}
-.bar-gold {
-  background: linear-gradient(180deg, #d8b75a 0%, #c9a84c 100%);
-  border-radius: 4px 4px 0 0;
-  box-shadow: 0 -4px 14px rgba(201,168,76,0.22);
-  transition: height 1400ms cubic-bezier(0.22, 1, 0.36, 1) 1200ms;
-}
-.bar-caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text2);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.3;
-  opacity: 0;
-  transition: opacity 500ms ease-out;
-}
-.bar-col-nego .bar-caption { color: var(--gold); }
-
-/* First-view reveal animation */
-.calc-chart-wrap:not(.revealed) .bar-segment { transform: scaleY(0); }
-.calc-chart-wrap.revealed .bar-segment {
-  animation: bar-grow 1200ms cubic-bezier(0.4, 0, 0.2, 1) 100ms forwards;
-}
-.calc-chart-wrap.revealed .bar-gold {
-  animation: bar-grow 500ms cubic-bezier(0.34, 1.56, 0.64, 1) 1100ms forwards;
-}
-.calc-chart-wrap.revealed .bar-total {
-  opacity: 1;
-  transform: translateY(0);
-  transition-delay: 1400ms;
-}
-.calc-chart-wrap.revealed .bar-caption {
-  opacity: 1;
-  transition-delay: 1600ms;
-}
-@keyframes bar-grow {
-  from { transform: scaleY(0); }
-  to { transform: scaleY(1); }
-}
-
-.calc-result {
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  text-align: center;
-}
-.calc-result-num {
-  font-size: 38px;
-  font-weight: 800;
-  color: var(--gold);
   letter-spacing: -1px;
-  line-height: 1.1;
-  transition: color 200ms ease;
-}
-.calc-result-sub {
-  font-size: 11.5px;
-  color: var(--text2);
-  margin-top: 10px;
-  letter-spacing: 0.01em;
-  line-height: 1.5;
-}
-#calc-result-sticky {
-  font-size: 16px;
-  font-weight: 700;
   color: var(--text);
-  letter-spacing: -0.2px;
-  display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 10;
 }
-.calc-result-disclaimer {
-  display: inline-block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 0.03em;
-}
+.hero h1 .accent { color: var(--purple); font-size: 1.25em; }
+.hero h1 .accent-soft { color: var(--purple); opacity: 0.7; }
+.hero h1 .hero-h1-line2 { font-weight: 500; display: inline-block; margin-top: 4px; }
+.hero-sub { font-size: clamp(15px, 2.6vw, 18px); line-height: 1.5; font-weight: 400; font-style: italic; color: var(--text2); max-width: 520px; margin: 0 auto 8px; }
+.hero-trust { font-size: 11px; color: var(--text3); letter-spacing: 0.04em; margin-top: 20px; text-transform: uppercase; }
+.hero-trust span { margin: 0 6px; }
+.cta-stack { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 28px auto 0; }
+@media (max-width: 480px) { .hero { padding: 48px 20px 44px; } .hero h1 { letter-spacing: -0.6px; } }
 
-/* CTA block below the calculator panel */
-.calc-cta {
+/* ── 6. BUTTONS — Gold for action ─────────── */
+.cta-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--gold); color: var(--gold-text);
+  border: none; border-radius: var(--radius);
+  padding: 16px 36px;
+  font-size: 15px; font-weight: 700; font-family: var(--sans);
+  text-decoration: none;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-gold);
+  line-height: 1.3; text-align: center; white-space: nowrap;
+  cursor: pointer;
+}
+.cta-btn:hover { background: var(--gold-hover); transform: translateY(-1px); box-shadow: var(--shadow-gold-hover); text-decoration: none; }
+.cta-btn:active { transform: translateY(0); }
+.cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
+.cta-btn.secondary { background: transparent; color: var(--text2); border: 1.5px solid var(--border); box-shadow: none; }
+.cta-btn.secondary:hover { background: var(--purple-light); color: var(--text); border-color: var(--purple); }
+.cta-btn.outline-gold { background: transparent; color: var(--purple); border: 1.5px solid var(--border); padding: 13px 26px; font-size: 14.5px; box-shadow: none; }
+.cta-btn.outline-gold:hover { background: var(--purple-light); border-color: var(--purple); }
+@media (max-width: 420px) { .cta-btn { padding: 14px 28px; font-size: 14.5px; } .cta-stack { gap: 10px; margin-top: 20px; } }
+
+/* Text-style CTAs (links that look like CTAs) */
+.demo-text-cta { color: var(--gold-hover); font-weight: 700; font-size: 14.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
+.demo-text-cta:hover { text-decoration: underline; }
+.demo-text-cta-arrow { display: inline-block; transition: transform 0.15s; }
+.demo-text-cta:hover .demo-text-cta-arrow { transform: translateX(3px); }
+
+/* ── 7. SECTION TITLES ────────────────────── */
+.section-title { font-family: var(--sans); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.35; }
+.divider { height: 1px; background: var(--border); margin: 36px 0; }
+
+/* ── 8. STATS ─────────────────────────────── */
+.stats { display: flex; gap: 14px; margin: 0 0 32px; }
+.stat-card { flex: 1; text-align: center; padding: 22px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.stat-num { font-family: var(--sans); font-size: 34px; font-weight: 700; color: var(--purple); margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--text2); line-height: 1.5; }
+@media (max-width: 480px) { .stats { flex-direction: column; gap: 10px; } .stat-num { font-size: 28px; } }
+
+/* ── 9. SHARE CARD ────────────────────────── */
+/* (styled inline in HTML — no conflicts) */
+
+/* ── 10. STEPS (hiw) ──────────────────────── */
+.hiw-section { margin: 32px 0; }
+.hiw-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 18px 20px;
+  margin-bottom: 12px;
+  display: flex; gap: 14px; align-items: flex-start;
+  color: inherit; cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+.hiw-card:hover { border-color: var(--purple); box-shadow: var(--shadow-md); transform: translateY(-2px); text-decoration: none; }
+.hiw-card:active { transform: scale(0.995); }
+.hiw-card * { text-decoration: none; }
+.hiw-num { width: 28px; height: 28px; border-radius: 50%; background: var(--purple); color: #fff; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hiw-body { flex: 1; }
+.hiw-title { font-family: var(--sans); font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.hiw-desc { font-size: 13px; color: var(--text2); line-height: 1.55; margin-bottom: 8px; }
+.hiw-desc b { color: var(--text); font-weight: 600; }
+.hiw-question { color: var(--text2); font-style: italic; }
+.hiw-cta { font-size: 13px; font-weight: 700; color: var(--gold-hover); display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
+.hiw-cta-arrow { display: inline-block; transition: transform 0.15s; }
+.hiw-card:hover .hiw-cta-arrow { transform: translateX(3px); }
+
+/* ── 11. BLOCKERS ─────────────────────────── */
+.reasons-section { padding: 24px 0; }
+.reasons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 480px) { .reasons-grid { grid-template-columns: 1fr; } }
+.reason-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 13px 16px; font-size: 13.5px; color: var(--text); line-height: 1.35;
+  text-decoration: none; transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.reason-chip:hover { border-color: var(--purple); box-shadow: var(--shadow-md); transform: translateY(-1px); text-decoration: none; }
+.reason-chip span:first-child { flex: 1; }
+.reason-arrow { color: var(--gold-hover); font-size: 12px; font-weight: 700; white-space: nowrap; margin-left: 12px; }
+.reason-chip-cta { border-style: dashed; grid-column: 1 / -1; }
+
+/* ── 12. PROOF BAR ────────────────────────── */
+.proof-bar {
+  background: linear-gradient(160deg, #f5e6d8 0%, #eddce8 50%, #d8c4e8 100%);
+  border: none; border-radius: 20px;
+  padding: 36px 24px;
+  margin: 32px 0;
   text-align: center;
-  margin: 24px 0 48px;
 }
-.calc-cta-hook {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.45;
-  margin-bottom: 14px;
-}
-.calc-cta-hook .gold { color: var(--gold); }
+@media (max-width: 480px) { .proof-bar { margin: 24px -20px; padding: 28px 20px; } }
+.proof-stat { font-size: 15px; color: var(--text); line-height: 1.7; max-width: 480px; margin: 0 auto; }
+.proof-num { color: #00C4A0; font-weight: 800; font-size: 22px; }
+.proof-src { font-size: 11px; color: var(--text2); text-align: center; margin-top: 10px; }
 
-/* ── Scenario Tree Widget ─────────────────────────────── */
-.scenario-tree-widget{
-  background:linear-gradient(175deg,#0c0e15 0%,#090b10 50%,#0b0d14 100%);
-  border-radius:20px;max-width:460px;margin:0 auto;overflow:hidden;
-  border:1px solid rgba(255,255,255,0.05);
-  box-shadow:0 32px 100px rgba(0,0,0,0.7),inset 0 1px 0 rgba(255,255,255,0.04);
-  font-family:var(--sans);
+/* ── 13. DEMO SECTION ─────────────────────── */
+.demo-section { padding: 24px 0; }
+.demo-visual { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow: hidden; }
+.why-pill { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; color: var(--text2); background: var(--purple-light); border: 1px solid var(--border); }
+
+/* ── 14. CALCULATOR ───────────────────────── */
+.calc-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 16px; text-align: center; }
+.calc-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.calc-field { display: flex; flex-direction: column; gap: 4px; }
+.calc-micro-label { font-size: 9px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; }
+.calc-input-wrap { display: flex; align-items: center; gap: 2px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+.calc-input { font-family: var(--sans); font-size: 16px; font-weight: 700; color: var(--text); background: transparent; border: none; outline: none; width: 60px; }
+.calc-input-prefix, .calc-input-suffix { font-size: 14px; color: var(--text2); font-weight: 600; }
+.calc-year-select { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; cursor: pointer; }
+.calc-chart-wrap { margin: 16px 0; }
+.bars-chart { display: flex; justify-content: center; gap: 32px; align-items: flex-end; height: 140px; padding: 12px 0; }
+.bar-col { display: flex; flex-direction: column; align-items: center; }
+.bar-total { font-size: 12px; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 6px; }
+.bar-stack { width: 60px; display: flex; flex-direction: column; border-radius: 4px; overflow: hidden; }
+.bar-segment { transition: height 0.6s ease; }
+.bar-gray { background: var(--bg); }
+.bar-gold { background: var(--purple); }
+.bar-caption { font-size: 10px; color: var(--text2); text-align: center; margin-top: 6px; line-height: 1.3; }
+.calc-result { text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+.calc-result-num { font-size: 28px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; }
+.calc-result-sub { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+.calc-result-disclaimer { font-size: 10px; color: var(--text3); font-style: italic; }
+.calc-cta { text-align: center; margin-top: 20px; }
+
+/* ── 15. PROOF ROTATOR ────────────────────── */
+.proof-rotator { text-align: center; padding: 16px 0; margin: 16px 0; }
+.proof-rotator-text { font-size: 13px; color: var(--text2); font-style: italic; min-height: 20px; }
+.proof-rotator-text .cursor { display: inline-block; width: 2px; background: var(--purple); margin-left: 2px; animation: proof-blink 0.9s steps(2, end) infinite; height: 1em; vertical-align: text-bottom; }
+@keyframes proof-blink { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ── 16. CLOSING PITCH ────────────────────── */
+.closing-pitch {
+  background: linear-gradient(160deg, #2c1845 0%, #4a2d6e 50%, #7b5fa0 100%);
+  border-radius: 20px; padding: 44px 24px;
+  margin: 32px 0; text-align: center;
+  position: relative; overflow: hidden;
 }
-.st-header{
-  padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.04);
-  display:flex;justify-content:space-between;align-items:flex-start;
-}
-.st-badge{display:flex;align-items:center;gap:6px;margin-bottom:6px;
-  font-size:10px;font-weight:700;color:rgba(0,196,160,0.6);text-transform:uppercase;letter-spacing:0.12em;}
-.st-badge-dot{width:6px;height:6px;border-radius:50%;background:#00c4a0;box-shadow:0 0 8px rgba(0,196,160,0.4);}
-.st-title{font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.5px;line-height:1.2;}
-.st-counters{display:flex;gap:6px;}
-.st-counter{border-radius:10px;padding:6px 10px;text-align:center;min-width:42px;}
-.st-counter-g{background:rgba(0,196,160,0.06);border:1px solid rgba(0,196,160,0.1);}
-.st-counter-y{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.1);}
-.st-counter-n{display:block;font-size:18px;font-weight:800;line-height:1;}
-.st-counter-g .st-counter-n{color:#00c4a0;}
-.st-counter-y .st-counter-n{color:#c9a84c;}
-.st-counter-l{font-size:7px;color:rgba(255,255,255,0.5);margin-top:1px;}
-.st-tree-wrap{position:relative;overflow:hidden;
-  background:radial-gradient(ellipse at 50% 20%,rgba(0,196,160,0.02) 0%,transparent 60%);}
-.st-fade-l,.st-fade-r,.st-fade-b{position:absolute;z-index:2;pointer-events:none;}
-.st-fade-l{left:0;top:0;bottom:0;width:30px;background:linear-gradient(90deg,#0b0d14,transparent);}
-.st-fade-r{right:0;top:0;bottom:0;width:30px;background:linear-gradient(270deg,#0b0d14,transparent);}
-.st-fade-b{left:0;right:0;bottom:0;height:20px;background:linear-gradient(0deg,#0b0d14,transparent);}
-.st-chat-section{border-top:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.2);}
-.st-chat-header{padding:10px 20px 4px;display:flex;justify-content:space-between;align-items:center;
-  font-size:9px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;}
-.st-chat-header-left{display:flex;align-items:center;gap:6px;}
-.st-chat-dot{width:5px;height:5px;border-radius:50%;background:#00c4a0;
-  animation:stPulse 1.5s ease infinite;}
-.st-chat-depth{font-size:9px;color:rgba(255,255,255,0.3);text-transform:none;font-weight:400;}
-.st-chat-body{padding:4px 20px 14px;height:155px;overflow-y:auto;
-  display:flex;flex-direction:column;gap:5px;justify-content:flex-end;}
-.st-chat-body::-webkit-scrollbar{display:none;}
-.st-chat-placeholder{text-align:center;padding:14px 0;font-size:10px;color:rgba(255,255,255,0.3);font-style:italic;}
-.st-msg{display:flex;animation:stFadeUp 0.3s ease;}
-.st-msg.mgr{justify-content:flex-start;}
-.st-msg.you{justify-content:flex-end;}
-.st-msg-bubble{max-width:84%;padding:8px 12px;}
-.st-msg.mgr .st-msg-bubble{border-radius:3px 14px 14px 14px;background:rgba(0,196,160,0.03);border:1px solid rgba(0,196,160,0.07);}
-.st-msg.you .st-msg-bubble{border-radius:14px 3px 14px 14px;background:rgba(201,168,76,0.03);border:1px solid rgba(201,168,76,0.07);}
-.st-msg-role{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:3px;display:flex;align-items:center;gap:4px;}
-.st-msg.mgr .st-msg-role{color:rgba(0,196,160,0.4);}
-.st-msg.you .st-msg-role{color:rgba(201,168,76,0.4);}
-.st-msg-role-dot{width:4px;height:4px;border-radius:50%;opacity:0.6;}
-.st-msg.mgr .st-msg-role-dot{background:#00c4a0;}
-.st-msg.you .st-msg-role-dot{background:#c9a84c;}
-.st-msg-text{font-size:11.5px;font-weight:500;line-height:1.5;}
-.st-msg.mgr .st-msg-text{color:rgba(0,196,160,0.55);}
-.st-msg.you .st-msg-text{color:rgba(201,168,76,0.55);}
-.st-sys{display:flex;align-items:center;gap:8px;padding:6px 0;animation:stFadeUp 0.3s ease;}
-.st-sys-line{flex:1;height:1px;background:rgba(255,255,255,0.04);}
-.st-sys-text{font-size:9px;color:rgba(255,255,255,0.35);white-space:nowrap;}
-.st-typing-cursor{display:inline-block;width:1.5px;height:13px;margin-left:1px;
-  vertical-align:text-bottom;animation:stBlink 0.6s steps(1) infinite;}
-.st-msg.mgr .st-typing-cursor{background:#00c4a0;}
-.st-msg.you .st-typing-cursor{background:#c9a84c;}
-@keyframes stPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.7);}}
-@keyframes stFadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-@keyframes stBlink{0%,100%{opacity:1;}50%{opacity:0;}}
-/* Demo visual — adapted from coach landing */
-.demo-section{padding:20px 20px 56px;}
-/* Canvas demo pills */
-.cvd-pill{border-radius:6px;padding:8px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;transition:all 0.5s ease,opacity 0.4s ease;display:flex;align-items:center;gap:5px;}
-.cvd-empty{background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1);color:rgba(255,255,255,0.25);}
-.cvd-strong{background:rgba(26,158,108,0.15);border:1px solid rgba(26,158,108,0.3);color:#5ddba8;}
-.cvd-weak{background:rgba(228,78,78,0.12);border:1px solid rgba(228,78,78,0.25);color:#f09595;}
-.cvd-medium{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.25);color:#e8c96a;}
-.cvd-plan{background:rgba(100,150,255,0.1);border:1px solid rgba(100,150,255,0.2);color:#8ab4ff;}
-.demo-visual{max-width:500px;margin:0 auto;background:rgba(10,10,15,0.97);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:20px;color:#eeeee6;}
-.ds{display:flex;gap:12px;position:relative;opacity:0.4;transition:opacity 0.6s ease, transform 0.6s ease;transform:scale(0.95) translateX(-4px);}
-.ds.active{opacity:1;transform:scale(1.04) translateX(0);}
-.ds.active .dd{box-shadow:0 0 16px rgba(201,168,76,0.25);}
-.ds.active .dc{background:rgba(201,168,76,0.03);border-radius:8px;padding:8px 10px 18px;margin:-8px -10px 0;}
-.ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:rgba(255,255,255,0.07);}
+.closing-pitch::before { content: ''; position: absolute; top: 0; right: 0; width: 50%; height: 100%; background: radial-gradient(circle at 80% 30%, rgba(232,184,76,0.06) 0%, transparent 50%); pointer-events: none; }
+.closing-pitch h3 { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; line-height: 1.35; }
+.closing-pitch h3 .accent { color: var(--gold); }
+.closing-pitch p { font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 16px; line-height: 1.6; }
+.closing-pitch .cta-btn { background: var(--gold); color: var(--gold-text); }
+.closing-pitch .mini-trust { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 12px; }
+
+/* ── 17. FAQ ──────────────────────────────── */
+.section { margin: 32px 0; }
+.section h2 { font-family: var(--sans); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+details { border-bottom: 1px solid var(--border); padding: 14px 0; }
+details summary { color: var(--text); font-weight: 600; font-size: 14px; cursor: pointer; list-style: none; }
+details summary::-webkit-details-marker { display: none; }
+details[open] summary { color: var(--purple); margin-bottom: 8px; }
+details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* ── 18. SEO ──────────────────────────────── */
+.seo-guide { margin: 32px 0; padding: 24px 0; border-top: 1px solid var(--border); }
+.seo-content h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 24px 0 8px; }
+.seo-content h3:first-child { margin-top: 0; }
+.seo-content p { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* ── 19. ANIMATIONS ───────────────────────── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.hero h1 { animation: fadeUp 0.6s ease-out; }
+.fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* ── 20. UTILITIES ────────────────────────── */
+.progress { height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; margin: 8px 0; }
+.progress .pseg { height: 3px; flex: 1; background: var(--bg); border-radius: 2px; transition: background 0.25s; }
+.progress .pseg.done { background: var(--purple); }
+.hiw-continue { text-align: center; margin: 20px 0 8px; }
+.hiw-continue-hint { font-size: 11px; color: var(--text2); letter-spacing: 0.04em; margin-top: 10px; text-transform: uppercase; }
+
+
+/* ── DEMO STEPS (coaching visualization) ──── */
+.ds{display:flex;gap:12px;position:relative;opacity:0.5;transition:opacity 0.6s ease,transform 0.6s ease;transform:scale(0.97) translateX(-4px);}
+.ds.active{opacity:1;transform:scale(1.02) translateX(0);}
+.ds.active .dd{box-shadow:0 0 12px rgba(123,92,252,0.2);}
+.ds.active .dc{background:rgba(123,92,252,0.03);border-radius:8px;padding:8px 10px 18px;margin:-8px -10px 0;}
+.ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:var(--border);}
 .ds:last-child::before{display:none;}
 .dd{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
 .dd svg{width:14px;height:14px;}
-.dd.c{background:rgba(201,168,76,0.1);border:1.5px solid rgba(201,168,76,0.25);}
-.dd.c svg{color:#c9a84c;}
-.dd.u{background:rgba(29,217,179,0.08);border:1.5px solid rgba(29,217,179,0.2);}
-.dd.u svg{color:#1dd9b3;}
-.dd.i{background:rgba(201,168,76,0.06);border:1.5px dashed rgba(201,168,76,0.2);}
-.dd.i svg{color:#c9a84c;}
-.dd.m{background:rgba(25,26,36,1);border:1.5px solid rgba(255,255,255,0.07);}
-.dd.m svg{color:#6a6960;}
+.dd.c{background:rgba(245,207,86,0.12);border:1.5px solid rgba(245,207,86,0.35);}
+.dd.c svg{color:var(--gold);}
+.dd.u{background:rgba(29,180,160,0.08);border:1.5px solid rgba(29,180,160,0.2);}
+.dd.u svg{color:#1db4a0;}
+.dd.i{background:rgba(245,207,86,0.08);border:1.5px dashed rgba(245,207,86,0.3);}
+.dd.i svg{color:var(--gold);}
+.dd.m{background:var(--purple-light);border:1.5px solid var(--purple);}
+.dd.m svg{color:var(--purple);}
 .dc{flex:1;padding-bottom:18px;}
 .dl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
-.dl.cl{color:#c9a84c;}
-.dl.ul{color:#1dd9b3;}
-.dl.il{color:#c9a84c;}
-.dl.ml{color:#6a6960;}
+.dl.cl{color:var(--gold-hover);}
+.dl.ul{color:#1db4a0;}
+.dl.il{color:var(--gold-hover);}
+.dl.ml{color:var(--purple);}
 .dp-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
-.dp{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:500;background:rgba(25,26,36,1);border:1px solid rgba(255,255,255,0.07);color:#eeeee6;}
-.dp.sel{border-color:#1dd9b3;color:#1dd9b3;background:rgba(29,217,179,0.04);}
-.di-card{background:rgba(17,18,25,1);border:1px solid rgba(255,255,255,0.07);border-radius:7px;padding:8px 12px;margin-top:5px;display:inline-flex;gap:14px;flex-wrap:wrap;}
-.di{font-size:11px;color:#9a9890;line-height:1.3;}
-.di b{color:#eeeee6;font-weight:600;display:block;font-size:10.5px;margin-bottom:1px;}
-.demo-text-cta{color:#c9a84c;font-size:14px;font-weight:600;text-decoration:none;transition:all 0.15s;}
-.demo-text-cta:hover{color:#d8b75a;}
-.demo-text-cta-arrow{display:inline-block;margin-left:4px;transition:transform 0.15s;}
-.demo-text-cta:hover .demo-text-cta-arrow{transform:translateX(4px);}
-.why-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,0.07);background:rgba(10,10,15,0.97);font-size:13px;font-weight:500;color:#eeeee6;}
-@media(max-width:600px){
-  .demo-section{padding:16px 16px 40px;}
-  .why-pill{font-size:12px;padding:5px 10px;}
+.dp{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:500;background:var(--card);border:1px solid var(--border);color:var(--text);}
+.dp.sel{border-color:#1db4a0;color:#1db4a0;background:rgba(29,180,160,0.04);}
+.di-card{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-top:5px;display:inline-flex;gap:14px;flex-wrap:wrap;}
+.di{font-size:11px;color:var(--text2);line-height:1.3;}
+.di b{color:var(--text);font-weight:600;display:block;font-size:10.5px;margin-bottom:1px;}
+
+
+/* ── CALCULATOR (full) ────────────────────── */
+.calc-inputs{display:flex;gap:10px;align-items:stretch;margin-bottom:20px;max-width:340px;margin-left:auto;margin-right:auto;}
+.calc-field{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.calc-field:first-child{flex:1;}
+.calc-field-salary{flex:1.4;}
+.calc-field-years{flex:0 0 88px;}
+.calc-micro-label{font-size:10px;font-weight:700;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;padding-left:2px;}
+.calc-input-wrap{position:relative;width:100%;min-width:0;}
+.calc-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:16px;font-weight:700;padding:9px 12px;line-height:1.25;border-radius:6px;outline:none;font-family:inherit;-moz-appearance:textfield;box-sizing:border-box;}
+.calc-input-raise{padding-right:26px;}
+.calc-input-prefix+.calc-input{padding-left:24px;}
+.calc-input::-webkit-outer-spin-button,.calc-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.calc-input:focus{border-color:var(--purple);background:var(--card);}
+.calc-input-prefix{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:14px;font-weight:700;pointer-events:none;}
+.calc-input-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text2);font-size:13px;font-weight:700;pointer-events:none;}
+.calc-year-select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:16px;font-weight:700;padding:9px 28px 9px 12px;line-height:1.25;border-radius:6px;font-family:inherit;-webkit-appearance:none;-moz-appearance:none;appearance:none;cursor:pointer;outline:none;box-sizing:border-box;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b5f7a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.calc-year-select:focus{border-color:var(--purple);background-color:var(--card);}
+.calc-chart-wrap{position:relative;margin:0 -4px 8px;}
+.bars-chart{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:40px;height:240px;padding:30px 20px 0;margin:0 auto;max-width:340px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;width:90px;position:relative;padding-top:30px;padding-bottom:44px;}
+.bar-total{position:absolute;top:0;left:0;right:0;text-align:center;font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.3px;opacity:0;transform:translateY(6px);transition:opacity 600ms ease-out,transform 600ms ease-out;}
+.bar-col-nego .bar-total{color:#00C4A0;}
+.bar-stack{width:72px;display:flex;flex-direction:column-reverse;justify-content:flex-start;position:relative;}
+.bar-segment{width:100%;transform:scaleY(0);transform-origin:bottom;}
+.bar-gray{background:linear-gradient(180deg,#c4bdd0 0%,#a89cb8 100%);border-radius:4px 4px 0 0;transition:height 1800ms cubic-bezier(0.22,1,0.36,1);}
+.bar-col-nego .bar-gray{border-radius:0;}
+.bar-gold{background:linear-gradient(180deg,#00C4A0 0%,#00A888 100%);border-radius:4px 4px 0 0;box-shadow:0 -4px 14px rgba(0,196,160,0.25);transition:height 1400ms cubic-bezier(0.22,1,0.36,1) 1200ms;}
+.bar-caption{position:absolute;bottom:0;left:0;right:0;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:0.05em;text-transform:uppercase;text-align:center;line-height:1.3;opacity:0;transition:opacity 500ms ease-out;}
+.bar-col-nego .bar-caption{color:#00C4A0;}
+.calc-chart-wrap:not(.revealed) .bar-segment{transform:scaleY(0);}
+.calc-chart-wrap.revealed .bar-segment{animation:bar-grow 1200ms cubic-bezier(0.4,0,0.2,1) 100ms forwards;}
+.calc-chart-wrap.revealed .bar-gold{animation:bar-grow 500ms cubic-bezier(0.34,1.56,0.64,1) 1100ms forwards;}
+.calc-chart-wrap.revealed .bar-total{opacity:1;transform:translateY(0);transition-delay:1400ms;}
+.calc-chart-wrap.revealed .bar-caption{opacity:1;transition-delay:1600ms;}
+@keyframes bar-grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.calc-result{margin-top:20px;padding-top:18px;border-top:1px solid var(--border);text-align:center;}
+.calc-result-num{font-size:38px;font-weight:800;color:#00C4A0;letter-spacing:-1px;line-height:1.1;}
+.calc-result-sub{font-size:11.5px;color:var(--text2);margin-top:10px;letter-spacing:0.01em;line-height:1.5;}
+#calc-result-sticky{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.2px;display:inline-block;margin-bottom:4px;}
+.calc-result-disclaimer{display:inline-block;font-size:10px;color:var(--text3);font-style:italic;}
+.calc-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;text-align:center;}
+.calc-cta{text-align:center;margin-top:20px;}
+
+
+/* ── FAQ ──────────────────────────────────── */
+.faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);gap:12px;user-select:none;transition:background 0.15s;}
+.faq-q:hover{background:var(--purple-light);}
+.faq-q.open{background:var(--purple-light);}
+.faq-icon{font-size:16px;color:var(--text3);flex-shrink:0;transition:transform 0.2s;}
+.faq-q.open .faq-icon{transform:rotate(45deg);color:var(--purple);}
+.faq-a{display:none;padding:0 18px 16px;font-size:13px;color:var(--text2);line-height:1.75;border-top:1px solid var(--border);}
+.faq-a.open{display:block;}
+.faq-a a{color:var(--gold-hover);}
+
+
+/* ── RESPONSIVE ───────────────────────────── */
+@media (max-width: 600px) {
+  /* Share card: stack vertically */
+  .share-card-wrap { flex-direction: column; }
+  
+  /* Raise case preview */
+  .case-preview-wrap { width: 100%; overflow: hidden; }
+  
+  /* Closing pitch */
+  .closing-pitch { margin-left: 0; margin-right: 0; border-radius: 16px; padding: 32px 20px; }
+  
+  /* Proof bar */
+  
+  
+  /* Reasons section */
+  .reasons-section { margin-left: 0; margin-right: 0; padding: 24px 16px; }
 }
+
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
 
 <body>
 
@@ -1310,78 +446,110 @@ h2.section-title {
 
   <!-- Hero ─────────────────────────────────────────────── -->
   <section class="hero">
-    <h1>How to ask for a <span class="accent">raise</span> <br><span class="hero-h1-line2">with a professional <span class="accent-soft">negotiation plan</span></span></h1>
+    <h1>How to ask for a <span class="accent">raise</span><br><span class="hero-h1-line2">A professional negotiation plan<br><span class="accent-soft" style="font-weight:800;">for women</span></span></h1>
     
 
+    <p class="hero-sub-new" style="font-size:15px;color:var(--text2);line-height:1.75;max-width:460px;margin:0 auto 28px;text-align:center;">81% of women who ask for a raise get one. Most never do.</p>
     <div class="cta-stack">
-      <a href="/raise/chat/?reason=no_script" class="cta-btn" id="cta-raise">
+      <a href="/raise/chat/?reason=other" class="cta-btn" id="cta-raise">
         <span>Show me how</span>
         <span class="cta-arrow">→</span>
       </a>
     </div>
   </section>
 
-  <div class="divider"></div>
 
   <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
   <section class="section hiw-section" id="how-it-works">
-    <h2 class="section-title"><b style="color:var(--gold);">In <span style="font-size:1.3em;">3</span> simple steps</b></h2>
+    <h2 class="section-title"><span style="color:var(--purple);">In <span style="font-size:1.3em;">3</span> simple steps</span></h2>
 
-    <a href="/raise/chat/?reason=no_script" class="hiw-card" aria-label="Step 1: discover your negotiation position">
+    <a href="/raise/chat/?reason=other" class="hiw-card" aria-label="Step 1: discover your negotiation position">
       <div class="hiw-num">1</div>
       <div class="hiw-body">
         <div class="hiw-title">Assess your negotiation position</div>
-        <div class="hiw-desc">Before you ask for a raise at work, look at your <b>evidence</b>, <b>timing</b>, <b>manager</b>, <b>company situation</b>, and <b>market value</b> to understand your leverage and risks. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
+        <div class="hiw-desc">Before you ask for a raise at work, look at your evidence, timing, manager, company situation, and market value to understand your leverage and risks. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
         <div class="hiw-cta">Assess yours now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
+    <!-- Share card -->
+    <div style="background:var(--purple-light);border:1px solid rgba(139,111,165,0.12);border-radius:16px;padding:24px;margin:32px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden;">
+      <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(139,111,165,0.05);border-radius:50%;"></div>
+      <!-- Preview mockup card (right) -->
+      <div onclick="shareLink()" style="flex-shrink:0;width:220px;max-width:100%;order:2;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#faf3e8"/>
+              <stop offset="40%" stop-color="#f5ece0"/>
+              <stop offset="100%" stop-color="#efe4da"/>
+            </linearGradient>
+            <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#9B7CFC"/>
+              <stop offset="100%" stop-color="#F5CF56"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="400" fill="url(#cardBg)"/>
+          <circle cx="60" cy="50" r="20" fill="#f0e2d2" opacity="0.4"/>
+          <circle cx="360" cy="340" r="25" fill="#e8daf0" opacity="0.3"/>
+          <circle cx="340" cy="70" r="12" fill="#fce8c8" opacity="0.35"/>
+          <text x="200" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">You deserve to ask</text>
+          <text x="200" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">for a raise</text>
+          <text x="200" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#3a2e42" font-style="italic">with confidence.</text>
+          <rect x="150" y="224" width="100" height="3" rx="1.5" fill="url(#accentBar)"/>
+          <text x="200" y="270" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#9B7CFC">❤</text>
+          <text x="200" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#8a7e72" font-style="italic">from a friend who thinks you're worth it</text>
+          <rect x="140" y="330" width="120" height="0.5" fill="#d8cab8" opacity="0.5"/>
+          <text x="200" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#a89888">salary.recomlinked.com</text>
+          <text x="200" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#b8a898">Know where you stand. Then ask for a raise.</text>
+        </svg>
+      </div>
+      <!-- CTA side -->
+      <div style="flex:1;min-width:200px;order:1;position:relative;z-index:1;">
+                <div style="font-size:18px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px;">Know a woman who deserves a raise?</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px;">Send her this to assess her position and know her value. It's free.</div>
+        <button onclick="shareLink()" style="display:inline-flex;align-items:center;gap:6px;background:var(--purple);color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:var(--sans);box-shadow:0 2px 12px rgba(123,92,252,0.2);transition:all 0.15s;" onmouseover="this.style.background='var(--purple-hover)'" onmouseout="this.style.background='var(--purple)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Encourage her</button>
+        <div id="share-copied" style="display:none;font-size:12px;color:var(--purple);margin-top:8px;font-weight:500;">Link copied ✓</div>
+      </div>
+    </div>
 
-    <a href="#raise-case-sample" class="hiw-card" aria-label="Step 2: send your raise case">
+
+    <div class="divider"></div>
+    <a href="#blockers" class="hiw-card" aria-label="Step 2: know what is stopping you">
       <div class="hiw-num">2</div>
       <div class="hiw-body">
-        <div class="hiw-title">Email your Raise Case first</div>
-        <div class="hiw-desc">Your Raise Case is a professional document you email to your manager — your <b>impact</b>, <b>market data</b>, and a <b>clear ask</b>. The document makes your case, so you don’t have to find the words in the room. <span class="hiw-question">Research shows that written requests get the same results as in-person conversations.</span></div>
-        <div class="hiw-cta">See the sample below <span class="hiw-cta-arrow">↓</span></div>
-      </div>
-    </a>
-
-    <a href="#blockers" class="hiw-card" aria-label="Step 3: know what is stopping you">
-      <div class="hiw-num">3</div>
-      <div class="hiw-body">
         <div class="hiw-title">Know what’s stopping you</div>
-        <div class="hiw-desc">Every raise conversation has one thing holding you back. Your <b>Raise Negotiation Canvas</b> brings everything together in one document: your <b>opening script</b>, <b>pushback responses</b>, key points to emphasize, and what to avoid. <span class="hiw-question">The most comprehensive tool for professionally asking for a raise.</span></div>
+        <div class="hiw-desc">Every raise conversation has one thing holding you back. Your Raise Negotiation Canvas brings everything together in one document: your opening script, pushback responses, key points to emphasize, and what to avoid. <span class="hiw-question">The most comprehensive tool for professionally asking for a raise.</span></div>
         <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
 
-    <!-- Blockers section — each chip is one dimension of the full plan -->
-    <div class="divider"></div>
-    <div class="reasons-section" id="blockers">
+<!-- Blockers section — each chip is one dimension of the full plan -->
+    <div class="fade-in reasons-section" id="blockers">
       <h2 class="section-title">Common blockers to asking for a pay raise</h2>
       <div class="reasons-grid">
         <a href="/raise/chat/?reason=no_script" class="reason-chip">
-          <span>I don't know how to start the conversation</span><span class="reason-arrow">Get it →</span>
+          <span>I don't know how to start the conversation</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=underpaid" class="reason-chip">
-          <span>I think I'm underpaid but I can't prove it</span><span class="reason-arrow">Fix it →</span>
+          <span>I think I'm underpaid but I can't prove it</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=quiet_performer" class="reason-chip">
-          <span>I'm a strong performer but quiet</span><span class="reason-arrow">Fix it →</span>
+          <span>I'm a strong performer but quiet</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=unknown_number" class="reason-chip">
-          <span>I don't know what number to ask for</span><span class="reason-arrow">Find it →</span>
+          <span>I don't know what number to ask for</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=fear_no" class="reason-chip">
-          <span>What if they say no?</span><span class="reason-arrow">Handle it →</span>
+          <span>What if they say no?</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=no_advocate" class="reason-chip">
-          <span>My manager doesn't advocate for me</span><span class="reason-arrow">Fix it →</span>
+          <span>My manager doesn't advocate for me</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=already_asked" class="reason-chip">
-          <span>I already asked and got nothing</span><span class="reason-arrow">Reopen it →</span>
+          <span>I already asked and got nothing</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=unknown_timing" class="reason-chip">
-          <span>I'm not sure if now is the right time</span><span class="reason-arrow">Find out →</span>
+          <span>I'm not sure if now is the right time</span><span class="reason-arrow">→</span>
         </a>
         <a href="/raise/chat/?reason=other" class="reason-chip reason-chip-cta">
           <span>None of these? Let's find yours</span><span class="reason-arrow">→</span>
@@ -1390,21 +558,32 @@ h2.section-title {
     </div>
 
     <!-- Harvard proof bar -->
-    <div class="proof-bar" style="margin-top:32px;">
+    <div class="fade-in proof-bar" style="margin-top:32px;">
       <div class="proof-stat">
         People who consistently negotiate their salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
       </div>
       <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
     </div>
 
-    <!-- Raise Case section -->
-    <div class="divider"></div>
-    <div class="demo-section" id="raise-case-sample">
-      <h2 class="section-title">Why sending a raise case before the meeting is <a href="/raise/chat/?reason=no_script" style="color:var(--gold);text-decoration:none;">the best way to ask for a raise</a></h2>
+    
+    
+<div class="divider"></div>
+<a href="#raise-case-sample" class="hiw-card" aria-label="Step 3: send your raise case">
+      <div class="hiw-num">3</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Email your Raise Case first</div>
+        <div class="hiw-desc">Your Raise Case is a professional document you email to your manager — your impact, market data, and a clear ask. The document makes your case, so you don’t have to find the words in the room. <span class="hiw-question">Research shows that written requests get the same results as in-person conversations.</span></div>
+        <div class="hiw-cta">See the sample below <span class="hiw-cta-arrow">↓</span></div>
+      </div>
+    </a>
+
+    
+    <div class="fade-in demo-section" id="raise-case-sample">
+      <h2 class="section-title">Why sending a raise case is <a href="/raise/chat/?reason=other" style="color:var(--purple);text-decoration:none;">the best way to ask for a raise</a></h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 28px;">Instead of rehearsing what to say, send a professional document first. Your manager reads your case, reviews the data, and comes to the meeting already understanding your position. <strong style="color:var(--text);">The hardest part is done before you sit down and say a word.</strong></p>
 
-      <div style="display:flex;flex-direction:column;align-items:center;margin:28px 0 0;">
-        <a href="/raise/sample-raise-case.pdf" download style="display:block;width:320px;height:260px;overflow:hidden;border-radius:6px;box-shadow:0 2px 20px rgba(0,0,0,0.3);cursor:pointer;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
+      <div style="display:flex;flex-direction:column;align-items:center;margin:28px 0 0;max-width:100%;">
+        <a href="/raise/sample-raise-case.pdf" download onclick="if(typeof gtag==='function')gtag('event','pdf_download',{file:'sample-raise-case',page:'women_landing'})" style="display:block;width:100%;max-width:320px;height:260px;overflow:hidden;border-radius:6px;box-shadow:0 2px 20px rgba(0,0,0,0.3);cursor:pointer;transition:opacity 0.15s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
           <div style="width:800px;transform:scale(0.4);transform-origin:top left;background:#fff;text-align:left;">
             <div style="background:#1e3d72;padding:16px 32px 12px;">
               <div style="font-size:9px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Compensation review request</div>
@@ -1438,7 +617,7 @@ h2.section-title {
               </div>
 
               <div style="font-size:9px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #e8eaef;">The ask</div>
-              <div style="background:#f8f6f0;border:1px solid rgba(201,168,76,0.2);border-radius:6px;padding:12px;text-align:center;margin-bottom:14px;">
+              <div style="background:#f8f6f0;border:1px solid rgba(139,111,165,0.2);border-radius:6px;padding:12px;text-align:center;margin-bottom:14px;">
                 <div style="font-size:9px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Proposed adjustment</div>
                 <div style="font-size:18px;font-weight:600;color:#6a4a10;">$118,000 → $128,000</div>
                 <div style="font-size:10px;color:#8a7540;margin-top:4px;">8.5% market alignment · retention-focused correction</div>
@@ -1454,18 +633,18 @@ h2.section-title {
             </div>
           </div>
         </a>
-        <a href="/raise/sample-raise-case.pdf" download class="demo-text-cta" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;margin-top:12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download sample PDF</a>
+        <a href="/raise/sample-raise-case.pdf" download class="demo-text-cta" onclick="if(typeof gtag==='function')gtag('event','pdf_download',{file:'sample-raise-case',page:'women_landing'})" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;margin-top:24px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download sample PDF</a>
       </div>
 
       <div style="margin-top:36px;font-size:14px;color:var(--text);line-height:1.7;">Answer 5 questions about your situation. We analyze your negotiation position, find your strongest leverage points, and build a professional raise case you can email to your manager.</div>
-      <div style="margin-top:24px;margin-bottom:8px;text-align:center;"><a href="/raise/chat/?reason=no_script" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#07090f;padding:12px 28px;border-radius:var(--radius);font-size:15px;font-weight:700;text-decoration:none;transition:all 0.15s;">Get your raise case now <span style="font-size:18px;">→</span></a></div>
+      <div style="margin-top:24px;margin-bottom:8px;text-align:center;"><a href="/raise/chat/?reason=other" class="cta-btn">Get your raise case now <span class="cta-arrow">→</span></a></div>
     </div>
 
     <!-- Simulation demo section -->
     <div class="divider"></div>
-    <div class="demo-section">
-      <h2 class="section-title">How to professionally ask for a raise in 2026</h2>
-      <p style="max-width:560px;margin:0 auto 24px;font-size:14px;color:var(--text2);line-height:1.6;">In 2026, you don't need to ask for a raise unprepared. This AI coach simulates your manager's responses, coaches you on every move, and lets you practice until nothing surprises you.</p>
+    <div class="fade-in demo-section">
+      <h2 class="section-title">How to professionally ask for a raise <span style="color:var(--purple)">in 2026</span></h2>
+      <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 24px;">In 2026, you don't need to ask for a raise unprepared. This AI coach simulates your manager's responses, coaches you on every move, and lets you practice until nothing surprises you.</p>
       <div class="demo-visual">
         <div class="ds">
           <div class="dd c"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4c0-.8.7-1.5 1.5-1.5h8c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-2.5 2.5V10.5H4c-.8 0-1.5-.7-1.5-1.5V4z" stroke="currentColor" stroke-width="1.2"/></svg></div>
@@ -1477,7 +656,7 @@ h2.section-title {
         </div>
         <div class="ds">
           <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-          <div class="dc"><div class="dl il">AI coach tips on your move</div><div class="di-card"><div class="di"><b>Approach</b></div><div class="di"><b>Risk</b></div><div class="di"><b>Opportunity</b></div><div class="di"><b>Next move</b></div></div></div>
+          <div class="dc"><div class="dl il">AI coach tips on your move</div><div class="di-card"><div class="di">Approach</div><div class="di">Risk</div><div class="di">Opportunity</div><div class="di">Next move</div></div></div>
         </div>
         <div class="ds">
           <div class="dd c"><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 4c0-.8.7-1.5 1.5-1.5h8c.8 0 1.5.7 1.5 1.5v5c0 .8-.7 1.5-1.5 1.5H7l-2.5 2.5V10.5H4c-.8 0-1.5-.7-1.5-1.5V4z" stroke="currentColor" stroke-width="1.2"/></svg></div>
@@ -1489,19 +668,19 @@ h2.section-title {
         </div>
         <div class="ds">
           <div class="dd i"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2v3M8 11v3M2 8h3M11 8h3M4 4l2 2M10 10l2 2M12 4l-2 2M6 10l-2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-          <div class="dc"><div class="dl il">AI coach tips on the response</div><div class="di-card"><div class="di"><b>Signal</b></div><div class="di"><b>Hidden meaning</b></div><div class="di"><b>Preparation</b></div><div class="di"><b>Watch for</b></div></div></div>
+          <div class="dc"><div class="dl il">AI coach tips on the response</div><div class="di-card"><div class="di">Signal</div><div class="di">Hidden meaning</div><div class="di">Preparation</div><div class="di">Watch for</div></div></div>
         </div>
         <div class="ds" style="margin-top:12px;">
-          <div class="dd m" style="background:rgba(201,168,76,0.1);border-color:rgba(201,168,76,0.25);"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 019.5-2M13 8a5 5 0 01-9.5 2" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round"/><path d="M12 3v3h-3" stroke="#c9a84c" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="dc" style="padding-top:10px;"><div class="dl ml" style="font-weight:700;color:#c9a84c;font-size:11px;">Go deeper or explore another path<br><span style="font-weight:400;opacity:0.7;">Until nothing surprises you</span></div></div>
+          <div class="dd m" style="background:rgba(139,111,165,0.1);border-color: var(--purple);"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 019.5-2M13 8a5 5 0 01-9.5 2" stroke="var(--purple, #8B6FA5)" stroke-width="1.3" stroke-linecap="round"/><path d="M12 3v3h-3" stroke="var(--purple, #8B6FA5)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="dc" style="padding-top:10px;"><div class="dl ml" style="font-weight:700;color:var(--purple);font-size:11px;">Go deeper or explore another path<br><span style="font-weight:400;opacity:0.7;">Until nothing surprises you</span></div></div>
         </div>
       </div>
       <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--text2);">The best pay raise negotiations take a few hours of prep</div>
-      <div style="text-align:center;margin-top:12px;margin-bottom:12px;"><a href="/raise/chat/?reason=no_script" class="demo-text-cta">Start now <span class="demo-text-cta-arrow">→</span></a></div>
+      <div style="text-align:center;margin-top:12px;margin-bottom:12px;"><a href="/raise/chat/?mode=simulation" class="cta-btn">Start practicing <span class="cta-arrow">→</span></a></div>
       <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px;">
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 013 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 013 0v2.5"/><path d="M14 10.5a1.5 1.5 0 013 0v1.5"/><path d="M17 11.5a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-2a6 6 0 01-5.3-3.2l-2.7-5a1.5 1.5 0 012.6-1.5l1.4 2.2"/></svg> Just tap, no typing</span>
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 7c0-1.7 6-3.5 6-6"/><path d="M6 17c0-1.7 6-3.5 6-6"/></svg> Branching scenarios</span>
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5h4.5l-3.5 2.7 1.3 4.3-3.8-2.8-3.8 2.8 1.3-4.3-3.5-2.7h4.5z"/><path d="M2 12h2M20 12h2M12 20v2"/></svg> AI coaching every move</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 013 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 013 0v2.5"/><path d="M14 10.5a1.5 1.5 0 013 0v1.5"/><path d="M17 11.5a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-2a6 6 0 01-5.3-3.2l-2.7-5a1.5 1.5 0 012.6-1.5l1.4 2.2"/></svg> Just tap, no typing</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 7c0-1.7 6-3.5 6-6"/><path d="M6 17c0-1.7 6-3.5 6-6"/></svg> Branching scenarios</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5h4.5l-3.5 2.7 1.3 4.3-3.8-2.8-3.8 2.8 1.3-4.3-3.5-2.7h4.5z"/><path d="M2 12h2M20 12h2M12 20v2"/></svg> AI coaching every move</span>
       </div>
     </div>
 
@@ -1550,12 +729,12 @@ h2.section-title {
   </div>
   -->
 
-  <div class="divider"></div>
 
+  <div class="divider"></div>
   <h2 class="section-title" id="calculator">What each 1% raise at work means for your career</h2>
 
   <!-- Interactive compound-raise calculator -->
-  <div class="proof-bar">
+  <div class="fade-in proof-bar">
     <div class="calc-title" id="calc-title">8% raise today, compounded over 25 years means:</div>
 
     <div class="calc-inputs">
@@ -1620,12 +799,12 @@ h2.section-title {
   </div>
 
   <!-- Closing CTA (positioning statement lands here) ──────── -->
-  <div class="closing-pitch">
-    <h3><span class="accent">A negotiation coach</span> for people who hate asking for a raise</h3>
+  <div class="fade-in closing-pitch">
+    <h3><span class="accent">A negotiation coach</span> for women who hate asking for a raise</h3>
     <p>
       Selling your work <strong>isn't greedy</strong>. It's how careers move. We coach you to <strong>ask for a raise</strong> professionally, with evidence, and in words that sound like you.
     </p>
-    <a href="/raise/chat/?reason=no_script" class="cta-btn">
+    <a href="/raise/chat/?reason=other" class="cta-btn">
       <span>Start Now</span>
       <span class="cta-arrow">→</span>
     </a>
@@ -1634,9 +813,10 @@ h2.section-title {
     </div>
   </div>
 
+  <div class="divider"></div>
   <!-- FAQ ─────────────────────────────────────────────── -->
   <section class="section">
-    <h2>How to professionally ask for a raise with AI coaching — FAQ</h2>
+    <h2 class="section-title">How to professionally ask for a raise with AI coaching — FAQ</h2>
     <div style="margin-top: 16px;">
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">How does the AI coach help me ask for a raise at work?<span class="faq-icon">+</span></div>
@@ -1681,9 +861,9 @@ h2.section-title {
 
     <div class="seo-content">
       <h3>Why most people never ask for a raise — and why those who do, get one</h3>
-      <p>85% of people who ask for a raise get one. But 55% never ask because it's too uncomfortable. The gap isn't about deserving it — it's about the conversation itself. Most people know they're underpaid. They have the evidence. But sitting across from their manager and saying "I want more" feels impossible. That's why the best approach to asking for a raise in 2026 isn't rehearsing a speech — it's having a complete negotiation plan that covers every scenario before you walk in.</p>
+      <p>81% of women who ask for a raise get one. But 55% never ask because it's too uncomfortable. The gap isn't about deserving it — it's about the conversation itself. Most people know they're underpaid. They have the evidence. But sitting across from their manager and saying "I want more" feels impossible. That's why the best approach to asking for a raise in 2026 isn't rehearsing a speech — it's having a complete negotiation plan that covers every scenario before you walk in.</p>
 
-      <h3>Best way to ask for a raise in 2026 — simulate first</h3>
+      <h3>Best way to ask for a raise <span style="color:var(--purple)">in 2026</span> — simulate first</h3>
       <p>The best way to ask for a raise used to be reading a blog post and hoping you'd remember the advice. In 2026, you simulate the entire conversation with AI before you have it for real. Try different openings. Handle different pushbacks. Get coached on every move. That's how to get a raise at work — not by reading about it, but by practicing it. The best time to ask for a raise is when you've already had the conversation dozens of times and nothing your manager says can surprise you.</p>
 
       <h3>How to ask for a raise — why the opening matters most</h3>
@@ -1707,8 +887,8 @@ h2.section-title {
   <!-- Secondary CTA at bottom of landing ───────────────── -->
   <div style="text-align:center; margin: 36px 0 10px;">
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Still here? Good.</div>
-    <a href="/raise/chat/?reason=no_script" class="cta-btn">
-      <span>Start practicing</span>
+    <a href="/raise/chat/?reason=other" class="cta-btn">
+      <span>Start Now</span>
       <span class="cta-arrow">→</span>
     </a>
   </div>
@@ -2496,6 +1676,58 @@ function submitAssessment() {
     barsWrapEl.classList.add('revealed');
   }
 })();
+
+
+
+// Scroll fade-in
+var observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-in').forEach(function(el) {
+  observer.observe(el);
+});
+
+// Animate stat numbers on scroll
+var statObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting && !entry.target.dataset.animated) {
+      entry.target.dataset.animated = '1';
+      var target = parseInt(entry.target.textContent);
+      var current = 0;
+      var step = Math.ceil(target / 30);
+      var timer = setInterval(function() {
+        current += step;
+        if (current >= target) { current = target; clearInterval(timer); }
+        entry.target.textContent = current + '%';
+      }, 25);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.stat-num').forEach(function(el) {
+  if (el.textContent.includes('%')) {
+    el.dataset.target = el.textContent;
+    el.textContent = '0%';
+    statObserver.observe(el);
+  }
+});
+
+function shareLink() {
+  var url = 'https://salary.recomlinked.com/raise/?utm_source=share&utm_medium=referral&utm_campaign=women_encourage';
+  var text = 'You deserve to ask for a raise with confidence. Know where you stand — free assessment, 60 seconds.';
+  if (typeof gtag === 'function') { gtag('event', 'share_click', { method: navigator.share ? 'native' : 'clipboard', page: 'women_landing' }); }
+  if (navigator.share) {
+    navigator.share({ title: 'Know where you stand', text: text, url: url });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      var el = document.getElementById('share-copied');
+      if (el) { el.style.display = 'block'; setTimeout(function() { el.style.display = 'none'; }, 2000); }
+    });
+  }
+}
 </script>
 
 <!-- Scenario tree auto-animation ─────────────────────── -->
@@ -2785,10 +2017,14 @@ function submitAssessment() {
     renderTree();timer=setTimeout(runScript,600);
   }
 })();
+
+
 </script>
 
 <!-- FAQ Schema (structured data for Google) -->
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does the AI coach help me ask for a raise at work?", "acceptedAnswer": {"@type": "Answer", "text": "It's an AI-powered practice tool. You pick what's stopping you, then practice the conversation — choose your opening, see how your manager responds, try different replies. The AI coach gives feedback on every choice."}}, {"@type": "Question", "name": "What's the best way to ask for a raise?", "acceptedAnswer": {"@type": "Answer", "text": "The best way to ask for a raise is to practice the conversation before you have it. The AI coach lets you try different openings, see how your boss might respond, and rehearse your answers to pushback."}}, {"@type": "Question", "name": "Is the AI coach a real conversation with a person?", "acceptedAnswer": {"@type": "Answer", "text": "No. The manager responses and coaching tips are AI-generated based on real negotiation patterns."}}, {"@type": "Question", "name": "How much can I do for free?", "acceptedAnswer": {"@type": "Answer", "text": "Pick an opening, see manager responses, and get first coaching tips — free, no email needed. $19 unlocks everything for 30 days."}}, {"@type": "Question", "name": "How does the AI coach help me ask my boss for a raise professionally?", "acceptedAnswer": {"@type": "Answer", "text": "The AI coach analyzes the tone and strategy of every choice — not just what you say, but how it lands. You learn how to ask for a raise professionally by practicing it."}}, {"@type": "Question", "name": "How does the AI coach help me properly ask for a raise without risking my job?", "acceptedAnswer": {"@type": "Answer", "text": "Every scenario shows you the risk alongside the opportunity. The coach tells you what signals each move sends so you know which approaches protect the relationship."}}, {"@type": "Question", "name": "How does the AI coach help me ask for a raise if I've never done it?", "acceptedAnswer": {"@type": "Answer", "text": "Just tap through options the coach gives you. Pick an opening, see what happens, try a different path. Practice in a safe environment where mistakes don't cost anything."}}, {"@type": "Question", "name": "How is the AI coach different from ChatGPT?", "acceptedAnswer": {"@type": "Answer", "text": "ChatGPT gives one generic conversation. This gives branching scenarios, structured coaching analysis, pro tips, and a purpose-built practice environment."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How does the AI coach help me ask for a raise at work?", "acceptedAnswer": {"@type": "Answer", "text": "It's an AI-powered practice tool. You pick what's stopping you, then practice the conversation — choose your opening, see how your manager responds, try different replies. The AI coach gives feedback on every choice."}}, {"@type": "Question", "name": "What's the best way to ask for a raise?", "acceptedAnswer": {"@type": "Answer", "text": "The best way to ask for a raise is to practice the conversation before you have it. The AI coach lets you try different openings, see how your boss might respond, and rehearse your answers to pushback."}}, {"@type": "Question", "name": "Is the AI coach a real conversation with a person?", "acceptedAnswer": {"@type": "Answer", "text": "No. The manager responses and coaching tips are AI-generated based on real negotiation patterns."}}, {"@type": "Question", "name": "How much can I do for free?", "acceptedAnswer": {"@type": "Answer", "text": "Pick an opening, see manager responses, and get first coaching tips — free, no email needed. $19 unlocks everything for 30 days."}}, {"@type": "Question", "name": "How does the AI coach help me ask my boss for a raise professionally?", "acceptedAnswer": {"@type": "Answer", "text": "The AI coach analyzes the tone and strategy of every choice — not just what you say, but how it lands. You learn how to ask for a raise professionally by practicing it."}}, {"@type": "Question", "name": "How does the AI coach help me properly ask for a raise without risking my job?", "acceptedAnswer": {"@type": "Answer", "text": "Every scenario shows you the risk alongside the opportunity. The coach tells you what signals each move sends so you know which approaches protect the relationship."}}, {"@type": "Question", "name": "How does the AI coach help me ask for a raise if I've never done it?", "acceptedAnswer": {"@type": "Answer", "text": "Just tap through options the coach gives you. Pick an opening, see what happens, try a different path. Practice in a safe environment where mistakes don't cost anything."}}, {"@type": "Question", "name": "How is the AI coach different from ChatGPT?", "acceptedAnswer": {"@type": "Answer", "text": "ChatGPT gives one generic conversation. This gives branching scenarios, structured coaching analysis, pro tips, and a purpose-built practice environment."}}]}
+
+</script>
 
 <!-- Pass UTM params through to chat page links -->
 <script>
@@ -2817,10 +2053,14 @@ function submitAssessment() {
     a.setAttribute('href', href + (href.indexOf('?') > -1 ? '&' : '?') + suffix);
   });
 })();
+
+
 </script>
 
 <!-- shared.js loads footer, GA4, Clarity (deferred) ────── -->
-<script defer src="/shared.js"></script>
+<script defer src="/shared.js">
+
+</script>
 
 <script>
 // Demo visual step animation
@@ -2849,6 +2089,8 @@ function submitAssessment() {
     rotateSteps();
   }
 })();
+
+
 </script>
 <script>
 (function(){
@@ -2875,6 +2117,8 @@ ci++;setTimeout(cvNext,1000);
 }
 setTimeout(cvNext,800);
 })();
+
+
 </script>
 </body>
 </html>
