@@ -407,8 +407,9 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 
 /* ── RESPONSIVE ───────────────────────────── */
 @media (max-width: 600px) {
-  /* Share card: stack vertically */
-  .share-card-wrap { flex-direction: column; }
+  /* Share card: stack vertically, edge-to-edge, image centered */
+  .share-card-wrap { flex-direction: column; margin-left: -20px; margin-right: -20px; border-radius: 0; padding: 24px 20px; }
+  .share-card-wrap > div[onclick] { margin: 0 auto; }
   
   /* Raise case preview */
   .case-preview-wrap { width: 100%; overflow: hidden; }
@@ -472,7 +473,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       </div>
     </a>
     <!-- Share card -->
-    <div style="background:var(--purple-light);border:1px solid rgba(139,111,165,0.12);border-radius:16px;padding:24px;margin:32px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden;">
+    <div class="share-card-wrap" style="background:var(--purple-light);border:1px solid rgba(139,111,165,0.12);border-radius:16px;padding:24px;margin:32px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden;">
       <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(139,111,165,0.05);border-radius:50%;"></div>
       <!-- Preview mockup card (right) -->
       <div onclick="shareLink()" style="flex-shrink:0;width:220px;max-width:100%;order:2;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
@@ -496,7 +497,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
           <text x="200" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">for a raise</text>
           <text x="200" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#3a2e42" font-style="italic">with confidence.</text>
           <rect x="150" y="224" width="100" height="3" rx="1.5" fill="url(#accentBar)"/>
-          <text x="200" y="270" text-anchor="middle" font-family="system-ui,sans-serif" font-size="16" fill="#9B7CFC">❤</text>
+          <path d="M200,279 C186,270 178,262 178,255 C178,250 182,247 186,247 C190,247 193,249 200,255 C207,249 210,247 214,247 C218,247 222,250 222,255 C222,262 214,270 200,279Z" fill="#9B7CFC"/>
           <text x="200" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#8a7e72" font-style="italic">from a friend who thinks you're worth it</text>
           <rect x="140" y="330" width="120" height="0.5" fill="#d8cab8" opacity="0.5"/>
           <text x="200" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#a89888">salary.recomlinked.com</text>
