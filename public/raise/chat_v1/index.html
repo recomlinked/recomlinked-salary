@@ -4787,11 +4787,6 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
-  // Closing nudge after paywall
-  var nudge = el('div', 'coach-msg', '');
-  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Your complete negotiation plan is ready \u2014 unlock to reveal it</div>';
-  chatArea.appendChild(nudge);
-
   // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
     var chatWrap = $('chat-wrap');
@@ -4889,7 +4884,7 @@ function showTailorQuestion(chatArea, idx) {
       btn.innerHTML = 'Your plan is tailored — unlock it now \u00b7 $' + PRICE_USD + ' \u2192';
     }
     var doneWrap = el('div', 'coach-msg', '');
-    doneWrap.innerHTML = '<div class="bubble"><p>Your plan has been updated based on your answers. Unlock it to see everything.</p></div>';
+    doneWrap.innerHTML = '<div class="bubble"><p>Your plan has been updated. <a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:700;text-decoration:none;">Unlock it to see everything \u2192</a></p></div>';
     chatArea.appendChild(doneWrap);
     setTimeout(function() {
       var w = $('chat-wrap');
@@ -4904,21 +4899,29 @@ function showTailorQuestion(chatArea, idx) {
   chatArea.appendChild(qWrap);
 
   // Chips
-  var chipsWrap = el('div', 'coach-msg chips-msg', '');
-  var chipsInner = el('div', 'user-chips', '');
+  var chipsWrap = el('div', 'coach-msg', '');
+  var opts = el('div', 'sim-pills-row', '');
+  opts.style.alignItems = 'flex-start';
   q.chips.forEach(function(chip) {
-    var btn = document.createElement('button');
-    btn.className = 'tailor-chip';
-    btn.textContent = chip.text;
-    btn.onclick = function() {
-      // Lock all chips
-      chipsInner.querySelectorAll('.tailor-chip').forEach(function(c) {
-        c.classList.add('selected');
-        c.style.opacity = c === btn ? '1' : '0.35';
-        c.style.pointerEvents = 'none';
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    textSpan.textContent = chip.text;
+    pill.appendChild(textSpan);
+    pill.onclick = function() {
+      // Dim all, highlight selected
+      opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
+        p.disabled = true;
+        p.style.opacity = '0.35';
+        p.style.pointerEvents = 'none';
       });
-      btn.classList.add('selected');
-      btn.style.opacity = '1';
+      pill.style.opacity = '1';
+      pill.classList.add('active');
 
       // User bubble
       var userWrap = el('div', 'user-msg', '');
@@ -4931,24 +4934,40 @@ function showTailorQuestion(chatArea, idx) {
       // Highlight cards
       highlightPlanCards(chip.keys);
 
-      // Scroll canvas into view briefly
-      var canvas = $('disc-canvas-live');
-      if (canvas) {
-        setTimeout(function() {
-          canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 200);
-      }
+      // Scroll to user bubble (same as pickDiscAnswer)
+      setTimeout(function() {
+        var chatWrap = $('chat-wrap');
+        if (chatWrap && userWrap) {
+          var target = userWrap.offsetTop - 20;
+          var start = chatWrap.scrollTop;
+          var distance = target - start;
+          var duration = 1500;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            chatWrap.scrollTop = start + distance * easeOut(progress);
+            if (progress < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+      }, 200);
+
+      // Then scroll to show updated canvas card
+      setTimeout(function() {
+        var canvas = $('disc-canvas-live');
+        if (canvas) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 800);
 
       // Next question after pause
       setTimeout(function() {
-        var w = $('chat-wrap');
-        if (w) w.scrollTop = w.scrollHeight;
         showTailorQuestion(chatArea, idx + 1);
-      }, 800);
+      }, 2200);
     };
-    chipsInner.appendChild(btn);
+    opts.appendChild(pill);
   });
-  chipsWrap.appendChild(chipsInner);
+  chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
 
   setTimeout(function() {
@@ -4963,20 +4982,29 @@ function showTailorConsent(chatArea) {
     consentWrap.innerHTML = '<div class="bubble"><p>Want me to tailor your plan further? (3 questions)</p></div>';
     chatArea.appendChild(consentWrap);
 
-    var chipsWrap = el('div', 'coach-msg chips-msg', '');
-    var chipsInner = el('div', 'user-chips', '');
+    var chipsWrap = el('div', 'coach-msg', '');
+    var consentOpts = el('div', 'sim-pills-row', '');
+    consentOpts.style.alignItems = 'flex-start';
 
-    var yesBtn = document.createElement('button');
-    yesBtn.className = 'tailor-chip';
-    yesBtn.textContent = 'Yes, let\'s do it';
+    var yesBtn = el('button', 'sim-reply-pill', '');
+    yesBtn.style.cssText = 'flex-direction:row;align-items:center;gap:10px;';
+    var yesRadio = el('div', 'chip-radio', '');
+    var yesSpan = el('span', '', '');
+    yesSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    yesSpan.textContent = 'Yes, let\'s do it';
+    yesBtn.appendChild(yesRadio); yesBtn.appendChild(yesSpan);
 
-    var skipBtn = document.createElement('button');
-    skipBtn.className = 'tailor-chip';
-    skipBtn.textContent = 'Skip';
+    var skipBtn = el('button', 'sim-reply-pill', '');
+    skipBtn.style.cssText = 'flex-direction:row;align-items:center;gap:10px;';
+    var skipRadio = el('div', 'chip-radio', '');
+    var skipSpan = el('span', '', '');
+    skipSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    skipSpan.textContent = 'Skip';
+    skipBtn.appendChild(skipRadio); skipBtn.appendChild(skipSpan);
 
     yesBtn.onclick = function() {
-      [yesBtn, skipBtn].forEach(function(b) { b.style.pointerEvents = 'none'; b.style.opacity = '0.35'; });
-      yesBtn.classList.add('selected'); yesBtn.style.opacity = '1';
+      [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
+      yesBtn.style.opacity = '1'; yesBtn.classList.add('active');
       var userWrap = el('div', 'user-msg', '');
       userWrap.innerHTML = '<div class="user-bubble">Yes, let\'s do it</div>';
       chatArea.appendChild(userWrap);
@@ -4985,16 +5013,16 @@ function showTailorConsent(chatArea) {
     };
 
     skipBtn.onclick = function() {
-      [yesBtn, skipBtn].forEach(function(b) { b.style.pointerEvents = 'none'; b.style.opacity = '0.35'; });
-      skipBtn.classList.add('selected'); skipBtn.style.opacity = '1';
+      [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
+      skipBtn.style.opacity = '1'; skipBtn.classList.add('active');
       var userWrap = el('div', 'user-msg', '');
       userWrap.innerHTML = '<div class="user-bubble">Skip</div>';
       chatArea.appendChild(userWrap);
     };
 
-    chipsInner.appendChild(yesBtn);
-    chipsInner.appendChild(skipBtn);
-    chipsWrap.appendChild(chipsInner);
+    consentOpts.appendChild(yesBtn);
+    consentOpts.appendChild(skipBtn);
+    chipsWrap.appendChild(consentOpts);
     chatArea.appendChild(chipsWrap);
 
     setTimeout(function() {
