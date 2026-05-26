@@ -180,7 +180,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
    to signal "this is the moment" but the shape + border-radius matches
    the regular coach bubble. CTA is the only inline UI element. */
 .paywall-bubble{
-  background:linear-gradient(160deg, #2c1845 0%, #4a2d6e 50%, #5a3880 100%);border-radius:4px 14px 14px 14px;
+  background:linear-gradient(160deg, #2c1845 0%, #4a2d6e 50%, #7b5fa0 100%);
+  border-radius:4px 14px 14px 14px;
   padding:20px 18px 18px;color:#fff;
 }
 .paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:10px;}
@@ -188,16 +189,16 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .paywall-bubble p strong{color:#fff;}
 .paywall-bubble .echo{
   font-size:12px;color:rgba(255,255,255,0.55);font-style:italic;
-  border-left:2px solid rgba(245,207,86,0.4);padding-left:10px;margin-bottom:10px;
+  border-left:2px solid rgba(245,207,86,0.5);padding-left:10px;margin-bottom:10px;
 }
 .btn-pay{
-  width:100%;background:var(--gold);color:var(--bg);
+  width:100%;background:#F5CF56;color:#1a1520;
   border:none;border-radius:10px;padding:14px;margin-top:10px;
   font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
   display:flex;align-items:center;justify-content:center;gap:6px;
   transition:background 0.12s,transform 0.1s;
 }
-.btn-pay:hover{background:var(--gold2);}
+.btn-pay:hover{background:#E8C044;}
 .btn-pay:active{transform:translateY(1px);}
 .btn-pay:disabled{opacity:0.6;cursor:wait;}
 .btn-pay-arrow{display:inline-block;animation:ap 1.8s ease-in-out infinite;}
@@ -230,7 +231,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 }
 .paywall-includes-title{
   font-size:10px;font-weight:700;text-transform:uppercase;
-  letter-spacing:0.08em;color:rgba(255,255,255,0.4);
+  letter-spacing:0.08em;color:rgba(255,255,255,0.5);
   margin:18px 0 8px;
 }
 .paywall-includes{
@@ -246,7 +247,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .paywall-inc-item::before{
   content:'';position:absolute;left:0;top:6px;
   width:6px;height:6px;border-radius:50%;
-  background:var(--gold);
+  background:#F5CF56;
 }
 .paywall-inc-item strong{
   color:#fff;font-weight:700;font-size:12.5px;
@@ -258,8 +259,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 .paywall-closing{
   margin-top:24px;text-align:center;padding:20px 0;
-  border-top:1px solid rgba(255,255,255,0.06);
-  font-size:15px;font-weight:700;color:var(--gold);line-height:1.5;
+  border-top:1px solid rgba(255,255,255,0.1);
+  font-size:15px;font-weight:700;color:#F5CF56;line-height:1.5;
 }
 .paywall-ticker{overflow:hidden;padding:18px 14px;margin-top:10px;background:rgba(255,255,255,0.08);border-radius:10px;}
 .paywall-ticker-inner{display:flex;gap:14px;white-space:nowrap;}
