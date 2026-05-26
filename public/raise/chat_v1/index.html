@@ -4083,11 +4083,14 @@ function renderCanvasHTML() {
   return html;
 }
 
-// Renders only the Overall Negotiation Position card — used after the paywall
-// to avoid duplicating the full plan that's already shown above.
+// Renders canvas from Overall Negotiation Position onwards (skips the position
+// dimension blocks shown above) — used after the paywall to avoid duplication.
 function renderPositionOnlyHTML() {
   var answeredCount = Object.values(discActive).filter(Boolean).length;
-  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;padding:8px;">';
+  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
+  html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
+
+  // OVERALL NEGOTIATION POSITION
   if (answeredCount >= 5) {
     var nScore = calculateNegotiationScore();
     var nLabel = getNegotiationLabel(nScore);
@@ -4100,6 +4103,56 @@ function renderPositionOnlyHTML() {
     html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
     html += '</div>';
   }
+
+  // YOUR STRATEGY
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
+  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
+  html += planBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
+  html += '</div>';
+
+  // YOUR PLAN
+  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+  html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
+  html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
+  html += '</div>';
+  html += planBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
+  html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
+  html += '</div>';
+
+  // CHECKLIST
+  if (answeredCount >= 5) {
+    html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
+    html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your checklist</div>';
+    html += '<div style="border-radius:8px;padding:10px 12px;background:var(--muted);border:1px solid var(--divider);">';
+    html += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">';
+    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">Pre-meeting checklist</span>';
+    html += '</div>';
+    html += '<div style="font-size:10px;color:var(--t2);line-height:1.8;">';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Practice opening script out loud</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Prepare responses for top 3 pushbacks</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Send meeting request email</div>';
+    html += '<div style="display:flex;align-items:flex-start;gap:6px;color:var(--t4);">&#9744; ...</div>';
+    html += '</div>';
+    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);font-style:italic;">Full checklist with after-meeting steps in your PDF download</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+
+  // Download bar
+  html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
+  html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-plan.pdf</span>';
+  html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
+  html += '</div>';
+
   html += '</div>';
   return html;
 }
