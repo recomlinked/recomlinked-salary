@@ -180,7 +180,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
    to signal "this is the moment" but the shape + border-radius matches
    the regular coach bubble. CTA is the only inline UI element. */
 .paywall-bubble{
-  background:#000;border-radius:4px 14px 14px 14px;
+  background:linear-gradient(160deg, #2c1845 0%, #4a2d6e 50%, #5a3880 100%);border-radius:4px 14px 14px 14px;
   padding:20px 18px 18px;color:#fff;
 }
 .paywall-bubble p{font-size:13px;color:rgba(255,255,255,0.82);line-height:1.65;margin-bottom:10px;}
@@ -188,7 +188,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .paywall-bubble p strong{color:#fff;}
 .paywall-bubble .echo{
   font-size:12px;color:rgba(255,255,255,0.55);font-style:italic;
-  border-left:2px solid rgba(201,168,76,0.4);padding-left:10px;margin-bottom:10px;
+  border-left:2px solid rgba(245,207,86,0.4);padding-left:10px;margin-bottom:10px;
 }
 .btn-pay{
   width:100%;background:var(--gold);color:var(--bg);
@@ -235,7 +235,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 }
 .paywall-includes{
   margin:0;padding:12px 14px;
-  background:rgba(255,255,255,0.04);border-radius:8px;
+  background:rgba(255,255,255,0.08);border-radius:8px;
   display:flex;flex-direction:column;gap:12px;
 }
 .paywall-inc-item{
@@ -261,7 +261,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   border-top:1px solid rgba(255,255,255,0.06);
   font-size:15px;font-weight:700;color:var(--gold);line-height:1.5;
 }
-.paywall-ticker{overflow:hidden;padding:18px 14px;margin-top:10px;background:rgba(255,255,255,0.05);border-radius:10px;}
+.paywall-ticker{overflow:hidden;padding:18px 14px;margin-top:10px;background:rgba(255,255,255,0.08);border-radius:10px;}
 .paywall-ticker-inner{display:flex;gap:14px;white-space:nowrap;}
 .paywall-ticker-item{display:inline-flex;align-items:center;gap:10px;flex-shrink:0;}
 .paywall-ticker-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,0.18);flex-shrink:0;}
@@ -3838,81 +3838,6 @@ function getNegotiationLabel(score) {
   return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
 }
 
-// ── Shared canvas helpers (module scope so renderPositionOnlyHTML can use them) ──
-function canvasFormatInsight(text) {
-  if (!text) return '';
-  return text.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-}
-
-var canvasIcons = {
-  evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
-  timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-  manager: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
-  company: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>',
-  market: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-  leverage_risk: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
-  emphasize: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
-  avoid: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
-  opening_script: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
-  pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-  if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
-  raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
-};
-
-function canvasGetTeaserForBlock(key, text) {
-  if (!text) return { preview: '', badge: '' };
-  var clean = text.replace(/\*\*/g, '');
-  if (key === 'leverage_risk') {
-    var match = clean.match(/^[^.!?]*[.!?]/);
-    return { preview: match ? match[0] : clean.slice(0, 100), badge: '' };
-  }
-  if (key === 'emphasize' || key === 'avoid') return { preview: clean.slice(0, 45) + '...', badge: '3 key points' };
-  if (key === 'opening_script') return { preview: clean.slice(0, 50) + '...', badge: 'Full script ready' };
-  if (key === 'pushback') return { preview: clean.slice(0, 45) + '...', badge: '4 prepared responses' };
-  if (key === 'if_yes') return { preview: clean.slice(0, 50) + '...', badge: '' };
-  if (key === 'meeting_email') {
-    var subMatch = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
-    return { preview: subMatch ? subMatch[0] : clean.slice(0, 40) + '...', badge: 'Ready to send' };
-  }
-  if (key === 'raise_case') return { preview: clean.slice(0, 45) + '...', badge: 'One-page brief' };
-  return { preview: clean.slice(0, 60) + '...', badge: '' };
-}
-
-function canvasPlanBlock(key, label, subtitle) {
-  var b = discCanvasBlocks[key];
-  var ic = canvasIcons[key] || '';
-  if (b && b.filled && b.teaser) {
-    var t = canvasGetTeaserForBlock(key, b.insight);
-    return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
-      '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
-      '<span style="color:var(--navy);">' + ic + '</span>' +
-      '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
-      (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
-      '</div>' +
-      '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + t.preview + '</p>' +
-      '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
-      '<p style="font-size:10px;margin:2px 0 0;color:var(--gold);font-weight:600;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</p>' +
-      '</div>';
-  }
-  if (b && b.filled && !b.teaser) {
-    return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;">' +
-      '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
-      '<span style="color:var(--navy);">' + ic + '</span>' +
-      '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
-      '</div>' +
-      '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + canvasFormatInsight(b.insight) + '</p>' +
-      '</div>';
-  }
-  if (discStrategyLoading) {
-    var loadingMessages = { leverage_risk:'Analyzing your leverage points',emphasize:'Identifying what to lead with',avoid:'Flagging what not to say',opening_script:'Writing your opening script',pushback:'Preparing pushback responses',if_yes:'Planning your closing moves',meeting_email:'Drafting your meeting email',raise_case:'Building your raise case brief' };
-    var loadMsg = loadingMessages[key] || 'Generating';
-    var dots = '<span style="display:inline-flex;gap:3px;margin-right:6px;"><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.2s;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.4s;"></span></span>';
-    return '<div style="border-radius:8px;padding:14px 16px;min-height:48px;background:var(--muted);border:1px solid var(--divider);"><div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;"><span style="color:var(--t3);">' + ic + '</span><span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span></div><div style="font-size:11px;color:var(--t3);font-style:italic;display:flex;align-items:center;">' + dots + loadMsg + '...</div></div>';
-  }
-  return '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);"><div style="display:flex;align-items:center;gap:5px;"><span style="color:var(--t3);">' + ic + '</span><span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span></div>' + (subtitle ? '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + subtitle + '</p>' : '') + '</div>';
-}
-
 function renderCanvasHTML() {
   // Parse **bold** markers in insight text
   function formatInsight(text) {
@@ -4008,7 +3933,7 @@ function renderCanvasHTML() {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
     if (b && b.filled && b.teaser) {
-      // Teaser mode: entire card clickable → scrolls to paywall
+      // Teaser mode: short preview + badge + unlock
       var t = getTeaserForBlock(key, b.insight);
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
@@ -4018,7 +3943,7 @@ function renderCanvasHTML() {
         '</div>' +
         '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + t.preview + '</p>' +
         '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
-        '<p style="font-size:10px;margin:2px 0 0;color:var(--gold);font-weight:600;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</p>' +
+        '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
         '</div>';
     }
     if (b && b.filled && !b.teaser) {
@@ -4149,80 +4074,6 @@ function renderCanvasHTML() {
   html += '</div>';
 
   // Download bar — always active
-  html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
-  html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-plan.pdf</span>';
-  html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
-  html += '</div>';
-
-  html += '</div>';
-  return html;
-}
-
-// Renders canvas from Overall Negotiation Position onwards (skips the position
-// dimension blocks shown above) — used after the paywall to avoid duplication.
-function renderPositionOnlyHTML() {
-  var answeredCount = Object.values(discActive).filter(Boolean).length;
-  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
-  html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
-
-  // OVERALL NEGOTIATION POSITION
-  if (answeredCount >= 5) {
-    var nScore = calculateNegotiationScore();
-    var nLabel = getNegotiationLabel(nScore);
-    html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;">';
-    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
-    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
-    html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
-    html += '</div>';
-    html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
-    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
-    html += '</div>';
-  }
-
-  // YOUR STRATEGY
-  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
-  html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += canvasPlanBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += canvasPlanBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
-  html += canvasPlanBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
-  html += '</div>';
-
-  // YOUR PLAN
-  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
-  html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += canvasPlanBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
-  html += canvasPlanBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
-  html += '</div>';
-  html += canvasPlanBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
-  html += canvasPlanBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
-  html += canvasPlanBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
-  html += '</div>';
-
-  // CHECKLIST
-  if (answeredCount >= 5) {
-    html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
-    html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your checklist</div>';
-    html += '<div style="border-radius:8px;padding:10px 12px;background:var(--muted);border:1px solid var(--divider);">';
-    html += '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">';
-    html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>';
-    html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">Pre-meeting checklist</span>';
-    html += '</div>';
-    html += '<div style="font-size:10px;color:var(--t2);line-height:1.8;">';
-    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Practice opening script out loud</div>';
-    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Prepare responses for top 3 pushbacks</div>';
-    html += '<div style="display:flex;align-items:flex-start;gap:6px;"><span style="color:var(--t4);">&#9744;</span> Send meeting request email</div>';
-    html += '<div style="display:flex;align-items:flex-start;gap:6px;color:var(--t4);">&#9744; ...</div>';
-    html += '</div>';
-    html += '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);font-style:italic;">Full checklist with after-meeting steps in your PDF download</div>';
-    html += '</div>';
-  }
-
-  html += '</div>';
-
-  // Download bar
   html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
   html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-plan.pdf</span>';
   html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
@@ -4840,8 +4691,6 @@ async function generateDiscInsights() {
   // Strategy shimmer already running — just update position blocks
   var liveCanvas = $('disc-canvas-live');
   if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
-  var apCanvas = $('disc-canvas-after-paywall');
-  if (apCanvas) apCanvas.innerHTML = renderPositionOnlyHTML();
 
   // Handle strategy (may already be done or still in flight)
   try {
@@ -4866,16 +4715,12 @@ async function generateDiscInsights() {
       discStrategyLoading = false;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
-      var apCanvas2 = $('disc-canvas-after-paywall');
-      if (apCanvas2) apCanvas2.innerHTML = renderPositionOnlyHTML();
     } else {
       console.warn('[disc_insights] Empty strategy response, generating fallbacks');
       generateClientFallbacks();
       discStrategyLoading = false;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
-      var apCanvas2 = $('disc-canvas-after-paywall');
-      if (apCanvas2) apCanvas2.innerHTML = renderPositionOnlyHTML();
     }
   } catch (e) {
     console.error('[disc_insights] Strategy API error:', e);
@@ -4912,17 +4757,9 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
-  // Full plan — rendered again after paywall so user sees exactly what unlocking reveals
-  var planAfterPaywall = el('div', 'coach-msg', '');
-  var planDiv = el('div', '', '');
-  planDiv.id = 'disc-canvas-after-paywall';
-  planDiv.innerHTML = renderPositionOnlyHTML();
-  planAfterPaywall.appendChild(planDiv);
-  chatArea.appendChild(planAfterPaywall);
-
-  // Closing nudge — last element, after the plan
+  // Closing nudge after paywall
   var nudge = el('div', 'coach-msg', '');
-  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:600;text-decoration:none;">Your complete negotiation plan is ready \u2014 unlock to reveal it \u2192</a></div>';
+  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Your complete negotiation plan is ready \u2014 unlock to reveal it</div>';
   chatArea.appendChild(nudge);
 
   // Smooth scroll reveal: user answer → canvas → intro → paywall
