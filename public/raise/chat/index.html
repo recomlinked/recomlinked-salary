@@ -4257,7 +4257,7 @@ function initDiscoveryMode(container) {
     // Instant restore — no typing
     var intro = el('div', 'coach-msg', '');
     var _introMsg = 'Most women have more leverage in salary negotiations than they realize. Let’s find yours in just 5 questions.';
-    var _pr = (state.profile && state.profile.reason) || new URLSearchParams(window.location.search).get('reason') || '';
+    var _pr = state.sim_reason || (state.profile && state.profile.reason) || '';
     var _rl = { no_script:'I don’t know how to start the conversation', underpaid:'I think I’m underpaid but I can’t prove it', quiet_performer:'I’m a strong performer but I don’t speak up', unknown_number:'I don’t know what number to ask for', fear_no:'What if they say no?', no_advocate:'My manager doesn’t advocate for me', already_asked:'I already asked and got nothing', unknown_timing:'I’m not sure if now is the right time' };
     if (_pr && _rl[_pr]) { _introMsg = 'You said “' + _rl[_pr] + '”. Most women have more leverage than they realize. Let’s find yours in just 5 questions.'; }
     intro.innerHTML = '<div class="bubble"><p>' + _introMsg + '</p></div>';
@@ -4294,7 +4294,7 @@ function initDiscoveryMode(container) {
     already_asked:   'I already asked and got nothing',
     unknown_timing:  'I\u2019m not sure if now is the right time',
   };
-  var profileReason = (state.profile && state.profile.reason) || new URLSearchParams(window.location.search).get('reason') || '';
+  var profileReason = state.sim_reason || (state.profile && state.profile.reason) || '';
   if (profileReason && REASON_LABELS[profileReason]) {
     introText = 'You said \u201c' + REASON_LABELS[profileReason] + '\u201d. Most women have more leverage than they realize. Let\u2019s find yours in just 5 questions.';
   }
