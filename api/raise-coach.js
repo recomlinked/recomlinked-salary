@@ -720,11 +720,19 @@ async function handleDiscoveryMode(body, res) {
 // ══ DISC INSIGHTS — AI-generated canvas insights           ══
 // ════════════════════════════════════════════════════════════
 async function handleDiscInsights(body, res) {
-  const { blocker, answers, dims, levers, weaks, part } = body;
+  const { blocker, answers, dims, levers, weaks, part, tailor } = body;
 
   if (!answers || typeof answers !== 'object') {
     return res.status(400).json({ error: 'answers required' });
   }
+
+  // Build tailor context block if answers provided
+  const tailorBlock = tailor && (tailor.role_change || tailor.manager_reaction || tailor.timing)
+    ? `\nADDITIONAL CONTEXT (from follow-up questions):\n` +
+      (tailor.role_change      ? `- Role growth: ${tailor.role_change}\n`           : '') +
+      (tailor.manager_reaction ? `- Expected manager reaction: ${tailor.manager_reaction}\n` : '') +
+      (tailor.timing           ? `- Conversation timing: ${tailor.timing}\n`         : '')
+    : '';
 
   const dimDescriptions = {
     evidence: { label: 'Evidence & Leverage' },
@@ -769,7 +777,7 @@ Sections:
 
 Return ALL 8 keys. Respond ONLY with valid JSON (no markdown, no backticks):
 {"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","if_yes":"...","meeting_email":"...","raise_case":"..."}`;
-    userMessage = `Position:\n${answeredDims}\n\nGenerate strategy and plan.`;
+    userMessage = `Position:\n${answeredDims}${tailorBlock}\n\nGenerate strategy and plan.`;
     maxTokens = 1500;
 
   } else {
