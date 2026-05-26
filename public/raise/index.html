@@ -468,48 +468,51 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       <div class="hiw-num">1</div>
       <div class="hiw-body">
         <div class="hiw-title">Assess your negotiation position</div>
-        <div class="hiw-desc">Before you ask for a raise at work, look at your evidence, timing, manager, company situation, and market value to understand your leverage and risks. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
+        <div class="hiw-desc">Before you ask for a raise at work, look at your evidence, timing, manager, company situation, and market value <b>to understand your leverage and risks</b>. <span class="hiw-question">Ready to learn the best way to ask for a raise?</span></div>
         <div class="hiw-cta">Assess yours now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
     <!-- Share card -->
     <div class="share-card-wrap" style="background:var(--purple-light);border:1px solid rgba(139,111,165,0.12);border-radius:16px;padding:24px;margin:32px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden;">
       <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(139,111,165,0.05);border-radius:50%;"></div>
-      <!-- Preview mockup card (right) -->
-      <div onclick="shareLink()" style="flex-shrink:0;width:220px;max-width:100%;order:2;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-        <svg width="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#faf3e8"/>
-              <stop offset="40%" stop-color="#f5ece0"/>
-              <stop offset="100%" stop-color="#efe4da"/>
-            </linearGradient>
-            <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stop-color="#9B7CFC"/>
-              <stop offset="100%" stop-color="#F5CF56"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="400" fill="url(#cardBg)"/>
-          <circle cx="60" cy="50" r="20" fill="#f0e2d2" opacity="0.4"/>
-          <circle cx="360" cy="340" r="25" fill="#e8daf0" opacity="0.3"/>
-          <circle cx="340" cy="70" r="12" fill="#fce8c8" opacity="0.35"/>
-          <text x="200" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">You deserve to ask</text>
-          <text x="200" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">for a raise</text>
-          <text x="200" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#3a2e42" font-style="italic">with confidence.</text>
-          <rect x="150" y="224" width="100" height="3" rx="1.5" fill="url(#accentBar)"/>
-          <path d="M200,278 C193,274 189,270 189,266 C189,264 191,262 193,262 C195,262 197,263 200,266 C204,263 205,262 207,262 C209,262 211,264 211,266 C211,270 207,274 200,278Z" fill="#9B7CFC"/>
-          <text x="200" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#8a7e72" font-style="italic">from a friend who thinks you're worth it</text>
-          <rect x="140" y="330" width="120" height="0.5" fill="#d8cab8" opacity="0.5"/>
-          <text x="200" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#a89888">salary.recomlinked.com</text>
-          <text x="200" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#b8a898">Know where you stand. Then ask for a raise.</text>
-        </svg>
+      <!-- CTA side (left) -->
+      <div style="flex:1;min-width:180px;order:1;position:relative;z-index:1;">
+        <div style="font-size:18px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px;">Know a woman who deserves a raise?</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px;">Send her this to assess her leverage and know her value. It's free.</div>
+        <div style="font-size:13px;font-weight:600;color:var(--purple);letter-spacing:0.03em;">Be the reason she finally asks for a raise.</div>
       </div>
-      <!-- CTA side -->
-      <div style="flex:1;min-width:200px;order:1;position:relative;z-index:1;">
-                <div style="font-size:18px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px;">Know a woman who deserves a raise?</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px;">Send her this to assess her position and know her value. It's free.</div>
-        <button onclick="shareLink()" style="display:inline-flex;align-items:center;gap:6px;background:var(--purple);color:#fff;padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:var(--sans);box-shadow:0 2px 12px rgba(123,92,252,0.2);transition:all 0.15s;" onmouseover="this.style.background='var(--purple-hover)'" onmouseout="this.style.background='var(--purple)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Encourage her</button>
-        <div id="share-copied" style="display:none;font-size:12px;color:var(--purple);margin-top:8px;font-weight:500;">Link copied ✓</div>
+      <!-- Card (right) + button below -->
+      <div style="flex-shrink:0;width:200px;max-width:100%;order:2;display:flex;flex-direction:column;align-items:center;gap:12px;">
+        <div onclick="shareLink()" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+          <svg width="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#faf3e8"/>
+                <stop offset="40%" stop-color="#f5ece0"/>
+                <stop offset="100%" stop-color="#efe4da"/>
+              </linearGradient>
+              <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#9B7CFC"/>
+                <stop offset="100%" stop-color="#F5CF56"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="400" fill="url(#cardBg)"/>
+            <circle cx="60" cy="50" r="20" fill="#f0e2d2" opacity="0.4"/>
+            <circle cx="360" cy="340" r="25" fill="#e8daf0" opacity="0.3"/>
+            <circle cx="340" cy="70" r="12" fill="#fce8c8" opacity="0.35"/>
+            <text x="200" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">You deserve to ask</text>
+            <text x="200" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">for a raise</text>
+            <text x="200" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#3a2e42" font-style="italic">with confidence.</text>
+            <rect x="150" y="224" width="100" height="3" rx="1.5" fill="url(#accentBar)"/>
+            <path d="M200,278 C193,274 189,270 189,266 C189,264 191,262 193,262 C195,262 197,263 200,266 C204,263 205,262 207,262 C209,262 211,264 211,266 C211,270 207,274 200,278Z" fill="#9B7CFC"/>
+            <text x="200" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#8a7e72" font-style="italic">from a friend who believes in you</text>
+            <rect x="140" y="330" width="120" height="0.5" fill="#d8cab8" opacity="0.5"/>
+            <text x="200" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#a89888">salary.recomlinked.com</text>
+            <text x="200" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#b8a898">Know where you stand. Then ask for a raise.</text>
+          </svg>
+        </div>
+        <button onclick="shareLink()" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--purple);color:#fff;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:var(--sans);box-shadow:0 2px 12px rgba(123,92,252,0.2);transition:all 0.15s;" onmouseover="this.style.background='var(--purple-hover)'" onmouseout="this.style.background='var(--purple)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Encourage her</button>
+        <div id="share-copied" style="display:none;font-size:12px;color:var(--purple);font-weight:500;">Link copied ✓</div>
       </div>
     </div>
 
@@ -519,7 +522,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       <div class="hiw-num">2</div>
       <div class="hiw-body">
         <div class="hiw-title">Know what’s stopping you</div>
-        <div class="hiw-desc">Every raise conversation has one thing holding you back. Your Raise Negotiation Canvas brings everything together in one document: your opening script, pushback responses, key points to emphasize, and what to avoid. <span class="hiw-question">The most comprehensive tool for professionally asking for a raise.</span></div>
+        <div class="hiw-desc">Every raise conversation has one thing holding you back. Your Raise Negotiation Plan brings everything together in one document: your opening script, pushback responses, key points to emphasize, and what to avoid. <span class="hiw-question">The most comprehensive tool for professionally asking for a raise.</span></div>
         <div class="hiw-cta">Find yours below <span class="hiw-cta-arrow">↓</span></div>
       </div>
     </a>
