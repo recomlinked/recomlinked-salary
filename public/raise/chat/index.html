@@ -852,7 +852,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
              switch modes. Replaces the older single-button toggle which
              made it unclear whether you were in coach or simulation mode. -->
         <div class="mode-toggle locked" id="mode-toggle" role="tablist" aria-label="Mode">
-          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Build your Raise Negotiation Canvas">
+          <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="Build your Raise Negotiation Plan">
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
               <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.4"/>
               <line x1="7" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
@@ -3230,7 +3230,7 @@ function _generatePDFPrintFallback() {
     ]}
   ];
 
-  var html = '<html><head><title>Raise Negotiation Canvas</title><style>';
+  var html = '<html><head><title>Raise Negotiation Plan</title><style>';
   html += 'body{font-family:-apple-system,sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#1a1d2e;}';
   html += '.header{background:#1e3d72;color:#fff;padding:16px 20px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;}';
   html += '.header h1{font-size:18px;margin:0;} .header small{font-size:11px;color:#b0b8d0;}';
@@ -3251,7 +3251,7 @@ function _generatePDFPrintFallback() {
   html += '.footer{background:#1e3d72;color:#b0b8d0;padding:10px 20px;border-radius:0 0 8px 8px;font-size:11px;display:flex;justify-content:space-between;margin-top:12px;}';
   html += '.footer .gold{color:#c9a84c;} @media print{body{padding:0;}}';
   html += '</style></head><body>';
-  html += '<div class="header"><h1>Raise Negotiation Canvas</h1><small>salary.recomlinked.com/raise</small></div>';
+  html += '<div class="header"><h1>Raise Negotiation Plan</h1><small>salary.recomlinked.com/raise</small></div>';
 
   var icons = {
     evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
@@ -3394,7 +3394,7 @@ function _generatePDFWithJsPDF() {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('Raise Negotiation Canvas', mx, 13);
+  doc.text('Raise Negotiation Plan', mx, 13);
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(200, 200, 220);
@@ -3784,7 +3784,7 @@ function _generatePDFWithJsPDF() {
     doc.text('access to reveal your complete opening script, pushback responses, and more.', mx + 6, y + 12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.text('Unlock your full canvas at salary.recomlinked.com/raise', mx + 6, y + 18);
+    doc.text('Unlock your full plan at salary.recomlinked.com/raise', mx + 6, y + 18);
     y += 26;
   }
 
@@ -3792,7 +3792,7 @@ function _generatePDFWithJsPDF() {
   drawFooter();
 
   // ── Save ──
-  doc.save('raise-negotiation-canvas.pdf');
+  doc.save('raise-negotiation-plan.pdf');
   } catch (e) {
     console.error('PDF generation error:', e);
     // Fallback to print version
@@ -3990,7 +3990,7 @@ function renderCanvasHTML() {
 
   var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
   html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
-  html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation canvas</span>';
+  html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Raise negotiation plan</span>';
   html += '<a href="#" onclick="event.preventDefault();generateCanvasPDF();" style="margin-left:auto;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>';
   html += '</div>';
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
@@ -4075,7 +4075,7 @@ function renderCanvasHTML() {
 
   // Download bar — always active
   html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
-  html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-canvas.pdf</span>';
+  html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-plan.pdf</span>';
   html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
   html += '</div>';
 
@@ -4171,7 +4171,7 @@ function appendStandardPaywall(container) {
     '<div style="display:flex;gap:8px;margin-top:8px;">' +
       '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
         '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
-        '<div style="font-size:11px;font-weight:600;color:#fff;">Full canvas file</div>' +
+        '<div style="font-size:11px;font-weight:600;color:#fff;">Full plan file</div>' +
         '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>' +
       '</div>' +
       '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
@@ -4262,7 +4262,7 @@ function initDiscoveryMode(container) {
     if (state.paid) {
       // Paid user: show success message, no paywall
       var successBubble = el('div', 'coach-msg', '');
-      successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Raise Negotiation Canvas</strong> is ready. All sections are unlocked \u2014 opening script, pushback responses, meeting email, and raise case brief. Download your full PDF anytime.</p></div>';
+      successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Raise Negotiation Plan</strong> is ready. All sections are unlocked \u2014 opening script, pushback responses, meeting email, and raise case brief. Download your full PDF anytime.</p></div>';
       chatArea.appendChild(successBubble);
     } else {
       showDiscPaywall();
@@ -4749,7 +4749,7 @@ async function generateDiscInsights() {
     early: 'Your negotiation position is <strong>early stage \u2014 but there\u2019s a path</strong>. Your target: <strong>plant the seed, increase visibility, and create conditions for 2\u20133 months from now.</strong>'
   };
   var introKey = introScore >= 72 ? 'strong' : introScore >= 55 ? 'solid' : introScore >= 40 ? 'viable' : introScore >= 25 ? 'challenging' : 'early';
-  introBubble.innerHTML = '<div class="bubble"><p>' + introLines[introKey] + ' Your Raise Negotiation Canvas is ready above \u2014 opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief. Unlock to reveal your complete plan.</p></div>';
+  introBubble.innerHTML = '<div class="bubble"><p>' + introLines[introKey] + ' Your Raise Negotiation Plan is ready above \u2014 opening script, pushback responses, what to emphasize, what to avoid, a meeting email, and a raise case brief. Unlock to reveal your complete plan.</p></div>';
   chatArea.appendChild(introBubble);
 
   // Log and show paywall
