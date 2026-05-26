@@ -4083,6 +4083,27 @@ function renderCanvasHTML() {
   return html;
 }
 
+// Renders only the Overall Negotiation Position card — used after the paywall
+// to avoid duplicating the full plan that's already shown above.
+function renderPositionOnlyHTML() {
+  var answeredCount = Object.values(discActive).filter(Boolean).length;
+  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;padding:8px;">';
+  if (answeredCount >= 5) {
+    var nScore = calculateNegotiationScore();
+    var nLabel = getNegotiationLabel(nScore);
+    html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;">';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
+    html += '</div>';
+    html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function lockFreeModes() {
   // Tabs stay clickable — they show paywall content when tapped
 }
@@ -4692,7 +4713,7 @@ async function generateDiscInsights() {
   var liveCanvas = $('disc-canvas-live');
   if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
   var apCanvas = $('disc-canvas-after-paywall');
-  if (apCanvas) apCanvas.innerHTML = renderCanvasHTML();
+  if (apCanvas) apCanvas.innerHTML = renderPositionOnlyHTML();
 
   // Handle strategy (may already be done or still in flight)
   try {
@@ -4718,7 +4739,7 @@ async function generateDiscInsights() {
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
       var apCanvas2 = $('disc-canvas-after-paywall');
-      if (apCanvas2) apCanvas2.innerHTML = renderCanvasHTML();
+      if (apCanvas2) apCanvas2.innerHTML = renderPositionOnlyHTML();
     } else {
       console.warn('[disc_insights] Empty strategy response, generating fallbacks');
       generateClientFallbacks();
@@ -4726,7 +4747,7 @@ async function generateDiscInsights() {
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
       var apCanvas2 = $('disc-canvas-after-paywall');
-      if (apCanvas2) apCanvas2.innerHTML = renderCanvasHTML();
+      if (apCanvas2) apCanvas2.innerHTML = renderPositionOnlyHTML();
     }
   } catch (e) {
     console.error('[disc_insights] Strategy API error:', e);
@@ -4763,19 +4784,18 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
-  // Closing nudge after paywall
-  var nudge = el('div', 'coach-msg', '');
-  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:600;text-decoration:none;">Your complete negotiation plan is ready \u2014 unlock to reveal it \u2192</a></div>';
-  chatArea.appendChild(nudge);
-
-
   // Full plan — rendered again after paywall so user sees exactly what unlocking reveals
   var planAfterPaywall = el('div', 'coach-msg', '');
   var planDiv = el('div', '', '');
   planDiv.id = 'disc-canvas-after-paywall';
-  planDiv.innerHTML = renderCanvasHTML();
+  planDiv.innerHTML = renderPositionOnlyHTML();
   planAfterPaywall.appendChild(planDiv);
   chatArea.appendChild(planAfterPaywall);
+
+  // Closing nudge — last element, after the plan
+  var nudge = el('div', 'coach-msg', '');
+  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:600;text-decoration:none;">Your complete negotiation plan is ready \u2014 unlock to reveal it \u2192</a></div>';
+  chatArea.appendChild(nudge);
 
   // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
