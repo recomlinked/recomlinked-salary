@@ -3895,6 +3895,15 @@ function renderCanvasHTML() {
       var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
       var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+      // Collapse position blocks once strategy is done — header + tag only
+      if (discStrategyDone) {
+        return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 14px;">' +
+          '<div style="display:flex;align-items:center;gap:5px;">' +
+          '<span style="color:' + tc + ';">' + ic + '</span>' +
+          '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
+          '<span style="font-size:9px;color:' + bc + ';margin-left:auto;font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+          '</div></div>';
+      }
       var hasAI = b.insight && b.insight.length > 40;
       var animStyle = hasAI ? 'animation:canvasBlockIn 0.5s ease;' : '';
       return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:14px 16px;min-height:48px;' + animStyle + '">' +
