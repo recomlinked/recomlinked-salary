@@ -3318,8 +3318,8 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
-      // After Q5 answered, collapse position blocks — show header only
-      if (section === 'position' && answeredCount >= 5) {
+      // Collapse position blocks after all 5 answered AND strategy has loaded
+      if (section === 'position' && answeredCount >= 5 && !discStrategyLoading) {
         h += '</div></div>';
         return h;
       }
@@ -3958,17 +3958,23 @@ function renderCanvasHTML() {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
     if (b && b.filled && b.teaser) {
-      // Teaser mode: short preview + badge + unlock
+      // Collapsed mode: header + badge + lock icon only — no text preview
       var t = getTeaserForBlock(key, b.insight);
-      return '<div data-block-key="' + key + '" style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
-        '<span style="color:var(--navy);">' + ic + '</span>' +
-        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
-        (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
-        '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + t.preview + '</p>' +
-        '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
-        '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
+      var BADGES = {
+        opening_script: '4 options',
+        pushback: '8 prepared',
+        meeting_email: 'Ready to send',
+        raise_case: 'One-page brief',
+        leverage_risk: '',
+        emphasize: '5 points',
+        avoid: '4 points',
+      };
+      var collapsedBadge = BADGES[key] || t.badge || '';
+      return '<div data-block-key="' + key + '" style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:11px 14px;cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;display:flex;align-items:center;gap:6px;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
+        '<span style="color:var(--navy);flex-shrink:0;">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
+        (collapsedBadge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;white-space:nowrap;">' + collapsedBadge + '</span>' : '') +
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
         '</div>';
     }
     if (b && b.filled && !b.teaser) {
