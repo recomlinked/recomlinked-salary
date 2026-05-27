@@ -783,16 +783,29 @@ QUALITY BAR:
 - Use **bold** sparingly — only for the single most important tactic per block.
 - Tone: a smart coach who's seen 1,000 of these conversations, not a textbook.
 
-Based on user's position below, generate strategy and plan.
+Sections (each opens with a HOOK SENTENCE that's insightful and personalized, then the content):
 
-Sections:
-- leverage_risk: Open with the non-obvious dynamic underneath their leverage. Then 2-3 sentences on how to deploy it without overplaying it.
-- emphasize: Exactly 5 specific points to lead with, numbered 1-5. Each ONE sentence with a concrete tactic — not abstract advice.
-- avoid: Exactly 4 specific things NOT to say or do, numbered 1-4. Each ONE sentence with the actual phrase or move to avoid AND why.
-- opening_script: 4 different opening script options in first person, numbered 1-4. Each opens with different psychological framing (collaborative, data-driven, future-focused, direct). Label "**Option 1:**", "**Option 2:**", etc.
-- pushback: 8 likely manager objections with responses. Format each: "**If they say:** '...'" / "**Your response:** '...'" — cover budget freeze, timing, performance, HR process, surprise, wait for review, need to check, and a curveball.
-- meeting_email: Short email to request meeting. Include subject line. Lead with a hook line that earns the reply.
-- raise_case: One-paragraph summary to hand to manager. Open with the strongest single fact, not "I'd like to discuss compensation."
+- leverage_risk: Hook + 2-3 sentences on the non-obvious dynamic. Then how to deploy it.
+- emphasize: Hook sentence revealing what most people get wrong about emphasis in this situation. Then 5 numbered points, each ONE sentence with a concrete tactic.
+- avoid: Hook sentence revealing the most common self-sabotage pattern given their position. Then 4 numbered points, each ONE sentence with the actual phrase to avoid AND why.
+- opening_script: Hook sentence about why their first 30 seconds matters more than the rest of the conversation. Then 4 different opening scripts in first person, numbered 1-4. Each opens with different psychological framing (collaborative, data-driven, future-focused, direct). Label "**Option 1:**", "**Option 2:**", etc.
+- pushback: Hook sentence about the trap of most pushback responses. Then 8 likely objections with responses. Format: "**If they say:** '...'" / "**Your response:** '...'" — cover budget freeze, timing, performance, HR process, surprise, wait for review, need to check, and a curveball.
+- meeting_email: Hook sentence about what makes managers actually open a comp email. Then the email with subject line.
+- raise_case: Hook sentence about why most one-pagers fail to land. Then the one-paragraph summary.
+
+CRITICAL: The hook sentence MUST be the very first sentence — it's what the user sees in the teaser before unlocking. It must:
+1. Reveal a non-obvious insight personalized to their situation
+2. Make them think "I need to read the rest"
+3. NOT restate their input or the obvious
+
+EXAMPLES OF GOOD HOOK SENTENCES PER SECTION:
+- leverage_risk: "Your competing offer is your strongest asset — but lead with it and you become a flight risk, not a star."
+- emphasize: "Most people emphasize what they've done — the people who get raises emphasize what they will stop doing if they leave."
+- avoid: "The fastest way to lose a raise conversation is apologizing before you ask — it tells them you're already prepared to back down."
+- opening_script: "Your first 30 seconds set the tempo — managers decide their answer before you finish your second sentence."
+- pushback: "Every objection is really one of two things — a real constraint or a test of how serious you are. Treat them differently."
+- meeting_email: "Managers ignore compensation emails that sound like a request — they open ones that sound like a decision."
+- raise_case: "Most one-pagers fail because they argue what you deserve — yours should prove what you cost to replace."
 
 Return ALL 7 keys. Respond ONLY with valid JSON (no markdown, no backticks):
 {"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
