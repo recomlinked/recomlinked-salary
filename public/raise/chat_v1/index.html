@@ -3354,7 +3354,8 @@ function _generatePDFPrintFallback() {
   html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:14px 16px;margin:8px 0;">';
   html += '<div style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Overall Negotiation Position</div>';
   html += '<div style="font-size:14px;font-weight:700;color:' + nLabel.color + ';margin-bottom:4px;">' + nLabel.label + '</div>';
-  html += '<div style="font-size:12px;color:' + nLabel.color + ';opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</div>';
+  html += '<div style="font-size:12px;color:' + nLabel.color + ';opacity:0.85;margin-bottom:6px;"><strong>Your target:</strong> ' + nLabel.target + '</div>';
+  html += '<div style="font-size:12px;color:' + nLabel.color + ';opacity:0.85;"><strong style="color:#c44;">Risk:</strong> ' + nLabel.risk + '</div>';
   html += '</div>';
 
   // YOUR STRATEGY
@@ -3362,11 +3363,12 @@ function _generatePDFPrintFallback() {
   html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'}, 'strategy');
   html += '<div class="row">' + renderBlock({key:'emphasize',label:'Emphasize'}, 'strategy') + renderBlock({key:'avoid',label:'Avoid'}, 'strategy') + '</div>';
 
-  // YOUR PLAN
+  // YOUR PLAN — all full-width, no if_yes
   html += '<div class="section-title">YOUR PLAN</div>';
-  html += '<div class="row">' + renderBlock({key:'opening_script',label:'Opening Script'}, 'plan') + renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan') + '</div>';
-  html += renderBlock({key:'if_yes',label:'If They Say Yes'}, 'plan');
-  html += '<div class="row">' + renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan') + renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan') + '</div>';
+  html += renderBlock({key:'opening_script',label:'Opening Script'}, 'plan');
+  html += renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan');
+  html += renderBlock({key:'meeting_email',label:'Meeting Email'}, 'plan');
+  html += renderBlock({key:'raise_case',label:'Raise Case Brief'}, 'plan');
 
   // FULL CHECKLIST
   html += '<div class="section-title">YOUR CHECKLIST</div>';
@@ -3709,7 +3711,11 @@ function _generatePDFWithJsPDF() {
   if (y + 26 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
   doc.setFillColor(npColors[0], npColors[1], npColors[2]);
   doc.setDrawColor(npBorder[0], npBorder[1], npBorder[2]);
-  doc.roundedRect(mx, y, W - mx * 2, 26, 2, 2, 'FD');
+  // Calculate dynamic height for target + risk text
+  var targetLines = doc.splitTextToSize('Your target: ' + nLabel.target, W - mx * 2 - 10);
+  var riskLines = doc.splitTextToSize('Risk: ' + nLabel.risk, W - mx * 2 - 10);
+  var boxH = 14 + (targetLines.length * 3.5) + (riskLines.length * 3.5) + 4;
+  doc.roundedRect(mx, y, W - mx * 2, boxH, 2, 2, 'FD');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(npText[0], npText[1], npText[2]);
@@ -3718,11 +3724,22 @@ function _generatePDFWithJsPDF() {
   doc.text(nLabel.label, mx + 5, y + 12);
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
-  doc.text('Your target: ' + nLabel.target.slice(0, 90), mx + 5, y + 18);
-  if (nLabel.target.length > 90) doc.text(nLabel.target.slice(90), mx + 5, y + 22.5);
-  y += 30;
+  doc.text(targetLines, mx + 5, y + 17);
+  var riskY = y + 17 + (targetLines.length * 3.5) + 1.5;
+  // Risk label in red
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(196, 68, 68);
+  doc.text('Risk:', mx + 5, riskY);
+  var riskLabelWidth = doc.getTextWidth('Risk: ');
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(npText[0], npText[1], npText[2]);
+  var riskBodyLines = doc.splitTextToSize(nLabel.risk, W - mx * 2 - 10 - riskLabelWidth);
+  doc.text(riskBodyLines[0], mx + 5 + riskLabelWidth, riskY);
+  for (var rL = 1; rL < riskBodyLines.length; rL++) {
+    doc.text(riskBodyLines[rL], mx + 5, riskY + (rL * 3.5));
+  }
+  y += boxH + 4;
 
-  y += 4;
   doc.setDrawColor(220, 225, 235);
   doc.line(mx, y, W - mx, y);
   y += 6;
@@ -3737,9 +3754,10 @@ function _generatePDFWithJsPDF() {
   y += 6;
 
   drawSectionTitle('Your plan');
-  drawRow(['opening_script', 'pushback'], ['Opening Script', 'Pushback Playbook'], 'plan');
-  drawFullWidth('if_yes', 'If They Say Yes', 'plan');
-  drawRow(['meeting_email', 'raise_case'], ['Meeting Email', 'Raise Case Brief'], 'plan');
+  drawFullWidth('opening_script', 'Opening Script', 'plan');
+  drawFullWidth('pushback', 'Pushback Playbook', 'plan');
+  drawFullWidth('meeting_email', 'Meeting Email', 'plan');
+  drawFullWidth('raise_case', 'Raise Case Brief', 'plan');
 
   // ── CHECKLIST ──
   y += 4;
@@ -4148,7 +4166,7 @@ function renderCanvasHTML() {
     html += '</div>';
     html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
     html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0 0 6px;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
-    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Risk:</strong> ' + nLabel.risk + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong style="color:#c44;">Risk:</strong> ' + nLabel.risk + '</p>';
     html += '</div>';
   } else {
     html += '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);margin-top:4px;">';
