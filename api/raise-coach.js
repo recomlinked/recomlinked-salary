@@ -767,18 +767,17 @@ Based on user's position below, generate strategy and plan. Use **bold** for key
 
 Sections:
 - leverage_risk: Leverage points vs risks. 2-3 sentences.
-- emphasize: What to lead with. 2-3 sentences.
-- avoid: What NOT to say. 2-3 sentences.
-- opening_script: Exact opening words in first person. 2-3 sentences.
-- pushback: 2 likely manager objections with responses. "**If they say:** '...'" / "**Your response:** '...'" format.
-- if_yes: What to do if manager agrees. 2-3 sentences.
+- emphasize: Exactly 5 specific points to lead with, numbered 1-5. Each point one sentence.
+- avoid: Exactly 4 specific things NOT to say or do, numbered 1-4. Each point one sentence.
+- opening_script: 4 different opening script options in first person, numbered 1-4. Each a complete opening sentence or two. Label each: "**Option 1:**", "**Option 2:**", etc.
+- pushback: 8 likely manager objections with responses. Format each: "**If they say:** '...'" / "**Your response:** '...'" — cover budget freeze, timing, performance, HR process, surprise, wait for review, need to check, and a curveball.
 - meeting_email: Short email to request meeting. Include subject line.
 - raise_case: One-paragraph summary to hand to manager.
 
-Return ALL 8 keys. Respond ONLY with valid JSON (no markdown, no backticks):
-{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","if_yes":"...","meeting_email":"...","raise_case":"..."}`;
+Return ALL 7 keys. Respond ONLY with valid JSON (no markdown, no backticks):
+{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
     userMessage = `Position:\n${answeredDims}${tailorBlock}\n\nGenerate strategy and plan.`;
-    maxTokens = 1500;
+    maxTokens = 2500;
 
   } else {
     system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
