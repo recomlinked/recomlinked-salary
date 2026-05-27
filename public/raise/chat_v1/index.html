@@ -208,7 +208,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:0.03em;
   flex-wrap:wrap;
 }
-.paywall-trust{ padding-bottom:14px; }
+.paywall-trust{ padding-bottom:0; }
 .trust-row .dot{color:rgba(255,255,255,0.35);}
 .btn-deep-dive{
   width:100%;background:transparent;color:rgba(255,255,255,0.55);
@@ -936,6 +936,11 @@ document.addEventListener('DOMContentLoaded', function() {
               discCanvasBlocks[k].teaser = true;
             }
           });
+          // Restore collapsed position state
+          var hasStrat = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].some(function(k) {
+            return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
+          });
+          if (hasStrat) discStrategyDone = true;
           var lc = document.getElementById('disc-canvas-live');
           if (lc) lc.innerHTML = renderCanvasHTML();
         }
@@ -4331,7 +4336,6 @@ function appendStandardPaywall(container) {
     '<p class="paywall-headline"><strong>Don\u2019t risk thousands. Your raise could be bigger, sooner.</strong></p>' +
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Generate my raise request package \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
-    '<p style="font-size:11px;color:rgba(255,255,255,0.55);margin:0;text-align:center;font-style:italic;">Includes practice simulation + AI coach</p>' +
   '</div>';
   container.appendChild(wrap);
 
@@ -4374,6 +4378,11 @@ function initDiscoveryMode(container) {
             discCanvasBlocks[k].teaser = true;
           }
         });
+        // Restore collapsed state if strategy was previously generated
+        var hasStrategy = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].some(function(k) {
+          return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
+        });
+        if (hasStrategy) discStrategyDone = true;
       }
     }
   } catch (e) {}
