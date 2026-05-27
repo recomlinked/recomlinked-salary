@@ -3203,6 +3203,7 @@ var discCanvasBlocks = {
   raise_case: { filled: false, insight: '' },
 };
 var discStrategyLoading = false;
+var discStrategyDone = false;
 
 function generateCanvasPDF() {
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
@@ -3318,8 +3319,8 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
-      // Collapse position blocks after all 5 answered AND strategy has loaded
-      if (section === 'position' && answeredCount >= 5 && !discStrategyLoading) {
+      // Collapse position blocks once strategy is fully done
+      if (section === 'position' && discStrategyDone) {
         h += '</div></div>';
         return h;
       }
@@ -4759,12 +4760,14 @@ async function generateDiscInsights() {
       });
       // Re-render canvas with strategy teasers
       discStrategyLoading = false;
+      discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
     } else {
       console.warn('[disc_insights] Empty strategy response, generating fallbacks');
       generateClientFallbacks();
       discStrategyLoading = false;
+      discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
     }
@@ -4772,6 +4775,7 @@ async function generateDiscInsights() {
     console.error('[disc_insights] Strategy API error:', e);
     generateClientFallbacks();
     discStrategyLoading = false;
+    discStrategyDone = true;
     var lc2 = $('disc-canvas-live');
     if (lc2) lc2.innerHTML = renderCanvasHTML();
   }
