@@ -205,11 +205,11 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 @keyframes ap{0%,100%{transform:translateX(0);}50%{transform:translateX(4px);}}
 .trust-row{
   display:flex;justify-content:center;gap:8px;margin-top:14px;
-  font-size:10px;color:rgba(255,255,255,0.32);letter-spacing:0.03em;
+  font-size:10px;color:rgba(255,255,255,0.6);letter-spacing:0.03em;
   flex-wrap:wrap;
 }
-.paywall-trust{ padding-bottom:24px; }
-.trust-row .dot{color:rgba(255,255,255,0.18);}
+.paywall-trust{ padding-bottom:14px; }
+.trust-row .dot{color:rgba(255,255,255,0.35);}
 .btn-deep-dive{
   width:100%;background:transparent;color:rgba(255,255,255,0.55);
   border:1px solid rgba(255,255,255,0.12);border-radius:10px;padding:12px;margin-top:6px;
@@ -4336,26 +4336,7 @@ function appendStandardPaywall(container) {
     '<p class="paywall-headline"><strong>Don\u2019t risk thousands. Your raise could be bigger, sooner.</strong></p>' +
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Generate my raise request package \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
-    '<div class="paywall-includes-title">Premium includes</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">' +
-      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
-        '<span style="font-size:11.5px;color:#fff;font-weight:500;">4 opening scripts</span>' +
-      '</div>' +
-      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
-        '<span style="font-size:11.5px;color:#fff;font-weight:500;">1-page raise case</span>' +
-      '</div>' +
-      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
-        '<span style="font-size:11.5px;color:#fff;font-weight:500;">8 pushback replies</span>' +
-      '</div>' +
-      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
-        '<span style="font-size:11.5px;color:#fff;font-weight:500;">Ready-to-send email</span>' +
-      '</div>' +
-    '</div>' +
-    '<p style="font-size:10.5px;color:rgba(255,255,255,0.45);margin:12px 0 0;text-align:center;font-style:italic;">Also included: practice simulation + AI coach</p>' +
+    '<p style="font-size:11px;color:rgba(255,255,255,0.55);margin:0;text-align:center;font-style:italic;">Includes practice simulation + AI coach</p>' +
   '</div>';
   container.appendChild(wrap);
 
