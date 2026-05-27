@@ -4067,31 +4067,26 @@ function renderCanvasHTML() {
     if (!text) return { preview: '', badge: '' };
     var clean = text.replace(/\*\*/g, '');
 
-    if (key === 'leverage_risk') {
-      // Full first sentence for leverage & risk
-      var match = clean.match(/^[^.!?]*[.!?]/);
-      return { preview: match ? match[0] : clean.slice(0, 100), badge: '' };
+    // First sentence — capped at ~120 chars for consistency across all blocks
+    function firstSentence(s, max) {
+      max = max || 120;
+      var match = s.match(/^[^.!?]*[.!?]/);
+      var sentence = match ? match[0] : s;
+      if (sentence.length > max) return sentence.slice(0, max) + '\u2026';
+      return sentence;
     }
-    if (key === 'emphasize' || key === 'avoid') {
-      return { preview: clean.slice(0, 45) + '...', badge: '3 key points' };
-    }
-    if (key === 'opening_script') {
-      return { preview: clean.slice(0, 50) + '...', badge: 'Full script ready' };
-    }
-    if (key === 'pushback') {
-      return { preview: clean.slice(0, 45) + '...', badge: '4 prepared responses' };
-    }
-    if (key === 'if_yes') {
-      return { preview: clean.slice(0, 50) + '...', badge: '' };
-    }
+
+    if (key === 'leverage_risk') return { preview: firstSentence(clean), badge: '' };
+    if (key === 'emphasize')     return { preview: firstSentence(clean), badge: '5 points' };
+    if (key === 'avoid')         return { preview: firstSentence(clean), badge: '4 points' };
+    if (key === 'opening_script') return { preview: firstSentence(clean), badge: '4 options' };
+    if (key === 'pushback')       return { preview: firstSentence(clean), badge: '8 prepared' };
     if (key === 'meeting_email') {
       var subMatch = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
-      return { preview: subMatch ? subMatch[0] : clean.slice(0, 40) + '...', badge: 'Ready to send' };
+      return { preview: subMatch ? (subMatch[0].length > 120 ? subMatch[0].slice(0, 120) + '\u2026' : subMatch[0]) : firstSentence(clean), badge: 'Ready to send' };
     }
-    if (key === 'raise_case') {
-      return { preview: clean.slice(0, 45) + '...', badge: 'One-page brief' };
-    }
-    return { preview: clean.slice(0, 60) + '...', badge: '' };
+    if (key === 'raise_case')    return { preview: firstSentence(clean), badge: 'One-page brief' };
+    return { preview: firstSentence(clean), badge: '' };
   }
 
   function planBlock(key, label, subtitle) {
