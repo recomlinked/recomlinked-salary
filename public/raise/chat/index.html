@@ -362,7 +362,16 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .sim-reply-pill.locked:hover{border-color:var(--divider);background:var(--card);opacity:0.6;}
 .sim-reply-pill.locked .lock-icon{flex-shrink:0;font-size:14px;color:var(--t3);opacity:0.5;display:flex;align-items:center;}
 
-/* ── Depth revelation card (branches visual) ──────────── */
+/* ── Post-paywall tailor highlight ───────────────────── */
+.plan-tailored{border-color:rgba(123,92,252,0.5)!important;box-shadow:0 0 0 2px rgba(123,92,252,0.12)!important;}
+@keyframes tailorPulse{0%{transform:scale(1);}50%{transform:scale(1.02);}100%{transform:scale(1);}}
+.plan-tailored-animate{animation:tailorPulse 0.5s ease;}
+.tailor-badge{font-size:8px;font-weight:700;color:#7B5CFC;background:rgba(123,92,252,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;white-space:nowrap;}
+
+.tailor-chip{background:var(--card);color:var(--t2);border:1.5px solid var(--divider);border-radius:20px;padding:8px 14px;font-size:12.5px;font-weight:500;cursor:pointer;font-family:var(--sans);transition:background 0.12s,color 0.12s,border-color 0.12s;line-height:1.3;white-space:nowrap;}
+.tailor-chip:hover{border-color:var(--navy);color:var(--navy);}
+.tailor-chip:active{transform:scale(0.97);}
+.tailor-chip.selected{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700;pointer-events:none;}
 .depth-card{background:linear-gradient(135deg,#fdf9ef,#faf3e0);border:1px solid #e8d9a8;border-radius:10px;padding:14px 16px;margin:4px 0;}
 .depth-card-text{font-size:13px;color:#5a4a20;line-height:1.6;}
 .depth-card-text b{color:#3d3010;font-weight:700;}
@@ -3936,7 +3945,7 @@ function renderCanvasHTML() {
     if (b && b.filled && b.teaser) {
       // Teaser mode: short preview + badge + unlock
       var t = getTeaserForBlock(key, b.insight);
-      return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
+      return '<div data-block-key="' + key + '" style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
@@ -4778,11 +4787,6 @@ async function generateDiscInsights() {
   logSession('paywall', { source: 'canvas', levers: discLevers, weaks: discWeaks, dims: discDims });
   showDiscPaywall();
 
-  // Closing nudge after paywall
-  var nudge = el('div', 'coach-msg', '');
-  nudge.innerHTML = '<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Your complete negotiation plan is ready \u2014 unlock to reveal it</div>';
-  chatArea.appendChild(nudge);
-
   // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
     var chatWrap = $('chat-wrap');
@@ -4796,12 +4800,15 @@ async function generateDiscInsights() {
     // Step 1: Jump to user's answer
     chatWrap.scrollTop = lastAnswer.offsetTop - 20;
 
-    // Step 2: After a pause, slowly scroll to bottom (through canvas + paywall)
+    // Step 2: Smooth scroll to bottom of consent question over 2 seconds
     setTimeout(function() {
       var start = chatWrap.scrollTop;
-      var target = chatWrap.scrollHeight - chatWrap.clientHeight;
+      var consent = document.getElementById('tailor-consent-chips');
+      var target = consent
+        ? consent.offsetTop + consent.offsetHeight + 16
+        : chatWrap.scrollHeight - chatWrap.clientHeight;
       var distance = target - start;
-      var duration = Math.min(4000, Math.max(2000, distance * 2));
+      var duration = 2000;
       var startTime = null;
       function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
       function step(ts) {
@@ -4815,6 +4822,305 @@ async function generateDiscInsights() {
   }, 300);
 }
 
+// ── Post-paywall tailor questions ────────────────────────
+var POST_PAYWALL_QS = [
+  {
+    id: 'role_change',
+    text: 'Has your role grown since your last raise?',
+    chips: [
+      { val: 'significantly', text: 'Yes — significantly more',     keys: ['leverage_risk'] },
+      { val: 'somewhat',      text: 'Somewhat — a few new things',  keys: ['leverage_risk'] },
+      { val: 'same',          text: 'Not really — same scope',      keys: ['emphasize'] },
+    ]
+  },
+  {
+    id: 'manager_reaction',
+    text: 'How do you think your manager will react?',
+    chips: [
+      { val: 'open',      text: 'They\'ll be open to it',               keys: ['opening_script'] },
+      { val: 'budget',    text: 'They\'ll say budgets are tight',        keys: ['pushback'] },
+      { val: 'surprised', text: 'They\'ll be surprised I\'m asking',     keys: ['opening_script','emphasize'] },
+      { val: 'hr',        text: 'They\'ll need to check with HR',        keys: ['pushback','avoid'] },
+      { val: 'cycle',     text: 'They\'ll say wait for the review cycle', keys: ['pushback','timing'] },
+      { val: 'unknown',   text: 'I genuinely don\'t know',               keys: ['avoid','leverage_risk'] },
+    ]
+  },
+  {
+    id: 'timing',
+    text: 'When are you thinking of having this conversation?',
+    chips: [
+      { val: 'this_week',    text: 'This week',          keys: ['meeting_email','opening_script'] },
+      { val: 'next_month',   text: 'In the next month',  keys: ['meeting_email'] },
+      { val: 'three_months', text: 'Within 3 months',    keys: ['meeting_email'] },
+      { val: 'not_sure',     text: 'Not sure yet',        keys: ['if_yes'] },
+    ]
+  }
+];
+
+var tailorAnswers = {};
+var tailorStep = 0;
+
+function highlightPlanCards(keys) {
+  var canvas = $('disc-canvas-live');
+  if (!canvas) return;
+  highlightPlanCardsIn(canvas, keys);
+}
+
+function highlightPlanCardsIn(container, keys) {
+  keys.forEach(function(key) {
+    var card = container.querySelector('[data-block-key="' + key + '"]');
+    if (!card) return;
+    card.classList.add('plan-tailored', 'plan-tailored-animate');
+    // Add badge after the header row, not inside it, to avoid flex overflow
+    if (!card.querySelector('.tailor-badge')) {
+      var badge = document.createElement('div');
+      badge.className = 'tailor-badge';
+      badge.style.cssText = 'margin-top:6px;display:inline-block;';
+      badge.textContent = '✓ Tailored';
+      card.insertBefore(badge, card.querySelector('p'));
+    }
+    setTimeout(function() { card.classList.remove('plan-tailored-animate'); }, 500);
+  });
+}
+
+function showTailorQuestion(chatArea, idx) {
+  if (idx >= POST_PAYWALL_QS.length) {
+    // All 3 done
+
+    // 1. Collapse the canvas above the paywall
+    var oldCanvas = $('disc-canvas-live');
+    if (oldCanvas) {
+      oldCanvas.style.transition = 'max-height 0.5s ease, opacity 0.4s ease';
+      oldCanvas.style.overflow = 'hidden';
+      oldCanvas.style.maxHeight = oldCanvas.scrollHeight + 'px';
+      requestAnimationFrame(function() {
+        oldCanvas.style.maxHeight = '0';
+        oldCanvas.style.opacity = '0';
+      });
+    }
+
+    // 2. Render fresh canvas below
+    var newCanvasWrap = el('div', 'coach-msg', '');
+    var newCanvasDiv = el('div', '', '');
+    newCanvasDiv.id = 'disc-canvas-tailored';
+    newCanvasDiv.innerHTML = renderCanvasHTML();
+    newCanvasWrap.appendChild(newCanvasDiv);
+    chatArea.appendChild(newCanvasWrap);
+
+    // 3. Re-apply highlights on new canvas + always tag opening_script
+    setTimeout(function() {
+      var newCanvas = $('disc-canvas-tailored');
+      if (newCanvas) {
+        // Always tag opening script — it's always affected by tailor answers
+        highlightPlanCardsIn(newCanvas, ['opening_script']);
+        Object.values(tailorAnswers).forEach(function(val) {
+          POST_PAYWALL_QS.forEach(function(q) {
+            q.chips.forEach(function(chip) {
+              if (chip.val === val) highlightPlanCardsIn(newCanvas, chip.keys);
+            });
+          });
+        });
+      }
+    }, 100);
+
+    // 4. Update paywall CTA
+    var btn = chatArea.querySelector('.btn-pay');
+    if (btn) btn.innerHTML = 'Your plan is tailored \u2014 unlock it now \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span>';
+
+    // 5. Done bubble
+    var doneWrap = el('div', 'coach-msg', '');
+    doneWrap.innerHTML = '<div class="bubble"><p>Your plan has been updated. <a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:700;text-decoration:none;">Unlock it to see everything \u2192</a></p></div>';
+    chatArea.appendChild(doneWrap);
+
+    setTimeout(function() {
+      var w = $('chat-wrap');
+      if (!w) return;
+      var start = w.scrollTop;
+      var target = w.scrollHeight - w.clientHeight;
+      var distance = target - start;
+      var duration = 2000;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        w.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }, 600);
+    return;
+  }
+
+  var q = POST_PAYWALL_QS[idx];
+  var qWrap = el('div', 'coach-msg', '');
+  qWrap.innerHTML = '<div class="bubble"><p>' + q.text + '</p></div>';
+  chatArea.appendChild(qWrap);
+
+  // Chips
+  var chipsWrap = el('div', 'coach-msg', '');
+  var opts = el('div', 'sim-pills-row', '');
+  opts.style.alignItems = 'flex-start';
+  q.chips.forEach(function(chip) {
+    var pill = el('button', 'sim-reply-pill', '');
+    pill.style.flexDirection = 'row';
+    pill.style.alignItems = 'center';
+    pill.style.gap = '10px';
+    var radio = el('div', 'chip-radio', '');
+    pill.appendChild(radio);
+    var textSpan = el('span', '', '');
+    textSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    textSpan.textContent = chip.text;
+    pill.appendChild(textSpan);
+    pill.onclick = function() {
+      // Dim all, highlight selected
+      opts.querySelectorAll('.sim-reply-pill').forEach(function(p) {
+        p.disabled = true;
+        p.style.opacity = '0.35';
+        p.style.pointerEvents = 'none';
+      });
+      pill.style.opacity = '1';
+      pill.classList.add('active');
+
+      // User bubble
+      var userWrap = el('div', 'user-msg', '');
+      userWrap.innerHTML = '<div class="user-bubble">' + chip.text + '</div>';
+      chatArea.appendChild(userWrap);
+
+      // Store answer
+      tailorAnswers[q.id] = chip.val;
+
+      // Highlight cards
+      highlightPlanCards(chip.keys);
+
+      // Scroll to user bubble (same as pickDiscAnswer)
+      setTimeout(function() {
+        var chatWrap = $('chat-wrap');
+        if (chatWrap && userWrap) {
+          var target = userWrap.offsetTop - 20;
+          var start = chatWrap.scrollTop;
+          var distance = target - start;
+          var duration = 1500;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            chatWrap.scrollTop = start + distance * easeOut(progress);
+            if (progress < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+      }, 200);
+
+      // Next question after pause — same timing as original (2200ms)
+      setTimeout(function() {
+        showTailorQuestion(chatArea, idx + 1);
+      }, 2200);
+    };
+    opts.appendChild(pill);
+  });
+  chipsWrap.appendChild(opts);
+  chatArea.appendChild(chipsWrap);
+
+  // Smooth scroll to question bubble — same as renderDiscQuestion (1800ms, easeInOutCubic, 300ms delay)
+  setTimeout(function() {
+    var wrap = $('chat-wrap');
+    if (wrap && qWrap) {
+      var target = qWrap.offsetTop - 10;
+      var start = wrap.scrollTop;
+      var distance = target - start;
+      var duration = 1800;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        wrap.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  }, 300);
+}
+
+function showTailorConsent(chatArea) {
+  setTimeout(function() {
+    var consentWrap = el('div', 'coach-msg', '');
+    consentWrap.innerHTML = '<div class="bubble"><p>Want me to tailor your plan further? (3 questions)</p></div>';
+    chatArea.appendChild(consentWrap);
+
+    var chipsWrap = el('div', 'coach-msg', '');
+    chipsWrap.id = 'tailor-consent-chips';
+    var consentOpts = el('div', 'sim-pills-row', '');
+    consentOpts.style.alignItems = 'flex-start';
+
+    var yesBtn = el('button', 'sim-reply-pill', '');
+    yesBtn.style.cssText = 'flex-direction:row;align-items:center;gap:10px;';
+    var yesRadio = el('div', 'chip-radio', '');
+    var yesSpan = el('span', '', '');
+    yesSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    yesSpan.textContent = 'Yes, let\'s do it';
+    yesBtn.appendChild(yesRadio); yesBtn.appendChild(yesSpan);
+
+    var skipBtn = el('button', 'sim-reply-pill', '');
+    skipBtn.style.cssText = 'flex-direction:row;align-items:center;gap:10px;';
+    var skipRadio = el('div', 'chip-radio', '');
+    var skipSpan = el('span', '', '');
+    skipSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
+    skipSpan.textContent = 'Skip';
+    skipBtn.appendChild(skipRadio); skipBtn.appendChild(skipSpan);
+
+    yesBtn.onclick = function() {
+      [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
+      yesBtn.style.opacity = '1'; yesBtn.classList.add('active');
+      var userWrap = el('div', 'user-msg', '');
+      userWrap.innerHTML = '<div class="user-bubble">Yes, let\'s do it</div>';
+      chatArea.appendChild(userWrap);
+      // Scroll to user bubble (same as pickDiscAnswer)
+      setTimeout(function() {
+        var w = $('chat-wrap');
+        if (w && userWrap) {
+          var start = w.scrollTop;
+          var distance = (userWrap.offsetTop - 20) - start;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) { if (!startTime) startTime = ts; var p = Math.min((ts-startTime)/1500,1); w.scrollTop = start + distance*easeOut(p); if(p<1) requestAnimationFrame(step); }
+          requestAnimationFrame(step);
+        }
+      }, 200);
+      tailorStep = 0; tailorAnswers = {};
+      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 2200);
+    };
+
+    skipBtn.onclick = function() {
+      [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
+      skipBtn.style.opacity = '1'; skipBtn.classList.add('active');
+      var userWrap = el('div', 'user-msg', '');
+      userWrap.innerHTML = '<div class="user-bubble">Skip</div>';
+      chatArea.appendChild(userWrap);
+      // Scroll to user bubble
+      setTimeout(function() {
+        var w = $('chat-wrap');
+        if (w && userWrap) {
+          var start = w.scrollTop;
+          var distance = (userWrap.offsetTop - 20) - start;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) { if (!startTime) startTime = ts; var p = Math.min((ts-startTime)/1500,1); w.scrollTop = start + distance*easeOut(p); if(p<1) requestAnimationFrame(step); }
+          requestAnimationFrame(step);
+        }
+      }, 200);
+    };
+
+    consentOpts.appendChild(yesBtn);
+    consentOpts.appendChild(skipBtn);
+    chipsWrap.appendChild(consentOpts);
+    chatArea.appendChild(chipsWrap);
+    // No instant scroll here — the main smooth scroll in generateDiscInsights handles it
+  }, 600);
+}
+
 function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
@@ -4822,13 +5128,12 @@ function showDiscPaywall() {
   // Standard paywall — same across all modes
   appendStandardPaywall(chatArea);
 
+  // Tailor consent — 3 questions to personalize the plan visually
+  showTailorConsent(chatArea);
+
   // Lock Practice and Coaching tabs
   lockFreeModes();
-
-  setTimeout(function() {
-    var w = $('chat-wrap');
-    if (w) w.scrollTop = w.scrollHeight;
-  }, 200);
+  // No instant scroll here — smooth scroll in generateDiscInsights handles everything
 }
 
 // ── Start simulation at the specific blocker moment ──
@@ -7445,6 +7750,55 @@ async function startCheckout() {
     };
     const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
     const checkoutObstacle = state.obstacle || SIM_STATE.blocker || { code: 'other', label: 'Other' };
+
+    // If user answered the 3 tailor questions, fire enriched strategy re-call in parallel
+    // This updates the plan with richer context before they return from Stripe
+    if (tailorAnswers && Object.keys(tailorAnswers).length > 0) {
+      var blockerCode = SIM_STATE.context && SIM_STATE.context.blocker_code || 'no_script';
+      var answers = {};
+      discOrderedQuestions.slice(0, 5).forEach(function(q) {
+        answers[q.dimTag] = SIM_STATE.context[q.id] || '';
+      });
+      var enrichedBody = {
+        mode: 'disc_insights',
+        blocker: blockerCode,
+        answers: answers,
+        dims: discDims,
+        levers: discLevers,
+        weaks: discWeaks,
+        part: 'strategy',
+        tailor: {
+          role_change:      tailorAnswers.role_change      || '',
+          manager_reaction: tailorAnswers.manager_reaction || '',
+          timing:           tailorAnswers.timing           || '',
+        },
+      };
+      // Fire and forget — don't await, Stripe redirect takes priority
+      fetch('/api/raise-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(enrichedBody),
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        if (data && data.insights && Object.keys(data.insights).length > 0) {
+          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+          Object.keys(data.insights).forEach(function(dim) {
+            if (discCanvasBlocks[dim]) {
+              discCanvasBlocks[dim].insight = data.insights[dim];
+              if (stratPlanKeys.indexOf(dim) >= 0) {
+                discCanvasBlocks[dim].filled = true;
+                discCanvasBlocks[dim].strength = 'plan';
+              }
+            }
+          });
+          try {
+            state.discovery = state.discovery || {};
+            state.discovery.canvasBlocks = discCanvasBlocks;
+            saveState();
+          } catch(e) {}
+        }
+      }).catch(function() { /* non-fatal */ });
+    }
+
     const res = await fetch(API_CHECKOUT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
