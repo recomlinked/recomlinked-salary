@@ -931,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         var s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
         if (!s.paid) {
-          ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+          ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
             }
@@ -3199,11 +3199,11 @@ var discCanvasBlocks = {
   avoid: { filled: false, insight: '' },
   opening_script: { filled: false, insight: '' },
   pushback: { filled: false, insight: '' },
-  if_yes: { filled: false, insight: '' },
   meeting_email: { filled: false, insight: '' },
   raise_case: { filled: false, insight: '' },
 };
 var discStrategyLoading = false;
+var discStrategyDone = false;
 
 function generateCanvasPDF() {
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
@@ -3237,7 +3237,7 @@ function _generatePDFPrintFallback() {
     ]},
     { section: 'YOUR PLAN', items: [
       { key: 'opening_script', label: 'Opening Script' }, { key: 'pushback', label: 'Pushback Playbook' },
-      { key: 'if_yes', label: 'If They Say Yes' }, { key: 'meeting_email', label: 'Meeting Email' }, { key: 'raise_case', label: 'Raise Case Brief' }
+      { key: 'meeting_email', label: 'Meeting Email' }, { key: 'raise_case', label: 'Raise Case Brief' }
     ]}
   ];
 
@@ -3283,7 +3283,7 @@ function _generatePDFPrintFallback() {
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
     var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
 
     if (b && b.filled) {
@@ -3319,8 +3319,23 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
+      // Collapse position blocks once strategy is fully done
+      if (section === 'position' && discStrategyDone) {
+        h += '</div></div>';
+        return h;
+      }
       h += '</div><div class="block-text">' + text + '</div></div>';
       return h;
+    } else if (section === 'position' && discStrategyLoading) {
+      // Position block answered but API still analyzing — show collapsed with pulse
+      var b2 = discCanvasBlocks[item.key];
+      var icon2 = icons[item.key] || '';
+      if (b2 && b2.filled) {
+        var cls2 = b2.strength === 'strong' ? 'strong' : b2.strength === 'weak' ? 'weak' : 'neutral';
+        var badge2 = b2.strength === 'strong' ? 'Strong' : b2.strength === 'weak' ? 'Weak' : b2.strength === 'neutral' ? 'Medium' : '';
+        return '<div class="block ' + cls2 + '"><div class="block-label">' + icon2 + item.label + (badge2 ? '<span class="block-badge">' + badge2 + '</span>' : '') + '</div></div>';
+      }
+      return '<div class="block empty"><div class="block-label">' + icon2 + item.label + '</div><div class="block-text" style="animation:cvDotPulse 1.4s ease-in-out infinite;opacity:0.5;">Analyzing...</div></div>';
     } else {
       var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
       return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">' + emptyText + '</div></div>';
@@ -3849,6 +3864,83 @@ function getNegotiationLabel(score) {
   return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
 }
 
+function togglePosBlock(el, key) {
+  var expanded = el.getAttribute('data-expanded') === '1';
+  var b = discCanvasBlocks[key];
+  if (!b || !b.filled) return;
+  var bg = b.strength === 'weak' ? '#FCEBEB' : b.strength === 'neutral' ? '#FDF5E6' : '#E8F7F0';
+  var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
+  var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
+  var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+  var icons = {
+    evidence: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+    timing: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    manager: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    company: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></svg>',
+    market: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'
+  };
+  var ic = icons[key] || '';
+  var label = key.charAt(0).toUpperCase() + key.slice(1);
+  var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  if (!expanded) {
+    el.setAttribute('data-expanded', '1');
+    el.style.padding = '14px 16px';
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
+      '<span style="color:' + tc + ';">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
+      '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;transform:rotate(180deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+      '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0;">' + text + '</p>';
+  } else {
+    el.setAttribute('data-expanded', '0');
+    el.style.padding = '10px 14px';
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;gap:5px;">' +
+      '<span style="color:' + tc + ';">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
+      '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>';
+  }
+}
+
+function togglePlanBlock(el, key) {
+  var expanded = el.getAttribute('data-expanded') === '1';
+  if (expanded) {
+    // Collapse back — restore flex row layout
+    el.setAttribute('data-expanded', '0');
+    el.style.cssText = 'background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;';
+    var lbl = el.getAttribute('data-label') || key;
+    var badge = el.getAttribute('data-badge') || '';
+    var ic = el.getAttribute('data-ic') || '';
+    el.innerHTML =
+      '<span style="color:var(--navy);flex-shrink:0;">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + lbl + '</span>' +
+      (badge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;white-space:nowrap;">' + badge + '</span>' : '') +
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
+  } else {
+    // Expand — show teaser
+    el.setAttribute('data-expanded', '1');
+    el.style.cssText = 'background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;gap:0;';
+    var lbl = el.getAttribute('data-label') || key;
+    var badge = el.getAttribute('data-badge') || '';
+    var ic = el.getAttribute('data-ic') || '';
+    var preview = el.getAttribute('data-preview') || '';
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;">' +
+      '<span style="color:var(--navy);">' + ic + '</span>' +
+      '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + lbl + '</span>' +
+      (badge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;">' + badge + '</span>' : '') +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
+      '</div>' +
+      '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + preview + '</p>' +
+      '<a href="#" onclick="event.stopPropagation();event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see your full ' + lbl.toLowerCase() + ' \u2192</a>';
+  }
+}
+
 function renderCanvasHTML() {
   // Parse **bold** markers in insight text
   function formatInsight(text) {
@@ -3880,6 +3972,16 @@ function renderCanvasHTML() {
       var tc = b.strength === 'weak' ? '#7a2020' : b.strength === 'neutral' ? '#6a4a10' : '#0a5c3a';
       var bc = b.strength === 'weak' ? '#c44' : b.strength === 'neutral' ? '#c9a84c' : '#1a9e6c';
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
+      // Collapse position blocks once strategy is done — header + tag only, tappable to expand
+      if (discStrategyDone) {
+        return '<div data-expanded="0" onclick="togglePosBlock(this,\'' + key + '\')" style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 14px;cursor:pointer;">' +
+          '<div style="display:flex;align-items:center;gap:5px;">' +
+          '<span style="color:' + tc + ';">' + ic + '</span>' +
+          '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
+          '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+          '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
+          '</div></div>';
+      }
       var hasAI = b.insight && b.insight.length > 40;
       var animStyle = hasAI ? 'animation:canvasBlockIn 0.5s ease;' : '';
       return '<div style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:14px 16px;min-height:48px;' + animStyle + '">' +
@@ -3944,17 +4046,26 @@ function renderCanvasHTML() {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
     if (b && b.filled && b.teaser) {
-      // Teaser mode: short preview + badge + unlock
+      // Collapsed mode: header + badge + lock icon only — tappable to expand teaser
       var t = getTeaserForBlock(key, b.insight);
-      return '<div data-block-key="' + key + '" style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;position:relative;overflow:hidden;cursor:pointer;transition:border-color 0.3s,box-shadow 0.3s;" onclick="var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})">' +
-        '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
-        '<span style="color:var(--navy);">' + ic + '</span>' +
-        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
-        (t.badge ? '<span style="font-size:8px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 6px;border-radius:4px;margin-left:auto;">' + t.badge + '</span>' : '') +
-        '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + t.preview + '</p>' +
-        '<div style="background:linear-gradient(transparent, #E8EFF8 70%);height:20px;margin-top:-8px;position:relative;"></div>' +
-        '<p style="font-size:10px;margin:2px 0 0;"><a href="#" onclick="event.preventDefault();var p=this.closest(\'.coach-msg\');if(p){var pw=p.parentNode.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})}" style="color:var(--gold);font-weight:600;text-decoration:none;">Unlock to see your full ' + label.toLowerCase() + ' \u2192</a></p>' +
+      var BADGES = {
+        opening_script: '4 options',
+        pushback: '8 prepared',
+        meeting_email: 'Ready to send',
+        raise_case: 'One-page brief',
+        leverage_risk: '',
+        emphasize: '5 points',
+        avoid: '4 points',
+      };
+      var collapsedBadge = BADGES[key] || t.badge || '';
+      var safePreview = (t.preview || '').replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+      var safeIc = ic.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+      return '<div data-block-key="' + key + '" data-expanded="0" data-label="' + label + '" data-badge="' + collapsedBadge + '" data-ic="' + safeIc + '" data-preview="' + safePreview + '" onclick="togglePlanBlock(this,\'' + key + '\')" style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:11px 14px;cursor:pointer;display:flex;align-items:center;gap:6px;">' +
+        '<span style="color:var(--navy);flex-shrink:0;">' + ic + '</span>' +
+        '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
+        (collapsedBadge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;white-space:nowrap;">' + collapsedBadge + '</span>' : '') +
+        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>';
     }
     if (b && b.filled && !b.teaser) {
@@ -4053,15 +4164,10 @@ function renderCanvasHTML() {
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
   html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
-  html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
   html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
-  html += '</div>';
 
   // CHECKLIST card (web preview)
   if (answeredCount >= 5) {
@@ -4233,7 +4339,7 @@ function initDiscoveryMode(container) {
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
-        ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+        ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
           if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
             discCanvasBlocks[k].teaser = true;
           }
@@ -4256,7 +4362,7 @@ function initDiscoveryMode(container) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       stratPlanKeys.forEach(function(key) {
         if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
           discCanvasBlocks[key].teaser = false;
@@ -4730,7 +4836,7 @@ async function generateDiscInsights() {
     console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
 
     if (data2 && data2.insights && Object.keys(data2.insights).length > 0) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       Object.keys(data2.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim]) {
           discCanvasBlocks[dim].insight = data2.insights[dim];
@@ -4744,12 +4850,14 @@ async function generateDiscInsights() {
       });
       // Re-render canvas with strategy teasers
       discStrategyLoading = false;
+      discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
     } else {
       console.warn('[disc_insights] Empty strategy response, generating fallbacks');
       generateClientFallbacks();
       discStrategyLoading = false;
+      discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
       if (lc2) lc2.innerHTML = renderCanvasHTML();
     }
@@ -4757,6 +4865,7 @@ async function generateDiscInsights() {
     console.error('[disc_insights] Strategy API error:', e);
     generateClientFallbacks();
     discStrategyLoading = false;
+    discStrategyDone = true;
     var lc2 = $('disc-canvas-live');
     if (lc2) lc2.innerHTML = renderCanvasHTML();
   }
@@ -7781,7 +7890,7 @@ async function startCheckout() {
         body: JSON.stringify(enrichedBody),
       }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
-          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
             if (discCanvasBlocks[dim]) {
               discCanvasBlocks[dim].insight = data.insights[dim];
