@@ -5069,7 +5069,7 @@ function showTailorConsent(chatArea) {
     var skipRadio = el('div', 'chip-radio', '');
     var skipSpan = el('span', '', '');
     skipSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
-    skipSpan.textContent = 'Skip';
+    skipSpan.textContent = 'I\'ll do it later';
     skipBtn.appendChild(skipRadio); skipBtn.appendChild(skipSpan);
 
     yesBtn.onclick = function() {
@@ -5098,7 +5098,7 @@ function showTailorConsent(chatArea) {
       [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
       skipBtn.style.opacity = '1'; skipBtn.classList.add('active');
       var userWrap = el('div', 'user-msg', '');
-      userWrap.innerHTML = '<div class="user-bubble">Skip</div>';
+      userWrap.innerHTML = '<div class="user-bubble">I\'ll do it later</div>';
       chatArea.appendChild(userWrap);
       // Scroll to user bubble
       setTimeout(function() {
