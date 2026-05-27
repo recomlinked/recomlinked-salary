@@ -757,7 +757,33 @@ async function handleDiscInsights(body, res) {
 
   let system, userMessage, maxTokens;
 
-  if (part === 'strategy') {
+  if (part === 'teasers') {
+    system = `You are a senior salary negotiation coach. Generate ONE hook sentence per section that creates urgency to read more.
+
+User preparing to ask for a raise. Blocker: "${blockerContext}".
+Leverage: ${leverList}. Weak spots: ${weakList}.
+
+For each section, write EXACTLY ONE single sentence (no more) that:
+1. Reveals a non-obvious insight personalized to their situation
+2. Makes the reader think "I need to read the rest"
+3. NEVER restates their input or states the obvious
+4. Uses **bold** for the most important phrase if it helps
+
+EXAMPLES OF GOOD HOOKS:
+- leverage_risk: "Your competing offer is your strongest asset — but lead with it and you become a flight risk, not a star."
+- emphasize: "Most people emphasize what they've done — the people who get raises emphasize what they will stop doing if they leave."
+- avoid: "The fastest way to lose a raise conversation is apologizing before you ask — it tells them you're already prepared to back down."
+- opening_script: "Your first 30 seconds set the tempo — managers decide their answer before you finish your second sentence."
+- pushback: "Every objection is really one of two things — a real constraint or a test of how serious you are. Treat them differently."
+- meeting_email: "Managers ignore compensation emails that sound like a request — they open ones that sound like a decision."
+- raise_case: "Most one-pagers fail because they argue what you deserve — yours should prove what you cost to replace."
+
+Respond ONLY with valid JSON, single sentence per key:
+{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
+    userMessage = `Position:\n${answeredDims}\n\nGenerate 7 hook sentences.`;
+    maxTokens = 600;
+
+  } else if (part === 'strategy') {
     system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
 
 User preparing to ask for a raise. Blocker: "${blockerContext}".
