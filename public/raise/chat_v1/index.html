@@ -3319,8 +3319,13 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
-      // Collapse position blocks once strategy is fully done
-      if (section === 'position' && discStrategyDone) {
+      // Lock position blocks for unpaid users (consistent with web)
+      if (section === 'position' && !isPaid) {
+        h += '</div></div>';
+        return h;
+      }
+      // Collapse position blocks once strategy is fully done (paid view)
+      if (section === 'position' && discStrategyDone && !isPaid) {
         h += '</div></div>';
         return h;
       }
@@ -3523,8 +3528,7 @@ function _generatePDFWithJsPDF() {
 
     if (filled && b.teaser) {
       // Teaser mode: short preview + badge + unlock
-      var c = getBlockColors(b.strength);
-      var clean = insight.replace(/\*\*/g, '');
+      var c = getBlockColors(b.strength);      var clean = insight.replace(/\*\*/g, '');
       var teaserText = '', teaserBadge = '';
       if (block === 'leverage_risk') {
         var m = clean.match(/^[^.!?]*[.!?]/);
@@ -3584,6 +3588,26 @@ function _generatePDFWithJsPDF() {
       return blockH + 2;
     } else if (filled) {
       var c = getBlockColors(b.strength);
+      // Lock position blocks for unpaid users — header + tag only, no body text
+      if (section === 'position' && !state.paid) {
+        var lockedH = forceH || 12;
+        doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+        doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
+        doc.roundedRect(x, y, blockW, lockedH, 2, 2, 'FD');
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+        doc.text(label.toUpperCase(), x + padX, y + 7.5);
+        if (c.badge) {
+          var bw0 = doc.getTextWidth(c.badge) + 4;
+          doc.setFillColor(c.border[0], c.border[1], c.border[2]);
+          doc.roundedRect(x + blockW - 4 - bw0 - 1, y + 3, bw0 + 2, 5, 1, 1, 'F');
+          doc.setFontSize(6);
+          doc.setTextColor(255, 255, 255);
+          doc.text(c.badge, x + blockW - 4 - bw0 / 2, y + 6.3, { align: 'center' });
+        }
+        return lockedH + 2;
+      }
       doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
       doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
       doc.setFontSize(7.5);
@@ -3634,6 +3658,9 @@ function _generatePDFWithJsPDF() {
         var lines = wrapText(teaser, colW - 10);
         var h = 12 + lines.length * 4.2 + 10 + 6;
         if (h > maxH) maxH = h;
+      } else if (b && b.filled && section === 'position' && !state.paid) {
+        // Locked position block — header + tag only
+        if (12 > maxH) maxH = 12;
       } else if (b && b.filled) {
         doc.setFontSize(7.5);
         var text = (b.insight || b.note || '').replace(/\*\*/g, '');
