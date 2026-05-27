@@ -3318,8 +3318,23 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
+      // After Q5 answered, collapse position blocks — show header only
+      if (section === 'position' && answeredCount >= 5) {
+        h += '</div></div>';
+        return h;
+      }
       h += '</div><div class="block-text">' + text + '</div></div>';
       return h;
+    } else if (section === 'position' && discStrategyLoading) {
+      // Position block answered but API still analyzing — show collapsed with pulse
+      var b2 = discCanvasBlocks[item.key];
+      var icon2 = icons[item.key] || '';
+      if (b2 && b2.filled) {
+        var cls2 = b2.strength === 'strong' ? 'strong' : b2.strength === 'weak' ? 'weak' : 'neutral';
+        var badge2 = b2.strength === 'strong' ? 'Strong' : b2.strength === 'weak' ? 'Weak' : b2.strength === 'neutral' ? 'Medium' : '';
+        return '<div class="block ' + cls2 + '"><div class="block-label">' + icon2 + item.label + (badge2 ? '<span class="block-badge">' + badge2 + '</span>' : '') + '</div></div>';
+      }
+      return '<div class="block empty"><div class="block-label">' + icon2 + item.label + '</div><div class="block-text" style="animation:cvDotPulse 1.4s ease-in-out infinite;opacity:0.5;">Analyzing...</div></div>';
     } else {
       var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
       return '<div class="block empty"><div class="block-label">' + icon + item.label + '</div><div class="block-text">' + emptyText + '</div></div>';
