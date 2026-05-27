@@ -5013,13 +5013,7 @@ function showTailorQuestion(chatArea, idx) {
         }
       }, 200);
 
-      // Then scroll to show updated canvas card
-      setTimeout(function() {
-        var canvas = $('disc-canvas-live');
-        if (canvas) canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 800);
-
-      // Next question after pause
+      // Next question after pause — same timing as original (2200ms)
       setTimeout(function() {
         showTailorQuestion(chatArea, idx + 1);
       }, 2200);
@@ -5029,10 +5023,25 @@ function showTailorQuestion(chatArea, idx) {
   chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
 
+  // Smooth scroll to question bubble — same as renderDiscQuestion (1800ms, easeInOutCubic, 300ms delay)
   setTimeout(function() {
-    var w = $('chat-wrap');
-    if (w) w.scrollTop = w.scrollHeight;
-  }, 100);
+    var wrap = $('chat-wrap');
+    if (wrap && qWrap) {
+      var target = qWrap.offsetTop - 10;
+      var start = wrap.scrollTop;
+      var distance = target - start;
+      var duration = 1800;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        wrap.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+  }, 300);
 }
 
 function showTailorConsent(chatArea) {
