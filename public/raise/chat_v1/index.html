@@ -5077,8 +5077,20 @@ function showTailorConsent(chatArea) {
       var userWrap = el('div', 'user-msg', '');
       userWrap.innerHTML = '<div class="user-bubble">Yes, let\'s do it</div>';
       chatArea.appendChild(userWrap);
+      // Scroll to user bubble (same as pickDiscAnswer)
+      setTimeout(function() {
+        var w = $('chat-wrap');
+        if (w && userWrap) {
+          var start = w.scrollTop;
+          var distance = (userWrap.offsetTop - 20) - start;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) { if (!startTime) startTime = ts; var p = Math.min((ts-startTime)/1500,1); w.scrollTop = start + distance*easeOut(p); if(p<1) requestAnimationFrame(step); }
+          requestAnimationFrame(step);
+        }
+      }, 200);
       tailorStep = 0; tailorAnswers = {};
-      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 500);
+      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 2200);
     };
 
     skipBtn.onclick = function() {
@@ -5087,17 +5099,25 @@ function showTailorConsent(chatArea) {
       var userWrap = el('div', 'user-msg', '');
       userWrap.innerHTML = '<div class="user-bubble">Skip</div>';
       chatArea.appendChild(userWrap);
+      // Scroll to user bubble
+      setTimeout(function() {
+        var w = $('chat-wrap');
+        if (w && userWrap) {
+          var start = w.scrollTop;
+          var distance = (userWrap.offsetTop - 20) - start;
+          var startTime = null;
+          function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+          function step(ts) { if (!startTime) startTime = ts; var p = Math.min((ts-startTime)/1500,1); w.scrollTop = start + distance*easeOut(p); if(p<1) requestAnimationFrame(step); }
+          requestAnimationFrame(step);
+        }
+      }, 200);
     };
 
     consentOpts.appendChild(yesBtn);
     consentOpts.appendChild(skipBtn);
     chipsWrap.appendChild(consentOpts);
     chatArea.appendChild(chipsWrap);
-
-    setTimeout(function() {
-      var w = $('chat-wrap');
-      if (w) w.scrollTop = w.scrollHeight;
-    }, 100);
+    // No instant scroll here — the main smooth scroll in generateDiscInsights handles it
   }, 600);
 }
 
@@ -5113,11 +5133,7 @@ function showDiscPaywall() {
 
   // Lock Practice and Coaching tabs
   lockFreeModes();
-
-  setTimeout(function() {
-    var w = $('chat-wrap');
-    if (w) w.scrollTop = w.scrollHeight;
-  }, 200);
+  // No instant scroll here — smooth scroll in generateDiscInsights handles everything
 }
 
 // ── Start simulation at the specific blocker moment ──
