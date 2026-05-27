@@ -3857,11 +3857,11 @@ function calculateNegotiationScore() {
 }
 
 function getNegotiationLabel(score) {
-  if (score >= 72) return { label: 'Strong negotiating position', color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.' };
-  if (score >= 55) return { label: 'Solid position \u2014 preparation needed', color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: 'Secure a specific raise with a committed timeline in writing.' };
-  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Open the conversation seriously and lock in a review date.' };
-  if (score >= 25) return { label: 'Challenging \u2014 strategy is everything', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'Build your case with your manager and establish a clear path to a raise.' };
-  return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.' };
+  if (score >= 72) return { label: 'Strong negotiating position', color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Negotiate the amount \u2014 push for the upper range and negotiate extras like title, bonus, or review date.', risk: 'Appearing overconfident or under-asking \u2014 leaving thousands on the table by accepting their first counter. Your pushback responses matter most.' };
+  if (score >= 55) return { label: 'Solid position \u2014 preparation needed', color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: 'Secure a specific raise with a committed timeline in writing.', risk: 'Getting deflected to next cycle or accepting a vague timeline without numbers. Your opening script needs to lock specifics.' };
+  if (score >= 40) return { label: 'Viable \u2014 right approach matters', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Open the conversation seriously and lock in a review date.', risk: 'Walking in unprepared and either freezing or accepting the first \u2018no\u2019 as final. Your pushback prep is the difference.' };
+  if (score >= 25) return { label: 'Challenging \u2014 strategy is everything', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'Build your case with your manager and establish a clear path to a raise.', risk: 'Asking with weak framing and getting a vague \u2018maybe later\u2019. Your case framing and emphasize section matter most.' };
+  return { label: 'Early stage \u2014 groundwork first', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'Plant the seed, increase visibility, and create conditions for 2\u20133 months from now.', risk: 'Asking now and being shut down before you\u2019ve built the ground. Your timing and avoid section matter most.' };
 }
 
 function togglePosBlock(el, key) {
@@ -3881,7 +3881,10 @@ function togglePosBlock(el, key) {
   };
   var ic = icons[key] || '';
   var label = key.charAt(0).toUpperCase() + key.slice(1);
-  var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  var fullText = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
+  // Show only first sentence as teaser (locked)
+  var firstSentence = fullText.split(/(?<=[.!?])\s+/)[0] || '';
+  var teaser = firstSentence.length > 100 ? firstSentence.slice(0, 100) + '\u2026' : firstSentence;
   if (!expanded) {
     el.setAttribute('data-expanded', '1');
     el.style.padding = '14px 16px';
@@ -3890,9 +3893,11 @@ function togglePosBlock(el, key) {
       '<span style="color:' + tc + ';">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
       '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;transform:rotate(180deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
-      '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0;">' + text + '</p>';
+      '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0 0 8px;">' + teaser + '</p>' +
+      '<a href="#" onclick="event.stopPropagation();event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis \u2192</a>';
   } else {
     el.setAttribute('data-expanded', '0');
     el.style.padding = '10px 14px';
@@ -3901,6 +3906,7 @@ function togglePosBlock(el, key) {
       '<span style="color:' + tc + ';">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
       '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>';
   }
@@ -3979,6 +3985,7 @@ function renderCanvasHTML() {
           '<span style="color:' + tc + ';">' + ic + '</span>' +
           '<span style="font-size:10px;font-weight:700;color:' + tc + ';text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
           '<span style="font-size:9px;color:' + bc + ';font-weight:600;background:' + bc + '18;padding:2px 6px;border-radius:4px;">' + bt + '</span>' +
+          '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
           '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
           '</div></div>';
       }
@@ -4140,7 +4147,8 @@ function renderCanvasHTML() {
     html += '<span style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
     html += '</div>';
     html += '<p style="font-size:12px;font-weight:700;color:' + nLabel.color + ';margin:0 0 4px;">' + nLabel.label + '</p>';
-    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0 0 6px;opacity:0.85;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    html += '<p style="font-size:11px;color:' + nLabel.color + ';line-height:1.5;margin:0;opacity:0.85;"><strong>Risk:</strong> ' + nLabel.risk + '</p>';
     html += '</div>';
   } else {
     html += '<div style="border-radius:8px;padding:14px 16px;min-height:48px;border:1.5px dashed var(--divider);background:var(--muted);margin-top:4px;">';
@@ -4280,28 +4288,29 @@ function appendStandardPaywall(container) {
   var PRICE_USD = 19;
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
-    '<p class="paywall-headline"><strong>Don’t risk thousands without a plan. Your raise could be bigger, sooner.</strong></p>' +
-    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Ask with a plan \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<p class="paywall-headline"><strong>Don\u2019t risk thousands. Your raise could be bigger, sooner.</strong></p>' +
+    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Generate my raise request package \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
-    '<div class="paywall-closing">Don\u2019t risk thousands without a plan. Your raise could be bigger, sooner.</div>' +
-    '<div class="paywall-includes-title">Premium access includes</div>' +
-    '<div style="display:flex;gap:8px;margin-top:8px;">' +
-      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>' +
-        '<div style="font-size:11px;font-weight:600;color:#fff;">Full plan file</div>' +
-        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Download as PDF</div>' +
+    '<div class="paywall-includes-title">Premium includes</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">' +
+      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span style="font-size:11.5px;color:#fff;font-weight:500;">4 opening scripts</span>' +
       '</div>' +
-      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>' +
-        '<div style="font-size:11px;font-weight:600;color:#fff;">Simulation</div>' +
-        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Practice every scenario</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span style="font-size:11.5px;color:#fff;font-weight:500;">1-page raise case</span>' +
       '</div>' +
-      '<div style="flex:1;text-align:center;padding:10px 6px;background:rgba(255,255,255,0.05);border-radius:8px;">' +
-        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:4px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>' +
-        '<div style="font-size:11px;font-weight:600;color:#fff;">AI coach</div>' +
-        '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin-top:2px;">Guidance on every move</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span style="font-size:11.5px;color:#fff;font-weight:500;">8 pushback replies</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:6px;padding:9px 10px;background:rgba(255,255,255,0.06);border-radius:6px;">' +
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span style="font-size:11.5px;color:#fff;font-weight:500;">Ready-to-send email</span>' +
       '</div>' +
     '</div>' +
+    '<p style="font-size:10.5px;color:rgba(255,255,255,0.45);margin:12px 0 0;text-align:center;font-style:italic;">Also included: practice simulation + AI coach</p>' +
   '</div>';
   container.appendChild(wrap);
 
