@@ -208,6 +208,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   font-size:10px;color:rgba(255,255,255,0.32);letter-spacing:0.03em;
   flex-wrap:wrap;
 }
+.paywall-trust{ padding-bottom:24px; }
 .trust-row .dot{color:rgba(255,255,255,0.18);}
 .btn-deep-dive{
   width:100%;background:transparent;color:rgba(255,255,255,0.55);
@@ -224,12 +225,12 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .paywall-refund{
   color:var(--teal);font-weight:700;
 }
-.paywall-headline{margin-bottom:14px !important;}
+.paywall-headline{margin-bottom:14px !important; margin-top:8px !important; padding:8px 0;}
 .paywall-headline strong{
   font-size:17px;font-weight:800;color:#fff;
   letter-spacing:-0.02em;line-height:1.3;
 }
-.paywall-includes-title{
+.paywall-closing{ display:none; }.paywall-includes-title{
   font-size:10px;font-weight:700;text-transform:uppercase;
   letter-spacing:0.08em;color:rgba(255,255,255,0.5);
   margin:18px 0 8px;
@@ -930,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
       try {
         var s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
         if (!s.paid) {
-          ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+          ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
             }
@@ -3198,7 +3199,6 @@ var discCanvasBlocks = {
   avoid: { filled: false, insight: '' },
   opening_script: { filled: false, insight: '' },
   pushback: { filled: false, insight: '' },
-  if_yes: { filled: false, insight: '' },
   meeting_email: { filled: false, insight: '' },
   raise_case: { filled: false, insight: '' },
 };
@@ -3236,7 +3236,7 @@ function _generatePDFPrintFallback() {
     ]},
     { section: 'YOUR PLAN', items: [
       { key: 'opening_script', label: 'Opening Script' }, { key: 'pushback', label: 'Pushback Playbook' },
-      { key: 'if_yes', label: 'If They Say Yes' }, { key: 'meeting_email', label: 'Meeting Email' }, { key: 'raise_case', label: 'Raise Case Brief' }
+      { key: 'meeting_email', label: 'Meeting Email' }, { key: 'raise_case', label: 'Raise Case Brief' }
     ]}
   ];
 
@@ -3282,7 +3282,7 @@ function _generatePDFPrintFallback() {
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
     var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
 
     if (b && b.filled) {
@@ -4052,15 +4052,10 @@ function renderCanvasHTML() {
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
   html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
-  html += '</div>';
-  html += planBlock('if_yes', 'If they say yes', 'Will fill after answering your 5 questions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
   html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
   html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
-  html += '</div>';
 
   // CHECKLIST card (web preview)
   if (answeredCount >= 5) {
@@ -4173,7 +4168,7 @@ function appendStandardPaywall(container) {
   var PRICE_USD = 19;
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
-    '<p class="paywall-headline"><strong>No one can say no when you walk in with a complete plan.</strong></p>' +
+    '<p class="paywall-headline"><strong>Don’t risk thousands without a plan. Your raise could be bigger, sooner.</strong></p>' +
     '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Ask with a plan \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '<div class="paywall-closing">Don\u2019t risk thousands without a plan. Your raise could be bigger, sooner.</div>' +
@@ -4232,7 +4227,7 @@ function initDiscoveryMode(container) {
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
-        ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'].forEach(function(k) {
+        ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
           if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
             discCanvasBlocks[k].teaser = true;
           }
@@ -4255,7 +4250,7 @@ function initDiscoveryMode(container) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       stratPlanKeys.forEach(function(key) {
         if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
           discCanvasBlocks[key].teaser = false;
@@ -4265,10 +4260,10 @@ function initDiscoveryMode(container) {
 
     // Instant restore — no typing
     var intro = el('div', 'coach-msg', '');
-    var _introMsg = 'Most women have more leverage in salary negotiations than they realize. Let’s find yours in just 5 questions.';
+    var _introMsg = 'Most people have more leverage in salary negotiations than they realize. Let’s find yours in just 5 questions.';
     var _pr = state.sim_reason || (state.profile && state.profile.reason) || '';
     var _rl = { no_script:'I don’t know how to start the conversation', underpaid:'I think I’m underpaid but I can’t prove it', quiet_performer:'I’m a strong performer but I don’t speak up', unknown_number:'I don’t know what number to ask for', fear_no:'What if they say no?', no_advocate:'My manager doesn’t advocate for me', already_asked:'I already asked and got nothing', unknown_timing:'I’m not sure if now is the right time' };
-    if (_pr && _rl[_pr]) { _introMsg = 'You said “' + _rl[_pr] + '”. Most women have more leverage than they realize. Let’s find yours in just 5 questions.'; }
+    if (_pr && _rl[_pr]) { _introMsg = 'You said “' + _rl[_pr] + '”. Most people have more leverage than they realize. Let’s find yours in just 5 questions.'; }
     intro.innerHTML = '<div class="bubble"><p>' + _introMsg + '</p></div>';
     chatArea.appendChild(intro);
     insertDiscRadar();
@@ -4290,7 +4285,7 @@ function initDiscoveryMode(container) {
   introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
   chatArea.appendChild(introWrap);
 
-  var introText = 'Most women have more leverage in salary negotiations than they realize. Let\u2019s find yours in just 5 questions.';
+  var introText = 'Most people have more leverage in salary negotiations than they realize. Let\u2019s find yours in just 5 questions.';
 
   // Personalize opening if user came from a specific blocker chip
   var REASON_LABELS = {
@@ -4305,7 +4300,7 @@ function initDiscoveryMode(container) {
   };
   var profileReason = state.sim_reason || (state.profile && state.profile.reason) || '';
   if (profileReason && REASON_LABELS[profileReason]) {
-    introText = 'You said \u201c' + REASON_LABELS[profileReason] + '\u201d. Most women have more leverage than they realize. Let\u2019s find yours in just 5 questions.';
+    introText = 'You said \u201c' + REASON_LABELS[profileReason] + '\u201d. Most people have more leverage than they realize. Let\u2019s find yours in just 5 questions.';
   }
   var textEl = introWrap.querySelector('.typed-text');
   var cursorEl = introWrap.querySelector('.cursor');
@@ -4729,7 +4724,7 @@ async function generateDiscInsights() {
     console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
 
     if (data2 && data2.insights && Object.keys(data2.insights).length > 0) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       Object.keys(data2.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim]) {
           discCanvasBlocks[dim].insight = data2.insights[dim];
@@ -5013,10 +5008,10 @@ function showTailorQuestion(chatArea, idx) {
         }
       }, 200);
 
-      // Next question after pause — same timing as original (2200ms)
+      // Next question after pause — faster than original 5 questions
       setTimeout(function() {
         showTailorQuestion(chatArea, idx + 1);
-      }, 2200);
+      }, 800);
     };
     opts.appendChild(pill);
   });
@@ -5068,7 +5063,7 @@ function showTailorConsent(chatArea) {
     var skipRadio = el('div', 'chip-radio', '');
     var skipSpan = el('span', '', '');
     skipSpan.style.cssText = 'font-size:12.5px;line-height:1.5;color:var(--t2);flex:1;';
-    skipSpan.textContent = 'Skip';
+    skipSpan.textContent = 'I\'ll do it later';
     skipBtn.appendChild(skipRadio); skipBtn.appendChild(skipSpan);
 
     yesBtn.onclick = function() {
@@ -5090,14 +5085,14 @@ function showTailorConsent(chatArea) {
         }
       }, 200);
       tailorStep = 0; tailorAnswers = {};
-      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 2200);
+      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 800);
     };
 
     skipBtn.onclick = function() {
       [yesBtn, skipBtn].forEach(function(b) { b.disabled = true; b.style.opacity = '0.35'; b.style.pointerEvents = 'none'; });
       skipBtn.style.opacity = '1'; skipBtn.classList.add('active');
       var userWrap = el('div', 'user-msg', '');
-      userWrap.innerHTML = '<div class="user-bubble">Skip</div>';
+      userWrap.innerHTML = '<div class="user-bubble">I\'ll do it later</div>';
       chatArea.appendChild(userWrap);
       // Scroll to user bubble
       setTimeout(function() {
@@ -7780,7 +7775,7 @@ async function startCheckout() {
         body: JSON.stringify(enrichedBody),
       }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
-          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','if_yes','meeting_email','raise_case'];
+          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
             if (discCanvasBlocks[dim]) {
               discCanvasBlocks[dim].insight = data.insights[dim];
@@ -7965,7 +7960,7 @@ async function renderPaywallBubble(opts) {
   const displayPrice = PRICE_USD;
   const ctaPrice = `$${PRICE_USD}`;
 
-  const headline = `No one can say no when you walk in with a complete plan.`;
+  const headline = `Don’t risk thousands without a plan. Your raise could be bigger, sooner.`;
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
@@ -8285,7 +8280,7 @@ async function handleCoachingChat(userText) {
     const ctaPrice = `$${PRICE_USD}`;
     limitWrap.innerHTML = `
       <div class="bubble paywall-bubble">
-        <p class="paywall-headline"><strong>No one can say no when you walk in with a complete plan.</strong></p>
+        <p class="paywall-headline"><strong>Don’t risk thousands without a plan. Your raise could be bigger, sooner.</strong></p>
         <div class="paywall-pitch"></div>
         <button class="btn-pay paywall-cta" onclick="startCheckout()">
           Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
