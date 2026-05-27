@@ -764,7 +764,18 @@ User preparing to ask for a raise. Blocker: "${blockerContext}".
 Leverage: ${leverList}. Weak spots: ${weakList}.
 
 CRITICAL — FIRST SENTENCE RULE:
-The first sentence of every block must be a HOOK — a counterintuitive insight, a hidden risk, or a surprising tactical move that makes the reader think "I need to read this." NEVER restate what the user told you. NEVER say something obvious like "Your strong leverage is X." Instead reveal the non-obvious dynamic underneath their situation (e.g. "Your competing offer is your single most powerful asset — but lead with it and you lose the room.").
+The first sentence of every block must be a HOOK — a counterintuitive insight, a hidden risk, or a surprising tactical move that makes the reader think "I need to read this." NEVER restate what the user told you. NEVER say something obvious like "Your strong leverage is X." Instead reveal the non-obvious dynamic underneath their situation.
+
+EXAMPLES OF GOOD FIRST SENTENCES (study these patterns):
+- leverage_risk: "Your competing offer is your single most powerful asset — but lead with it and you lose the room."
+- emphasize (#1): "Lead with the cost of replacing you, not the value of keeping you — managers approve risk mitigation faster than rewards."
+- avoid (#1): "Don't apologize before you ask — 'I know this is a tough time, but...' tells them you're already prepared to back down."
+- opening_script Option 1: "I want to talk about my compensation — I've been doing more than my title reflects, and I think it's time to align both."
+- pushback "Budget is tight": "Your response: 'I understand. Can we talk about the timeline instead? I want to know what would unlock this and when.'"
+- meeting_email subject: "Subject: 30 minutes to discuss next steps — open early next week?"
+- raise_case: "Over the past 18 months I've taken on [scope] and delivered [outcome], which puts my contribution at [level] — meanwhile my comp is still at [band]."
+
+NOTICE: each opens with a tactical move, a specific phrase, or a reframe. None of them restate the user's input or state the obvious.
 
 QUALITY BAR:
 - Every sentence must contain new information they didn't already know.
@@ -795,7 +806,17 @@ User preparing to ask for a raise. Blocker: "${blockerContext}".
 Leverage: ${leverList}. Weak spots: ${weakList}.
 
 CRITICAL — FIRST SENTENCE RULE:
-The first sentence of every insight must be a HOOK that reveals a non-obvious dynamic — what most people miss about this dimension in their situation. NEVER restate what the user told you ("You have a competing offer" is forbidden). NEVER state the obvious ("Recruiters reaching out is a strong signal" is forbidden). Instead reveal the trap, the hidden lever, or the counterintuitive move (e.g. "Your competing offer cuts both ways — used wrong it labels you a flight risk, used right it forces a retention decision.").
+The first sentence of every insight must be a HOOK that reveals a non-obvious dynamic — what most people miss about this dimension in their situation. NEVER restate what the user told you ("You have a competing offer" is forbidden). NEVER state the obvious ("Recruiters reaching out is a strong signal" is forbidden). Instead reveal the trap, the hidden lever, or the counterintuitive move.
+
+EXAMPLES OF GOOD FIRST SENTENCES (study these patterns):
+- Evidence (weak): "No documented wins means you're asking for trust instead of payment for proven value — a losing position in any environment."
+- Evidence (strong): "Your competing offer cuts both ways — lead with it and you label yourself a flight risk; bury it and you waste your only leverage."
+- Timing (strong): "1-2 years in is the single best window — long enough to show competence, short enough that they fear losing you before recouping hiring costs."
+- Manager (neutral): "A neutral manager won't fight for you, but they also won't block you — they'll defer upward, which means your real audience is their boss."
+- Company (weak): "Cost-cutting environments kill raises that feel like overhead and approve raises that feel like risk mitigation."
+- Market (strong): "Recruiters reaching out is third-party validation that's more credible than any salary survey — but only if you can quote a specific range."
+
+NOTICE: each first sentence names the dynamic, the trap, or the reframe. Each gives them something they couldn't say themselves.
 
 QUALITY BAR:
 - Each insight 2-3 sentences. Use **bold** for the single key tactic only.
