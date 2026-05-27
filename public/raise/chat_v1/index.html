@@ -4800,12 +4800,12 @@ async function generateDiscInsights() {
     // Step 1: Jump to user's answer
     chatWrap.scrollTop = lastAnswer.offsetTop - 20;
 
-    // Step 2: After a pause, slowly scroll to bottom (through canvas + paywall)
+    // Step 2: Smooth scroll to bottom over exactly 2 seconds
     setTimeout(function() {
       var start = chatWrap.scrollTop;
       var target = chatWrap.scrollHeight - chatWrap.clientHeight;
       var distance = target - start;
-      var duration = Math.min(4000, Math.max(2000, distance * 2));
+      var duration = 2000;
       var startTime = null;
       function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
       function step(ts) {
@@ -4928,7 +4928,20 @@ function showTailorQuestion(chatArea, idx) {
 
     setTimeout(function() {
       var w = $('chat-wrap');
-      if (w) w.scrollTop = w.scrollHeight;
+      if (!w) return;
+      var start = w.scrollTop;
+      var target = w.scrollHeight - w.clientHeight;
+      var distance = target - start;
+      var duration = 2000;
+      var startTime = null;
+      function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function step(ts) {
+        if (!startTime) startTime = ts;
+        var progress = Math.min((ts - startTime) / duration, 1);
+        w.scrollTop = start + distance * easeInOutCubic(progress);
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     }, 600);
     return;
   }
@@ -5023,7 +5036,7 @@ function showTailorConsent(chatArea) {
     chatArea.appendChild(consentWrap);
 
     var chipsWrap = el('div', 'coach-msg', '');
-    var consentOpts = el('div', 'sim-pills-row', '');
+    chipsWrap.id = 'tailor-consent-chips';
     consentOpts.style.alignItems = 'flex-start';
 
     var yesBtn = el('button', 'sim-reply-pill', '');
