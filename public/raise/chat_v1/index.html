@@ -4836,7 +4836,7 @@ async function generateDiscInsights() {
   var strategyFetch = fetch('/api/raise-coach', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(Object.assign({}, apiBody, { part: 'strategy' })),
+    body: JSON.stringify(Object.assign({}, apiBody, { part: 'teasers' })),
   });
 
   // Handle position (usually returns first — faster, smaller)
@@ -7885,9 +7885,9 @@ async function startCheckout() {
     const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
     const checkoutObstacle = state.obstacle || SIM_STATE.blocker || { code: 'other', label: 'Other' };
 
-    // If user answered the 3 tailor questions, fire enriched strategy re-call in parallel
-    // This updates the plan with richer context before they return from Stripe
-    if (tailorAnswers && Object.keys(tailorAnswers).length > 0) {
+    // Always fire full strategy generation on checkout — replaces the lighter teasers
+    // with full content so when user returns from Stripe, they see the real plan
+    {
       var blockerCode = SIM_STATE.context && SIM_STATE.context.blocker_code || 'no_script';
       var answers = {};
       discOrderedQuestions.slice(0, 5).forEach(function(q) {
@@ -7902,9 +7902,9 @@ async function startCheckout() {
         weaks: discWeaks,
         part: 'strategy',
         tailor: {
-          role_change:      tailorAnswers.role_change      || '',
-          manager_reaction: tailorAnswers.manager_reaction || '',
-          timing:           tailorAnswers.timing           || '',
+          role_change:      tailorAnswers && tailorAnswers.role_change      || '',
+          manager_reaction: tailorAnswers && tailorAnswers.manager_reaction || '',
+          timing:           tailorAnswers && tailorAnswers.timing           || '',
         },
       };
       // Fire and forget — don't await, Stripe redirect takes priority
