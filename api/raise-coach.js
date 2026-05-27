@@ -763,16 +763,25 @@ async function handleDiscInsights(body, res) {
 User preparing to ask for a raise. Blocker: "${blockerContext}".
 Leverage: ${leverList}. Weak spots: ${weakList}.
 
-Based on user's position below, generate strategy and plan. Use **bold** for key tactics.
+CRITICAL — FIRST SENTENCE RULE:
+The first sentence of every block must be a HOOK — a counterintuitive insight, a hidden risk, or a surprising tactical move that makes the reader think "I need to read this." NEVER restate what the user told you. NEVER say something obvious like "Your strong leverage is X." Instead reveal the non-obvious dynamic underneath their situation (e.g. "Your competing offer is your single most powerful asset — but lead with it and you lose the room.").
+
+QUALITY BAR:
+- Every sentence must contain new information they didn't already know.
+- Avoid generic advice that applies to anyone. Every paragraph must reference their specific position.
+- Use **bold** sparingly — only for the single most important tactic per block.
+- Tone: a smart coach who's seen 1,000 of these conversations, not a textbook.
+
+Based on user's position below, generate strategy and plan.
 
 Sections:
-- leverage_risk: Leverage points vs risks. 2-3 sentences.
-- emphasize: Exactly 5 specific points to lead with, numbered 1-5. Each point one sentence.
-- avoid: Exactly 4 specific things NOT to say or do, numbered 1-4. Each point one sentence.
-- opening_script: 4 different opening script options in first person, numbered 1-4. Each a complete opening sentence or two. Label each: "**Option 1:**", "**Option 2:**", etc.
+- leverage_risk: Open with the non-obvious dynamic underneath their leverage. Then 2-3 sentences on how to deploy it without overplaying it.
+- emphasize: Exactly 5 specific points to lead with, numbered 1-5. Each ONE sentence with a concrete tactic — not abstract advice.
+- avoid: Exactly 4 specific things NOT to say or do, numbered 1-4. Each ONE sentence with the actual phrase or move to avoid AND why.
+- opening_script: 4 different opening script options in first person, numbered 1-4. Each opens with different psychological framing (collaborative, data-driven, future-focused, direct). Label "**Option 1:**", "**Option 2:**", etc.
 - pushback: 8 likely manager objections with responses. Format each: "**If they say:** '...'" / "**Your response:** '...'" — cover budget freeze, timing, performance, HR process, surprise, wait for review, need to check, and a curveball.
-- meeting_email: Short email to request meeting. Include subject line.
-- raise_case: One-paragraph summary to hand to manager.
+- meeting_email: Short email to request meeting. Include subject line. Lead with a hook line that earns the reply.
+- raise_case: One-paragraph summary to hand to manager. Open with the strongest single fact, not "I'd like to discuss compensation."
 
 Return ALL 7 keys. Respond ONLY with valid JSON (no markdown, no backticks):
 {"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
@@ -785,9 +794,14 @@ Return ALL 7 keys. Respond ONLY with valid JSON (no markdown, no backticks):
 User preparing to ask for a raise. Blocker: "${blockerContext}".
 Leverage: ${leverList}. Weak spots: ${weakList}.
 
-For each dimension, write 2-3 sentence insight. Use **bold** for the key tactic.
-WEAK (score < 40): add "**If they say:** '...'" and "**Your response:** '...'" lines.
-STRONG (score >= 60): tell HOW to use this leverage — specific tactic.
+CRITICAL — FIRST SENTENCE RULE:
+The first sentence of every insight must be a HOOK that reveals a non-obvious dynamic — what most people miss about this dimension in their situation. NEVER restate what the user told you ("You have a competing offer" is forbidden). NEVER state the obvious ("Recruiters reaching out is a strong signal" is forbidden). Instead reveal the trap, the hidden lever, or the counterintuitive move (e.g. "Your competing offer cuts both ways — used wrong it labels you a flight risk, used right it forces a retention decision.").
+
+QUALITY BAR:
+- Each insight 2-3 sentences. Use **bold** for the single key tactic only.
+- Every sentence must give them something they couldn't have said themselves.
+- WEAK dimensions (score < 40): add a "**If they say:** '...'" / "**Your response:** '...'" example because this is where they'll get pushback.
+- STRONG dimensions (score >= 60): tell HOW to deploy this leverage — the specific phrase, the specific moment.
 
 Return ALL dimensions. Respond ONLY with valid JSON (no markdown, no backticks):
 {"evidence":"...","timing":"...","manager":"...","company":"...","market":"..."}`;
