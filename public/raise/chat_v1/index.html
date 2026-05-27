@@ -4823,22 +4823,23 @@ async function generateDiscInsights() {
 var POST_PAYWALL_QS = [
   {
     id: 'role_change',
-    text: 'Has your role grown since you joined — or since your last raise?',
+    text: 'Has your role grown since your last raise?',
     chips: [
-      { val: 'significantly', text: 'Yes — significantly more', keys: ['leverage_risk'] },
-      { val: 'somewhat',      text: 'Somewhat — a few new things', keys: ['leverage_risk'] },
-      { val: 'same',          text: 'Not really — same scope', keys: ['emphasize'] },
-      { val: 'grown_in',      text: 'I\'ve grown into the role', keys: ['leverage_risk'] },
+      { val: 'significantly', text: 'Yes — significantly more',     keys: ['leverage_risk'] },
+      { val: 'somewhat',      text: 'Somewhat — a few new things',  keys: ['leverage_risk'] },
+      { val: 'same',          text: 'Not really — same scope',      keys: ['emphasize'] },
     ]
   },
   {
     id: 'manager_reaction',
-    text: 'When you picture your manager\'s reaction — what do you see?',
+    text: 'How do you think your manager will react?',
     chips: [
-      { val: 'open',      text: 'They\'ll be open to it',          keys: ['opening_script'] },
-      { val: 'budget',    text: 'They\'ll say budgets are tight',   keys: ['pushback'] },
-      { val: 'surprised', text: 'They\'ll be surprised I\'m asking', keys: ['opening_script','emphasize'] },
-      { val: 'unknown',   text: 'I genuinely don\'t know',          keys: ['avoid','leverage_risk'] },
+      { val: 'open',      text: 'They\'ll be open to it',               keys: ['opening_script'] },
+      { val: 'budget',    text: 'They\'ll say budgets are tight',        keys: ['pushback'] },
+      { val: 'surprised', text: 'They\'ll be surprised I\'m asking',     keys: ['opening_script','emphasize'] },
+      { val: 'hr',        text: 'They\'ll need to check with HR',        keys: ['pushback','avoid'] },
+      { val: 'cycle',     text: 'They\'ll say wait for the review cycle', keys: ['pushback','timing'] },
+      { val: 'unknown',   text: 'I genuinely don\'t know',               keys: ['avoid','leverage_risk'] },
     ]
   },
   {
@@ -4859,11 +4860,14 @@ var tailorStep = 0;
 function highlightPlanCards(keys) {
   var canvas = $('disc-canvas-live');
   if (!canvas) return;
+  highlightPlanCardsIn(canvas, keys);
+}
+
+function highlightPlanCardsIn(container, keys) {
   keys.forEach(function(key) {
-    var card = canvas.querySelector('[data-block-key="' + key + '"]');
+    var card = container.querySelector('[data-block-key="' + key + '"]');
     if (!card) return;
     card.classList.add('plan-tailored', 'plan-tailored-animate');
-    // Add tailored badge if not already there
     var header = card.querySelector('div');
     if (header && !header.querySelector('.tailor-badge')) {
       var badge = document.createElement('span');
@@ -4877,19 +4881,55 @@ function highlightPlanCards(keys) {
 
 function showTailorQuestion(chatArea, idx) {
   if (idx >= POST_PAYWALL_QS.length) {
-    // All 3 done — update paywall CTA
-    var btn = chatArea.querySelector('.btn-pay');
-    if (btn) {
-      btn.textContent = '';
-      btn.innerHTML = 'Your plan is tailored — unlock it now \u00b7 $' + PRICE_USD + ' \u2192';
+    // All 3 done
+
+    // 1. Collapse the canvas above the paywall
+    var oldCanvas = $('disc-canvas-live');
+    if (oldCanvas) {
+      oldCanvas.style.transition = 'max-height 0.5s ease, opacity 0.4s ease';
+      oldCanvas.style.overflow = 'hidden';
+      oldCanvas.style.maxHeight = oldCanvas.scrollHeight + 'px';
+      requestAnimationFrame(function() {
+        oldCanvas.style.maxHeight = '0';
+        oldCanvas.style.opacity = '0';
+      });
     }
+
+    // 2. Render fresh canvas below
+    var newCanvasWrap = el('div', 'coach-msg', '');
+    var newCanvasDiv = el('div', '', '');
+    newCanvasDiv.id = 'disc-canvas-tailored';
+    newCanvasDiv.innerHTML = renderCanvasHTML();
+    newCanvasWrap.appendChild(newCanvasDiv);
+    chatArea.appendChild(newCanvasWrap);
+
+    // 3. Re-apply highlights on new canvas
+    setTimeout(function() {
+      var newCanvas = $('disc-canvas-tailored');
+      if (newCanvas) {
+        Object.values(tailorAnswers).forEach(function(val) {
+          POST_PAYWALL_QS.forEach(function(q) {
+            q.chips.forEach(function(chip) {
+              if (chip.val === val) highlightPlanCardsIn(newCanvas, chip.keys);
+            });
+          });
+        });
+      }
+    }, 100);
+
+    // 4. Update paywall CTA
+    var btn = chatArea.querySelector('.btn-pay');
+    if (btn) btn.innerHTML = 'Your plan is tailored \u2014 unlock it now \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span>';
+
+    // 5. Done bubble
     var doneWrap = el('div', 'coach-msg', '');
     doneWrap.innerHTML = '<div class="bubble"><p>Your plan has been updated. <a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:700;text-decoration:none;">Unlock it to see everything \u2192</a></p></div>';
     chatArea.appendChild(doneWrap);
+
     setTimeout(function() {
       var w = $('chat-wrap');
       if (w) w.scrollTop = w.scrollHeight;
-    }, 100);
+    }, 600);
     return;
   }
 
