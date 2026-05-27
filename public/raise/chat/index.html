@@ -5013,10 +5013,10 @@ function showTailorQuestion(chatArea, idx) {
         }
       }, 200);
 
-      // Next question after pause — same timing as original (2200ms)
+      // Next question after pause — faster than original 5 questions
       setTimeout(function() {
         showTailorQuestion(chatArea, idx + 1);
-      }, 2200);
+      }, 800);
     };
     opts.appendChild(pill);
   });
@@ -5090,7 +5090,7 @@ function showTailorConsent(chatArea) {
         }
       }, 200);
       tailorStep = 0; tailorAnswers = {};
-      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 2200);
+      setTimeout(function() { showTailorQuestion(chatArea, 0); }, 800);
     };
 
     skipBtn.onclick = function() {
