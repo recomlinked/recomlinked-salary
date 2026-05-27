@@ -4800,10 +4800,13 @@ async function generateDiscInsights() {
     // Step 1: Jump to user's answer
     chatWrap.scrollTop = lastAnswer.offsetTop - 20;
 
-    // Step 2: Smooth scroll to bottom over exactly 2 seconds
+    // Step 2: Smooth scroll to bottom of consent question over 2 seconds
     setTimeout(function() {
       var start = chatWrap.scrollTop;
-      var target = chatWrap.scrollHeight - chatWrap.clientHeight;
+      var consent = document.getElementById('tailor-consent-chips');
+      var target = consent
+        ? consent.offsetTop + consent.offsetHeight + 16
+        : chatWrap.scrollHeight - chatWrap.clientHeight;
       var distance = target - start;
       var duration = 2000;
       var startTime = null;
@@ -4868,12 +4871,13 @@ function highlightPlanCardsIn(container, keys) {
     var card = container.querySelector('[data-block-key="' + key + '"]');
     if (!card) return;
     card.classList.add('plan-tailored', 'plan-tailored-animate');
-    var header = card.querySelector('div');
-    if (header && !header.querySelector('.tailor-badge')) {
-      var badge = document.createElement('span');
+    // Add badge after the header row, not inside it, to avoid flex overflow
+    if (!card.querySelector('.tailor-badge')) {
+      var badge = document.createElement('div');
       badge.className = 'tailor-badge';
+      badge.style.cssText = 'margin-top:6px;display:inline-block;';
       badge.textContent = '✓ Tailored';
-      header.appendChild(badge);
+      card.insertBefore(badge, card.querySelector('p'));
     }
     setTimeout(function() { card.classList.remove('plan-tailored-animate'); }, 500);
   });
@@ -4903,10 +4907,12 @@ function showTailorQuestion(chatArea, idx) {
     newCanvasWrap.appendChild(newCanvasDiv);
     chatArea.appendChild(newCanvasWrap);
 
-    // 3. Re-apply highlights on new canvas
+    // 3. Re-apply highlights on new canvas + always tag opening_script
     setTimeout(function() {
       var newCanvas = $('disc-canvas-tailored');
       if (newCanvas) {
+        // Always tag opening script — it's always affected by tailor answers
+        highlightPlanCardsIn(newCanvas, ['opening_script']);
         Object.values(tailorAnswers).forEach(function(val) {
           POST_PAYWALL_QS.forEach(function(q) {
             q.chips.forEach(function(chip) {
