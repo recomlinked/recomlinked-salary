@@ -87,7 +87,8 @@ button { font-family: var(--sans); cursor: pointer; }
 
 
 /* ── 4. HEADER ────────────────────────────── */
-.site-header {
+.site-header.menu-open { background: var(--card); }
+    .site-header {
   background: transparent;
   padding: 14px 24px;
   display: flex; align-items: center; justify-content: space-between;
@@ -106,7 +107,8 @@ button { font-family: var(--sans); cursor: pointer; }
   transition: background 0.15s;
 }
 .header-cta:hover { background: var(--gold-hover); text-decoration: none; }
-@media (max-width: 480px) { .site-header { padding: 12px 16px; } }
+@media (max-width: 480px) { .site-header.menu-open { background: var(--card); }
+    .site-header { padding: 12px 16px; } }
 .header-nav { display: flex; align-items: center; gap: 20px; }
 .header-nav a { font-size: 13px; font-weight: 500; color: var(--text3); text-decoration: none; white-space: nowrap; transition: color 0.15s; }
 .header-nav a:hover { color: var(--text); text-decoration: none; }
@@ -122,7 +124,7 @@ button { font-family: var(--sans); cursor: pointer; }
 .mobile-menu a:hover { color: var(--purple); text-decoration: none; }
 .mobile-menu a.active { color: var(--purple); }
 .mobile-menu .menu-arrow { color: var(--text3); font-size: 14px; }
-.mobile-menu-cta { margin-top: 24px; background: var(--gold); color: var(--gold-text); padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; text-align: center; box-shadow: var(--shadow-gold); border: none !important; }
+.mobile-menu a.mobile-menu-cta { margin-top: 24px; background: var(--gold); color: var(--gold-text); padding: 14px 20px; border-radius: 10px; font-size: 15px; font-weight: 700; text-align: center; box-shadow: var(--shadow-gold); border: none !important; display: flex; justify-content: center; align-items: center; }
 @media (max-width: 560px) { .header-nav { display: none; } .hamburger { display: flex; } }
 
 /* ── 5. HERO ──────────────────────────────── */
@@ -2165,6 +2167,7 @@ function toggleMenu() {
   btn.classList.toggle('open');
   menu.classList.toggle('open');
   document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  document.querySelector('.site-header').classList.toggle('menu-open', menu.classList.contains('open'));
 }
 document.addEventListener('click', function(e) {
   var menu = document.getElementById('mobile-menu');
@@ -2173,6 +2176,7 @@ document.addEventListener('click', function(e) {
     btn.classList.remove('open');
     menu.classList.remove('open');
     document.body.style.overflow = '';
+    document.querySelector('.site-header').classList.remove('menu-open');
   }
 });
 </script>
