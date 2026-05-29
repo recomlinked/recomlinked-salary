@@ -1881,6 +1881,7 @@ const SIM_STATE = {
   scenarios_total: 0,
   simMode: true,
   currentMode: 'discovery',
+  entryMode: null,
   unlocked: false,
 };
 
@@ -3020,7 +3021,7 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
-    setMode('discovery');
+    setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
     return;
   }
 
@@ -7085,6 +7086,9 @@ async function init() {
   const params = new URLSearchParams(location.search);
   const reason = params.get('reason');
   const forceReset = params.get('reset') === '1';
+  // start=sim → coach landing page wants simulation mode (not discovery)
+  const startMode = params.get('start');
+  if (startMode === 'sim') { SIM_STATE.entryMode = 'sim'; }
 
   if (reason) {
     // Check if paywall was already shown in a previous session
@@ -7295,7 +7299,10 @@ async function resumeFromState() {
     unlockModeToggle();
 
     // Free users go to Canvas mode; paid users resume in Practice
-    if (!state.paid) {
+    // Coach landing page (start=sim) opens simulation directly
+    if (SIM_STATE.entryMode === 'sim') {
+      setMode('sim');
+    } else if (!state.paid) {
       setMode('discovery');
     } else {
       setMode('sim');
