@@ -270,8 +270,6 @@
     .final p{font-size:14px;color:var(--t2);margin-bottom:20px;}
     
     @media(max-width:640px){
-      .hero{padding:40px 16px 28px;}
-      .hero-cta{width:100%;justify-content:center;max-width:calc(100% - 32px);margin-left:auto;margin-right:auto;}
       .di-card{flex-direction:row;gap:12px;}
       .bl-grid{grid-template-columns:1fr;}
       .demo{padding:36px 16px 40px;}
@@ -350,8 +348,7 @@
 <body>
 
 <!-- HEADER -->
-<header>
-  <div class="site-header">
+<header class="site-header">
     <a class="logo-wrap" href="/">
       <span class="logo-recom">recom</span><span class="logo-linked">linked</span>
     </a>
@@ -363,16 +360,15 @@
     <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
       <span></span><span></span><span></span>
     </button>
-  </div>
+</header>
 
-  <!-- Mobile drawer -->
-  <div class="mobile-menu" id="mobile-menu">
+<!-- Mobile drawer -->
+<div class="mobile-menu" id="mobile-menu">
     <a href="/raise/">Raise Plan <span class="menu-arrow">→</span></a>
     <a href="/raise-case/">Raise Case <span class="menu-arrow">→</span></a>
     <a href="/raise/coach/" class="active">AI Coach <span class="menu-arrow">→</span></a>
     <a class="mobile-menu-cta" href="/raise/chat/?reason=no_script">Start coaching →</a>
-  </div>
-</header>
+</div>
 
 <main class="main">
 
