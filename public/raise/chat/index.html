@@ -5349,8 +5349,8 @@ async function startSimulationAtBlocker() {
   }
   unlockModeToggle();
 
-  // Start in Discovery mode by default
-  setMode('discovery');
+  // Start in Discovery mode by default; Coach landing page (start=sim) opens Practice
+  setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
 }
 
 // ── Blocker-specific opening lines ──
