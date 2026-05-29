@@ -107,6 +107,23 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .header-cta:hover { background: var(--gold-hover); text-decoration: none; }
 @media (max-width: 480px) { .site-header { padding: 12px 16px; } }
+.header-nav { display: flex; align-items: center; gap: 20px; }
+.header-nav a { font-size: 13px; font-weight: 500; color: var(--text3); text-decoration: none; white-space: nowrap; transition: color 0.15s; }
+.header-nav a:hover { color: var(--text); text-decoration: none; }
+.header-nav a.active { color: var(--text); font-weight: 600; }
+.hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 4px; }
+.hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.2s; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; inset: 0; top: 50px; background: var(--card); z-index: 200; padding: 8px 24px 32px; border-top: 1px solid var(--border); flex-direction: column; }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-size: 17px; font-weight: 600; color: var(--text); padding: 16px 0; text-decoration: none; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.mobile-menu a:hover { color: var(--purple); text-decoration: none; }
+.mobile-menu a.active { color: var(--purple); }
+.mobile-menu .menu-arrow { color: var(--text3); font-size: 14px; }
+.mobile-menu-cta { margin-top: 24px; background: var(--gold); color: var(--gold-text); padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; text-align: center; box-shadow: var(--shadow-gold); border: none !important; }
+@media (max-width: 560px) { .header-nav { display: none; } .hamburger { display: flex; } }
 
 /* ── 5. HERO ──────────────────────────────── */
 .hero {
@@ -437,7 +454,23 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 <!-- ── Header ───────────────────────────────────────────── -->
 <header class="site-header">
   <a href="/" class="logo-wrap"><span class="logo-recom">Recom</span><span class="logo-linked">linked</span></a>
+  <nav class="header-nav">
+    <a href="/raise/" class="active">Raise Plan</a>
+    <a href="/raise-case/">Raise Case</a>
+    <a href="/raise/coach/">AI Coach</a>
+  </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </header>
+
+<!-- Mobile drawer -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/raise/" class="active">Raise Plan <span class="menu-arrow">→</span></a>
+  <a href="/raise-case/">Raise Case <span class="menu-arrow">→</span></a>
+  <a href="/raise/coach/">AI Coach <span class="menu-arrow">→</span></a>
+  <a class="mobile-menu-cta" href="/raise/chat/?reason=other">Start now →</a>
+</div>
 
 <div class="main">
 
@@ -2124,6 +2157,24 @@ setTimeout(cvNext,800);
 })();
 
 
+</script>
+<script>
+function toggleMenu() {
+  var btn = document.getElementById('hamburger');
+  var menu = document.getElementById('mobile-menu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('mobile-menu');
+  var btn = document.getElementById('hamburger');
+  if (menu && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    btn.classList.remove('open');
+    menu.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
 </script>
 </body>
 </html>
