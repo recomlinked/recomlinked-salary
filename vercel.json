@@ -20,6 +20,9 @@
     { "src": "/raise/coach",          "status": 301, "headers": { "Location": "/raise/coach/" }     },
     { "src": "/raise/coach/",         "dest": "/raise/coach/index.html"     },
 
+    { "src": "/raise-case",           "status": 301, "headers": { "Location": "/raise-case/" }      },
+    { "src": "/raise-case/",          "dest": "/raise-case/index.html"      },
+
     { "src": "/", "dest": "/index.html" }
   ],
   "functions": {
