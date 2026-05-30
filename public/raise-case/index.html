@@ -172,7 +172,12 @@
       gap: 14px;
     }
     @media (max-width: 560px) {
-      .templates-grid { grid-template-columns: 1fr; gap: 14px; max-width: 340px; margin: 0 auto; }
+      .templates-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .template-label { padding: 8px 10px 8px; }
+      .template-badge { font-size: 12px; }
+      .template-name { font-size: 10px; }
+      .template-preview { aspect-ratio: 1/1.6; }
+      .template-preview > div:first-child { transform: scale(0.27) !important; }
     }
 
     .template-card {
@@ -219,10 +224,6 @@
       border-top: 1px solid var(--border);
     }
     .template-preview > div:first-child { pointer-events: none; }
-    @media (max-width: 560px) {
-      .template-preview > div:first-child { transform: scale(0.5) !important; }
-      .template-preview { aspect-ratio: 2/3; }
-    }
 
     /* Hover overlay */
     .template-overlay {
@@ -568,7 +569,64 @@
         </div>
       </a>
 
-      <!-- Template 3: Market Rate -->
+      <!-- Template 3: Competing Offer -->
+      <a class="template-card" href="/raise/chat/?mode=case&template=offer">
+        <div class="template-preview">
+          <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
+<div style="position:absolute;right:0;top:0;bottom:0;width:5px;background:#c47a00;"></div>
+<div style="padding:14px 36px 10px 28px;border-bottom:1px solid #e8eaef;">
+  <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
+  <div style="font-size:15px;font-weight:600;color:#c47a00;">Michael Park</div>
+  <div style="font-size:10px;color:#8a90a8;">Product Manager &middot; GrowthCo &middot; 4 years</div>
+</div>
+<div style="padding:12px 36px 10px 28px;">
+  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I want to start by saying that after four years here, my preference is to stay. I have built something I am proud of, and I believe in where this company is heading. I am sharing this because I believe in being transparent, and I would rather have an honest conversation than let uncertainty build on either side. This document is not a negotiation tactic. It is my way of putting everything on the table so we can make a decision together.</p>
+
+  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The situation</div>
+  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 4px;">I have received a written offer from a Series B company for a Senior Product Manager role. I am not presenting this as an ultimatum. I am sharing it because the gap is significant enough that ignoring it would not be fair to either of us. The role is a Senior PM position with a team of 8, a $2M product budget, and equity participation.</p>
+  <div style="display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid #e8eaef;margin-bottom:8px;">
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#fdf8f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Current compensation</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$138K</div><div style="font-size:6.5px;color:#8a90a8;">Base + bonus</div></div>
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">External offer</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$165K</div><div style="font-size:6.5px;color:#8a90a8;">Base + equity</div></div>
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#f8f6f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Gap</div><div style="font-size:14px;font-weight:600;color:#6a4a10;">$27K</div><div style="font-size:6.5px;color:#8a90a8;">19.6% below offer</div></div>
+  </div>
+
+  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why I want to stay</div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I believe in the product roadmap we have built together and want to see it through the next two launches</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">The engineering and design team I have trained is producing its best work right now &#8212; leaving would disrupt that</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">Four years of customer context and cross-functional relationships are a compounding asset I cannot replicate elsewhere</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:8px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I genuinely enjoy working here &#8212; the culture, the pace, and the trust I have built with leadership</p></div>
+
+  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What would be lost</div>
+  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">If I leave, the company loses four years of product context, customer relationships I have built personally, a PM team I trained from scratch, and the institutional knowledge that keeps three product lines running smoothly. The cost of replacing and ramping a new PM at my level is estimated at 6&#8211;9 months of lost velocity. I am sharing this not as a threat, but because the retention math strongly favors closing this gap.</p>
+
+  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask &amp; timeline</div>
+  <div style="background:#fdf8f0;border:1px solid rgba(196,122,0,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:4px;">
+    <div style="font-size:7px;font-weight:600;color:#8a7540;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
+    <div style="font-size:16px;font-weight:600;color:#6a4a10;">$138,000 &#8594; $158,000</div>
+    <div style="font-size:8px;color:#8a7540;margin-top:2px;">14.5% retention-focused adjustment</div>
+  </div>
+  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#9200; Response needed: 2 weeks</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#128197; External offer expires: June 15</div>
+  </div>
+  <div style="padding:7px 10px;background:#fdf8f0;border-radius:4px;border-left:2px solid #c47a00;">
+    <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">I am not using this as leverage. I am sharing it because the gap is real, and I respect you enough to put it on the table directly. My preference is clear &#8212; I want to stay. I just need the compensation to reflect that staying is the right choice. I am open to discussing the structure of the adjustment, whether that is base salary, equity, or a combination.</p>
+  </div>
+</div>
+<div style="padding:5px 28px;border-top:1px solid #e8eaef;display:flex;justify-content:space-between;font-size:7.5px;color:#8a90a8;">
+  <span>Prepared with salary.recomlinked.com</span><span>Confidential</span>
+</div>
+</div>
+          <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
+        </div>
+        <div class="template-label">
+          <span class="template-badge">Competing Offer Case</span>
+          <p class="template-name">I have an offer from another company</p>
+        </div>
+      </a>
+
+      <!-- Template 4: Market Rate -->
       <a class="template-card" href="/raise/chat/?mode=case&template=market">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
@@ -640,63 +698,6 @@
         <div class="template-label">
           <span class="template-badge">Market Rate Gap (Underpaid)</span>
           <p class="template-name">I'm paid below market for my role</p>
-        </div>
-      </a>
-
-      <!-- Template 4: Competing Offer -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=offer">
-        <div class="template-preview">
-          <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
-<div style="position:absolute;right:0;top:0;bottom:0;width:5px;background:#c47a00;"></div>
-<div style="padding:14px 36px 10px 28px;border-bottom:1px solid #e8eaef;">
-  <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
-  <div style="font-size:15px;font-weight:600;color:#c47a00;">Michael Park</div>
-  <div style="font-size:10px;color:#8a90a8;">Product Manager &middot; GrowthCo &middot; 4 years</div>
-</div>
-<div style="padding:12px 36px 10px 28px;">
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
-  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I want to start by saying that after four years here, my preference is to stay. I have built something I am proud of, and I believe in where this company is heading. I am sharing this because I believe in being transparent, and I would rather have an honest conversation than let uncertainty build on either side. This document is not a negotiation tactic. It is my way of putting everything on the table so we can make a decision together.</p>
-
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The situation</div>
-  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 4px;">I have received a written offer from a Series B company for a Senior Product Manager role. I am not presenting this as an ultimatum. I am sharing it because the gap is significant enough that ignoring it would not be fair to either of us. The role is a Senior PM position with a team of 8, a $2M product budget, and equity participation.</p>
-  <div style="display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid #e8eaef;margin-bottom:8px;">
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#fdf8f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Current compensation</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$138K</div><div style="font-size:6.5px;color:#8a90a8;">Base + bonus</div></div>
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">External offer</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$165K</div><div style="font-size:6.5px;color:#8a90a8;">Base + equity</div></div>
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#f8f6f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Gap</div><div style="font-size:14px;font-weight:600;color:#6a4a10;">$27K</div><div style="font-size:6.5px;color:#8a90a8;">19.6% below offer</div></div>
-  </div>
-
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why I want to stay</div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I believe in the product roadmap we have built together and want to see it through the next two launches</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">The engineering and design team I have trained is producing its best work right now &#8212; leaving would disrupt that</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">Four years of customer context and cross-functional relationships are a compounding asset I cannot replicate elsewhere</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:8px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I genuinely enjoy working here &#8212; the culture, the pace, and the trust I have built with leadership</p></div>
-
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What would be lost</div>
-  <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">If I leave, the company loses four years of product context, customer relationships I have built personally, a PM team I trained from scratch, and the institutional knowledge that keeps three product lines running smoothly. The cost of replacing and ramping a new PM at my level is estimated at 6&#8211;9 months of lost velocity. I am sharing this not as a threat, but because the retention math strongly favors closing this gap.</p>
-
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask &amp; timeline</div>
-  <div style="background:#fdf8f0;border:1px solid rgba(196,122,0,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:4px;">
-    <div style="font-size:7px;font-weight:600;color:#8a7540;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
-    <div style="font-size:16px;font-weight:600;color:#6a4a10;">$138,000 &#8594; $158,000</div>
-    <div style="font-size:8px;color:#8a7540;margin-top:2px;">14.5% retention-focused adjustment</div>
-  </div>
-  <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#9200; Response needed: 2 weeks</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#128197; External offer expires: June 15</div>
-  </div>
-  <div style="padding:7px 10px;background:#fdf8f0;border-radius:4px;border-left:2px solid #c47a00;">
-    <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">I am not using this as leverage. I am sharing it because the gap is real, and I respect you enough to put it on the table directly. My preference is clear &#8212; I want to stay. I just need the compensation to reflect that staying is the right choice. I am open to discussing the structure of the adjustment, whether that is base salary, equity, or a combination.</p>
-  </div>
-</div>
-<div style="padding:5px 28px;border-top:1px solid #e8eaef;display:flex;justify-content:space-between;font-size:7.5px;color:#8a90a8;">
-  <span>Prepared with salary.recomlinked.com</span><span>Confidential</span>
-</div>
-</div>
-          <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
-        </div>
-        <div class="template-label">
-          <span class="template-badge">Competing Offer Case</span>
-          <p class="template-name">I have an offer from another company</p>
         </div>
       </a>
 
