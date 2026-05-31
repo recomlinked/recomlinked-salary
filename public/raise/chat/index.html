@@ -3053,18 +3053,18 @@ function showCasePaywall(container) {
   var t = CASE_TEMPLATES[caseState.template];
   var pw = t.paywallAfter || 2;
 
-  // Remove active input
   var active = container.querySelector('.case-input-active');
   if (active) active.remove();
 
-  // Paywall block
-  var paywall = el('div', 'case-paywall', '');
+  var paywall = el('div', 'coach-msg', '');
   paywall.id = 'case-paywall';
   paywall.innerHTML =
-    '<div class="case-paywall-title">Your first ' + pw + ' sections are ready</div>' +
-    '<div class="case-paywall-sub">Unlock the remaining ' + (t.sections.length - pw) + ' sections to complete your raise case document. Answer ' + (t.questions.length - pw) + ' more questions, review and edit every section, then download the finished PDF.</div>' +
-    '<button class="case-paywall-btn" id="case-paywall-btn">Generate my raise case \u00b7 $19 <span style="font-size:17px;margin-left:2px;">\u2192</span></button>' +
-    '<div class="case-paywall-note">One-time payment \u00b7 Instant PDF download \u00b7 Edit before you send</div>';
+    '<div class="bubble paywall-bubble">' +
+    '<p class="paywall-headline"><strong>Your first ' + pw + ' sections are ready. Complete your raise case document.</strong></p>' +
+    '<p>Unlock the remaining ' + (t.sections.length - pw) + ' sections, answer ' + (t.questions.length - pw) + ' more questions, review and edit every section, then download the finished PDF.</p>' +
+    '<button class="btn-pay" id="case-paywall-btn">Generate my raise case \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
+    '</div>';
   container.insertBefore(paywall, $('case-doc-preview'));
 
   // Handle paywall CTA
@@ -3112,7 +3112,7 @@ function showCasePaywall(container) {
     } catch(err) {
       console.error('[case_paywall] error:', err);
       btn.disabled = false;
-      btn.innerHTML = 'Generate my raise case \u00b7 $19 \u2192';
+      btn.innerHTML = 'Generate my raise case \u00b7 $19 <span class="btn-pay-arrow">\u2192</span>';
     }
   };
 
