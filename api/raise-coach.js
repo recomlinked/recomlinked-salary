@@ -309,6 +309,12 @@ module.exports = async function handler(req, res) {
   if (body.mode === 'coaching_chat') {
     return handleCoachingChat(body, res);
   }
+  if (body.mode === 'case_polish') {
+    return handleCasePolish(body, res);
+  }
+  if (body.mode === 'case_save') {
+    return handleCaseSave(body, res);
+  }
   const isFreeMode = !body.token && !!body.profile;
   if (isFreeMode) {
     return handleFreeMode(body, res);
@@ -1370,5 +1376,164 @@ COACHING GUIDELINES:
   } catch (err) {
     console.error('[coaching_chat] error:', err);
     return res.status(200).json({ reply: null, mode: 'coaching_chat' });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ CASE POLISH MODE — polish raw answers into professional raise case sections
+// ════════════════════════════════════════════════════════════
+
+const CASE_SECTION_PROMPTS = {
+  performance: {
+    0: { name: 'Opening Statement', instruction: 'Write a 1-2 sentence professional opening statement for a raise request. Frame it as a compensation alignment conversation, not a complaint. Use the person\'s role and tenure naturally. Be confident and direct.' },
+    1: { name: 'Key Results', instruction: 'Rewrite these results as 2-3 crisp, quantified bullet points suitable for a professional raise request document. Each bullet should lead with the impact (numbers, percentages, outcomes) and follow with what the person did. Be specific and avoid vague language.' },
+    2: { name: 'Recognition & Reviews', instruction: 'Polish this recognition information into a brief professional paragraph. Reference specific reviews, ratings, awards, or manager feedback. If the input is thin, make the most of what\'s there without fabricating details.' },
+    3: { name: 'Compensation Alignment', instruction: 'Turn this project/moment into a compelling anchor story that demonstrates the person\'s value. Write it as a short paragraph that a manager would recognize and respect. Lead with the business impact.' },
+    4: { name: 'The Ask', instruction: 'Write a clear, confident ask paragraph. State the current salary, the target salary, and frame the increase as alignment with contribution and market value. Include a proposed effective date (suggest "beginning of next quarter" if none given). End with a collaborative close — "happy to discuss timeline and details."' },
+    5: { name: 'Additional Leverage', instruction: 'Weave this additional context naturally into a short supporting paragraph. If it mentions competing offers, frame carefully (loyalty first, then the market signal). If it mentions market data, reference it as external validation. If empty or skipped, return an empty string.' },
+  },
+  scope: {
+    0: { name: 'Opening Statement', instruction: 'Write a 1-2 sentence professional opening statement for a compensation adjustment request based on scope expansion. Reference both the original role and the current role naturally. Frame it as aligning compensation to actual responsibilities, not a complaint.' },
+    1: { name: 'Role Evolution', instruction: 'Transform this description of new responsibilities into a clear before/after comparison. Structure it as: what the original role involved vs what the person actually does now. Be specific about the scope increase — team size, domains, decision-making authority. Write in first person, 2-3 concise sentences.' },
+    2: { name: 'Impact Delivered', instruction: 'Rewrite these results as 2-3 crisp bullet points demonstrating impact in the expanded role. Lead with quantified outcomes (numbers, percentages, timelines) and follow with what was done. Emphasize that these results came from responsibilities beyond the original job description.' },
+    3: { name: 'The Timeline', instruction: 'Write a brief paragraph highlighting how long the person has been performing the expanded role and when they last received a compensation adjustment. Frame the time gap as supporting evidence — the longer the gap between expanded scope and pay adjustment, the stronger the case. Be factual and direct.' },
+    4: { name: 'The Ask', instruction: 'Write a clear, confident ask paragraph. State current salary, target salary, and frame the increase as aligning pay to actual scope and responsibilities. Suggest an effective date. End collaboratively.' },
+    5: { name: 'Additional Leverage', instruction: 'Weave this additional context naturally into a supporting paragraph. Reference market data, recruiter interest, or competing offers as external validation. If empty or skipped, return an empty string.' },
+  },
+  offer: {
+    0: { name: 'Opening Statement', instruction: 'Write a 1-2 sentence opening that leads with loyalty and commitment to the company. Reference the person\'s tenure and role. Make clear this is a transparency conversation, not a threat. The tone should be: "I want to stay, and I want us to figure this out together."' },
+    1: { name: 'The Situation', instruction: 'Present the competing offer factually and professionally. Include the company type, role, and compensation package. Frame it as: "I received this offer, I am not presenting it as a threat, I am sharing it because the gap is significant enough that ignoring it would not be fair to either of us." Be specific with numbers.' },
+    2: { name: 'Why I Want to Stay', instruction: 'Transform these reasons into a compelling, authentic paragraph about why the person values their current company. Reference specific things: the team, the product, the relationships, the mission. This section should make the manager feel valued too. Avoid generic "I love working here" — be specific.' },
+    3: { name: 'What Would Be Lost', instruction: 'Write a brief paragraph framing what the company would lose — institutional knowledge, relationships, projects in flight, team continuity. Reference the offer deadline to create appropriate urgency without pressure. Frame it as mutual cost, not a threat.' },
+    4: { name: 'The Ask & Timeline', instruction: 'Write a clear ask paragraph with current salary, target number, and the deadline. Frame the target as what would make the decision clear. Include the offer expiration date and when the person needs an answer. End with openness to discuss.' },
+    5: { name: 'Additional Context', instruction: 'Weave this additional context naturally into a supporting paragraph. If it mentions other offers or recruiter interest, frame as market validation. If empty or skipped, return an empty string.' },
+  },
+  market: {
+    0: { name: 'Opening Statement', instruction: 'Write a 1-2 sentence opening requesting a market-rate adjustment. Reference the role, company, and location naturally. Frame it as proactive alignment — the person is raising this because they value the role and want to resolve the gap before it becomes a larger issue.' },
+    1: { name: 'Market Evidence', instruction: 'Transform this market data into a structured evidence paragraph. Reference specific sources (Glassdoor, LinkedIn, Levels.fyi, job postings, recruiter quotes), salary ranges, and percentiles. Show where the person\'s current salary falls relative to the market. Be specific with numbers and sources. If they mention multiple sources, present them as converging evidence.' },
+    2: { name: 'Role & Tenure', instruction: 'Write a brief paragraph about the person\'s tenure, last raise timing, and how their role has evolved. Frame the time since last adjustment as supporting evidence for the gap. Be factual and professional.' },
+    3: { name: 'Contribution Summary', instruction: 'Transform these responsibilities into a value statement — not just what the person does, but what would be lost. Write 2-3 sentences highlighting their most impactful contributions. Frame responsibilities as evidence of market-rate work being done below market-rate pay.' },
+    4: { name: 'The Ask', instruction: 'Write a clear ask paragraph. State current salary, target salary, and frame the increase as market alignment based on the evidence presented. Reference the percentage gap. Suggest an effective date. End collaboratively.' },
+    5: { name: 'Additional Context', instruction: 'Weave this additional context naturally into a supporting paragraph. Reference recruiter outreach, competing offers, or certifications as market validation. If empty or skipped, return an empty string.' },
+  },
+  promotion: {
+    0: { name: 'Opening Statement', instruction: 'Write a 1-2 sentence opening expressing gratitude for the promotion while noting that compensation was not adjusted. Frame it as: the person wants to align their pay to the new responsibilities. Reference both old and new titles. Be professional and direct — grateful but clear.' },
+    1: { name: 'What Changed', instruction: 'Transform this description into a clear before/after comparison of what the promotion changed. Structure it around: scope increase, team size, budget authority, decision-making level, reporting line. Be specific. The goal is to make the magnitude of the change undeniable.' },
+    2: { name: 'Early Wins', instruction: 'Rewrite these results as 2-3 crisp bullet points demonstrating early impact in the promoted role. Lead with quantified outcomes. These should show the person is already performing at the level of the new title — the pay just hasn\'t caught up.' },
+    3: { name: 'Compensation Gap', instruction: 'Write a factual paragraph presenting the gap between the person\'s current salary and the market rate for their new title. Include both numbers and the percentage gap. Frame it as: the promotion was earned, the compensation adjustment is overdue, and the gap grows more noticeable over time.' },
+    4: { name: 'The Ask', instruction: 'Write a clear, confident ask paragraph. State the target salary and frame it as alignment with the new role\'s market rate and the person\'s demonstrated performance. Suggest an effective date (retroactive to promotion date if possible). End collaboratively.' },
+    5: { name: 'Additional Leverage', instruction: 'Weave this additional context naturally into a supporting paragraph. If it mentions the old role being backfilled at a higher salary, highlight that irony. If empty or skipped, return an empty string.' },
+  },
+};
+
+async function handleCasePolish(body, res) {
+  try {
+    const { template, section_index, section_name, raw_answer, question_text, all_answers } = body;
+
+    if (!template || section_index === undefined || !raw_answer) {
+      return res.status(400).json({ error: 'Missing required fields: template, section_index, raw_answer' });
+    }
+
+    const templatePrompts = CASE_SECTION_PROMPTS[template];
+    if (!templatePrompts) {
+      return res.status(400).json({ error: 'Unknown template: ' + template });
+    }
+
+    const sectionPrompt = templatePrompts[section_index];
+    if (!sectionPrompt) {
+      return res.status(400).json({ error: 'Unknown section index: ' + section_index });
+    }
+
+    // Build context from all answers so far
+    let contextBlock = '';
+    if (all_answers && typeof all_answers === 'object') {
+      const entries = Object.entries(all_answers).filter(([k, v]) => v);
+      if (entries.length > 0) {
+        contextBlock = '\n\nContext from other answers (for consistency, do NOT repeat these — just use for tone and context):\n' +
+          entries.map(([k, v]) => `- ${k}: ${v}`).join('\n');
+      }
+    }
+
+    const systemPrompt = `You are a professional raise case document writer. You take raw, informal input from employees and transform it into polished, professional language suitable for a formal salary review request document.
+
+Rules:
+- Write in first person ("I" not "they")
+- Be direct and confident, not aggressive or entitled
+- Use specific numbers and facts from the input — never fabricate
+- Keep it concise: 2-4 sentences per section maximum
+- Match the tone of a senior professional writing to their manager
+- No headers, labels, or bullet formatting — just flowing prose (unless the section specifically calls for bullets)
+- If the input is empty or says "skip", return an empty string`;
+
+    const userPrompt = `Template: ${template} (Performance Case)
+Section: ${sectionPrompt.name}
+Section instruction: ${sectionPrompt.instruction}
+
+Question asked: "${question_text}"
+Raw answer from user: "${raw_answer}"${contextBlock}
+
+Write ONLY the polished section text. No preamble, no labels, no markdown.`;
+
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 400,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const polished = response.content[0]?.text?.trim() || raw_answer;
+
+    return res.status(200).json({
+      polished: polished,
+      section_index: section_index,
+      section_name: sectionPrompt.name,
+      mode: 'case_polish',
+    });
+
+  } catch (err) {
+    console.error('[case_polish] error:', err);
+    return res.status(200).json({
+      polished: body.raw_answer || '',
+      section_index: body.section_index,
+      error: 'Polish failed, using raw text',
+      mode: 'case_polish',
+    });
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// ══ CASE SAVE MODE — store case data in Redis before Stripe payment
+// ════════════════════════════════════════════════════════════
+
+async function handleCaseSave(body, res) {
+  try {
+    const { template, answers, polished, session_id } = body;
+
+    if (!template || !answers || !polished) {
+      return res.status(400).json({ error: 'Missing required fields: template, answers, polished' });
+    }
+
+    // Generate a unique case ID
+    const caseId = 'case_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+
+    // Store in Redis with 24h TTL (enough time to complete payment)
+    const caseData = {
+      template,
+      answers,
+      polished,
+      session_id: session_id || null,
+      created_at: new Date().toISOString(),
+    };
+
+    await redis.set(`raise:case:${caseId}`, JSON.stringify(caseData), { ex: 60 * 60 * 24 });
+
+    return res.status(200).json({
+      case_id: caseId,
+      mode: 'case_save',
+    });
+
+  } catch (err) {
+    console.error('[case_save] error:', err);
+    return res.status(500).json({ error: 'Failed to save case data' });
   }
 }
