@@ -599,14 +599,24 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
 .case-skip-btn:hover{color:var(--t1);}
 .case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);max-width:92%;}
-.case-doc-topbar{padding:9px 16px;display:flex;align-items:center;justify-content:space-between;}
-.case-doc-topbar-title{font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;}
-.case-doc-topbar-pdf{color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;cursor:pointer;}
+.case-doc-topbar{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;}
+.case-doc-topbar-title{font-size:8px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;}
+.case-doc-topbar-name{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
+.case-doc-topbar-role{font-size:10px;color:rgba(255,255,255,0.6);margin-top:1px;}
+.case-doc-topbar-pdf{color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;cursor:pointer;align-self:flex-start;}
 .case-doc-topbar-pdf:hover{color:#fff;}
-.case-doc-body{padding:20px 22px 16px;}
-.case-doc-header{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:2px;}
-.case-doc-sub{font-size:10px;color:var(--t3);margin-bottom:16px;}
-.case-doc-footer{padding:6px 16px;border-top:1px solid #e8eaef;font-size:8px;color:#8a90a8;display:flex;justify-content:space-between;}
+.case-doc-body{padding:18px 22px 12px;font-family:Arial,Helvetica,sans-serif;}
+.case-doc-header{display:none;}
+.case-doc-sub{font-size:10px;color:#8a90a8;margin-bottom:14px;font-style:italic;}
+.case-doc-section{margin-bottom:12px;padding-bottom:10px;}
+.case-doc-section-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #e8eaef;color:var(--case-accent,#3a6ea5);}
+.case-doc-section-text{font-size:10px;line-height:1.65;color:#2a3650;}
+.case-doc-section.empty .case-doc-section-text{color:#8a90a8;font-style:italic;font-size:9px;}
+.case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
+.case-doc-section.locked{opacity:0.5;}
+.case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
+.case-doc-section.locked .case-doc-section-label::after{content:' \uD83D\uDD12';font-size:9px;}
+.case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;}
 .case-doc-section{margin-bottom:14px;}
 .case-doc-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:4px;}
 .case-doc-section-text{font-size:13px;color:var(--t2);line-height:1.6;}
@@ -2886,7 +2896,8 @@ function initCaseMode(container) {
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
   var accent = t.accent || '#3a6ea5';
-  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><span class="case-doc-topbar-title">' + escapeHtml(t.name) + '</span><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
+  docPreview.style.setProperty('--case-accent', accent);
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name">Your Name</div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
   var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
@@ -2919,7 +2930,8 @@ function restoreCaseUI(container, tmpl) {
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
   var accent = t.accent || '#3a6ea5';
-  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><span class="case-doc-topbar-title">' + escapeHtml(t.name) + '</span><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
+  docPreview.style.setProperty('--case-accent', accent);
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name">Your Name</div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
   var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
@@ -2936,6 +2948,18 @@ function restoreCaseUI(container, tmpl) {
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>';
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
+
+  // Fill header with saved Q1 data
+  if (t.questions[0] && t.questions[0].type === 'row' && caseState.answers[t.questions[0].id]) {
+    try {
+      var q1 = JSON.parse(caseState.answers[t.questions[0].id]);
+      var vals = Object.values(q1).filter(function(v){return v;});
+      var nameEl = document.getElementById('case-doc-name');
+      var roleEl = document.getElementById('case-doc-role');
+      if (nameEl && vals[0]) nameEl.textContent = vals[0];
+      if (roleEl && vals[1]) roleEl.textContent = vals[1];
+    } catch(e) {}
+  }
 
   for (var i = 0; i < caseState.currentQ && i < t.questions.length; i++) {
     var q = t.questions[i];
@@ -3066,7 +3090,12 @@ function showCasePaywall(container) {
     '<button class="btn-pay" id="case-paywall-btn">Generate my raise case \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '</div>';
-  container.insertBefore(paywall, $('case-doc-preview'));
+  var preview = $('case-doc-preview');
+  if (preview) {
+    preview.parentNode.insertBefore(paywall, preview.nextSibling);
+  } else {
+    container.appendChild(paywall);
+  }
 
   // Handle paywall CTA
   var btn = $('case-paywall-btn');
@@ -3156,7 +3185,18 @@ function handleCaseAnswer(container, qIndex) {
 
   caseState.answers[q.id] = answer;
 
-  // Save progress
+  // Update doc header with user info from Q1
+  if (qIndex === 0 && q.type === 'row') {
+    try {
+      var p = JSON.parse(answer);
+      var nameEl = document.getElementById('case-doc-name');
+      var roleEl = document.getElementById('case-doc-role');
+      var vals = Object.values(p).filter(function(v){return v;});
+      if (nameEl && vals[0]) nameEl.textContent = vals[0];
+      if (roleEl && vals[1]) roleEl.textContent = vals[1];
+    } catch(e) {}
+  }
+
   saveCaseState();
 
   // Update doc preview section
