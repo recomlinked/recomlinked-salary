@@ -168,21 +168,20 @@
     /* ── 7. TEMPLATE GRID ───────────────────── */
     .templates-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
     }
     @media (max-width: 560px) {
-      .templates-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .template-label { padding: 11px 11px 12px; }
-      .template-badge { font-size: 11px; margin-bottom: 8px; padding: 4px 9px; }
-      .template-name { font-size: 14px; }
+      .templates-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 10px; }
+      .template-label { padding: 0 1px 9px; }
+      .template-badge { font-size: 11px; margin-bottom: 7px; padding: 4px 9px; }
+      .template-name { font-size: 12.5px; }
       .template-preview { aspect-ratio: 1/1.55; }
       .template-preview > div:first-child { transform: scale(0.27) !important; }
     }
 
     .template-card {
-      display: flex;
-      flex-direction: column;
+      display: block;
       text-decoration: none;
       cursor: pointer;
       border-radius: 10px;
@@ -191,6 +190,7 @@
       transition: all 0.22s;
       background: var(--card);
       box-shadow: var(--shadow-sm);
+      line-height: 0;
     }
     .template-card:hover {
       border-color: var(--template-color, var(--purple));
@@ -199,8 +199,9 @@
       text-decoration: none;
     }
 
-    /* Card label — ABOVE preview */
-    .template-label { padding: 14px 14px 12px; order: -1; }
+    /* Card label — now ABOVE the card (outside it) */
+    .template-item { display: flex; flex-direction: column; }
+    .template-label { padding: 0 2px 10px; }
     .template-badge {
       display: inline-block;
       font-size: 12px; font-weight: 800;
@@ -213,9 +214,9 @@
     }
     .template-name {
       display: block;
-      font-size: 17px; font-weight: 800;
-      color: var(--text); line-height: 1.25;
-      letter-spacing: -0.3px;
+      font-size: 13.5px; font-weight: 400;
+      color: var(--text2); line-height: 1.4;
+      letter-spacing: 0;
       margin: 0;
     }
 
@@ -226,9 +227,9 @@
       background: #fff;
       position: relative;
       overflow: hidden;
-      border-top: 1px solid var(--border);
+      border-top: none;
     }
-    .template-preview > div:first-child { pointer-events: none; }
+    .template-preview > div:first-child { pointer-events: none; position: absolute; top: 0; left: 0; }
     /* Fade preview to white at the bottom so it reads as a document, not a text wall */
     .template-preview::after {
       content: '';
@@ -446,7 +447,12 @@
     <div class="templates-grid">
 
       <!-- Template 1: Performance -->
-      <a class="template-card" style="--template-color:#3a6ea5;--template-tint:rgba(58,110,165,0.10);" href="/raise/chat/?mode=case&template=performance">
+      <div class="template-item" style="--template-color:#3a6ea5;--template-tint:rgba(58,110,165,0.10);">
+        <div class="template-label">
+          <span class="template-badge">Performance</span>
+          <p class="template-name">I've delivered strong results this year</p>
+        </div>
+        <a class="template-card" style="--template-color:#3a6ea5;--template-tint:rgba(58,110,165,0.10);" href="/raise/chat/?mode=case&template=performance">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
 <div style="background:#3a6ea5;padding:16px 28px 12px;">
@@ -504,14 +510,16 @@
 </div>
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
-        <div class="template-label">
-          <span class="template-badge">Performance</span>
-          <p class="template-name">I've delivered strong results this year</p>
-        </div>
-      </a>
+        </a>
+      </div>
 
       <!-- Template 2: Scope Expansion -->
-      <a class="template-card" style="--template-color:#0a9b96;--template-tint:rgba(10,155,150,0.10);" href="/raise/chat/?mode=case&template=scope">
+      <div class="template-item" style="--template-color:#0a9b96;--template-tint:rgba(10,155,150,0.10);">
+        <div class="template-label">
+          <span class="template-badge">Scope Expansion</span>
+          <p class="template-name">My role has grown but my pay hasn't</p>
+        </div>
+        <a class="template-card" style="--template-color:#0a9b96;--template-tint:rgba(10,155,150,0.10);" href="/raise/chat/?mode=case&template=scope">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
 <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:#0a9b96;"></div>
@@ -579,14 +587,16 @@
 </div>
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
-        <div class="template-label">
-          <span class="template-badge">Scope Expansion</span>
-          <p class="template-name">My role has grown but my pay hasn't</p>
-        </div>
-      </a>
+        </a>
+      </div>
 
       <!-- Template 3: Competing Offer -->
-      <a class="template-card" style="--template-color:#2f8f6f;--template-tint:rgba(47,143,111,0.10);" href="/raise/chat/?mode=case&template=offer">
+      <div class="template-item" style="--template-color:#2f8f6f;--template-tint:rgba(47,143,111,0.10);">
+        <div class="template-label">
+          <span class="template-badge">Competing Offer</span>
+          <p class="template-name">I have an offer from another company</p>
+        </div>
+        <a class="template-card" style="--template-color:#2f8f6f;--template-tint:rgba(47,143,111,0.10);" href="/raise/chat/?mode=case&template=offer">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
 <div style="position:absolute;right:0;top:0;bottom:0;width:5px;background:#2f8f6f;"></div>
@@ -636,14 +646,16 @@
 </div>
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
-        <div class="template-label">
-          <span class="template-badge">Competing Offer</span>
-          <p class="template-name">I have an offer from another company</p>
-        </div>
-      </a>
+        </a>
+      </div>
 
       <!-- Template 4: Market Rate -->
-      <a class="template-card" style="--template-color:#4a8db0;--template-tint:rgba(74,141,176,0.10);" href="/raise/chat/?mode=case&template=market">
+      <div class="template-item" style="--template-color:#4a8db0;--template-tint:rgba(74,141,176,0.10);">
+        <div class="template-label">
+          <span class="template-badge">Market Gap (Underpaid)</span>
+          <p class="template-name">I'm paid below market for my role</p>
+        </div>
+        <a class="template-card" style="--template-color:#4a8db0;--template-tint:rgba(74,141,176,0.10);" href="/raise/chat/?mode=case&template=market">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
 <div style="height:4px;background:linear-gradient(90deg,#4a8db0,#6ba2be);"></div>
@@ -711,14 +723,16 @@
 </div>
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
-        <div class="template-label">
-          <span class="template-badge">Market Gap (Underpaid)</span>
-          <p class="template-name">I'm paid below market for my role</p>
-        </div>
-      </a>
+        </a>
+      </div>
 
       <!-- Template 5: Promotion Without Pay -->
-      <a class="template-card" style="--template-color:#15616d;--template-tint:rgba(21,97,109,0.10);" href="/raise/chat/?mode=case&template=promotion">
+      <div class="template-item" style="--template-color:#15616d;--template-tint:rgba(21,97,109,0.10);">
+        <div class="template-label">
+          <span class="template-badge">Promotion Without Pay</span>
+          <p class="template-name">I got a new title but no salary change</p>
+        </div>
+        <a class="template-card" style="--template-color:#15616d;--template-tint:rgba(21,97,109,0.10);" href="/raise/chat/?mode=case&template=promotion">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
 <div style="display:flex;"><div style="flex:1;background:#15616d;opacity:0.1;height:28px;"></div><div style="flex:1;background:#15616d;opacity:0.05;height:28px;"></div></div>
@@ -788,11 +802,8 @@
 </div>
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
-        <div class="template-label">
-          <span class="template-badge">Promotion Without Pay</span>
-          <p class="template-name">I got a new title but no salary change</p>
-        </div>
-      </a>
+        </a>
+      </div>
 
     </div>
   </section>
