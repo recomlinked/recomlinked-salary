@@ -598,11 +598,15 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
 .case-skip-btn:hover{color:var(--t1);}
-.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:4px;margin:24px 0 0;padding:36px 32px 28px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);}
-.case-doc-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#7B5CFC,#F5CF56);}
-.case-doc-preview::after{content:'PDF';position:absolute;top:12px;right:16px;font-size:9px;font-weight:700;letter-spacing:0.06em;color:#c43a3a;background:rgba(196,58,58,0.08);padding:2px 8px;border-radius:3px;}
-.case-doc-header{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px;}
-.case-doc-sub{font-size:11px;color:var(--t3);margin-bottom:16px;}
+.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);}
+.case-doc-topbar{padding:9px 16px;display:flex;align-items:center;justify-content:space-between;}
+.case-doc-topbar-title{font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;}
+.case-doc-topbar-pdf{color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;cursor:pointer;}
+.case-doc-topbar-pdf:hover{color:#fff;}
+.case-doc-body{padding:20px 22px 16px;}
+.case-doc-header{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:2px;}
+.case-doc-sub{font-size:10px;color:var(--t3);margin-bottom:16px;}
+.case-doc-footer{padding:6px 16px;border-top:1px solid #e8eaef;font-size:8px;color:#8a90a8;display:flex;justify-content:space-between;}
 .case-doc-section{margin-bottom:14px;}
 .case-doc-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:4px;}
 .case-doc-section-text{font-size:13px;color:var(--t2);line-height:1.6;}
@@ -2724,6 +2728,7 @@ function addBackToPracticeCTA() {
 
 var CASE_TEMPLATES = {
   performance: {
+    accent: '#3a6ea5',
     name: 'Performance Case',
     tagline: 'Your results speak for themselves. Let the document do the talking.',
     paywallAfter: 2,
@@ -2738,6 +2743,7 @@ var CASE_TEMPLATES = {
     ]
   },
   scope: {
+    accent: '#0a9b96',
     name: 'Scope Expansion Case',
     tagline: 'Your role grew. Your pay didn\u2019t. Fix that.',
     paywallAfter: 2,
@@ -2752,6 +2758,7 @@ var CASE_TEMPLATES = {
     ]
   },
   offer: {
+    accent: '#2f8f6f',
     name: 'Competing Offer Case',
     tagline: 'You have leverage. Use it without burning bridges.',
     paywallAfter: 2,
@@ -2766,6 +2773,7 @@ var CASE_TEMPLATES = {
     ]
   },
   market: {
+    accent: '#4a8db0',
     name: 'Market Gap Case',
     tagline: 'The data says you\u2019re underpaid. Let the numbers talk.',
     paywallAfter: 2,
@@ -2780,6 +2788,7 @@ var CASE_TEMPLATES = {
     ]
   },
   promotion: {
+    accent: '#15616d',
     name: 'Promotion Without Pay Case',
     tagline: 'New title, same salary. Time to close the gap.',
     paywallAfter: 2,
@@ -2861,7 +2870,9 @@ function initCaseMode(container) {
 
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
-  var docHeader = '<div class="case-doc-header">Compensation Review Request</div>';
+  var accent = t.accent || '#3a6ea5';
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><span class="case-doc-topbar-title">' + escapeHtml(t.name) + '</span><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
+  var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
   t.sections.forEach(function(name, i) {
@@ -2872,7 +2883,8 @@ function initCaseMode(container) {
       '<div class="case-doc-section-text">' + txt + '</div>' +
       '</div>';
   });
-  docPreview.innerHTML = docHeader + sections;
+  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>';
+  docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
 
   showCaseQuestion(container, 0);
@@ -2891,7 +2903,9 @@ function restoreCaseUI(container, tmpl) {
 
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
-  var docHeader = '<div class="case-doc-header">Compensation Review Request</div>';
+  var accent = t.accent || '#3a6ea5';
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><span class="case-doc-topbar-title">' + escapeHtml(t.name) + '</span><span class="case-doc-topbar-pdf"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF</span></div>';
+  var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
   t.sections.forEach(function(name, i) {
@@ -2904,7 +2918,8 @@ function restoreCaseUI(container, tmpl) {
       '<div class="case-doc-section-text">' + escapeHtml(text) + '</div>' +
       '</div>';
   });
-  docPreview.innerHTML = docHeader + sections;
+  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>';
+  docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
 
   for (var i = 0; i < caseState.currentQ && i < t.questions.length; i++) {
@@ -7748,6 +7763,7 @@ async function init() {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
+    var bp = $('bottom-panel'); if (bp) bp.classList.remove('dimmed');
     setMode('case');
     return;
   }
