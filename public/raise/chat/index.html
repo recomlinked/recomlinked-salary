@@ -598,7 +598,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
 .case-skip-btn:hover{color:var(--t1);}
-.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);}
+.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);max-width:92%;}
 .case-doc-topbar{padding:9px 16px;display:flex;align-items:center;justify-content:space-between;}
 .case-doc-topbar-title{font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;}
 .case-doc-topbar-pdf{color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;cursor:pointer;}
@@ -979,6 +979,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle back-button from Stripe: re-apply teasers
   window.addEventListener('pageshow', function(e) {
     if (e.persisted) {
+      // Re-enable paywall buttons after back from Stripe
+      document.querySelectorAll('.btn-pay, .header-buy-btn').forEach(function(el) {
+        el.removeAttribute('disabled');
+        el.style.pointerEvents = '';
+        el.querySelectorAll('.rl-cta-spinner').forEach(function(sp) { sp.remove(); });
+        if (el.dataset.origHtml) el.innerHTML = el.dataset.origHtml;
+      });
       try {
         var s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
         if (!s.paid) {
@@ -2847,6 +2854,14 @@ function initCaseMode(container) {
 
   var restored = loadCaseState();
   if (restored && caseState.template === tmpl && caseState.currentQ > 0) {
+    // Fix: if polished sections exist beyond currentQ, advance it
+    var t2 = CASE_TEMPLATES[tmpl];
+    if (t2) {
+      var maxPolished = -1;
+      t2.questions.forEach(function(q, i) { if (caseState.polished[q.section] && i >= caseState.currentQ) maxPolished = i; });
+      if (maxPolished >= 0) caseState.currentQ = maxPolished + 1;
+      saveCaseState();
+    }
     restoreCaseUI(container, tmpl);
     return;
   }
@@ -3048,7 +3063,7 @@ function showCasePaywall(container) {
   paywall.innerHTML =
     '<div class="case-paywall-title">Your first ' + pw + ' sections are ready</div>' +
     '<div class="case-paywall-sub">Unlock the remaining ' + (t.sections.length - pw) + ' sections to complete your raise case document. Answer ' + (t.questions.length - pw) + ' more questions, review and edit every section, then download the finished PDF.</div>' +
-    '<button class="case-paywall-btn" id="case-paywall-btn">Unlock my full raise case \u00b7 $19 <span style="font-size:17px;margin-left:2px;">\u2192</span></button>' +
+    '<button class="case-paywall-btn" id="case-paywall-btn">Generate my raise case \u00b7 $19 <span style="font-size:17px;margin-left:2px;">\u2192</span></button>' +
     '<div class="case-paywall-note">One-time payment \u00b7 Instant PDF download \u00b7 Edit before you send</div>';
   container.insertBefore(paywall, $('case-doc-preview'));
 
@@ -3097,7 +3112,7 @@ function showCasePaywall(container) {
     } catch(err) {
       console.error('[case_paywall] error:', err);
       btn.disabled = false;
-      btn.innerHTML = 'Unlock my full raise case \u00b7 $19 \u2192';
+      btn.innerHTML = 'Generate my raise case \u00b7 $19 \u2192';
     }
   };
 
@@ -7437,6 +7452,13 @@ function goBack() {
 // back button of the given type by calling goBack(). The toolbar
 // buttons mirror the inline ones so the user doesn't have to scroll up.
 // ── Paywall after N taps of simulation ──
+function getPaywallCTA(price) {
+  var mode = SIM_STATE.currentMode || 'discovery';
+  if (mode === 'sim') return 'Unlock all scenarios \u00b7 ' + price;
+  if (mode === 'coach') return 'Unlock full coaching \u00b7 ' + price;
+  if (mode === 'case') return 'Generate my raise case \u00b7 ' + price;
+  return 'Practice every scenario \u00b7 ' + price;
+}
 // ── Unlock toast — nudge users who click chips after paywall ──
 function showUnlockToast(anchorEl) {
   // Remove existing toast
@@ -8792,7 +8814,7 @@ async function renderPaywallBubble(opts) {
       <p class="paywall-headline"><strong class="paywall-typed-head"></strong><span class="paywall-head-cursor"></span></p>
       <div class="paywall-pitch"></div>
       <button class="btn-pay paywall-cta" id="btn-pay-cta">
-        Practice every scenario · ${ctaPrice} <span class="btn-pay-arrow">→</span>
+        ${getPaywallCTA('$' + PRICE_USD)} <span class="btn-pay-arrow">→</span>
       </button>
       <div class="trust-row paywall-trust">
         <span>One-time payment</span><span class="dot">·</span><span>No subscription</span><span class="dot">·</span><span>Stripe secure</span>
@@ -8982,7 +9004,7 @@ async function handlePostPaywallText(text) {
     <div class="bubble">
       <p>I\u2019m ready to dive deeper into your specific situation. Unlock full access for $${PRICE_USD} to continue.</p>
       <button class="btn-pay" style="margin-top:10px;width:100%;" data-tail-cta>
-        Practice every scenario \u00b7 $${PRICE_USD} <span class="btn-pay-arrow">\u2192</span>
+        ${getPaywallCTA('$' + PRICE_USD)} <span class="btn-pay-arrow">\u2192</span>
       </button>
     </div>
   `;
@@ -9107,7 +9129,7 @@ async function handleCoachingChat(userText) {
         <p class="paywall-headline"><strong>Don’t risk thousands without a plan. Your raise could be bigger, sooner.</strong></p>
         <div class="paywall-pitch"></div>
         <button class="btn-pay paywall-cta" onclick="startCheckout()">
-          Practice every scenario \u00b7 ${ctaPrice} <span class="btn-pay-arrow">\u2192</span>
+          ${getPaywallCTA(ctaPrice)} <span class="btn-pay-arrow">\u2192</span>
         </button>
         <div class="trust-row paywall-trust">
           <span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span>
