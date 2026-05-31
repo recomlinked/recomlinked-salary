@@ -579,8 +579,45 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .mode-toggle-btn.active.sim{background:rgba(30,61,114,0.12);color:var(--navy);}
 .mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
 .mode-toggle-btn.active.disc{background:rgba(56,132,244,0.12);color:#185FA5;}
+.mode-toggle-btn.active.rcase{background:rgba(123,92,252,0.12);color:#5B3CC4;}
 .mode-toggle-btn svg{flex-shrink:0;}
+
+/* ── Case Mode ─────────────── */
+.case-chat{padding:16px 0;}
+.case-q-bubble{background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:16px 18px;margin:0 0 14px;max-width:92%;}
+.case-q-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:6px;}
+.case-q-text{font-size:14px;color:var(--t1);line-height:1.5;margin:0;}
+.case-input-wrap{margin:0 0 18px;max-width:92%;}
+.case-input-wrap input,.case-input-wrap textarea{width:100%;border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;font-family:var(--sans);font-size:14px;color:var(--t1);background:var(--card);resize:vertical;transition:border-color 0.15s;}
+.case-input-wrap input:focus,.case-input-wrap textarea:focus{outline:none;border-color:#7B5CFC;}
+.case-input-wrap textarea{min-height:80px;}
+.case-row{display:flex;gap:10px;}
+.case-row input{flex:1;}
+.case-next-btn{display:inline-flex;align-items:center;gap:6px;background:#7B5CFC;color:#fff;border:none;border-radius:10px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.case-next-btn:hover{background:#6A4CE8;transform:translateY(-1px);}
+.case-next-btn:disabled{opacity:0.4;pointer-events:none;}
+.case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
+.case-skip-btn:hover{color:var(--t1);}
+.case-doc-preview{background:var(--card);border:1px solid var(--divider);border-radius:14px;margin:24px 0 0;padding:28px 24px;position:relative;overflow:hidden;}
+.case-doc-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#7B5CFC,#F5CF56);}
+.case-doc-header{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px;}
+.case-doc-sub{font-size:11px;color:var(--t3);margin-bottom:16px;}
+.case-doc-section{margin-bottom:14px;}
+.case-doc-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:4px;}
+.case-doc-section-text{font-size:13px;color:var(--t2);line-height:1.6;}
+.case-doc-section.empty .case-doc-section-text{color:var(--t3);font-style:italic;}
+.case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
+@keyframes casePulse{0%,100%{opacity:0.4;}50%{opacity:0.8;}}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
+.case-doc-section.locked .case-doc-section-text{filter:blur(4px);user-select:none;color:var(--t3);font-style:italic;}
+.case-doc-section.locked .case-doc-section-label::after{content:' \uD83D\uDD12';font-size:10px;}
+.case-paywall{background:linear-gradient(135deg,rgba(123,92,252,0.06),rgba(245,207,86,0.08));border:1.5px solid rgba(123,92,252,0.2);border-radius:14px;padding:24px 22px;margin:20px 0 10px;text-align:center;}
+.case-paywall-title{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px;}
+.case-paywall-sub{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:18px;}
+.case-paywall-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#E8C044,#F5CF56);color:#1a1520;border:none;border-radius:12px;padding:14px 32px;font-family:var(--sans);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.15s;box-shadow:0 4px 16px rgba(232,192,68,0.3);}
+.case-paywall-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(232,192,68,0.4);}
+.case-paywall-btn:disabled{opacity:0.5;pointer-events:none;}
+.case-paywall-note{font-size:11px;color:var(--t3);margin-top:10px;}
 
 /* ── Discovery mode ── */
 .discovery-chat{padding:16px 0;}
@@ -845,6 +882,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
     <div id="discovery-messages" class="discovery-chat" style="display:none;"></div>
     <div id="messages" class="active-chat" style="display:none;"></div>
     <div id="coaching-messages" class="coaching-chat" style="display:none;"></div>
+    <div id="case-messages" class="case-chat" style="display:none;"></div>
 
   </div>
 
@@ -892,6 +930,14 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
               <circle cx="13.5" cy="8.5" r="0.9" fill="currentColor"/>
             </svg>
             <span>Coaching</span>
+          </button>
+          <button class="mode-toggle-btn rcase" id="mode-btn-rcase" type="button" onclick="setMode('case')" role="tab" aria-selected="false" title="Generate a professional raise case document">
+            <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
+              <path d="M6 2h8l3 3v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+              <path d="M7 9h6M7 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+              <path d="M14 2v3h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Raise Case</span>
           </button>
         </div>
         <!-- Context button hidden — nobody clicked on it
@@ -2267,7 +2313,7 @@ let unseenCoachCount = 0;    // how many coaching messages user hasn't seen
 let currentCoachPreview = null; // the preview card in practice mode
 
 function setMode(target) {
-  if (target !== 'sim' && target !== 'coach' && target !== 'discovery') return;
+  if (target !== 'sim' && target !== 'coach' && target !== 'discovery' && target !== 'case') return;
 
   SIM_STATE.simMode = (target === 'sim');
   SIM_STATE.currentMode = target;
@@ -2276,6 +2322,7 @@ function setMode(target) {
   const practiceEl = $('messages');
   const coachingEl = $('coaching-messages');
   const discoveryEl = $('discovery-messages');
+  const caseEl = $('case-messages');
 
   // Hide all and remove active class
   practiceEl.style.display = 'none';
@@ -2283,6 +2330,7 @@ function setMode(target) {
   coachingEl.style.display = 'none';
   coachingEl.classList.remove('active-chat');
   if (discoveryEl) { discoveryEl.style.display = 'none'; discoveryEl.classList.remove('active-chat'); }
+  if (caseEl) { caseEl.style.display = 'none'; caseEl.classList.remove('active-chat'); }
 
   if (target === 'discovery') {
     if (discoveryEl) {
@@ -2318,7 +2366,7 @@ function setMode(target) {
     const input = $('chat-input');
     if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
     scrollChatToBottom();
-  } else {
+  } else if (target === 'coach') {
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
 
@@ -2355,6 +2403,23 @@ function setMode(target) {
       var chatWrap2 = $('chat-wrap');
       if (chatWrap2) chatWrap2.scrollTop = 0;
     }
+  } else if (target === 'case') {
+    if (caseEl) {
+      caseEl.style.display = 'block';
+      caseEl.classList.add('active-chat');
+      if (!caseEl.dataset.initialized) {
+        initCaseMode(caseEl);
+        caseEl.dataset.initialized = 'true';
+      }
+    }
+    const input = $('chat-input');
+    if (input) { input.placeholder = 'Building your raise case\u2026'; input.disabled = true; }
+    var sendBtn3 = $('send-btn');
+    if (sendBtn3) sendBtn3.disabled = true;
+    var chipsArea3 = $('chips-area');
+    if (chipsArea3) chipsArea3.style.display = 'none';
+    var chatWrap3 = $('chat-wrap');
+    if (chatWrap3) setTimeout(function() { chatWrap3.scrollTop = 0; }, 50);
   }
 }
 
@@ -2394,10 +2459,11 @@ function updateModeToggleUI() {
   const simBtn   = $('mode-btn-sim');
   const coachBtn = $('mode-btn-coach');
   const discBtn  = $('mode-btn-disc');
+  const rcaseBtn = $('mode-btn-rcase');
   if (!simBtn || !coachBtn) return;
   
   // Reset all
-  [simBtn, coachBtn, discBtn].forEach(function(b) {
+  [simBtn, coachBtn, discBtn, rcaseBtn].forEach(function(b) {
     if (b) { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); }
   });
   document.body.classList.remove('sim-mode');
@@ -2410,6 +2476,9 @@ function updateModeToggleUI() {
   } else if (mode === 'coach') {
     coachBtn.classList.add('active');
     coachBtn.setAttribute('aria-selected', 'true');
+  } else if (mode === 'case' && rcaseBtn) {
+    rcaseBtn.classList.add('active');
+    rcaseBtn.setAttribute('aria-selected', 'true');
   } else if (mode === 'discovery' && discBtn) {
     discBtn.classList.add('active');
     discBtn.setAttribute('aria-selected', 'true');
@@ -2645,6 +2714,575 @@ function addBackToPracticeCTA() {
   cta.innerHTML = '\u2190 Continue practicing';
   cta.addEventListener('click', function() { setMode('sim'); });
   coachingEl.appendChild(cta);
+}
+
+// ═══════════════════════════════════════════════════════════
+// ██  RAISE CASE MODE — Question flow + Document preview  ██
+// ═══════════════════════════════════════════════════════════
+
+var CASE_TEMPLATES = {
+  performance: {
+    name: 'Performance Case',
+    tagline: 'Your results speak for themselves. Let the document do the talking.',
+    paywallAfter: 2,
+    sections: ['Opening Statement','Key Results','Recognition & Reviews','Compensation Alignment','The Ask','Additional Leverage'],
+    questions: [
+      { id: 'role_tenure', label: 'About you', text: "What\u2019s your current role/title, and how long since your last raise?", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Senior Product Designer', type: 'text' },{ name: 'tenure', placeholder: 'e.g. 2 years', type: 'text' }], section: 0 },
+      { id: 'results', label: 'Key results', text: "What were your 3 biggest measurable results in the last 12 months? Be specific \u2014 numbers, percentages, projects shipped.", type: 'textarea', placeholder: "e.g. Led the onboarding redesign that lifted activation by 23%. Shipped the design system used across 3 squads. Reduced churn by 11% through retention flow improvements.", section: 1 },
+      { id: 'recognition', label: 'Recognition', text: "Did you receive any formal recognition? Exceeds-expectations review, promotion recommendation, manager praise, awards \u2014 anything documented.", type: 'textarea', placeholder: "e.g. Rated \u2018exceeds expectations\u2019 in Q3 review. Manager nominated me for the quarterly impact award.", section: 2 },
+      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
+      { id: 'anchor_project', label: 'Your strongest card', text: "Is there one specific project or moment that best demonstrates your value? The one your manager would recognize instantly.", type: 'textarea', placeholder: "e.g. When the enterprise deal was at risk, I redesigned the proposal flow in 3 days and we closed the account.", section: 3 },
+      { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? A competing offer, market data, scope changes, recruiter outreach \u2014 anything your manager should know.", type: 'textarea', placeholder: "(Optional) e.g. I\u2019ve had 3 recruiters reach out this quarter for senior roles paying $130-140k.", optional: true, section: 5 }
+    ]
+  },
+  scope: {
+    name: 'Scope Expansion Case',
+    tagline: 'Your role grew. Your pay didn\u2019t. Fix that.',
+    paywallAfter: 2,
+    sections: ['Opening Statement','Role Evolution','Impact Delivered','The Timeline','The Ask','Additional Leverage'],
+    questions: [
+      { id: 'titles', label: 'Your role', text: "What\u2019s your current title, and what were you originally hired as?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Engineering Manager', type: 'text' },{ name: 'hired_as', placeholder: 'e.g. Senior Engineer', type: 'text' }], section: 0 },
+      { id: 'new_responsibilities', label: 'Scope growth', text: "What new responsibilities have you taken on that weren\u2019t in your original role? Think team management, new domains, cross-functional work.", type: 'textarea', placeholder: "e.g. Took over the platform team (4 engineers). Now own the API roadmap and run weekly architecture reviews. None of this was in my original job description.", section: 1 },
+      { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g. Cut P1 incidents by 60%. Shipped the API v2 migration on time. Reduced onboarding time from 3 weeks to 5 days.", section: 2 },
+      { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
+      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
+      { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, recruiter interest, a competing offer?", type: 'textarea', placeholder: "(Optional) e.g. The market rate for Engineering Managers in my city is $160\u2013180k. I\u2019m at $135k.", optional: true, section: 5 }
+    ]
+  },
+  offer: {
+    name: 'Competing Offer Case',
+    tagline: 'You have leverage. Use it without burning bridges.',
+    paywallAfter: 2,
+    sections: ['Opening Statement','The Situation','Why I Want to Stay','What Would Be Lost','The Ask & Timeline','Additional Context'],
+    questions: [
+      { id: 'tenure_role', label: 'About you', text: "How long have you been at this company, and what\u2019s your current role?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 4 years', type: 'text' },{ name: 'role', placeholder: 'e.g. Product Manager', type: 'text' }], section: 0 },
+      { id: 'offer_details', label: 'The offer', text: "What\u2019s the competing offer? Company, role, and compensation package. Be as specific as you can.", type: 'textarea', placeholder: "e.g. Series B company, Senior PM role. $165k base + equity package worth ~$40k/year. They want an answer by June 15.", section: 1 },
+      { id: 'why_stay', label: 'Why you want to stay', text: "Why do you want to stay at your current company? What do you value here that the other offer doesn\u2019t have?", type: 'textarea', placeholder: "e.g. I believe in the product roadmap. I\u2019ve built strong relationships with my team. I don\u2019t want to start over \u2014 I want to keep building here.", section: 2 },
+      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number would make you stay?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Number to stay', type: 'text' }], section: 4 },
+      { id: 'deadline', label: 'Timeline', text: "When does the offer expire, and when do you need an answer from your current employer?", type: 'row', fields: [{ name: 'deadline', placeholder: 'e.g. June 15', type: 'text' },{ name: 'decision_date', placeholder: 'e.g. by end of this week', type: 'text' }], section: 3 },
+      { id: 'extra_context', label: 'Anything else?', text: "Is there anything else your manager should know? Other offers, personal circumstances, specific concerns?", type: 'textarea', placeholder: "(Optional) e.g. I\u2019ve turned down two other calls this quarter because I wanted to make this work here first.", optional: true, section: 5 }
+    ]
+  },
+  market: {
+    name: 'Market Gap Case',
+    tagline: 'The data says you\u2019re underpaid. Let the numbers talk.',
+    paywallAfter: 2,
+    sections: ['Opening Statement','Market Evidence','Role & Tenure','Contribution Summary','The Ask','Additional Context'],
+    questions: [
+      { id: 'role_location', label: 'Your role', text: "What\u2019s your role and where are you located? This helps the document reference the right market.", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Data Analyst', type: 'text' },{ name: 'location', placeholder: 'e.g. Calgary, AB', type: 'text' }], section: 0 },
+      { id: 'market_data', label: 'Market evidence', text: "What market data do you have? Salary sites, job postings, recruiter ranges, industry reports \u2014 anything showing you\u2019re paid below market.", type: 'textarea', placeholder: "e.g. Glassdoor median for this role in my city is $92k. LinkedIn shows 3 open roles at $95\u2013105k. My salary is $78k.", section: 1 },
+      { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 3 years', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 18 months ago', type: 'text' }], section: 2 },
+      { id: 'responsibilities', label: 'What you do', text: "What are your main responsibilities and contributions? What would your manager miss if you left?", type: 'textarea', placeholder: "e.g. I own all executive reporting. Built the forecasting model the CFO uses weekly. Train new analysts. Lead the cross-team data council.", section: 3 },
+      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
+      { id: 'extra_context', label: 'Anything else?', text: "Is there anything else that strengthens your case? Recruiter outreach, competing offers, certifications?", type: 'textarea', placeholder: "(Optional) e.g. Three recruiters reached out this quarter for roles paying $95\u2013110k.", optional: true, section: 5 }
+    ]
+  },
+  promotion: {
+    name: 'Promotion Without Pay Case',
+    tagline: 'New title, same salary. Time to close the gap.',
+    paywallAfter: 2,
+    sections: ['Opening Statement','What Changed','Early Wins','Compensation Gap','The Ask','Additional Leverage'],
+    questions: [
+      { id: 'titles', label: 'The promotion', text: "What was your old title, and what\u2019s your new title?", type: 'row', fields: [{ name: 'old_title', placeholder: 'e.g. Marketing Coordinator', type: 'text' },{ name: 'new_title', placeholder: 'e.g. Marketing Manager', type: 'text' }], section: 0 },
+      { id: 'what_changed', label: 'What changed', text: "What changed when you got promoted? New responsibilities, team size, scope, decision-making authority.", type: 'textarea', placeholder: "e.g. Now managing 3 direct reports. Own the full campaign budget ($400k). Report directly to the VP instead of a team lead.", section: 1 },
+      { id: 'early_wins', label: 'Early wins', text: "What are your early wins since the promotion? Results you\u2019ve delivered in the new role.", type: 'textarea', placeholder: "e.g. Launched the Q1 campaign \u2014 highest conversion rate this year. Reduced agency spend by 30% by bringing creative in-house.", section: 2 },
+      { id: 'compensation', label: 'The gap', text: "What\u2019s the market rate for your new title, and what\u2019s your current salary?", type: 'row', fields: [{ name: 'market_rate', placeholder: 'Market rate (e.g. $95k)', type: 'text' },{ name: 'current', placeholder: 'Current salary', type: 'text' }], section: 3 },
+      { id: 'target', label: 'Your ask', text: "What salary are you asking for?", type: 'text', placeholder: "e.g. $95,000", section: 4 },
+      { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, competing interest, timeline?", type: 'textarea', placeholder: "(Optional) e.g. The company posted my old role at $75k \u2014 I\u2019m still being paid $72k in the senior role.", optional: true, section: 5 }
+    ]
+  }
+};
+
+var LS_CASE_STATE = 'rl_case_state';
+
+var caseState = {
+  template: null,
+  currentQ: 0,
+  answers: {},
+  polished: {},
+  reviewing: false,
+  paid: false
+};
+
+function saveCaseState() {
+  try {
+    localStorage.setItem(LS_CASE_STATE, JSON.stringify(caseState));
+  } catch(e) {}
+}
+
+function loadCaseState() {
+  try {
+    var saved = localStorage.getItem(LS_CASE_STATE);
+    if (saved) {
+      var parsed = JSON.parse(saved);
+      if (parsed && parsed.template) {
+        caseState = parsed;
+        return true;
+      }
+    }
+  } catch(e) {}
+  return false;
+}
+
+function clearCaseState() {
+  caseState = { template: null, currentQ: 0, answers: {}, polished: {}, reviewing: false, paid: false };
+  try { localStorage.removeItem(LS_CASE_STATE); } catch(e) {}
+}
+
+function initCaseMode(container) {
+  var params = new URLSearchParams(location.search);
+  var tmpl = params.get('template') || 'performance';
+  if (!CASE_TEMPLATES[tmpl]) tmpl = 'performance';
+
+  var restored = loadCaseState();
+  if (restored && caseState.template === tmpl && caseState.currentQ > 0) {
+    restoreCaseUI(container, tmpl);
+    return;
+  }
+
+  caseState.template = tmpl;
+  caseState.currentQ = 0;
+  caseState.answers = {};
+  caseState.polished = {};
+  caseState.reviewing = false;
+  caseState.paid = false;
+  saveCaseState();
+
+  container.innerHTML = '';
+  var t = CASE_TEMPLATES[tmpl];
+  var pw = t.paywallAfter || 2;
+
+  var welcome = el('div', 'case-q-bubble', '');
+  welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + '</div>' +
+    '<div class="case-q-text">' + escapeHtml(t.tagline) + ' Answer a few quick questions and your raise case document will build itself below.</div>';
+  container.appendChild(welcome);
+
+  var docPreview = el('div', 'case-doc-preview', '');
+  docPreview.id = 'case-doc-preview';
+  var docHeader = '<div class="case-doc-header">Compensation Review Request</div>';
+  docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
+  var sections = '';
+  t.sections.forEach(function(name, i) {
+    var cls = i >= pw ? 'case-doc-section locked' : 'case-doc-section empty';
+    var txt = i >= pw ? 'This section unlocks after purchase\u2026' : 'Waiting for your answer\u2026';
+    sections += '<div class="' + cls + '" id="case-sec-' + i + '">' +
+      '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
+      '<div class="case-doc-section-text">' + txt + '</div>' +
+      '</div>';
+  });
+  docPreview.innerHTML = docHeader + sections;
+  container.appendChild(docPreview);
+
+  showCaseQuestion(container, 0);
+}
+
+function restoreCaseUI(container, tmpl) {
+  container.innerHTML = '';
+  var t = CASE_TEMPLATES[tmpl];
+  var pw = t.paywallAfter || 2;
+
+  var welcome = el('div', 'case-q-bubble', '');
+  welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + ' \u2014 Resuming</div>' +
+    '<div class="case-q-text">Welcome back. Your progress has been saved. Continuing where you left off.</div>' +
+    '<div style="margin-top:8px;"><a href="#" style="font-size:12px;color:var(--t3);" onclick="clearCaseState();location.reload();return false;">Start over</a></div>';
+  container.appendChild(welcome);
+
+  var docPreview = el('div', 'case-doc-preview', '');
+  docPreview.id = 'case-doc-preview';
+  var docHeader = '<div class="case-doc-header">Compensation Review Request</div>';
+  docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
+  var sections = '';
+  t.sections.forEach(function(name, i) {
+    var hasPolished = caseState.polished[i];
+    var isLocked = i >= pw && !caseState.paid;
+    var cssClass = isLocked ? 'case-doc-section locked' : (hasPolished ? 'case-doc-section' : 'case-doc-section empty');
+    var text = isLocked ? 'This section unlocks after purchase\u2026' : (hasPolished || 'Waiting for your answer\u2026');
+    sections += '<div class="' + cssClass + '" id="case-sec-' + i + '">' +
+      '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
+      '<div class="case-doc-section-text">' + escapeHtml(text) + '</div>' +
+      '</div>';
+  });
+  docPreview.innerHTML = docHeader + sections;
+  container.appendChild(docPreview);
+
+  for (var i = 0; i < caseState.currentQ && i < t.questions.length; i++) {
+    var q = t.questions[i];
+    var ans = caseState.answers[q.id] || '';
+    if (!ans) continue;
+    var conf = el('div', 'case-q-bubble', '');
+    conf.style.cssText = 'background:rgba(123,92,252,0.08);border-color:rgba(123,92,252,0.2);';
+    var displayAns = ans;
+    if (q.type === 'row') {
+      try { var p = JSON.parse(ans); displayAns = Object.values(p).filter(function(v){return v;}).join(' \u2022 '); } catch(e) {}
+    }
+    conf.innerHTML = '<div class="case-q-label" style="color:var(--t3);">' + escapeHtml(q.label) + '</div>' +
+      '<div class="case-q-text" style="color:var(--t1);font-size:13px;">\u2713 ' + escapeHtml(displayAns).substring(0, 200) + '</div>';
+    container.insertBefore(conf, docPreview);
+  }
+
+  if (caseState.currentQ >= t.questions.length) {
+    buildCaseReview(container);
+  } else {
+    showCaseQuestion(container, caseState.currentQ);
+  }
+}
+
+function showCaseQuestion(container, qIndex) {
+  var t = CASE_TEMPLATES[caseState.template];
+  var pw = t.paywallAfter || 2;
+
+  // If we've hit the paywall point and haven't paid, show paywall
+  if (qIndex >= pw && !caseState.paid) {
+    showCasePaywall(container);
+    return;
+  }
+
+  if (qIndex >= t.questions.length) {
+    buildCaseReview(container);
+    return;
+  }
+
+  caseState.currentQ = qIndex;
+  saveCaseState();
+  var q = t.questions[qIndex];
+
+  // Remove previous input wrap if exists
+  var prev = container.querySelector('.case-input-active');
+  if (prev) prev.remove();
+
+  // Question bubble
+  var bubble = el('div', 'case-q-bubble', '');
+  bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + ' \u2014 Question ' + (qIndex + 1) + ' of ' + t.questions.length + '</div>' +
+    '<div class="case-q-text">' + escapeHtml(q.text) + '</div>';
+  container.insertBefore(bubble, $('case-doc-preview'));
+
+  // Input area
+  var inputWrap = el('div', 'case-input-wrap case-input-active', '');
+
+  if (q.type === 'textarea') {
+    var ta = document.createElement('textarea');
+    ta.placeholder = q.placeholder || '';
+    ta.id = 'case-input-' + q.id;
+    inputWrap.appendChild(ta);
+  } else if (q.type === 'row') {
+    var row = el('div', 'case-row', '');
+    q.fields.forEach(function(f) {
+      var inp = document.createElement('input');
+      inp.type = f.type || 'text';
+      inp.placeholder = f.placeholder || '';
+      inp.id = 'case-input-' + q.id + '-' + f.name;
+      row.appendChild(inp);
+    });
+    inputWrap.appendChild(row);
+  } else {
+    var inp2 = document.createElement('input');
+    inp2.type = 'text';
+    inp2.placeholder = q.placeholder || '';
+    inp2.id = 'case-input-' + q.id;
+    inputWrap.appendChild(inp2);
+  }
+
+  // Buttons
+  var btnWrap = el('div', '', '');
+  btnWrap.style.cssText = 'margin-top:10px;display:flex;align-items:center;';
+  var nextBtn = document.createElement('button');
+  nextBtn.className = 'case-next-btn';
+  nextBtn.textContent = qIndex < t.questions.length - 1 ? 'Next \u2192' : 'Build my raise case \u2192';
+  nextBtn.onclick = function() { handleCaseAnswer(container, qIndex); };
+  btnWrap.appendChild(nextBtn);
+
+  if (q.optional) {
+    var skipBtn = document.createElement('button');
+    skipBtn.className = 'case-skip-btn';
+    skipBtn.textContent = 'Skip';
+    skipBtn.onclick = function() {
+      caseState.answers[q.id] = '';
+      showCaseQuestion(container, qIndex + 1);
+    };
+    btnWrap.appendChild(skipBtn);
+  }
+
+  inputWrap.appendChild(btnWrap);
+  container.insertBefore(inputWrap, $('case-doc-preview'));
+
+  // Focus first input
+  setTimeout(function() {
+    var first = inputWrap.querySelector('input,textarea');
+    if (first) first.focus();
+  }, 100);
+
+  // Scroll question into view
+  setTimeout(function() {
+    bubble.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 150);
+}
+
+function showCasePaywall(container) {
+  var t = CASE_TEMPLATES[caseState.template];
+  var pw = t.paywallAfter || 2;
+
+  // Remove active input
+  var active = container.querySelector('.case-input-active');
+  if (active) active.remove();
+
+  // Paywall block
+  var paywall = el('div', 'case-paywall', '');
+  paywall.id = 'case-paywall';
+  paywall.innerHTML =
+    '<div class="case-paywall-title">Your first ' + pw + ' sections are ready</div>' +
+    '<div class="case-paywall-sub">Unlock the remaining ' + (t.sections.length - pw) + ' sections to complete your raise case document. Answer ' + (t.questions.length - pw) + ' more questions, review and edit every section, then download the finished PDF.</div>' +
+    '<button class="case-paywall-btn" id="case-paywall-btn">Unlock my full raise case \u00b7 $19 <span style="font-size:17px;margin-left:2px;">\u2192</span></button>' +
+    '<div class="case-paywall-note">One-time payment \u00b7 Instant PDF download \u00b7 Edit before you send</div>';
+  container.insertBefore(paywall, $('case-doc-preview'));
+
+  // Handle paywall CTA
+  var btn = $('case-paywall-btn');
+  btn.onclick = async function() {
+    btn.disabled = true;
+    btn.innerHTML = 'Saving your progress\u2026';
+
+    try {
+      var saveRes = await fetch('/api/raise-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'case_save',
+          template: caseState.template,
+          answers: caseState.answers,
+          polished: caseState.polished,
+          session_id: typeof getUserId === 'function' ? getUserId() : null,
+        }),
+      });
+      var saveData = await saveRes.json();
+      if (saveData.case_id) {
+        try { localStorage.setItem('rl_case_id', saveData.case_id); } catch(e) {}
+        // TODO: redirect to Stripe checkout
+        // window.location.href = '/api/raise-checkout?case_id=' + saveData.case_id;
+
+        // For testing: unlock and continue
+        caseState.paid = true;
+        saveCaseState();
+        paywall.remove();
+
+        // Unlock locked sections in the preview
+        document.querySelectorAll('.case-doc-section.locked').forEach(function(sec) {
+          sec.classList.remove('locked');
+          sec.classList.add('empty');
+          var textEl = sec.querySelector('.case-doc-section-text');
+          if (textEl) textEl.textContent = 'Waiting for your answer\u2026';
+        });
+
+        // Continue with next question
+        showCaseQuestion(container, pw);
+      } else {
+        throw new Error('No case_id returned');
+      }
+    } catch(err) {
+      console.error('[case_paywall] error:', err);
+      btn.disabled = false;
+      btn.innerHTML = 'Unlock my full raise case \u00b7 $19 \u2192';
+    }
+  };
+
+  setTimeout(function() {
+    paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+}
+
+function handleCaseAnswer(container, qIndex) {
+  var t = CASE_TEMPLATES[caseState.template];
+  var q = t.questions[qIndex];
+  var answer = '';
+
+  if (q.type === 'row') {
+    var parts = {};
+    q.fields.forEach(function(f) {
+      var inp = $('case-input-' + q.id + '-' + f.name);
+      parts[f.name] = inp ? inp.value.trim() : '';
+    });
+    answer = JSON.stringify(parts);
+    // Check at least one field filled
+    if (!Object.values(parts).some(function(v) { return v.length > 0; })) {
+      // Shake the button
+      return;
+    }
+  } else {
+    var inp = $('case-input-' + q.id);
+    answer = inp ? inp.value.trim() : '';
+    if (!answer && !q.optional) return;
+  }
+
+  caseState.answers[q.id] = answer;
+
+  // Save progress
+  saveCaseState();
+
+  // Update doc preview section
+  updateCaseDocSection(q.section, q, answer);
+
+  // Disable the input
+  var active = container.querySelector('.case-input-active');
+  if (active) {
+    active.querySelectorAll('input,textarea,button').forEach(function(el) { el.disabled = true; });
+    active.classList.remove('case-input-active');
+    active.style.opacity = '0.5';
+  }
+
+  // Show user's answer as a confirmation bubble
+  var conf = el('div', 'case-q-bubble', '');
+  conf.style.cssText = 'background:rgba(123,92,252,0.08);border-color:rgba(123,92,252,0.2);';
+  var displayAnswer = answer;
+  if (q.type === 'row') {
+    try {
+      var p = JSON.parse(answer);
+      displayAnswer = Object.values(p).filter(function(v){return v;}).join(' \u2022 ');
+    } catch(e) {}
+  }
+  conf.innerHTML = '<div class="case-q-text" style="color:var(--t1);font-size:13px;">\u2713 ' + escapeHtml(displayAnswer).substring(0, 200) + (displayAnswer.length > 200 ? '\u2026' : '') + '</div>';
+  container.insertBefore(conf, $('case-doc-preview'));
+
+  // Next question
+  showCaseQuestion(container, qIndex + 1);
+}
+
+function updateCaseDocSection(sectionIndex, q, answer) {
+  var sec = $('case-sec-' + sectionIndex);
+  if (!sec) return;
+  sec.classList.remove('empty');
+  sec.classList.add('generating');
+  var textEl = sec.querySelector('.case-doc-section-text');
+  if (textEl) textEl.textContent = 'Writing this section\u2026';
+
+  var t = CASE_TEMPLATES[caseState.template];
+
+  // Call AI polish API
+  fetch('/api/raise-coach', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mode: 'case_polish',
+      template: caseState.template,
+      section_index: sectionIndex,
+      section_name: t.sections[sectionIndex],
+      question_text: q.text,
+      raw_answer: answer,
+      all_answers: caseState.answers,
+    }),
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    sec.classList.remove('generating');
+    var polished = data.polished || answer;
+    caseState.polished[sectionIndex] = polished;
+    saveCaseState();
+    if (textEl) textEl.textContent = polished;
+  })
+  .catch(function(err) {
+    console.error('[case_polish] fetch error:', err);
+    sec.classList.remove('generating');
+    // Fallback: show raw answer
+    var displayText = answer;
+    if (q.type === 'row') {
+      try {
+        var p = JSON.parse(answer);
+        displayText = Object.entries(p).map(function(e) {
+          return e[0].charAt(0).toUpperCase() + e[0].slice(1) + ': ' + e[1];
+        }).filter(function(s) { return !s.endsWith(': '); }).join(' \u2022 ');
+      } catch(e) {}
+    }
+    caseState.polished[sectionIndex] = displayText;
+    if (textEl) textEl.textContent = displayText;
+  });
+}
+
+function buildCaseReview(container) {
+  caseState.reviewing = true;
+  var t = CASE_TEMPLATES[caseState.template];
+
+  // Remove the active input if any
+  var active = container.querySelector('.case-input-active');
+  if (active) active.remove();
+
+  // Review header
+  var reviewBubble = el('div', 'case-q-bubble', '');
+  reviewBubble.style.cssText = 'background:rgba(123,92,252,0.06);border-color:rgba(123,92,252,0.2);';
+  reviewBubble.innerHTML = '<div class="case-q-label">Review your raise case</div>' +
+    '<div class="case-q-text">Your raise case document is ready. Review and edit any section below, then generate the final PDF.</div>';
+  container.insertBefore(reviewBubble, $('case-doc-preview'));
+
+  // Make doc preview sections editable
+  var preview = $('case-doc-preview');
+  if (preview) {
+    preview.querySelectorAll('.case-doc-section').forEach(function(sec) {
+      var textEl = sec.querySelector('.case-doc-section-text');
+      if (textEl && !sec.classList.contains('empty')) {
+        var currentText = textEl.textContent;
+        var ta = document.createElement('textarea');
+        ta.value = currentText;
+        ta.style.cssText = 'width:100%;min-height:60px;border:1.5px solid var(--divider);border-radius:8px;padding:10px 12px;font-family:var(--sans);font-size:13px;color:var(--t1);background:var(--bg);resize:vertical;line-height:1.6;';
+        ta.onfocus = function() { ta.style.borderColor = '#7B5CFC'; };
+        ta.onblur = function() { ta.style.borderColor = ''; };
+        textEl.replaceWith(ta);
+      }
+    });
+
+    // Add CTA
+    var ctaWrap = el('div', '', '');
+    ctaWrap.style.cssText = 'text-align:center;margin-top:24px;';
+    var ctaBtn = document.createElement('button');
+    ctaBtn.className = 'case-next-btn';
+    ctaBtn.style.cssText = 'font-size:15px;padding:14px 32px;background:#E8C044;color:#1a1520;';
+    ctaBtn.innerHTML = 'Generate my raise case \u2192';
+    ctaBtn.onclick = async function() {
+      ctaBtn.disabled = true;
+      ctaBtn.innerHTML = 'Saving your case\u2026';
+
+      // Collect final polished text from textareas
+      var finalPolished = {};
+      preview.querySelectorAll('.case-doc-section').forEach(function(sec) {
+        var idx = sec.id.replace('case-sec-', '');
+        var ta = sec.querySelector('textarea');
+        if (ta) finalPolished[idx] = ta.value;
+      });
+
+      try {
+        // Save case data to server (Redis) before payment
+        var saveRes = await fetch('/api/raise-coach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'case_save',
+            template: caseState.template,
+            answers: caseState.answers,
+            polished: finalPolished,
+            session_id: typeof getUserId === 'function' ? getUserId() : null,
+          }),
+        });
+        var saveData = await saveRes.json();
+        if (saveData.case_id) {
+          // Store case_id locally for post-payment retrieval
+          try { localStorage.setItem('rl_case_id', saveData.case_id); } catch(e) {}
+          // TODO: redirect to Stripe checkout with case_id as metadata
+          // window.location.href = '/api/raise-checkout?case_id=' + saveData.case_id;
+          alert('Case saved (ID: ' + saveData.case_id + '). Stripe checkout integration coming in the next build phase.');
+        } else {
+          throw new Error('No case_id returned');
+        }
+      } catch(err) {
+        console.error('[case_save] error:', err);
+        ctaBtn.disabled = false;
+        ctaBtn.innerHTML = 'Generate my raise case \u2192';
+        alert('Something went wrong saving your case. Please try again.');
+      }
+    };
+    ctaWrap.appendChild(ctaBtn);
+    preview.appendChild(ctaWrap);
+  }
+
+  // Scroll to review
+  setTimeout(function() {
+    reviewBubble.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 200);
 }
 
 // Generate AI coaching insight based on practice action
@@ -7089,6 +7727,19 @@ async function init() {
   // start=sim → coach landing page wants simulation mode (not discovery)
   const startMode = params.get('start');
   if (startMode === 'sim') { SIM_STATE.entryMode = 'sim'; }
+
+  // mode=case → raise case landing page, enter case mode directly
+  const caseMode = params.get('mode');
+  if (caseMode === 'case') {
+    // Strip URL params
+    history.replaceState(null, '', location.pathname);
+    // Show toolbar and mode toggle, then switch to case mode
+    showToolbar();
+    showModeToggle();
+    unlockModeToggle();
+    setMode('case');
+    return;
+  }
 
   if (reason) {
     // Check if paywall was already shown in a previous session
