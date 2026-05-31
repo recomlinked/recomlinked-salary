@@ -173,10 +173,10 @@
     }
     @media (max-width: 560px) {
       .templates-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .template-label { padding: 8px 10px 8px; }
-      .template-badge { font-size: 12px; }
-      .template-name { font-size: 10px; }
-      .template-preview { aspect-ratio: 1/1.6; }
+      .template-label { padding: 11px 11px 12px; }
+      .template-badge { font-size: 11px; margin-bottom: 8px; padding: 4px 9px; }
+      .template-name { font-size: 14px; }
+      .template-preview { aspect-ratio: 1/1.55; }
       .template-preview > div:first-child { transform: scale(0.27) !important; }
     }
 
@@ -200,18 +200,23 @@
     }
 
     /* Card label — ABOVE preview */
-    .template-label { padding: 12px 14px 10px; order: -1; }
+    .template-label { padding: 14px 14px 12px; order: -1; }
     .template-badge {
-      display: block;
-      font-size: 14px; font-weight: 800;
-      color: var(--text); line-height: 1.3;
-      margin-bottom: 3px;
-      background: none; padding: 0; border-radius: 0;
-      text-transform: none; letter-spacing: -0.3px;
+      display: inline-block;
+      font-size: 12px; font-weight: 800;
+      color: var(--template-color, var(--purple));
+      line-height: 1.2;
+      margin-bottom: 9px;
+      background: var(--template-tint, rgba(123,92,252,0.08));
+      padding: 5px 11px; border-radius: 6px;
+      text-transform: uppercase; letter-spacing: 0.04em;
     }
     .template-name {
-      font-size: 12px; font-weight: 400;
-      color: var(--text2); line-height: 1.4;
+      display: block;
+      font-size: 17px; font-weight: 800;
+      color: var(--text); line-height: 1.25;
+      letter-spacing: -0.3px;
+      margin: 0;
     }
 
     /* Document preview area */
@@ -224,6 +229,16 @@
       border-top: 1px solid var(--border);
     }
     .template-preview > div:first-child { pointer-events: none; }
+    /* Fade preview to white at the bottom so it reads as a document, not a text wall */
+    .template-preview::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 55%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.85) 55%, #fff 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
 
     /* Hover overlay */
     .template-overlay {
@@ -231,6 +246,7 @@
       background: rgba(0,0,0,0.45);
       display: flex; align-items: center; justify-content: center;
       opacity: 0; transition: opacity 0.2s;
+      z-index: 2;
     }
     .template-card:hover .template-overlay { opacity: 1; }
     .template-overlay-btn {
@@ -381,7 +397,7 @@
     <h1>Ask for a raise <span class="accent">via email</span><br><span class="accent">Skip the tough talk</span></h1>
     <p class="hero-sub">The doc does the job. The conversation is just for closing.</p>
     <div class="cta-stack">
-      <a class="cta-btn" href="/raise/chat/?mode=case">
+      <a class="cta-btn" href="#templates">
         Generate my raise case
         <span style="font-size:17px;margin-left:6px;">→</span>
       </a>
@@ -424,61 +440,61 @@
 
   <!-- TEMPLATES -->
   <section class="section" id="templates">
-    <h2 class="section-title">Pick the template that matches your leverage</h2>
+    <h2 class="section-title">Start here: pick the case that matches your situation</h2>
     <p class="section-sub">Each template is built around a different type of raise request. The questions, structure, and language change to match your specific case.</p>
 
     <div class="templates-grid">
 
       <!-- Template 1: Performance -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=performance">
+      <a class="template-card" style="--template-color:#3a6ea5;--template-tint:rgba(58,110,165,0.10);" href="/raise/chat/?mode=case&template=performance">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
-<div style="background:#1e3d72;padding:16px 28px 12px;">
+<div style="background:#3a6ea5;padding:16px 28px 12px;">
   <div style="font-size:8px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
   <div style="font-size:15px;font-weight:600;color:#fff;margin-bottom:1px;">Sarah Mitchell</div>
   <div style="font-size:10px;color:rgba(255,255,255,0.6);">Senior Product Designer &middot; Acme Corp &middot; 2 years, 4 months</div>
 </div>
 <div style="padding:14px 28px 10px;">
 
-  <div style="font-size:8px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <div style="font-size:8px;font-weight:600;color:#3a6ea5;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 10px;">I am requesting a compensation review based on my performance over the past two years. My work has delivered measurable results across multiple product surfaces, and I would like to align my salary with the value I am contributing. I am raising this proactively because I believe the gap between my contribution and my compensation is worth addressing together.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Key results &mdash; Last 12 months</div>
-  <div style="padding:5px 0 5px 10px;border-left:2px solid #c9a84c;margin-bottom:4px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#1e3d72;">Checkout redesign</strong></p>
+  <div style="font-size:8px;font-weight:600;color:#3a6ea5;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Key results &mdash; Last 12 months</div>
+  <div style="padding:5px 0 5px 10px;border-left:2px solid #3a6ea5;margin-bottom:4px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#3a6ea5;">Checkout redesign</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Led end-to-end redesign of the checkout flow. Conversion increased 23%, generating approximately $340K in additional annual revenue. Delivered in 6 weeks, 2 weeks ahead of schedule.</p>
   </div>
-  <div style="padding:5px 0 5px 10px;border-left:2px solid #c9a84c;margin-bottom:4px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#1e3d72;">Design system rollout</strong></p>
+  <div style="padding:5px 0 5px 10px;border-left:2px solid #3a6ea5;margin-bottom:4px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#3a6ea5;">Design system rollout</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Built and shipped the component library now used across 3 engineering squads. Saves approximately 120 engineering hours per quarter and eliminated visual inconsistencies across the product.</p>
   </div>
-  <div style="padding:5px 0 5px 10px;border-left:2px solid #c9a84c;margin-bottom:4px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#1e3d72;">Retention flow improvements</strong></p>
+  <div style="padding:5px 0 5px 10px;border-left:2px solid #3a6ea5;margin-bottom:4px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#3a6ea5;">Retention flow improvements</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Redesigned the first-week user experience. Churn dropped 11% in the first month, with an estimated $180K in retained annual revenue. This project was self-initiated, not assigned.</p>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Recognition &amp; reviews</div>
+  <div style="font-size:8px;font-weight:600;color:#3a6ea5;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Recognition &amp; reviews</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 4px;">Rated &#8220;exceeds expectations&#8221; in both quarterly performance reviews this year. Nominated for the Q3 Impact Award by my direct manager, who cited my checkout redesign as the benchmark for the design team. Informally leading the design critique process and mentoring two junior designers.</p>
   <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">
-    <div style="padding:3px 7px;border-radius:3px;background:rgba(30,61,114,0.07);font-size:7.5px;color:#1e3d72;font-weight:600;">Q1 review: Exceeds</div>
-    <div style="padding:3px 7px;border-radius:3px;background:rgba(30,61,114,0.07);font-size:7.5px;color:#1e3d72;font-weight:600;">Q3 review: Exceeds</div>
-    <div style="padding:3px 7px;border-radius:3px;background:rgba(201,168,76,0.15);font-size:7.5px;color:#6a4a10;font-weight:600;">Q3 Impact Award Nominee</div>
-    <div style="padding:3px 7px;border-radius:3px;background:rgba(30,61,114,0.07);font-size:7.5px;color:#1e3d72;font-weight:600;">Mentoring 2 junior designers</div>
+    <div style="padding:3px 7px;border-radius:3px;background:rgba(58,110,165,0.07);font-size:7.5px;color:#3a6ea5;font-weight:600;">Q1 review: Exceeds</div>
+    <div style="padding:3px 7px;border-radius:3px;background:rgba(58,110,165,0.07);font-size:7.5px;color:#3a6ea5;font-weight:600;">Q3 review: Exceeds</div>
+    <div style="padding:3px 7px;border-radius:3px;background:rgba(201,168,76,0.15);font-size:7.5px;color:#294d73;font-weight:600;">Q3 Impact Award Nominee</div>
+    <div style="padding:3px 7px;border-radius:3px;background:rgba(58,110,165,0.07);font-size:7.5px;color:#3a6ea5;font-weight:600;">Mentoring 2 junior designers</div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The defining moment</div>
-  <div style="background:rgba(30,61,114,0.03);border-radius:5px;padding:10px 12px;border-left:3px solid #c9a84c;margin-bottom:10px;">
+  <div style="font-size:8px;font-weight:600;color:#3a6ea5;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The defining moment</div>
+  <div style="background:rgba(58,110,165,0.03);border-radius:5px;padding:10px 12px;border-left:3px solid #3a6ea5;margin-bottom:10px;">
     <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0;">When the enterprise deal with Meridian Corp was at risk due to a poor proposal experience, I volunteered to redesign the proposal flow in 3 days over a weekend. The client signed the following week &#8212; a $420K annual contract. My manager called it &#8220;the save of the quarter.&#8221; This is the kind of initiative I bring consistently, and it is the kind of contribution I believe should be reflected in my compensation.</p>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#1e3d72;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
-  <div style="background:#f8f6f0;border:1px solid rgba(139,111,165,0.2);border-radius:5px;padding:10px;text-align:center;margin-bottom:8px;">
-    <div style="font-size:7px;font-weight:600;color:#8a7540;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Proposed adjustment</div>
-    <div style="font-size:16px;font-weight:600;color:#6a4a10;">$112,000 &#8594; $134,000</div>
-    <div style="font-size:8px;color:#8a7540;margin-top:2px;">19.6% performance-based alignment &#183; effective beginning of next quarter</div>
+  <div style="font-size:8px;font-weight:600;color:#3a6ea5;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
+  <div style="background:#f1f5f9;border:1px solid rgba(139,111,165,0.2);border-radius:5px;padding:10px;text-align:center;margin-bottom:8px;">
+    <div style="font-size:7px;font-weight:600;color:#315e8c;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Proposed adjustment</div>
+    <div style="font-size:16px;font-weight:600;color:#294d73;">$112,000 &#8594; $134,000</div>
+    <div style="font-size:8px;color:#315e8c;margin-top:2px;">19.6% performance-based alignment &#183; effective beginning of next quarter</div>
   </div>
 
-  <div style="padding:8px 10px;background:#f8f9fc;border-radius:4px;border-left:2px solid #1e3d72;">
+  <div style="padding:8px 10px;background:#f8f9fc;border-radius:4px;border-left:2px solid #3a6ea5;">
     <p style="font-size:8.5px;color:#4a5068;line-height:1.6;font-style:italic;margin:0;">I am sharing this in writing so you have time to review the details before we sit down. I am not looking to create pressure &#8212; I want us to go into the conversation with the same information. I am happy to discuss the timeline and any supporting details that would help move this forward.</p>
   </div>
 </div>
@@ -489,71 +505,71 @@
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
         <div class="template-label">
-          <span class="template-badge">Performance Case</span>
+          <span class="template-badge">Performance</span>
           <p class="template-name">I've delivered strong results this year</p>
         </div>
       </a>
 
       <!-- Template 2: Scope Expansion -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=scope">
+      <a class="template-card" style="--template-color:#0a9b96;--template-tint:rgba(10,155,150,0.10);" href="/raise/chat/?mode=case&template=scope">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
-<div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:#7B5CFC;"></div>
+<div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:#0a9b96;"></div>
 <div style="padding:14px 28px 10px 36px;border-bottom:1px solid #e8eaef;">
   <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
-  <div style="font-size:15px;font-weight:600;color:#7B5CFC;">James Chen</div>
+  <div style="font-size:15px;font-weight:600;color:#0a9b96;">James Chen</div>
   <div style="font-size:10px;color:#8a90a8;">Engineering Manager &middot; TechFlow Inc &middot; 3 years</div>
 </div>
 <div style="padding:12px 28px 10px 36px;">
-  <div style="font-size:8px;font-weight:600;color:#7B5CFC;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <div style="font-size:8px;font-weight:600;color:#0a9b96;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I was hired as a backend engineer three years ago. Since then, my role has grown into a full engineering management position spanning three teams. I am requesting a compensation adjustment to reflect the job I am actually doing, not the job I was originally hired for.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#7B5CFC;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Role evolution</div>
+  <div style="font-size:8px;font-weight:600;color:#0a9b96;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Role evolution</div>
   <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <div style="flex:1;padding:7px 9px;border-radius:5px;background:#f8f6ff;border:1px solid rgba(123,92,252,0.12);">
+    <div style="flex:1;padding:7px 9px;border-radius:5px;background:#f8f6ff;border:1px solid rgba(10,155,150,0.12);">
       <div style="font-size:7px;color:#8a90a8;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Hired as</div>
-      <p style="font-size:9.5px;font-weight:600;color:#5B3CC4;margin:0 0 3px;">Backend Engineer</p>
+      <p style="font-size:9.5px;font-weight:600;color:#087470;margin:0 0 3px;">Backend Engineer</p>
       <p style="font-size:8.5px;color:#2a3650;line-height:1.5;margin:0;">1 service, individual contributor, no direct reports, no hiring responsibilities</p>
     </div>
-    <div style="display:flex;align-items:center;color:#9B7CFC;font-size:16px;font-weight:700;flex-shrink:0;">&#8594;</div>
-    <div style="flex:1;padding:7px 9px;border-radius:5px;background:rgba(123,92,252,0.06);border:1px solid rgba(123,92,252,0.2);">
-      <div style="font-size:7px;color:#5B3CC4;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Current scope</div>
-      <p style="font-size:9.5px;font-weight:600;color:#5B3CC4;margin:0 0 3px;">Engineering Manager</p>
+    <div style="display:flex;align-items:center;color:#36ada9;font-size:16px;font-weight:700;flex-shrink:0;">&#8594;</div>
+    <div style="flex:1;padding:7px 9px;border-radius:5px;background:rgba(10,155,150,0.06);border:1px solid rgba(10,155,150,0.2);">
+      <div style="font-size:7px;color:#087470;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Current scope</div>
+      <p style="font-size:9.5px;font-weight:600;color:#087470;margin:0 0 3px;">Engineering Manager</p>
       <p style="font-size:8.5px;color:#2a3650;line-height:1.5;margin:0;">3 teams, 8 direct reports, architecture owner, hiring lead, on-call rotation owner</p>
     </div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#7B5CFC;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Impact delivered in expanded role</div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #9B7CFC;margin-bottom:3px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#5B3CC4;">Platform migration</strong></p>
+  <div style="font-size:8px;font-weight:600;color:#0a9b96;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Impact delivered in expanded role</div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #36ada9;margin-bottom:3px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#087470;">Platform migration</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Led migration to microservices architecture. Latency reduced 40%, uptime improved to 99.95%. Completed on schedule with zero customer-facing incidents.</p>
   </div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #9B7CFC;margin-bottom:3px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#5B3CC4;">Team scaling</strong></p>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #36ada9;margin-bottom:3px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#087470;">Team scaling</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Hired and onboarded 5 engineers in 6 months. Zero attrition in the first year. All five received positive first-cycle reviews.</p>
   </div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #9B7CFC;margin-bottom:8px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#5B3CC4;">Incident response overhaul</strong></p>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #36ada9;margin-bottom:8px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#087470;">Incident response overhaul</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Redesigned the on-call process and runbooks. P1 resolution time dropped from 4 hours to 45 minutes. Reduced escalations to VP level by 70%.</p>
   </div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #9B7CFC;margin-bottom:3px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#5B3CC4;">Cross-team API standards</strong></p>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #36ada9;margin-bottom:3px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#087470;">Cross-team API standards</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Defined and enforced API contracts across 3 services. Integration bugs dropped 60% and cross-team shipping velocity increased 25%.</p>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#7B5CFC;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The timeline</div>
-  <div style="background:rgba(123,92,252,0.04);border-radius:5px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-    <div style="font-size:22px;font-weight:700;color:#5B3CC4;flex-shrink:0;">18</div>
-    <div><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">months operating at Engineering Manager scope with <strong style="color:#5B3CC4;">zero compensation adjustments</strong>. The expanded responsibilities were absorbed gradually, without a formal title change or salary review.</p></div>
+  <div style="font-size:8px;font-weight:600;color:#0a9b96;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The timeline</div>
+  <div style="background:rgba(10,155,150,0.04);border-radius:5px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <div style="font-size:22px;font-weight:700;color:#087470;flex-shrink:0;">18</div>
+    <div><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">months operating at Engineering Manager scope with <strong style="color:#087470;">zero compensation adjustments</strong>. The expanded responsibilities were absorbed gradually, without a formal title change or salary review.</p></div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#7B5CFC;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
-  <div style="background:rgba(123,92,252,0.05);border:1px solid rgba(123,92,252,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:6px;">
-    <div style="font-size:7px;font-weight:600;color:#5B3CC4;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
-    <div style="font-size:16px;font-weight:600;color:#5B3CC4;">$145,000 &#8594; $172,000</div>
-    <div style="font-size:8px;color:#7B5CFC;margin-top:2px;">18.6% scope alignment &#183; effective next quarter</div>
+  <div style="font-size:8px;font-weight:600;color:#0a9b96;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
+  <div style="background:rgba(10,155,150,0.05);border:1px solid rgba(10,155,150,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:6px;">
+    <div style="font-size:7px;font-weight:600;color:#087470;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
+    <div style="font-size:16px;font-weight:600;color:#087470;">$145,000 &#8594; $172,000</div>
+    <div style="font-size:8px;color:#0a9b96;margin-top:2px;">18.6% scope alignment &#183; effective next quarter</div>
   </div>
-  <div style="padding:7px 10px;background:#f8f6ff;border-radius:4px;border-left:2px solid #7B5CFC;">
+  <div style="padding:7px 10px;background:#f8f6ff;border-radius:4px;border-left:2px solid #0a9b96;">
     <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">I am raising this because I want to resolve it here. This is about aligning my compensation with the job I am already doing &#8212; not the job I was hired for three years ago. I am happy to discuss timing and details.</p>
   </div>
 </div>
@@ -564,53 +580,53 @@
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
         <div class="template-label">
-          <span class="template-badge">Scope Expansion Case</span>
+          <span class="template-badge">Scope Expansion</span>
           <p class="template-name">My role has grown but my pay hasn't</p>
         </div>
       </a>
 
       <!-- Template 3: Competing Offer -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=offer">
+      <a class="template-card" style="--template-color:#2f8f6f;--template-tint:rgba(47,143,111,0.10);" href="/raise/chat/?mode=case&template=offer">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;position:relative;">
-<div style="position:absolute;right:0;top:0;bottom:0;width:5px;background:#c47a00;"></div>
+<div style="position:absolute;right:0;top:0;bottom:0;width:5px;background:#2f8f6f;"></div>
 <div style="padding:14px 36px 10px 28px;border-bottom:1px solid #e8eaef;">
   <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
-  <div style="font-size:15px;font-weight:600;color:#c47a00;">Michael Park</div>
+  <div style="font-size:15px;font-weight:600;color:#2f8f6f;">Michael Park</div>
   <div style="font-size:10px;color:#8a90a8;">Product Manager &middot; GrowthCo &middot; 4 years</div>
 </div>
 <div style="padding:12px 36px 10px 28px;">
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <div style="font-size:8px;font-weight:600;color:#2f8f6f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I want to start by saying that after four years here, my preference is to stay. I have built something I am proud of, and I believe in where this company is heading. I am sharing this because I believe in being transparent, and I would rather have an honest conversation than let uncertainty build on either side. This document is not a negotiation tactic. It is my way of putting everything on the table so we can make a decision together.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The situation</div>
+  <div style="font-size:8px;font-weight:600;color:#2f8f6f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The situation</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 4px;">I have received a written offer from a Series B company for a Senior Product Manager role. I am not presenting this as an ultimatum. I am sharing it because the gap is significant enough that ignoring it would not be fair to either of us. The role is a Senior PM position with a team of 8, a $2M product budget, and equity participation.</p>
   <div style="display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid #e8eaef;margin-bottom:8px;">
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#fdf8f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Current compensation</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$138K</div><div style="font-size:6.5px;color:#8a90a8;">Base + bonus</div></div>
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">External offer</div><div style="font-size:14px;font-weight:600;color:#c47a00;">$165K</div><div style="font-size:6.5px;color:#8a90a8;">Base + equity</div></div>
-    <div style="flex:1;padding:8px 5px;text-align:center;background:#f8f6f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Gap</div><div style="font-size:14px;font-weight:600;color:#6a4a10;">$27K</div><div style="font-size:6.5px;color:#8a90a8;">19.6% below offer</div></div>
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#f5f9f8;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Current compensation</div><div style="font-size:14px;font-weight:600;color:#2f8f6f;">$138K</div><div style="font-size:6.5px;color:#8a90a8;">Base + bonus</div></div>
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">External offer</div><div style="font-size:14px;font-weight:600;color:#2f8f6f;">$165K</div><div style="font-size:6.5px;color:#8a90a8;">Base + equity</div></div>
+    <div style="flex:1;padding:8px 5px;text-align:center;background:#f0f7f5;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Gap</div><div style="font-size:14px;font-weight:600;color:#21644e;">$27K</div><div style="font-size:6.5px;color:#8a90a8;">19.6% below offer</div></div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why I want to stay</div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I believe in the product roadmap we have built together and want to see it through the next two launches</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">The engineering and design team I have trained is producing its best work right now &#8212; leaving would disrupt that</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">Four years of customer context and cross-functional relationships are a compounding asset I cannot replicate elsewhere</p></div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #c47a00;margin-bottom:8px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I genuinely enjoy working here &#8212; the culture, the pace, and the trust I have built with leadership</p></div>
+  <div style="font-size:8px;font-weight:600;color:#2f8f6f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why I want to stay</div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #2f8f6f;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I believe in the product roadmap we have built together and want to see it through the next two launches</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #2f8f6f;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">The engineering and design team I have trained is producing its best work right now &#8212; leaving would disrupt that</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #2f8f6f;margin-bottom:3px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">Four years of customer context and cross-functional relationships are a compounding asset I cannot replicate elsewhere</p></div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #2f8f6f;margin-bottom:8px;"><p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;">I genuinely enjoy working here &#8212; the culture, the pace, and the trust I have built with leadership</p></div>
 
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What would be lost</div>
+  <div style="font-size:8px;font-weight:600;color:#2f8f6f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What would be lost</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">If I leave, the company loses four years of product context, customer relationships I have built personally, a PM team I trained from scratch, and the institutional knowledge that keeps three product lines running smoothly. The cost of replacing and ramping a new PM at my level is estimated at 6&#8211;9 months of lost velocity. I am sharing this not as a threat, but because the retention math strongly favors closing this gap.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#c47a00;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask &amp; timeline</div>
-  <div style="background:#fdf8f0;border:1px solid rgba(196,122,0,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:4px;">
-    <div style="font-size:7px;font-weight:600;color:#8a7540;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
-    <div style="font-size:16px;font-weight:600;color:#6a4a10;">$138,000 &#8594; $158,000</div>
-    <div style="font-size:8px;color:#8a7540;margin-top:2px;">14.5% retention-focused adjustment</div>
+  <div style="font-size:8px;font-weight:600;color:#2f8f6f;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask &amp; timeline</div>
+  <div style="background:#f5f9f8;border:1px solid rgba(47,143,111,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:4px;">
+    <div style="font-size:7px;font-weight:600;color:#287a5e;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
+    <div style="font-size:16px;font-weight:600;color:#21644e;">$138,000 &#8594; $158,000</div>
+    <div style="font-size:8px;color:#287a5e;margin-top:2px;">14.5% retention-focused adjustment</div>
   </div>
   <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#9200; Response needed: 2 weeks</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(196,122,0,0.08);font-size:7.5px;color:#c47a00;font-weight:600;">&#128197; External offer expires: June 15</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(47,143,111,0.08);font-size:7.5px;color:#2f8f6f;font-weight:600;">&#9200; Response needed: 2 weeks</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(47,143,111,0.08);font-size:7.5px;color:#2f8f6f;font-weight:600;">&#128197; External offer expires: June 15</div>
   </div>
-  <div style="padding:7px 10px;background:#fdf8f0;border-radius:4px;border-left:2px solid #c47a00;">
+  <div style="padding:7px 10px;background:#f5f9f8;border-radius:4px;border-left:2px solid #2f8f6f;">
     <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">I am not using this as leverage. I am sharing it because the gap is real, and I respect you enough to put it on the table directly. My preference is clear &#8212; I want to stay. I just need the compensation to reflect that staying is the right choice. I am open to discussing the structure of the adjustment, whether that is base salary, equity, or a combination.</p>
   </div>
 </div>
@@ -621,71 +637,71 @@
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
         <div class="template-label">
-          <span class="template-badge">Competing Offer Case</span>
+          <span class="template-badge">Competing Offer</span>
           <p class="template-name">I have an offer from another company</p>
         </div>
       </a>
 
       <!-- Template 4: Market Rate -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=market">
+      <a class="template-card" style="--template-color:#4a8db0;--template-tint:rgba(74,141,176,0.10);" href="/raise/chat/?mode=case&template=market">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
-<div style="height:4px;background:linear-gradient(90deg,#1a8a5a,#2aaa6a);"></div>
+<div style="height:4px;background:linear-gradient(90deg,#4a8db0,#6ba2be);"></div>
 <div style="padding:12px 28px 10px;border-bottom:1px solid #e8eaef;">
   <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
-  <div style="font-size:15px;font-weight:600;color:#1a8a5a;">Emily Rodriguez</div>
+  <div style="font-size:15px;font-weight:600;color:#4a8db0;">Emily Rodriguez</div>
   <div style="font-size:10px;color:#8a90a8;">Data Analyst &middot; DataCo (Series B, 120 employees) &middot; Calgary, AB</div>
 </div>
 <div style="padding:12px 28px 10px;">
-  <div style="font-size:8px;font-weight:600;color:#1a8a5a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <div style="font-size:8px;font-weight:600;color:#4a8db0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I am requesting a market-rate adjustment. My research across four independent salary sources confirms my current compensation falls significantly below the median for my role, experience level, and geographic market. I am raising this proactively because I value my role here and want to resolve the gap before it becomes a larger issue.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#1a8a5a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Market evidence</div>
+  <div style="font-size:8px;font-weight:600;color:#4a8db0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Market evidence</div>
   <div style="display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid #e8eaef;margin-bottom:5px;">
-    <div style="flex:1;padding:7px 5px;text-align:center;background:#f8f9fc;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">My salary</div><div style="font-size:14px;font-weight:600;color:#1a8a5a;">$78K</div><div style="font-size:6.5px;color:#8a90a8;">Base</div></div>
-    <div style="flex:1;padding:7px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Market median</div><div style="font-size:14px;font-weight:600;color:#1a8a5a;">$92K</div><div style="font-size:6.5px;color:#8a90a8;">Data Analyst, this market</div></div>
+    <div style="flex:1;padding:7px 5px;text-align:center;background:#f8f9fc;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">My salary</div><div style="font-size:14px;font-weight:600;color:#4a8db0;">$78K</div><div style="font-size:6.5px;color:#8a90a8;">Base</div></div>
+    <div style="flex:1;padding:7px 5px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Market median</div><div style="font-size:14px;font-weight:600;color:#4a8db0;">$92K</div><div style="font-size:6.5px;color:#8a90a8;">Data Analyst, this market</div></div>
     <div style="flex:1;padding:7px 5px;text-align:center;background:#f8f6f0;"><div style="font-size:6.5px;color:#8a90a8;margin-bottom:1px;">Gap</div><div style="font-size:14px;font-weight:600;color:#6a4a10;">-15.2%</div><div style="font-size:6.5px;color:#8a90a8;">Below median</div></div>
   </div>
-  <div style="background:rgba(26,138,90,0.03);border-radius:5px;padding:8px 10px;margin-bottom:4px;">
-    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">My salary</span><span style="font-size:8px;font-weight:600;color:#1a8a5a;">$78,000</span></div>
-    <div style="height:5px;border-radius:3px;background:#e8eaef;margin-bottom:4px;"><div style="height:5px;border-radius:3px;background:#1a8a5a;width:84.8%;"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">Market median</span><span style="font-size:8px;font-weight:600;color:#2aaa6a;">$92,000</span></div>
-    <div style="height:5px;border-radius:3px;background:#e8eaef;margin-bottom:4px;"><div style="height:5px;border-radius:3px;background:#2aaa6a;width:100%;"></div></div>
-    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">75th percentile</span><span style="font-size:8px;font-weight:600;color:#2aaa6a;">$98,000</span></div>
-    <div style="height:5px;border-radius:3px;background:#e8eaef;"><div style="height:5px;border-radius:3px;background:#2aaa6a;opacity:0.5;width:100%;"></div></div>
+  <div style="background:rgba(74,141,176,0.03);border-radius:5px;padding:8px 10px;margin-bottom:4px;">
+    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">My salary</span><span style="font-size:8px;font-weight:600;color:#4a8db0;">$78,000</span></div>
+    <div style="height:5px;border-radius:3px;background:#e8eaef;margin-bottom:4px;"><div style="height:5px;border-radius:3px;background:#4a8db0;width:84.8%;"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">Market median</span><span style="font-size:8px;font-weight:600;color:#6ba2be;">$92,000</span></div>
+    <div style="height:5px;border-radius:3px;background:#e8eaef;margin-bottom:4px;"><div style="height:5px;border-radius:3px;background:#6ba2be;width:100%;"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:8px;color:#2a3650;">75th percentile</span><span style="font-size:8px;font-weight:600;color:#6ba2be;">$98,000</span></div>
+    <div style="height:5px;border-radius:3px;background:#e8eaef;"><div style="height:5px;border-radius:3px;background:#6ba2be;opacity:0.5;width:100%;"></div></div>
   </div>
   <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
-    <div style="padding:2px 6px;border-radius:3px;background:rgba(26,138,90,0.08);font-size:7px;color:#1a8a5a;font-weight:600;">Glassdoor verified</div>
-    <div style="padding:2px 6px;border-radius:3px;background:rgba(26,138,90,0.08);font-size:7px;color:#1a8a5a;font-weight:600;">Levels.fyi</div>
-    <div style="padding:2px 6px;border-radius:3px;background:rgba(26,138,90,0.08);font-size:7px;color:#1a8a5a;font-weight:600;">LinkedIn Salary</div>
-    <div style="padding:2px 6px;border-radius:3px;background:rgba(26,138,90,0.08);font-size:7px;color:#1a8a5a;font-weight:600;">Payscale</div>
-    <div style="padding:2px 6px;border-radius:3px;background:rgba(26,138,90,0.08);font-size:7px;color:#1a8a5a;font-weight:600;">Indeed</div>
+    <div style="padding:2px 6px;border-radius:3px;background:rgba(74,141,176,0.08);font-size:7px;color:#4a8db0;font-weight:600;">Glassdoor verified</div>
+    <div style="padding:2px 6px;border-radius:3px;background:rgba(74,141,176,0.08);font-size:7px;color:#4a8db0;font-weight:600;">Levels.fyi</div>
+    <div style="padding:2px 6px;border-radius:3px;background:rgba(74,141,176,0.08);font-size:7px;color:#4a8db0;font-weight:600;">LinkedIn Salary</div>
+    <div style="padding:2px 6px;border-radius:3px;background:rgba(74,141,176,0.08);font-size:7px;color:#4a8db0;font-weight:600;">Payscale</div>
+    <div style="padding:2px 6px;border-radius:3px;background:rgba(74,141,176,0.08);font-size:7px;color:#4a8db0;font-weight:600;">Indeed</div>
   </div>
   <p style="font-size:9px;color:#2a3650;line-height:1.55;margin:0 0 8px;">All five sources independently place the median for this role in this market between $89K and $95K. My current salary of $78K sits below the 25th percentile in three of the five data sets.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#1a8a5a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Role &amp; tenure</div>
+  <div style="font-size:8px;font-weight:600;color:#4a8db0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Role &amp; tenure</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">18 months in this role with two positive performance reviews and no salary adjustment since hire. I have taken on increasing responsibility without a formal comp review, including ownership of executive reporting and cross-team analytics projects. My most recent review rated my work as &ldquo;consistently strong&rdquo; and noted my growing influence on company-wide decision-making.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#1a8a5a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Contribution summary</div>
+  <div style="font-size:8px;font-weight:600;color:#4a8db0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Contribution summary</div>
   <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;">
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Executive dashboards</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Predictive modeling</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">A/B test design</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Stakeholder presentations</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Revenue forecasting</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Churn analysis</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Data pipeline QA</div>
-    <div style="padding:3px 8px;border-radius:3px;background:rgba(26,138,90,0.06);font-size:7.5px;color:#1a8a5a;font-weight:600;">Cross-team support</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Executive dashboards</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Predictive modeling</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">A/B test design</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Stakeholder presentations</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Revenue forecasting</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Churn analysis</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Data pipeline QA</div>
+    <div style="padding:3px 8px;border-radius:3px;background:rgba(74,141,176,0.06);font-size:7.5px;color:#4a8db0;font-weight:600;">Cross-team support</div>
   </div>
   <p style="font-size:9px;color:#2a3650;line-height:1.55;margin:0 0 8px;">I am raising this now because three recruiters have reached out in the past two months for roles paying $90K&ndash;$100K. I would rather solve this here than let the market pull me toward an unnecessary decision.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#1a8a5a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
+  <div style="font-size:8px;font-weight:600;color:#4a8db0;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
   <div style="background:#f8f6f0;border:1px solid rgba(139,111,165,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:6px;">
     <div style="font-size:7px;font-weight:600;color:#8a7540;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
     <div style="font-size:16px;font-weight:600;color:#6a4a10;">$78,000 &#8594; $92,000</div>
     <div style="font-size:8px;color:#8a7540;margin-top:2px;">17.9% market alignment &#183; retention-focused correction</div>
   </div>
-  <div style="padding:7px 10px;background:#f0faf5;border-radius:4px;border-left:2px solid #1a8a5a;">
+  <div style="padding:7px 10px;background:#f0faf5;border-radius:4px;border-left:2px solid #4a8db0;">
     <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">This is not about performance dissatisfaction &#8212; my reviews have been consistently positive. I value my role and want to resolve the market gap proactively so it does not become a reason to explore other options.</p>
   </div>
 </div>
@@ -696,73 +712,73 @@
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
         <div class="template-label">
-          <span class="template-badge">Market Rate Gap (Underpaid)</span>
+          <span class="template-badge">Market Gap (Underpaid)</span>
           <p class="template-name">I'm paid below market for my role</p>
         </div>
       </a>
 
       <!-- Template 5: Promotion Without Pay -->
-      <a class="template-card" href="/raise/chat/?mode=case&template=promotion">
+      <a class="template-card" style="--template-color:#15616d;--template-tint:rgba(21,97,109,0.10);" href="/raise/chat/?mode=case&template=promotion">
         <div class="template-preview">
           <div style="width:600px;transform:scale(0.33);transform-origin:top left;background:#fff;text-align:left;font-family:Arial,sans-serif;">
-<div style="display:flex;"><div style="flex:1;background:#c43a3a;opacity:0.1;height:28px;"></div><div style="flex:1;background:#c43a3a;opacity:0.05;height:28px;"></div></div>
+<div style="display:flex;"><div style="flex:1;background:#15616d;opacity:0.1;height:28px;"></div><div style="flex:1;background:#15616d;opacity:0.05;height:28px;"></div></div>
 <div style="padding:6px 28px 10px;border-bottom:1px solid #e8eaef;margin-top:-18px;">
   <div style="font-size:8px;color:rgba(0,0,0,0.4);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">Compensation review request</div>
-  <div style="font-size:15px;font-weight:600;color:#c43a3a;">Alex Thompson</div>
+  <div style="font-size:15px;font-weight:600;color:#15616d;">Alex Thompson</div>
   <div style="font-size:10px;color:#8a90a8;">Marketing Director &middot; BrandHQ &middot; Promoted 3 months ago</div>
 </div>
 <div style="padding:12px 28px 10px;">
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Opening statement</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">I appreciate the promotion to Marketing Director. I am proud that the company recognized my contribution with the title change and the expanded responsibilities. I would like to complete the promotion by aligning my compensation with the market rate and responsibility level for this new role.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What changed</div>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">What changed</div>
   <div style="display:flex;gap:6px;margin-bottom:8px;">
-    <div style="flex:1;padding:7px 9px;border-radius:5px;background:#fef5f5;border:1px solid rgba(196,58,58,0.12);">
+    <div style="flex:1;padding:7px 9px;border-radius:5px;background:#fef5f5;border:1px solid rgba(21,97,109,0.12);">
       <div style="font-size:7px;color:#8a90a8;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Previous title</div>
-      <p style="font-size:9.5px;font-weight:600;color:#c43a3a;margin:0 0 3px;">Sr. Marketing Manager</p>
+      <p style="font-size:9.5px;font-weight:600;color:#15616d;margin:0 0 3px;">Sr. Marketing Manager</p>
       <p style="font-size:8.5px;color:#2a3650;line-height:1.5;margin:0;">2 campaigns, 1 direct report, executes strategy set by director, no budget authority</p>
     </div>
-    <div style="display:flex;align-items:center;color:#d45050;font-size:16px;font-weight:700;flex-shrink:0;">&#8594;</div>
-    <div style="flex:1;padding:7px 9px;border-radius:5px;background:rgba(196,58,58,0.04);border:1px solid rgba(196,58,58,0.2);">
-      <div style="font-size:7px;color:#a03030;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Current title</div>
-      <p style="font-size:9.5px;font-weight:600;color:#c43a3a;margin:0 0 3px;">Marketing Director</p>
+    <div style="display:flex;align-items:center;color:#3f7d87;font-size:16px;font-weight:700;flex-shrink:0;">&#8594;</div>
+    <div style="flex:1;padding:7px 9px;border-radius:5px;background:rgba(21,97,109,0.04);border:1px solid rgba(21,97,109,0.2);">
+      <div style="font-size:7px;color:#104952;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">Current title</div>
+      <p style="font-size:9.5px;font-weight:600;color:#15616d;margin:0 0 3px;">Marketing Director</p>
       <p style="font-size:8.5px;color:#2a3650;line-height:1.5;margin:0;">Full department, $2.4M budget owner, 6 direct reports, sets strategy, reports to VP</p>
     </div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Early wins in new role</div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #d45050;margin-bottom:3px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#c43a3a;">Team restructure</strong></p>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Early wins in new role</div>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #3f7d87;margin-bottom:3px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#15616d;">Team restructure</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Reorganized marketing into pods by function. Campaign velocity increased 35% in the first quarter under new structure.</p>
   </div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #d45050;margin-bottom:3px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#c43a3a;">Agency contract renegotiation</strong></p>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #3f7d87;margin-bottom:3px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#15616d;">Agency contract renegotiation</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Renegotiated the primary agency contract within first month. Saved $180K annually and redirected budget to performance marketing channels.</p>
   </div>
-  <div style="padding:4px 0 4px 10px;border-left:2px solid #d45050;margin-bottom:8px;">
-    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#c43a3a;">Employer brand launch</strong></p>
+  <div style="padding:4px 0 4px 10px;border-left:2px solid #3f7d87;margin-bottom:8px;">
+    <p style="font-size:9.5px;color:#2a3650;line-height:1.5;margin:0;"><strong style="color:#15616d;">Employer brand launch</strong></p>
     <p style="font-size:9px;color:#2a3650;line-height:1.5;margin:2px 0 0;">Launched the employer brand initiative from scratch. Inbound applications up 60%, cost-per-hire reduced 22% in 90 days.</p>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Compensation gap</div>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Compensation gap</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 4px;">My salary remained at $118K after the title change. No compensation adjustment was discussed or offered at the time of promotion. Three months into the role, the gap between my title and my compensation has become increasingly visible &#8212; both to me and to the team I now lead.</p>
   <div style="display:flex;gap:0;border-radius:5px;overflow:hidden;border:1px solid #e8eaef;margin-bottom:8px;">
-    <div style="flex:1;padding:6px 4px;text-align:center;background:#fef5f5;"><div style="font-size:6.5px;color:#8a90a8;">Current</div><div style="font-size:12px;font-weight:600;color:#c43a3a;">$118K</div></div>
-    <div style="flex:1;padding:6px 4px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;">Mkt floor</div><div style="font-size:12px;font-weight:600;color:#c43a3a;">$140K</div></div>
-    <div style="flex:1;padding:6px 4px;text-align:center;background:#fff;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;">Mkt median</div><div style="font-size:12px;font-weight:600;color:#c43a3a;">$152K</div></div>
+    <div style="flex:1;padding:6px 4px;text-align:center;background:#fef5f5;"><div style="font-size:6.5px;color:#8a90a8;">Current</div><div style="font-size:12px;font-weight:600;color:#15616d;">$118K</div></div>
+    <div style="flex:1;padding:6px 4px;text-align:center;background:#fff;border-left:1px solid #e8eaef;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;">Mkt floor</div><div style="font-size:12px;font-weight:600;color:#15616d;">$140K</div></div>
+    <div style="flex:1;padding:6px 4px;text-align:center;background:#fff;border-right:1px solid #e8eaef;"><div style="font-size:6.5px;color:#8a90a8;">Mkt median</div><div style="font-size:12px;font-weight:600;color:#15616d;">$152K</div></div>
     <div style="flex:1;padding:6px 4px;text-align:center;background:#f8f6f0;"><div style="font-size:6.5px;color:#8a90a8;">Gap</div><div style="font-size:12px;font-weight:600;color:#6a4a10;">-25%</div></div>
   </div>
 
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why now</div>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">Why now</div>
   <p style="font-size:9.5px;color:#2a3650;line-height:1.6;margin:0 0 8px;">Every month the gap remains sends an unintended signal about how the company values the Director role. I want to resolve this before it affects my ability to lead with full confidence, and before external opportunities make the gap harder to ignore.</p>
 
-  <div style="font-size:8px;font-weight:600;color:#c43a3a;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
-  <div style="background:#fef5f5;border:1px solid rgba(196,58,58,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:6px;">
-    <div style="font-size:7px;font-weight:600;color:#a03030;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
-    <div style="font-size:16px;font-weight:600;color:#8a2020;">$118,000 &#8594; $148,000</div>
-    <div style="font-size:8px;color:#a03030;margin-top:2px;">25.4% title-to-comp alignment &#183; completing the promotion</div>
+  <div style="font-size:8px;font-weight:600;color:#15616d;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;padding-bottom:3px;border-bottom:1px solid #e8eaef;">The ask</div>
+  <div style="background:#fef5f5;border:1px solid rgba(21,97,109,0.2);border-radius:5px;padding:9px;text-align:center;margin-bottom:6px;">
+    <div style="font-size:7px;font-weight:600;color:#104952;text-transform:uppercase;margin-bottom:2px;">Proposed adjustment</div>
+    <div style="font-size:16px;font-weight:600;color:#0d3a41;">$118,000 &#8594; $148,000</div>
+    <div style="font-size:8px;color:#104952;margin-top:2px;">25.4% title-to-comp alignment &#183; completing the promotion</div>
   </div>
-  <div style="padding:7px 10px;background:#fef5f5;border-radius:4px;border-left:2px solid #c43a3a;">
+  <div style="padding:7px 10px;background:#fef5f5;border-radius:4px;border-left:2px solid #15616d;">
     <p style="font-size:8.5px;color:#4a5068;line-height:1.55;font-style:italic;margin:0;">A promotion without a compensation adjustment sends a signal I do not think was intended. The title change was step one. I am asking to complete step two so the promotion is real in every sense. Happy to discuss timing.</p>
   </div>
 </div>
@@ -773,7 +789,7 @@
           <div class="template-overlay"><span class="template-overlay-btn">Use this template →</span></div>
         </div>
         <div class="template-label">
-          <span class="template-badge">Promotion Without Pay Case</span>
+          <span class="template-badge">Promotion Without Pay</span>
           <p class="template-name">I got a new title but no salary change</p>
         </div>
       </a>
