@@ -598,8 +598,9 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
 .case-skip-btn:hover{color:var(--t1);}
-.case-doc-preview{background:var(--card);border:1px solid var(--divider);border-radius:14px;margin:24px 0 0;padding:28px 24px;position:relative;overflow:hidden;}
+.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:4px;margin:24px 0 0;padding:36px 32px 28px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);}
 .case-doc-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#7B5CFC,#F5CF56);}
+.case-doc-preview::after{content:'PDF';position:absolute;top:12px;right:16px;font-size:9px;font-weight:700;letter-spacing:0.06em;color:#c43a3a;background:rgba(196,58,58,0.08);padding:2px 8px;border-radius:3px;}
 .case-doc-header{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:4px;}
 .case-doc-sub{font-size:11px;color:var(--t3);margin-bottom:16px;}
 .case-doc-section{margin-bottom:14px;}
@@ -2412,6 +2413,7 @@ function setMode(target) {
         caseEl.dataset.initialized = 'true';
       }
     }
+    stopThinkingAnimation();
     const input = $('chat-input');
     if (input) { input.placeholder = 'Building your raise case\u2026'; input.disabled = true; }
     var sendBtn3 = $('send-btn');
@@ -3087,6 +3089,15 @@ function showCasePaywall(container) {
   setTimeout(function() {
     paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 200);
+
+  // Make locked sections clickable → scroll to paywall
+  var preview = $('case-doc-preview');
+  if (preview) {
+    preview.querySelectorAll('.case-doc-section.locked').forEach(function(sec) {
+      sec.style.cursor = 'pointer';
+      sec.onclick = function() { paywall.scrollIntoView({ behavior: 'smooth', block: 'center' }); };
+    });
+  }
 }
 
 function handleCaseAnswer(container, qIndex) {
