@@ -177,7 +177,6 @@
       .template-badge { font-size: 11px; margin-bottom: 7px; padding: 4px 9px; }
       .template-name { font-size: 12.5px; }
       .template-preview { aspect-ratio: 1/1.55; }
-      .template-preview > div:first-child { transform: scale(0.27) !important; }
     }
 
     .template-card {
@@ -190,7 +189,7 @@
       transition: all 0.22s;
       background: var(--card);
       box-shadow: var(--shadow-sm);
-      line-height: 0;
+      padding: 6px;
     }
     .template-card:hover {
       border-color: var(--template-color, var(--purple));
@@ -201,7 +200,7 @@
 
     /* Card label — now ABOVE the card (outside it) */
     .template-item { display: flex; flex-direction: column; }
-    .template-label { padding: 0 2px 10px; }
+    .template-label { padding: 0 4px 10px; }
     .template-badge {
       display: inline-block;
       font-size: 12px; font-weight: 800;
@@ -228,8 +227,16 @@
       position: relative;
       overflow: hidden;
       border-top: none;
+      border-radius: 6px;
     }
-    .template-preview > div:first-child { pointer-events: none; position: absolute; top: 0; left: 0; }
+    /* Document is designed at 600px wide; JS sets the correct scale on load */
+    .template-preview > div:first-child {
+      pointer-events: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 600px;
+      transform-origin: top left;
+    }
     /* Fade preview to white at the bottom so it reads as a document, not a text wall */
     .template-preview::after {
       content: '';
@@ -1053,6 +1060,20 @@ document.addEventListener('click', function(e) {
     document.querySelector('.site-header').classList.remove('menu-open');
   }
 });
+</script>
+<script>
+(function(){
+  function scalePreviewDocs(){
+    document.querySelectorAll('.template-preview').forEach(function(pv){
+      var inner=pv.querySelector(':scope > div');
+      if(!inner)return;
+      var s=pv.getBoundingClientRect().width/600;
+      inner.style.transform='scale('+s+')';
+    });
+  }
+  scalePreviewDocs();
+  window.addEventListener('resize',scalePreviewDocs);
+})();
 </script>
 </body>
 </html>
