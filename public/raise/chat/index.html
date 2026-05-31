@@ -3097,54 +3097,9 @@ function showCasePaywall(container) {
     container.appendChild(paywall);
   }
 
-  // Handle paywall CTA
+  // Handle paywall CTA — same Stripe flow as other modes
   var btn = $('case-paywall-btn');
-  btn.onclick = async function() {
-    btn.disabled = true;
-    btn.innerHTML = 'Saving your progress\u2026';
-
-    try {
-      var saveRes = await fetch('/api/raise-coach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: 'case_save',
-          template: caseState.template,
-          answers: caseState.answers,
-          polished: caseState.polished,
-          session_id: typeof getUserId === 'function' ? getUserId() : null,
-        }),
-      });
-      var saveData = await saveRes.json();
-      if (saveData.case_id) {
-        try { localStorage.setItem('rl_case_id', saveData.case_id); } catch(e) {}
-        // TODO: redirect to Stripe checkout
-        // window.location.href = '/api/raise-checkout?case_id=' + saveData.case_id;
-
-        // For testing: unlock and continue
-        caseState.paid = true;
-        saveCaseState();
-        paywall.remove();
-
-        // Unlock locked sections in the preview
-        document.querySelectorAll('.case-doc-section.locked').forEach(function(sec) {
-          sec.classList.remove('locked');
-          sec.classList.add('empty');
-          var textEl = sec.querySelector('.case-doc-section-text');
-          if (textEl) textEl.textContent = 'Waiting for your answer\u2026';
-        });
-
-        // Continue with next question
-        showCaseQuestion(container, pw);
-      } else {
-        throw new Error('No case_id returned');
-      }
-    } catch(err) {
-      console.error('[case_paywall] error:', err);
-      btn.disabled = false;
-      btn.innerHTML = 'Generate my raise case \u00b7 $19 <span class="btn-pay-arrow">\u2192</span>';
-    }
-  };
+  btn.onclick = startCheckout;
 
   setTimeout(function() {
     paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
