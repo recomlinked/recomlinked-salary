@@ -1077,6 +1077,25 @@ function logSession(stage, extra) {
     videoCompleted = localStorage.getItem('rl_video_completed') || '';
   } catch(e) {}
 
+  // Determine current mode
+  var _currentMode = 'plan';
+  try { _currentMode = SIM_STATE.currentMode || 'discovery'; } catch(e) {}
+  if (_currentMode === 'discovery') _currentMode = 'plan';
+  if (_currentMode === 'sim') _currentMode = 'practice';
+  if (_currentMode === 'coach') _currentMode = 'coaching';
+
+  // Get template and role for case mode
+  var _caseTempl = '';
+  var _caseRole = '';
+  try {
+    if (caseState && caseState.template) _caseTempl = caseState.template;
+    if (caseState && caseState.answers) {
+      var _q1 = caseState.answers[Object.keys(caseState.answers)[0]] || '';
+      if (_q1.charAt(0) === '{') { var _p = JSON.parse(_q1); _caseRole = Object.values(_p)[0] || ''; }
+      else _caseRole = _q1;
+    }
+  } catch(e) {}
+
   const payload = {
     timestamp: new Date().toISOString(),
     event: 'RAISE_SESSION',
@@ -1093,6 +1112,9 @@ function logSession(stage, extra) {
     gclid: _UTM.gclid,
     video_watched: videoWatched,
     video_completed: videoCompleted,
+    mode: _currentMode,
+    template: _caseTempl,
+    role: _caseRole,
     ...(extra || {}),
   };
   console.log('[logSession]', stage, payload);
