@@ -3028,7 +3028,7 @@ function restoreCaseUI(container, tmpl) {
       var roleEl = document.getElementById('case-doc-role');
       var title = q1.role || q1.current_title || q1.new_title || '';
       var context = '';
-      if (q1.tenure) context = q1.tenure + ' since last raise';
+      if (q1.tenure) context = q1.tenure;
       else if (q1.hired_as) context = 'Originally hired as ' + q1.hired_as;
       else if (q1.location) context = q1.location;
       else if (q1.old_title) context = 'Previously ' + q1.old_title;
@@ -3239,7 +3239,7 @@ function handleCaseAnswer(container, qIndex) {
       // Extract role/title by field name, not position
       var title = p.role || p.current_title || p.new_title || '';
       var context = '';
-      if (p.tenure) context = p.tenure + ' since last raise';
+      if (p.tenure) context = p.tenure;
       else if (p.hired_as) context = 'Originally hired as ' + p.hired_as;
       else if (p.location) context = p.location;
       else if (p.old_title) context = 'Previously ' + p.old_title;
