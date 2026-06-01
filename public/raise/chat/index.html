@@ -2860,7 +2860,9 @@ function clearCaseState() {
 
 function initCaseMode(container) {
   var params = new URLSearchParams(location.search);
-  var tmpl = params.get('template') || 'performance';
+  var tmpl = params.get('template') || '';
+  if (!tmpl) { try { tmpl = localStorage.getItem('rl_case_template') || ''; } catch(e) {} }
+  if (!tmpl) tmpl = 'performance';
   if (!CASE_TEMPLATES[tmpl]) tmpl = 'performance';
 
   var restored = loadCaseState();
@@ -7780,7 +7782,9 @@ async function init() {
   // mode=case → raise case landing page, enter case mode directly
   const caseMode = params.get('mode');
   if (caseMode === 'case') {
-    // Strip URL params
+    // Save template before stripping URL
+    var _caseTemplate = params.get('template') || 'performance';
+    try { localStorage.setItem('rl_case_template', _caseTemplate); } catch(e) {}
     history.replaceState(null, '', location.pathname);
     // Show toolbar and mode toggle, then switch to case mode
     showToolbar();
