@@ -590,6 +590,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-input-wrap{margin:0 0 18px;}
 .case-input-wrap input,.case-input-wrap textarea{width:100%;border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;font-family:var(--sans);font-size:16px;color:var(--t1);background:var(--card);resize:vertical;transition:border-color 0.15s;}
 .case-input-wrap input::placeholder,.case-input-wrap textarea::placeholder{color:#bbb;opacity:1;font-style:italic;}
+.case-input-wrap input.input-error,.case-input-wrap textarea.input-error{border-color:#E24B4A;animation:inputShake 0.4s ease;}
+@keyframes inputShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
 .case-input-wrap input:focus,.case-input-wrap textarea:focus{outline:none;border-color:#7B5CFC;}
 .case-input-wrap textarea{min-height:80px;}
 .case-row{display:flex;gap:10px;}
@@ -2805,7 +2807,7 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','Key Results','Recognition & Reviews','Compensation Alignment','The Ask','Additional Leverage'],
     questions: [
-      { id: 'role_tenure', label: 'About you', text: "What\u2019s your current role/title, and how long since your last raise?", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Senior Product Designer', type: 'text' },{ name: 'tenure', placeholder: 'e.g. 2 years', type: 'text' }], section: 0 },
+      { id: 'role_tenure', label: 'About you', text: "What\u2019s your current role/title, and how long since your last raise?", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Senior Product Designer', type: 'text' },{ name: 'tenure', placeholder: 'e.g. 2 years or 18 months', type: 'text' }], section: 0 },
       { id: 'results', label: 'Key results', text: "What were your 3 biggest measurable results in the last 12 months? Be specific \u2014 numbers, percentages, projects shipped.", type: 'textarea', placeholder: "e.g. Led the onboarding redesign that lifted activation by 23%. Shipped the design system used across 3 squads. Reduced churn by 11% through retention flow improvements.", section: 1 },
       { id: 'recognition', label: 'Recognition', text: "Did you receive any formal recognition? Exceeds-expectations review, promotion recommendation, manager praise, awards \u2014 anything documented.", type: 'textarea', placeholder: "e.g. Rated \u2018exceeds expectations\u2019 in Q3 review. Manager nominated me for the quarterly impact award.", section: 2 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
@@ -2823,7 +2825,7 @@ var CASE_TEMPLATES = {
       { id: 'titles', label: 'Your role', text: "What\u2019s your current title, and what were you originally hired as?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Engineering Manager', type: 'text' },{ name: 'hired_as', placeholder: 'e.g. Senior Engineer', type: 'text' }], section: 0 },
       { id: 'new_responsibilities', label: 'Scope growth', text: "What new responsibilities have you taken on that weren\u2019t in your original role? Think team management, new domains, cross-functional work.", type: 'textarea', placeholder: "e.g. Took over the platform team (4 engineers). Now own the API roadmap and run weekly architecture reviews. None of this was in my original job description.", section: 1 },
       { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g. Cut P1 incidents by 60%. Shipped the API v2 migration on time. Reduced onboarding time from 3 weeks to 5 days.", section: 2 },
-      { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
+      { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 1 year 6 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, recruiter interest, a competing offer?", type: 'textarea', placeholder: "(Optional) e.g. The market rate for Engineering Managers in my city is $160\u2013180k. I\u2019m at $135k.", optional: true, section: 5 }
     ]
@@ -2835,7 +2837,7 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','The Situation','Why I Want to Stay','What Would Be Lost','The Ask & Timeline','Additional Context'],
     questions: [
-      { id: 'tenure_role', label: 'About you', text: "How long have you been at this company, and what\u2019s your current role?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 4 years', type: 'text' },{ name: 'role', placeholder: 'e.g. Product Manager', type: 'text' }], section: 0 },
+      { id: 'tenure_role', label: 'About you', text: "How long have you been at this company, and what\u2019s your current role?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 4 years or 3.5 years', type: 'text' },{ name: 'role', placeholder: 'e.g. Product Manager', type: 'text' }], section: 0 },
       { id: 'offer_details', label: 'The offer', text: "What\u2019s the competing offer? Company, role, and compensation package. Be as specific as you can.", type: 'textarea', placeholder: "e.g. Series B company, Senior PM role. $165k base + equity package worth ~$40k/year. They want an answer by June 15.", section: 1 },
       { id: 'why_stay', label: 'Why you want to stay', text: "Why do you want to stay at your current company? What do you value here that the other offer doesn\u2019t have?", type: 'textarea', placeholder: "e.g. I believe in the product roadmap. I\u2019ve built strong relationships with my team. I don\u2019t want to start over \u2014 I want to keep building here.", section: 2 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number would make you stay?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Number to stay', type: 'text' }], section: 4 },
@@ -2852,7 +2854,7 @@ var CASE_TEMPLATES = {
     questions: [
       { id: 'role_location', label: 'Your role', text: "What\u2019s your role and where are you located? This helps the document reference the right market.", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Data Analyst', type: 'text' },{ name: 'location', placeholder: 'e.g. Calgary, AB', type: 'text' }], section: 0 },
       { id: 'market_data', label: 'Market evidence', text: "What market data do you have? Salary sites, job postings, recruiter ranges, industry reports \u2014 anything showing you\u2019re paid below market.", type: 'textarea', placeholder: "e.g. Glassdoor median for this role in my city is $92k. LinkedIn shows 3 open roles at $95\u2013105k. My salary is $78k.", section: 1 },
-      { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 3 years', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 18 months ago', type: 'text' }], section: 2 },
+      { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 3 years or 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 1 year ago', type: 'text' }], section: 2 },
       { id: 'responsibilities', label: 'What you do', text: "What are your main responsibilities and contributions? What would your manager miss if you left?", type: 'textarea', placeholder: "e.g. I own all executive reporting. Built the forecasting model the CFO uses weekly. Train new analysts. Lead the cross-team data council.", section: 3 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'extra_context', label: 'Anything else?', text: "Is there anything else that strengthens your case? Recruiter outreach, competing offers, certifications?", type: 'textarea', placeholder: "(Optional) e.g. Three recruiters reached out this quarter for roles paying $95\u2013110k.", optional: true, section: 5 }
@@ -3169,9 +3171,9 @@ function showCasePaywall(container) {
     '<button class="btn-pay" id="case-paywall-btn">Generate my raise case \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '</div>';
-  var preview = $('case-doc-preview');
-  if (preview) {
-    preview.parentNode.insertBefore(paywall, preview.nextSibling);
+  var deliverables = $('case-deliverables');
+  if (deliverables) {
+    deliverables.parentNode.insertBefore(paywall, deliverables.nextSibling);
   } else {
     container.appendChild(paywall);
   }
@@ -3220,13 +3222,25 @@ function handleCaseAnswer(container, qIndex) {
     answer = JSON.stringify(parts);
     // Check at least one field filled
     if (!Object.values(parts).some(function(v) { return v.length > 0; })) {
-      // Shake the button
+      q.fields.forEach(function(f) {
+        var inp = $('case-input-' + q.id + '-' + f.name);
+        if (inp && !inp.value.trim()) {
+          inp.classList.add('input-error');
+          setTimeout(function() { inp.classList.remove('input-error'); }, 1500);
+        }
+      });
       return;
     }
   } else {
     var inp = $('case-input-' + q.id);
     answer = inp ? inp.value.trim() : '';
-    if (!answer && !q.optional) return;
+    if (!answer && !q.optional) {
+      if (inp) {
+        inp.classList.add('input-error');
+        setTimeout(function() { inp.classList.remove('input-error'); }, 1500);
+      }
+      return;
+    }
   }
 
   caseState.answers[q.id] = answer;
