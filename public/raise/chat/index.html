@@ -2904,8 +2904,8 @@ function initCaseMode(container) {
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
   t.sections.forEach(function(name, i) {
-    var cls = i >= pw ? 'case-doc-section locked' : 'case-doc-section empty';
-    var txt = i >= pw ? 'This section unlocks after purchase\u2026' : 'Waiting for your answer\u2026';
+    var cls = 'case-doc-section empty';
+    var txt = 'Waiting for your answer\u2026';
     sections += '<div class="' + cls + '" id="case-sec-' + i + '">' +
       '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
       '<div class="case-doc-section-text">' + txt + '</div>' +
@@ -2939,9 +2939,9 @@ function restoreCaseUI(container, tmpl) {
   var sections = '';
   t.sections.forEach(function(name, i) {
     var hasPolished = caseState.polished[i];
-    var isLocked = i >= pw && !caseState.paid;
-    var cssClass = isLocked ? 'case-doc-section locked' : (hasPolished ? 'case-doc-section' : 'case-doc-section empty');
-    var text = isLocked ? 'This section unlocks after purchase\u2026' : (hasPolished || 'Waiting for your answer\u2026');
+    var isLocked = false;
+    var cssClass = hasPolished ? 'case-doc-section' : 'case-doc-section empty';
+    var text = hasPolished || 'Waiting for your answer\u2026';
     sections += '<div class="' + cssClass + '" id="case-sec-' + i + '">' +
       '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
       '<div class="case-doc-section-text">' + escapeHtml(text) + '</div>' +
@@ -3098,6 +3098,17 @@ function showCasePaywall(container) {
     preview.parentNode.insertBefore(paywall, preview.nextSibling);
   } else {
     container.appendChild(paywall);
+  }
+
+  // Now lock sections beyond paywall threshold
+  for (var li = pw; li < t.sections.length; li++) {
+    var sec = $('case-sec-' + li);
+    if (sec) {
+      sec.classList.remove('empty');
+      sec.classList.add('locked');
+      var txt = sec.querySelector('.case-doc-section-text');
+      if (txt) txt.textContent = 'This section unlocks after purchase\u2026';
+    }
   }
 
   // Handle paywall CTA — same Stripe flow as other modes
@@ -7786,6 +7797,8 @@ async function init() {
     // Save template before stripping URL
     var _caseTemplate = params.get('template') || 'performance';
     try { localStorage.setItem('rl_case_template', _caseTemplate); } catch(e) {}
+    // Coming from landing page = fresh start
+    clearCaseState();
     history.replaceState(null, '', location.pathname);
     // Show toolbar and mode toggle, then switch to case mode
     showToolbar();
