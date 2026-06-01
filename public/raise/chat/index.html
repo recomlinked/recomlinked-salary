@@ -584,10 +584,10 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 /* ── Case Mode ─────────────── */
 .case-chat{padding:16px 0;}
-.case-q-bubble{background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:16px 18px;margin:0 0 14px;max-width:92%;}
+.case-q-bubble{background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:16px 18px;margin:0 0 14px;}
 .case-q-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:6px;}
 .case-q-text{font-size:14px;color:var(--t1);line-height:1.5;margin:0;}
-.case-input-wrap{margin:0 0 18px;max-width:92%;}
+.case-input-wrap{margin:0 0 18px;}
 .case-input-wrap input,.case-input-wrap textarea{width:100%;border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;font-family:var(--sans);font-size:16px;color:var(--t1);background:var(--card);resize:vertical;transition:border-color 0.15s;}
 .case-input-wrap input:focus,.case-input-wrap textarea:focus{outline:none;border-color:#7B5CFC;}
 .case-input-wrap textarea{min-height:80px;}
@@ -598,7 +598,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
 .case-skip-btn:hover{color:var(--t1);}
-.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);max-width:92%;}
+.case-doc-preview{background:#fff;border:1px solid #d8d4de;border-radius:6px;margin:24px 0 0;padding:0;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08),0 1px 3px rgba(0,0,0,0.04);}
 .case-doc-topbar{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;}
 .case-doc-topbar-title{font-size:8px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;}
 .case-doc-topbar-name{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
@@ -3085,7 +3085,6 @@ function showCasePaywall(container) {
 
   var paywall = el('div', 'coach-msg', '');
   paywall.id = 'case-paywall';
-  paywall.style.maxWidth = '92%';
   paywall.innerHTML =
     '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>Your first ' + pw + ' sections are ready. Complete your raise case document.</strong></p>' +
