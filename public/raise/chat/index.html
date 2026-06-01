@@ -2336,6 +2336,7 @@ let currentCoachPreview = null; // the preview card in practice mode
 
 function setMode(target) {
   if (target !== 'sim' && target !== 'coach' && target !== 'discovery' && target !== 'case') return;
+  try { localStorage.setItem('rl_chat_mode', target); } catch(e) {}
 
   SIM_STATE.simMode = (target === 'sim');
   SIM_STATE.currentMode = target;
@@ -3696,7 +3697,9 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
-    setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
+    var _saved = null; try { _saved = localStorage.getItem('rl_chat_mode'); } catch(e) {}
+    if (_saved === 'case') { var bp=document.getElementById('bottom-panel'); if(bp)bp.classList.remove('dimmed'); setMode('case'); }
+    else { setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : (_saved || 'discovery')); }
     return;
   }
 
@@ -6024,8 +6027,10 @@ async function startSimulationAtBlocker() {
   }
   unlockModeToggle();
 
-  // Start in Discovery mode by default; Coach landing page (start=sim) opens Practice
-  setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
+  // Restore saved mode or default to Discovery; Coach landing page (start=sim) opens Practice
+  var _saved2 = null; try { _saved2 = localStorage.getItem('rl_chat_mode'); } catch(e) {}
+  if (_saved2 === 'case') { var bp2=document.getElementById('bottom-panel'); if(bp2)bp2.classList.remove('dimmed'); setMode('case'); }
+  else { setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : (_saved2 || 'discovery')); }
 }
 
 // ── Blocker-specific opening lines ──
