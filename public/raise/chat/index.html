@@ -2877,6 +2877,7 @@ function initCaseMode(container) {
   }
 
   caseState.template = tmpl;
+  logSession('case_template_selected', { template: tmpl });
   caseState.currentQ = 0;
   caseState.answers = {};
   caseState.polished = {};
@@ -3113,6 +3114,7 @@ function showCasePaywall(container) {
   // Handle paywall CTA — same Stripe flow as other modes
   var btn = $('case-paywall-btn');
   btn.onclick = startCheckout;
+  logSession('case_paywall_shown', { template: caseState.template });
 
   setTimeout(function() {
     paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -3152,6 +3154,9 @@ function handleCaseAnswer(container, qIndex) {
   }
 
   caseState.answers[q.id] = answer;
+
+  // Log case question answers
+  logSession('case_q' + (qIndex + 1), { template: caseState.template, question: q.id });
 
   // Update doc header with user info from Q1
   if (qIndex === 0 && q.type === 'row') {
