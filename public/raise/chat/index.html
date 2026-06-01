@@ -3104,7 +3104,7 @@ function showCaseQuestion(container, qIndex) {
 
   if (q.type === 'textarea') {
     var ta = document.createElement('textarea');
-    ta.placeholder = q.placeholder || '';
+    ta.placeholder = getCustomPlaceholder(q, qIndex);
     ta.id = 'case-input-' + q.id;
     inputWrap.appendChild(ta);
   } else if (q.type === 'row') {
@@ -3120,7 +3120,7 @@ function showCaseQuestion(container, qIndex) {
   } else {
     var inp2 = document.createElement('input');
     inp2.type = 'text';
-    inp2.placeholder = q.placeholder || '';
+    inp2.placeholder = getCustomPlaceholder(q, qIndex);
     inp2.id = 'case-input-' + q.id;
     inputWrap.appendChild(inp2);
   }
@@ -3375,6 +3375,80 @@ function formatDuration(val) {
   return val;
 }
 
+function getCustomPlaceholder(q, qIndex) {
+  if (qIndex !== 1) return q.placeholder || '';
+  var tmpl = caseState.template;
+  var q1 = caseState.answers && Object.values(caseState.answers)[0];
+  if (!q1) return q.placeholder || '';
+  var role = '';
+  try {
+    var p = JSON.parse(q1);
+    role = (p.role || p.current_title || p.new_title || '').toLowerCase();
+  } catch(e) { role = q1.toLowerCase(); }
+  if (!role) return q.placeholder || '';
+
+  var ph = {
+    marketing: {
+      performance: 'e.g. Increased Google Ads ROI by 3X. Reduced CAC by 40%. Launched campaign that drove 2,000 signups in one week.',
+      scope: 'e.g. Now own the full paid media budget ($500K). Manage 2 agencies. Lead weekly cross-team growth meetings.',
+      market: 'e.g. Glassdoor shows $95K median for Marketing Managers in my city. 3 LinkedIn postings at $90-110K.',
+      promotion: 'e.g. Own the entire campaign calendar. Manage 3 reports. Took over vendor relationships and budget approvals.'
+    },
+    engineer: {
+      performance: 'e.g. Reduced API latency by 60%. Shipped auth v2 on time. Mentored 2 junior engineers through their first quarter.',
+      scope: 'e.g. Now own the platform roadmap. Run architecture reviews. Manage 4 engineers across 2 squads.',
+      market: 'e.g. Levels.fyi shows $140K median for Senior Engineers in my area. 2 recruiters quoted $135-155K.',
+      promotion: 'e.g. Own system design decisions. Run sprint planning for 6 engineers. Oncall lead for production incidents.'
+    },
+    product: {
+      performance: 'e.g. Launched pricing page redesign, conversion up 18%. Reduced churn by 12% with retention flow. Shipped 3 features ahead of schedule.',
+      scope: 'e.g. Now own 2 product lines instead of 1. Lead cross-functional meetings with engineering, design, and sales.',
+      market: 'e.g. Glassdoor shows $125K median for Product Managers. 3 open roles on LinkedIn at $120-145K.',
+      promotion: 'e.g. Own the full product roadmap. Present to exec team monthly. Manage 2 PMs and coordinate with 3 squads.'
+    },
+    design: {
+      performance: 'e.g. Redesigned onboarding flow, activation up 23%. Built the design system used across 3 squads. Led 2 user research rounds.',
+      scope: 'e.g. Now lead design reviews for all product teams. Own the design system. Mentor 2 junior designers.',
+      market: 'e.g. Glassdoor shows $110K median for Senior Designers. Dribbble salary survey shows $105-125K in my market.',
+      promotion: 'e.g. Own design direction for the entire product. Run weekly design crits. Hired and onboarded 2 designers.'
+    },
+    sales: {
+      performance: 'e.g. Closed $1.2M in new ARR (120% of quota). Brought in 3 enterprise accounts. Shortest sales cycle on the team.',
+      scope: 'e.g. Now manage 4 SDRs. Own the enterprise segment. Built the outbound playbook the team uses.',
+      market: 'e.g. Glassdoor shows $95K base + $40K OTE for this role in my city. 2 competitors hiring at $100K+.',
+      promotion: 'e.g. Took over the enterprise book. Manage 4 reps. Built the new demo script that increased close rate by 15%.'
+    },
+    data: {
+      performance: 'e.g. Built the forecasting model the CFO uses weekly. Automated 3 manual reports saving 10 hours/week. Led the data migration.',
+      scope: 'e.g. Now own all executive reporting. Train new analysts. Lead the cross-team data council.',
+      market: 'e.g. Glassdoor shows $92K median for Data Analysts in my city. LinkedIn shows 3 open roles at $95-105K.',
+      promotion: 'e.g. Own the data pipeline. Built the executive dashboard. Run data literacy sessions for product teams.'
+    },
+    finance: {
+      performance: 'e.g. Streamlined month-end close from 10 days to 6. Built the budget model used for Series B. Caught a $200K billing discrepancy.',
+      scope: 'e.g. Now own FP&A in addition to accounting. Present to the board quarterly. Manage 2 analysts.',
+      market: 'e.g. Robert Half guide shows $95K for this role in my market. 2 open positions on LinkedIn at $90-110K.',
+      promotion: 'e.g. Own the full budget cycle. Lead quarterly board prep. Manage vendor contracts and 2 direct reports.'
+    }
+  };
+
+  var matched = '';
+  var keywords = Object.keys(ph);
+  for (var k = 0; k < keywords.length; k++) {
+    if (role.indexOf(keywords[k]) >= 0) { matched = keywords[k]; break; }
+  }
+  if (!matched && role.indexOf('develop') >= 0) matched = 'engineer';
+  if (!matched && role.indexOf('software') >= 0) matched = 'engineer';
+  if (!matched && role.indexOf('seo') >= 0) matched = 'marketing';
+  if (!matched && role.indexOf('growth') >= 0) matched = 'marketing';
+  if (!matched && role.indexOf('analyst') >= 0) matched = 'data';
+  if (!matched && role.indexOf('account') >= 0) matched = 'finance';
+  if (!matched && role.indexOf('ux') >= 0) matched = 'design';
+
+  if (matched && ph[matched] && ph[matched][tmpl]) return ph[matched][tmpl];
+  return q.placeholder || '';
+}
+
 function formatPolishedText(text) {
   if (!text) return '';
   // Split on bullet markers (•, -, *) at line start or after newline
@@ -3436,6 +3510,15 @@ function updateCaseDocSection(sectionIndex, q, answer) {
     caseState.polished[sectionIndex] = polished;
     saveCaseState();
     if (textEl) textEl.innerHTML = formatPolishedText(polished);
+
+    // Update Q2 placeholder with AI-generated example
+    if (data.q2_placeholder && sectionIndex === 0) {
+      var t = CASE_TEMPLATES[caseState.template];
+      if (t && t.questions[1]) {
+        var q2Input = $('case-input-' + t.questions[1].id);
+        if (q2Input) q2Input.placeholder = data.q2_placeholder;
+      }
+    }
   })
   .catch(function(err) {
     console.error('[case_polish] fetch error:', err);
