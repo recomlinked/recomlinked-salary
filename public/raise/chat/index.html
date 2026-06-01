@@ -2852,7 +2852,7 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','Market Evidence','Role & Tenure','Contribution Summary','The Ask','Additional Context'],
     questions: [
-      { id: 'role_location', label: 'Your role', text: "What\u2019s your role and where are you located? This helps the document reference the right market.", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Data Analyst', type: 'text' },{ name: 'location', placeholder: 'e.g. Calgary, AB', type: 'text' }], section: 0 },
+      { id: 'role_location', label: 'Your role', text: "What\u2019s your role and where are you located? This helps the document reference the right market.", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Data Analyst', type: 'text' },{ name: 'location', placeholder: 'e.g. New York, NY', type: 'text' }], section: 0 },
       { id: 'market_data', label: 'Market evidence', text: "What market data do you have? Salary sites, job postings, recruiter ranges, industry reports \u2014 anything showing you\u2019re paid below market.", type: 'textarea', placeholder: "e.g. Glassdoor median for this role in my city is $92k. LinkedIn shows 3 open roles at $95\u2013105k. My salary is $78k.", section: 1 },
       { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 3 years or 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 1 year ago', type: 'text' }], section: 2 },
       { id: 'responsibilities', label: 'What you do', text: "What are your main responsibilities and contributions? What would your manager miss if you left?", type: 'textarea', placeholder: "e.g. I own all executive reporting. Built the forecasting model the CFO uses weekly. Train new analysts. Lead the cross-team data council.", section: 3 },
@@ -3034,7 +3034,12 @@ function restoreCaseUI(container, tmpl) {
       var roleEl = document.getElementById('case-doc-role');
       var title = q1.role || q1.current_title || q1.new_title || '';
       var context = '';
-      if (q1.tenure) context = q1.tenure;
+      if (q1.tenure && (q1.role || !q1.current_title)) {
+        var dur = formatDuration(q1.tenure);
+        if (tmpl === 'offer') context = dur + ' at the company';
+        else if (tmpl === 'market') context = dur + ' in this role';
+        else context = dur + ' since last raise';
+      }
       else if (q1.hired_as) context = 'Originally hired as ' + q1.hired_as;
       else if (q1.location) context = q1.location;
       else if (q1.old_title) context = 'Previously ' + q1.old_title;
@@ -3257,7 +3262,13 @@ function handleCaseAnswer(container, qIndex) {
       // Extract role/title by field name, not position
       var title = p.role || p.current_title || p.new_title || '';
       var context = '';
-      if (p.tenure) context = p.tenure;
+      if (p.tenure && (p.role || !p.current_title)) {
+        var tmplKey = caseState.template;
+        var dur = formatDuration(p.tenure);
+        if (tmplKey === 'offer') context = dur + ' at the company';
+        else if (tmplKey === 'market') context = dur + ' in this role';
+        else context = dur + ' since last raise';
+      }
       else if (p.hired_as) context = 'Originally hired as ' + p.hired_as;
       else if (p.location) context = p.location;
       else if (p.old_title) context = 'Previously ' + p.old_title;
@@ -3355,6 +3366,13 @@ function buildEmailDraft(container, templateName, accent) {
       if (opener) opener.textContent = tone.opener;
     };
   });
+}
+
+function formatDuration(val) {
+  if (!val) return '';
+  val = val.trim();
+  if (/^\d+\.?\d*$/.test(val)) return val + ' years';
+  return val;
 }
 
 function formatPolishedText(text) {
