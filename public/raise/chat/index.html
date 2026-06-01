@@ -3887,9 +3887,7 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
-    var _saved = null; try { _saved = localStorage.getItem('rl_chat_mode'); } catch(e) {}
-    if (_saved === 'case') { var bp=document.getElementById('bottom-panel'); if(bp)bp.classList.remove('dimmed'); setMode('case'); }
-    else { setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : (_saved || 'discovery')); }
+    setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
     return;
   }
 
@@ -6217,10 +6215,8 @@ async function startSimulationAtBlocker() {
   }
   unlockModeToggle();
 
-  // Restore saved mode or default to Discovery; Coach landing page (start=sim) opens Practice
-  var _saved2 = null; try { _saved2 = localStorage.getItem('rl_chat_mode'); } catch(e) {}
-  if (_saved2 === 'case') { var bp2=document.getElementById('bottom-panel'); if(bp2)bp2.classList.remove('dimmed'); setMode('case'); }
-  else { setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : (_saved2 || 'discovery')); }
+  // Start in Discovery mode by default; Coach landing page (start=sim) opens Practice
+  setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
 }
 
 // ── Blocker-specific opening lines ──
