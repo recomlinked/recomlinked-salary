@@ -625,6 +625,27 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-download-name{font-size:10px;color:#8a90a8;display:flex;align-items:center;gap:4px;}
 .case-doc-download-btn{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;}
 .case-doc-download-btn:disabled,.case-doc-download-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
+.case-email-draft{margin:16px 0 0;}
+.case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.case-email-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;overflow:hidden;}
+.case-email-tones{padding:10px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
+.case-email-tones .tone-chips{display:flex;gap:6px;}
+.tone-chip{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--divider);background:transparent;color:var(--t2);cursor:pointer;font-weight:400;font-family:var(--sans);}
+.tone-chip.active{background:var(--case-accent,#3a6ea5);color:#fff;border-color:var(--case-accent,#3a6ea5);font-weight:500;}
+.case-email-fields{padding:12px 16px;border-bottom:1px solid var(--divider);}
+.case-email-field{display:flex;gap:8px;align-items:baseline;margin-bottom:4px;}
+.case-email-field:last-child{margin-bottom:0;}
+.case-email-field-label{font-size:10px;color:var(--t3);min-width:28px;}
+.case-email-field-value{font-size:12px;color:var(--t1);font-weight:500;}
+.case-email-body{padding:14px 16px;}
+.case-email-body p{font-size:11px;color:var(--t1);line-height:1.7;margin:0 0 8px;}
+.case-email-body .email-dots{color:var(--t3);margin:4px 0 0;}
+.case-email-body .email-note{font-size:10px;color:var(--t3);font-style:italic;margin:8px 0 0;}
+.case-email-attach{padding:8px 16px;border-top:1px solid var(--divider);font-size:10px;color:var(--t3);display:flex;align-items:center;gap:6px;}
+.case-email-copy{padding:10px 16px;border-top:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
+.case-email-copy-name{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;}
+.case-email-copy-btn{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-family:var(--sans);}
+.case-email-copy-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
 @keyframes casePulse{0%,100%{opacity:0.4;}50%{opacity:0.8;}}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
 .case-paywall{background:linear-gradient(135deg,rgba(123,92,252,0.06),rgba(245,207,86,0.08));border:1.5px solid rgba(123,92,252,0.2);border-radius:14px;padding:24px 22px;margin:20px 0 10px;text-align:center;}
@@ -2946,6 +2967,7 @@ function initCaseMode(container) {
     '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
+  buildEmailDraft(container, t.name, accent);
 
   showCaseQuestion(container, 0);
 }
@@ -2983,6 +3005,7 @@ function restoreCaseUI(container, tmpl) {
     '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
+  buildEmailDraft(container, t.name, accent);
 
   // Fill header with saved Q1 data
   if (t.questions[0] && t.questions[0].type === 'row' && caseState.answers[t.questions[0].id]) {
@@ -3231,6 +3254,67 @@ function handleCaseAnswer(container, qIndex) {
 
   // Next question
   showCaseQuestion(container, qIndex + 1);
+}
+
+var EMAIL_TONES = {
+  professional: {
+    subject: 'Compensation discussion \u2014 sharing some context ahead of time',
+    opener: 'I wanted to share something with you before we sit down to talk. I\u2019ve put together a short document that outlines my contributions and where I believe my compensation should be. I\u2019m sharing it in writing so you have time to review everything on your own terms.'
+  },
+  warm: {
+    subject: 'Would love to talk about something \u2014 sharing context first',
+    opener: 'I really value working here and I want to be upfront about something I\u2019ve been thinking about. I\u2019ve put together a document about my compensation \u2014 not because anything is urgent, but because I think it\u2019s worth a thoughtful conversation between us.'
+  },
+  direct: {
+    subject: 'Compensation review request \u2014 document attached',
+    opener: 'I\u2019m requesting a compensation review. I\u2019ve attached a document with the details. Please take a look at your convenience and let me know when works to discuss.'
+  }
+};
+
+function buildEmailDraft(container, templateName, accent) {
+  var draft = el('div', 'case-email-draft', '');
+  draft.id = 'case-email-draft';
+  var tone = EMAIL_TONES.professional;
+  var pdfName = escapeHtml(templateName.replace(/\s+/g, '_')) + '.pdf';
+
+  draft.innerHTML =
+    '<div class="case-email-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg> Draft email to your manager</div>' +
+    '<div class="case-email-card" style="--case-accent:' + accent + ';">' +
+      '<div class="case-email-tones"><div class="tone-chips">' +
+        '<button class="tone-chip active" data-tone="professional">Professional</button>' +
+        '<button class="tone-chip" data-tone="warm">Warm</button>' +
+        '<button class="tone-chip" data-tone="direct">Direct</button>' +
+      '</div><span style="font-size:10px;color:var(--t3);">tone</span></div>' +
+      '<div class="case-email-fields">' +
+        '<div class="case-email-field"><span class="case-email-field-label">To:</span><span class="case-email-field-value" style="font-weight:400;font-style:italic;color:var(--t2);">your.manager@company.com</span></div>' +
+        '<div class="case-email-field"><span class="case-email-field-label">Subj:</span><span class="case-email-field-value" id="case-email-subject">' + escapeHtml(tone.subject) + '</span></div>' +
+      '</div>' +
+      '<div class="case-email-body">' +
+        '<p>Hi [Manager name],</p>' +
+        '<p id="case-email-opener">' + escapeHtml(tone.opener) + '</p>' +
+        '<p class="email-dots">...</p>' +
+        '<p class="email-note">The full email generates after you complete all questions</p>' +
+      '</div>' +
+      '<div class="case-email-attach"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg> ' + pdfName + ' <span style="margin-left:4px;">attached</span></div>' +
+      '<div class="case-email-copy"><span class="case-email-copy-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,4 12,13 2,4"/></svg> Raise_Request_Email.txt</span><button class="case-email-copy-btn" style="background:' + accent + ';color:#fff;" data-locked="true" onclick="if(this.dataset.locked){alert(\'Complete all sections first to copy your email draft.\')}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy email draft</button></div>' +
+    '</div>';
+
+  container.appendChild(draft);
+
+  // Tone chip click handler
+  draft.querySelectorAll('.tone-chip').forEach(function(chip) {
+    chip.onclick = function() {
+      var t = chip.dataset.tone;
+      var tone = EMAIL_TONES[t];
+      if (!tone) return;
+      draft.querySelectorAll('.tone-chip').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      var subj = document.getElementById('case-email-subject');
+      var opener = document.getElementById('case-email-opener');
+      if (subj) subj.textContent = tone.subject;
+      if (opener) opener.textContent = tone.opener;
+    };
+  });
 }
 
 function formatPolishedText(text) {
