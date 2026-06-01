@@ -1474,21 +1474,39 @@ Raw answer from user: "${raw_answer}"${contextBlock}
 
 Write ONLY the polished section text. No preamble, no labels, no markdown.`;
 
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 400,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-    });
+    // For section 0, run polish + Q2 placeholder generation in parallel
+    let q2Promise = null;
+    if (section_index === 0) {
+      q2Promise = client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 150,
+        system: 'You generate realistic placeholder examples for form inputs. Write 2-3 brief, specific examples that someone in the given role would relate to. Use "e.g." prefix. Keep it under 200 characters. No quotes, no bullet points — just a flowing example string.',
+        messages: [{ role: 'user', content: `Role: ${raw_answer}\nTemplate type: ${template}\nThe next question asks about their biggest measurable results or key contributions.\nWrite a placeholder example specific to this role. Start with "e.g. "` }],
+      }).catch(e => { console.warn('[case_polish] q2 placeholder failed:', e.message); return null; });
+    }
+
+    const [response, q2Response] = await Promise.all([
+      client.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+      q2Promise || Promise.resolve(null),
+    ]);
 
     const polished = response.content[0]?.text?.trim() || raw_answer;
+    const q2_placeholder = q2Response?.content?.[0]?.text?.trim() || '';
 
-    return res.status(200).json({
+    const result = {
       polished: polished,
       section_index: section_index,
       section_name: sectionPrompt.name,
       mode: 'case_polish',
-    });
+    };
+    if (q2_placeholder) result.q2_placeholder = q2_placeholder;
+
+    return res.status(200).json(result);
 
   } catch (err) {
     console.error('[case_polish] error:', err);
