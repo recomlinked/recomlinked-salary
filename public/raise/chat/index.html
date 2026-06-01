@@ -2976,6 +2976,7 @@ function restoreCaseUI(container, tmpl) {
   container.innerHTML = '';
   var t = CASE_TEMPLATES[tmpl];
   var pw = t.paywallAfter || 2;
+  logSession('case_resumed', { template: tmpl });
 
   var welcome = el('div', 'case-q-bubble', '');
   welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + ' \u2014 Resuming</div>' +
