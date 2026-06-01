@@ -7957,7 +7957,7 @@ async function startSimulationFromPathA() {
 async function init() {
   // Check for simulation path FIRST — chip click from landing page
   const params = new URLSearchParams(location.search);
-  const reason = params.get('reason');
+  let reason = params.get('reason');
   const forceReset = params.get('reset') === '1';
   // start=sim → coach landing page wants simulation mode (not discovery)
   const startMode = params.get('start');
@@ -7981,7 +7981,7 @@ async function init() {
     return;
   }
 
-  // Refresh with no URL params — restore case mode from localStorage
+  // Refresh with no URL params — restore saved mode from localStorage
   if (!caseMode && !reason) {
     var _savedMode = null;
     try { _savedMode = localStorage.getItem('rl_chat_mode'); } catch(e) {}
@@ -7993,6 +7993,16 @@ async function init() {
       setMode('case');
       return;
     }
+    // For non-case modes, set entryMode and inject default reason so normal init flow runs
+    if (_savedMode === 'sim') {
+      SIM_STATE.entryMode = 'sim';
+      reason = 'other';
+    } else if (_savedMode === 'coach') {
+      SIM_STATE.entryMode = 'discovery';
+      reason = 'other';
+    }
+    // discovery/null: reason stays null, but we need it for the flow
+    if (!reason) reason = 'other';
   }
 
   if (reason) {
