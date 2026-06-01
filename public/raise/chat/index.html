@@ -612,6 +612,9 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-section{margin-bottom:12px;padding-bottom:10px;}
 .case-doc-section-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #e8eaef;color:var(--case-accent,#3a6ea5);}
 .case-doc-section-text{font-size:10px;line-height:1.65;color:#2a3650;}
+.case-doc-bullets{margin:4px 0 0;padding:0 0 0 14px;list-style:none;}
+.case-doc-bullets li{position:relative;padding:3px 0 3px 10px;font-size:10px;line-height:1.6;color:#2a3650;}
+.case-doc-bullets li::before{content:'';position:absolute;left:0;top:9px;width:3px;height:3px;border-radius:50%;background:var(--case-accent,#3a6ea5);}
 .case-doc-section.empty .case-doc-section-text{color:#8a90a8;font-style:italic;font-size:9px;}
 .case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
 .case-doc-section.locked{opacity:0.5;}
@@ -2973,7 +2976,7 @@ function restoreCaseUI(container, tmpl) {
     var text = hasPolished || 'Waiting for your answer\u2026';
     sections += '<div class="' + cssClass + '" id="case-sec-' + i + '">' +
       '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
-      '<div class="case-doc-section-text">' + escapeHtml(text) + '</div>' +
+      '<div class="case-doc-section-text">' + (hasPolished ? formatPolishedText(text) : escapeHtml(text)) + '</div>' +
       '</div>';
   });
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
@@ -3230,6 +3233,36 @@ function handleCaseAnswer(container, qIndex) {
   showCaseQuestion(container, qIndex + 1);
 }
 
+function formatPolishedText(text) {
+  if (!text) return '';
+  // Split on bullet markers (•, -, *) at line start or after newline
+  var lines = text.split(/\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+  var hasBullets = lines.some(function(l) { return /^[\u2022\-\*]\s/.test(l); });
+  if (hasBullets) {
+    var html = '';
+    var inList = false;
+    lines.forEach(function(l) {
+      if (/^[\u2022\-\*]\s/.test(l)) {
+        if (!inList) { html += '<ul class="case-doc-bullets">'; inList = true; }
+        html += '<li>' + escapeHtml(l.replace(/^[\u2022\-\*]\s*/, '')) + '</li>';
+      } else {
+        if (inList) { html += '</ul>'; inList = false; }
+        html += '<p style="margin:0 0 6px;">' + escapeHtml(l) + '</p>';
+      }
+    });
+    if (inList) html += '</ul>';
+    return html;
+  }
+  // Inline bullets (• without newlines)
+  if (text.indexOf('\u2022') > 0) {
+    var parts = text.split('\u2022').map(function(p) { return p.trim(); }).filter(function(p) { return p; });
+    if (parts.length > 1) {
+      return '<ul class="case-doc-bullets">' + parts.map(function(p) { return '<li>' + escapeHtml(p) + '</li>'; }).join('') + '</ul>';
+    }
+  }
+  return escapeHtml(text);
+}
+
 function updateCaseDocSection(sectionIndex, q, answer) {
   var sec = $('case-sec-' + sectionIndex);
   if (!sec) return;
@@ -3260,7 +3293,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
     var polished = data.polished || answer;
     caseState.polished[sectionIndex] = polished;
     saveCaseState();
-    if (textEl) textEl.textContent = polished;
+    if (textEl) textEl.innerHTML = formatPolishedText(polished);
   })
   .catch(function(err) {
     console.error('[case_polish] fetch error:', err);
@@ -3276,7 +3309,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
       } catch(e) {}
     }
     caseState.polished[sectionIndex] = displayText;
-    if (textEl) textEl.textContent = displayText;
+    if (textEl) textEl.innerHTML = formatPolishedText(displayText);
   });
 }
 
