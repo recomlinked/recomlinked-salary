@@ -618,17 +618,21 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-bullets li{position:relative;padding:3px 0 3px 10px;font-size:10px;line-height:1.6;color:#2a3650;}
 .case-doc-bullets li::before{content:'';position:absolute;left:0;top:9px;width:3px;height:3px;border-radius:50%;background:var(--case-accent,#3a6ea5);}
 .case-doc-section.empty .case-doc-section-text{color:#8a90a8;font-style:italic;font-size:9px;}
+.case-doc-section.empty{opacity:0.3;}
 .case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
-.case-doc-section.locked{opacity:0.5;}
+.case-doc-section.locked{opacity:0.25;}
 .case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
 .case-doc-section.locked .case-doc-section-label::after{content:' [locked]';font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#8a90a8;}
-.case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;}
-.case-doc-download{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e8eaef;}
+.case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;opacity:0.35;}
+.case-doc-download{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e8eaef;opacity:0.3;}
 .case-doc-download-name{font-size:10px;color:#8a90a8;display:flex;align-items:center;gap:4px;}
 .case-doc-download-btn{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;}
 .case-doc-download-btn:disabled,.case-doc-download-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
 .case-email-draft{margin:16px 0 0;}
-.case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.case-email-draft .case-email-fields,.case-email-draft .case-email-body,.case-email-draft .case-email-attach,.case-email-draft .case-email-copy{opacity:0.3;transition:opacity 0.3s;}
+.case-email-draft.active .case-email-fields,.case-email-draft.active .case-email-body,.case-email-draft.active .case-email-attach,.case-email-draft.active .case-email-copy{opacity:1;}
+.case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;opacity:0.3;transition:opacity 0.3s;}
+.case-email-draft.active .case-email-header{opacity:1;}
 .case-doc-label{font-size:13px;color:var(--t2);padding:12px 16px 8px;display:flex;align-items:center;gap:6px;}
 .case-doc-preview::before{display:none;}
 .case-deliverables-label{font-size:13px;color:var(--t2);margin:0 0 8px;display:flex;align-items:center;gap:6px;}
