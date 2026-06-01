@@ -29,9 +29,9 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 
   <style>
     /* ── 1. TOKENS ──────────────────────────── */
@@ -151,6 +151,7 @@
     /* ── 6. SECTION COMMON ──────────────────── */
     .section { padding: 32px 0; }
     #templates { padding: 48px 0 56px; }
+    .section:not(:first-of-type) { content-visibility: auto; contain-intrinsic-size: auto 500px; }
     .section-label {
       font-size: 10px; font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.1em; color: var(--text3); margin-bottom: 8px;
@@ -191,6 +192,8 @@
       background: var(--card);
       box-shadow: var(--shadow-sm);
       padding: 6px;
+      content-visibility: auto;
+      contain-intrinsic-size: auto 380px;
     }
     .template-card:hover {
       border-color: var(--template-color, var(--purple));
@@ -237,6 +240,7 @@
       top: 0; left: 0;
       width: 600px;
       transform-origin: top left;
+      will-change: transform;
     }
     /* Fade preview to white at the bottom so it reads as a document, not a text wall */
     .template-preview::after {
@@ -1062,7 +1066,7 @@ document.addEventListener('click', function(e) {
 });
 </script>
 <script>
-(function(){
+requestAnimationFrame(function(){
   function scalePreviewDocs(){
     document.querySelectorAll('.template-preview').forEach(function(pv){
       var inner=pv.querySelector(':scope > div');
@@ -1073,7 +1077,7 @@ document.addEventListener('click', function(e) {
   }
   scalePreviewDocs();
   window.addEventListener('resize',scalePreviewDocs);
-})();
+});
 </script>
 </body>
 </html>
