@@ -627,6 +627,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-download-btn:disabled,.case-doc-download-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
 .case-email-draft{margin:16px 0 0;}
 .case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.case-doc-label{font-size:13px;color:var(--t2);margin:24px 0 8px;display:flex;align-items:center;gap:6px;}
 .case-email-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;overflow:hidden;}
 .case-email-tones{padding:10px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
 .case-email-tones .tone-chips{display:flex;gap:6px;}
@@ -2885,6 +2886,7 @@ var caseState = {
 
 function saveCaseState() {
   try {
+    caseState.sessionId = state.sim_session_id || caseState.sessionId || '';
     localStorage.setItem(LS_CASE_STATE, JSON.stringify(caseState));
   } catch(e) {}
 }
@@ -2896,6 +2898,7 @@ function loadCaseState() {
       var parsed = JSON.parse(saved);
       if (parsed && parsed.template) {
         caseState = parsed;
+        if (parsed.sessionId) state.sim_session_id = parsed.sessionId;
         return true;
       }
     }
@@ -2936,6 +2939,7 @@ function initCaseMode(container) {
   caseState.polished = {};
   caseState.reviewing = false;
   caseState.paid = false;
+  state.sim_session_id = 'case_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
   saveCaseState();
 
   container.innerHTML = '';
@@ -2946,6 +2950,10 @@ function initCaseMode(container) {
   welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + '</div>' +
     '<div class="case-q-text">' + escapeHtml(t.tagline) + ' Answer a few quick questions and your raise case document will build itself below.</div>';
   container.appendChild(welcome);
+
+  var docLabel = el('div', 'case-doc-label', '');
+  docLabel.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document';
+  container.appendChild(docLabel);
 
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
@@ -2983,6 +2991,10 @@ function restoreCaseUI(container, tmpl) {
     '<div class="case-q-text">Welcome back. Your progress has been saved. Continuing where you left off.</div>' +
     '<div style="margin-top:8px;"><a href="#" style="font-size:12px;color:var(--t3);" onclick="clearCaseState();window.location.href=\'/raise/chat/?mode=case&template=' + tmpl + '\';return false;">Start over</a></div>';
   container.appendChild(welcome);
+
+  var docLabel = el('div', 'case-doc-label', '');
+  docLabel.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document';
+  container.appendChild(docLabel);
 
   var docPreview = el('div', 'case-doc-preview', '');
   docPreview.id = 'case-doc-preview';
