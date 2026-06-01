@@ -1089,10 +1089,16 @@ function logSession(stage, extra) {
   var _caseRole = '';
   try {
     if (caseState && caseState.template) _caseTempl = caseState.template;
-    if (caseState && caseState.answers) {
-      var _q1 = caseState.answers[Object.keys(caseState.answers)[0]] || '';
-      if (_q1.charAt(0) === '{') { var _p = JSON.parse(_q1); _caseRole = Object.values(_p)[0] || ''; }
-      else _caseRole = _q1;
+    if (caseState && caseState.template && caseState.answers) {
+      var _q1Id = CASE_TEMPLATES[caseState.template].questions[0].id;
+      var _q1 = caseState.answers[_q1Id] || '';
+      if (_q1.charAt(0) === '{') {
+        var _p = JSON.parse(_q1);
+        // Look for role-like field: role, current_title, old_title, or first field
+        _caseRole = _p.role || _p.current_title || _p.new_title || Object.values(_p)[0] || '';
+      } else {
+        _caseRole = _q1;
+      }
     }
   } catch(e) {}
 
