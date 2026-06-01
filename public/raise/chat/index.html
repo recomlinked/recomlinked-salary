@@ -2808,7 +2808,7 @@ var CASE_TEMPLATES = {
     sections: ['Opening Statement','Key Results','Recognition & Reviews','Compensation Alignment','The Ask','Additional Leverage'],
     questions: [
       { id: 'role_tenure', label: 'About you', text: "What\u2019s your current role/title, and how long since your last raise?", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Senior Product Designer', type: 'text' },{ name: 'tenure', placeholder: 'e.g. 2 years or 18 months', type: 'text' }], section: 0 },
-      { id: 'results', label: 'Key results', text: "What were your 3 biggest measurable results in the last 12 months? Be specific \u2014 numbers, percentages, projects shipped.", type: 'textarea', placeholder: "e.g. Led the onboarding redesign that lifted activation by 23%. Shipped the design system used across 3 squads. Reduced churn by 11% through retention flow improvements.", section: 1 },
+      { id: 'results', label: 'Key results', text: "What were your 3 biggest measurable results in the last 12 months? Be specific \u2014 numbers, percentages, projects shipped.", type: 'textarea', placeholder: "e.g.\n1. Led onboarding redesign — activation up 23%\n2. Shipped design system used across 3 squads\n3. Reduced churn by 11%", section: 1 },
       { id: 'recognition', label: 'Recognition', text: "Did you receive any formal recognition? Exceeds-expectations review, promotion recommendation, manager praise, awards \u2014 anything documented.", type: 'textarea', placeholder: "e.g. Rated \u2018exceeds expectations\u2019 in Q3 review. Manager nominated me for the quarterly impact award.", section: 2 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'anchor_project', label: 'Your strongest card', text: "Is there one specific project or moment that best demonstrates your value? The one your manager would recognize instantly.", type: 'textarea', placeholder: "e.g. When the enterprise deal was at risk, I redesigned the proposal flow in 3 days and we closed the account.", section: 3 },
@@ -2824,7 +2824,7 @@ var CASE_TEMPLATES = {
     questions: [
       { id: 'titles', label: 'Your role', text: "What\u2019s your current title, and what were you originally hired as?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Engineering Manager', type: 'text' },{ name: 'hired_as', placeholder: 'e.g. Senior Engineer', type: 'text' }], section: 0 },
       { id: 'new_responsibilities', label: 'Scope growth', text: "What new responsibilities have you taken on that weren\u2019t in your original role? Think team management, new domains, cross-functional work.", type: 'textarea', placeholder: "e.g. Took over the platform team (4 engineers). Now own the API roadmap and run weekly architecture reviews. None of this was in my original job description.", section: 1 },
-      { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g. Cut P1 incidents by 60%. Shipped the API v2 migration on time. Reduced onboarding time from 3 weeks to 5 days.", section: 2 },
+      { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g.\n1. Cut P1 incidents by 60%\n2. Shipped API v2 migration on time\n3. Onboarding time: 3 weeks → 5 days", section: 2 },
       { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 1 year 6 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, recruiter interest, a competing offer?", type: 'textarea', placeholder: "(Optional) e.g. The market rate for Engineering Managers in my city is $160\u2013180k. I\u2019m at $135k.", optional: true, section: 5 }
@@ -2869,7 +2869,7 @@ var CASE_TEMPLATES = {
     questions: [
       { id: 'titles', label: 'The promotion', text: "What was your old title, and what\u2019s your new title?", type: 'row', fields: [{ name: 'old_title', placeholder: 'e.g. Marketing Coordinator', type: 'text' },{ name: 'new_title', placeholder: 'e.g. Marketing Manager', type: 'text' }], section: 0 },
       { id: 'what_changed', label: 'What changed', text: "What changed when you got promoted? New responsibilities, team size, scope, decision-making authority.", type: 'textarea', placeholder: "e.g. Now managing 3 direct reports. Own the full campaign budget ($400k). Report directly to the VP instead of a team lead.", section: 1 },
-      { id: 'early_wins', label: 'Early wins', text: "What are your early wins since the promotion? Results you\u2019ve delivered in the new role.", type: 'textarea', placeholder: "e.g. Launched the Q1 campaign \u2014 highest conversion rate this year. Reduced agency spend by 30% by bringing creative in-house.", section: 2 },
+      { id: 'early_wins', label: 'Early wins', text: "What are your early wins since the promotion? Results you\u2019ve delivered in the new role.", type: 'textarea', placeholder: "e.g.\n1. Q1 campaign — highest conversion this year\n2. Reduced agency spend by 30%\n3. Brought creative in-house", section: 2 },
       { id: 'compensation', label: 'The gap', text: "What\u2019s the market rate for your new title, and what\u2019s your current salary?", type: 'row', fields: [{ name: 'market_rate', placeholder: 'Market rate (e.g. $95k)', type: 'text' },{ name: 'current', placeholder: 'Current salary', type: 'text' }], section: 3 },
       { id: 'target', label: 'Your ask', text: "What salary are you asking for?", type: 'text', placeholder: "e.g. $95,000", section: 4 },
       { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, competing interest, timeline?", type: 'textarea', placeholder: "(Optional) e.g. The company posted my old role at $75k \u2014 I\u2019m still being paid $72k in the senior role.", optional: true, section: 5 }
@@ -3389,46 +3389,46 @@ function getCustomPlaceholder(q, qIndex) {
 
   var ph = {
     marketing: {
-      performance: 'e.g. Increased Google Ads ROI by 3X. Reduced CAC by 40%. Launched campaign that drove 2,000 signups in one week.',
-      scope: 'e.g. Now own the full paid media budget ($500K). Manage 2 agencies. Lead weekly cross-team growth meetings.',
-      market: 'e.g. Glassdoor shows $95K median for Marketing Managers in my city. 3 LinkedIn postings at $90-110K.',
-      promotion: 'e.g. Own the entire campaign calendar. Manage 3 reports. Took over vendor relationships and budget approvals.'
+      performance: 'e.g.\n1. Increased Google Ads ROI by 3X\n2. Reduced CAC by 40%\n3. Launched campaign — 2,000 signups in one week',
+      scope: 'e.g.\n1. Own full paid media budget ($500K)\n2. Manage 2 agencies\n3. Lead weekly cross-team growth meetings',
+      market: 'e.g.\n1. Glassdoor median: $95K\n2. 3 LinkedIn postings at $90-110K\n3. Recruiter quoted $100K for similar role',
+      promotion: 'e.g.\n1. Own entire campaign calendar\n2. Manage 3 direct reports\n3. Took over vendor relationships + budget'
     },
     engineer: {
-      performance: 'e.g. Reduced API latency by 60%. Shipped auth v2 on time. Mentored 2 junior engineers through their first quarter.',
-      scope: 'e.g. Now own the platform roadmap. Run architecture reviews. Manage 4 engineers across 2 squads.',
-      market: 'e.g. Levels.fyi shows $140K median for Senior Engineers in my area. 2 recruiters quoted $135-155K.',
-      promotion: 'e.g. Own system design decisions. Run sprint planning for 6 engineers. Oncall lead for production incidents.'
+      performance: 'e.g.\n1. Reduced API latency by 60%\n2. Shipped auth v2 on time\n3. Mentored 2 junior engineers',
+      scope: 'e.g.\n1. Own the platform roadmap\n2. Run architecture reviews\n3. Manage 4 engineers across 2 squads',
+      market: 'e.g.\n1. Levels.fyi median: $140K\n2. 2 recruiters quoted $135-155K\n3. Competing offer at $150K base',
+      promotion: 'e.g.\n1. Own system design decisions\n2. Run sprint planning for 6 engineers\n3. Oncall lead for production'
     },
     product: {
-      performance: 'e.g. Launched pricing page redesign, conversion up 18%. Reduced churn by 12% with retention flow. Shipped 3 features ahead of schedule.',
-      scope: 'e.g. Now own 2 product lines instead of 1. Lead cross-functional meetings with engineering, design, and sales.',
-      market: 'e.g. Glassdoor shows $125K median for Product Managers. 3 open roles on LinkedIn at $120-145K.',
-      promotion: 'e.g. Own the full product roadmap. Present to exec team monthly. Manage 2 PMs and coordinate with 3 squads.'
+      performance: 'e.g.\n1. Pricing redesign — conversion up 18%\n2. Reduced churn by 12%\n3. Shipped 3 features ahead of schedule',
+      scope: 'e.g.\n1. Own 2 product lines (was 1)\n2. Lead cross-functional meetings\n3. Present roadmap to exec team',
+      market: 'e.g.\n1. Glassdoor median: $125K\n2. 3 open roles at $120-145K\n3. Industry report shows 15% underpaid',
+      promotion: 'e.g.\n1. Own full product roadmap\n2. Present to exec team monthly\n3. Manage 2 PMs + coordinate 3 squads'
     },
     design: {
-      performance: 'e.g. Redesigned onboarding flow, activation up 23%. Built the design system used across 3 squads. Led 2 user research rounds.',
-      scope: 'e.g. Now lead design reviews for all product teams. Own the design system. Mentor 2 junior designers.',
-      market: 'e.g. Glassdoor shows $110K median for Senior Designers. Dribbble salary survey shows $105-125K in my market.',
-      promotion: 'e.g. Own design direction for the entire product. Run weekly design crits. Hired and onboarded 2 designers.'
+      performance: 'e.g.\n1. Onboarding redesign — activation up 23%\n2. Built design system for 3 squads\n3. Led 2 user research rounds',
+      scope: 'e.g.\n1. Lead design reviews for all teams\n2. Own the design system\n3. Mentor 2 junior designers',
+      market: 'e.g.\n1. Glassdoor median: $110K\n2. Dribbble survey: $105-125K\n3. Open roles in my area at $115K+',
+      promotion: 'e.g.\n1. Own design direction for entire product\n2. Run weekly design crits\n3. Hired and onboarded 2 designers'
     },
     sales: {
-      performance: 'e.g. Closed $1.2M in new ARR (120% of quota). Brought in 3 enterprise accounts. Shortest sales cycle on the team.',
-      scope: 'e.g. Now manage 4 SDRs. Own the enterprise segment. Built the outbound playbook the team uses.',
-      market: 'e.g. Glassdoor shows $95K base + $40K OTE for this role in my city. 2 competitors hiring at $100K+.',
-      promotion: 'e.g. Took over the enterprise book. Manage 4 reps. Built the new demo script that increased close rate by 15%.'
+      performance: 'e.g.\n1. Closed $1.2M new ARR (120% quota)\n2. Brought in 3 enterprise accounts\n3. Shortest sales cycle on team',
+      scope: 'e.g.\n1. Manage 4 SDRs\n2. Own enterprise segment\n3. Built the outbound playbook',
+      market: 'e.g.\n1. Glassdoor: $95K base + $40K OTE\n2. 2 competitors hiring at $100K+\n3. Industry benchmark shows gap',
+      promotion: 'e.g.\n1. Took over enterprise book\n2. Manage 4 reps\n3. New demo script — close rate up 15%'
     },
     data: {
-      performance: 'e.g. Built the forecasting model the CFO uses weekly. Automated 3 manual reports saving 10 hours/week. Led the data migration.',
-      scope: 'e.g. Now own all executive reporting. Train new analysts. Lead the cross-team data council.',
-      market: 'e.g. Glassdoor shows $92K median for Data Analysts in my city. LinkedIn shows 3 open roles at $95-105K.',
-      promotion: 'e.g. Own the data pipeline. Built the executive dashboard. Run data literacy sessions for product teams.'
+      performance: 'e.g.\n1. Built forecasting model CFO uses weekly\n2. Automated 3 reports — saved 10 hrs/week\n3. Led the data migration',
+      scope: 'e.g.\n1. Own all executive reporting\n2. Train new analysts\n3. Lead cross-team data council',
+      market: 'e.g.\n1. Glassdoor median: $92K\n2. 3 open roles at $95-105K\n3. Recruiter quoted $100K for similar role',
+      promotion: 'e.g.\n1. Own the data pipeline\n2. Built executive dashboard\n3. Run data literacy sessions'
     },
     finance: {
-      performance: 'e.g. Streamlined month-end close from 10 days to 6. Built the budget model used for Series B. Caught a $200K billing discrepancy.',
-      scope: 'e.g. Now own FP&A in addition to accounting. Present to the board quarterly. Manage 2 analysts.',
-      market: 'e.g. Robert Half guide shows $95K for this role in my market. 2 open positions on LinkedIn at $90-110K.',
-      promotion: 'e.g. Own the full budget cycle. Lead quarterly board prep. Manage vendor contracts and 2 direct reports.'
+      performance: 'e.g.\n1. Month-end close: 10 days → 6\n2. Built budget model for Series B\n3. Caught $200K billing discrepancy',
+      scope: 'e.g.\n1. Own FP&A + accounting\n2. Present to board quarterly\n3. Manage 2 analysts',
+      market: 'e.g.\n1. Robert Half guide: $95K\n2. 2 open roles at $90-110K\n3. Industry benchmark shows gap',
+      promotion: 'e.g.\n1. Own full budget cycle\n2. Lead quarterly board prep\n3. Manage vendor contracts + 2 reports'
     }
   };
 
