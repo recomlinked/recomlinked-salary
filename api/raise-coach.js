@@ -1480,8 +1480,8 @@ Write ONLY the polished section text. No preamble, no labels, no markdown.`;
       q2Promise = client.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 150,
-        system: 'You generate realistic placeholder examples for form inputs. Write 2-3 brief, specific examples that someone in the given role would relate to. Use "e.g." prefix. Keep it under 200 characters. No quotes, no bullet points — just a flowing example string.',
-        messages: [{ role: 'user', content: `Role: ${raw_answer}\nTemplate type: ${template}\nThe next question asks about their biggest measurable results or key contributions.\nWrite a placeholder example specific to this role. Start with "e.g. "` }],
+        system: 'You generate realistic placeholder examples for form inputs. Write exactly 3 brief bullet points that someone in the given role would relate to. Keep each bullet under 40 characters. No full sentences — just the key result or fact. Format: e.g.\\n1. [result]\\n2. [result]\\n3. [result]',
+        messages: [{ role: 'user', content: `Role: ${raw_answer}\nTemplate type: ${template}\nThe next question asks about their biggest measurable results or key contributions.\nWrite a placeholder in this exact format:\ne.g.\n1. [short result]\n2. [short result]\n3. [short result]` }],
       }).catch(e => { console.warn('[case_polish] q2 placeholder failed:', e.message); return null; });
     }
 
