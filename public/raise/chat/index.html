@@ -3114,7 +3114,7 @@ function showCasePaywall(container) {
   // Handle paywall CTA — same Stripe flow as other modes
   var btn = $('case-paywall-btn');
   btn.onclick = startCheckout;
-  logSession('case_paywall_shown', { template: caseState.template });
+  logSession('case_paywall_shown', { template: caseState.template, paywall_seen: true });
 
   setTimeout(function() {
     paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
