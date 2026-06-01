@@ -1120,7 +1120,7 @@ function logSession(stage, extra) {
       if (_q1.charAt(0) === '{') {
         var _p = JSON.parse(_q1);
         // Look for role-like field: role, current_title, old_title, or first field
-        _caseRole = _p.role || _p.current_title || _p.new_title || Object.values(_p)[0] || '';
+        _caseRole = _p.role || _p.current_title || _p.new_title || '';
       } else {
         _caseRole = _q1;
       }
@@ -3012,12 +3012,16 @@ function restoreCaseUI(container, tmpl) {
   if (t.questions[0] && t.questions[0].type === 'row' && caseState.answers[t.questions[0].id]) {
     try {
       var q1 = JSON.parse(caseState.answers[t.questions[0].id]);
-      var vals = Object.values(q1).filter(function(v){return v;});
       var nameEl = document.getElementById('case-doc-name');
       var roleEl = document.getElementById('case-doc-role');
-      if (nameEl && vals[0]) nameEl.textContent = vals[0];
-      if (roleEl && vals.length > 1 && vals[1]) roleEl.textContent = vals[1] + ' since last raise';
-      else if (roleEl) roleEl.textContent = '';
+      var title = q1.role || q1.current_title || q1.new_title || '';
+      var context = '';
+      if (q1.tenure) context = q1.tenure + ' since last raise';
+      else if (q1.hired_as) context = 'Originally hired as ' + q1.hired_as;
+      else if (q1.location) context = q1.location;
+      else if (q1.old_title) context = 'Previously ' + q1.old_title;
+      if (nameEl && title) nameEl.textContent = title;
+      if (roleEl) roleEl.textContent = context;
     } catch(e) {}
   }
 
@@ -3220,10 +3224,15 @@ function handleCaseAnswer(container, qIndex) {
       var p = JSON.parse(answer);
       var nameEl = document.getElementById('case-doc-name');
       var roleEl = document.getElementById('case-doc-role');
-      var vals = Object.values(p).filter(function(v){return v;});
-      if (nameEl && vals[0]) nameEl.textContent = vals[0];
-      if (roleEl && vals.length > 1 && vals[1]) roleEl.textContent = vals[1] + ' since last raise';
-      else if (roleEl && vals[0]) roleEl.textContent = '';
+      // Extract role/title by field name, not position
+      var title = p.role || p.current_title || p.new_title || '';
+      var context = '';
+      if (p.tenure) context = p.tenure + ' since last raise';
+      else if (p.hired_as) context = 'Originally hired as ' + p.hired_as;
+      else if (p.location) context = p.location;
+      else if (p.old_title) context = 'Previously ' + p.old_title;
+      if (nameEl && title) nameEl.textContent = title;
+      if (roleEl) roleEl.textContent = context;
     } catch(e) {}
   }
 
