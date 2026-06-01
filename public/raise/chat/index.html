@@ -617,14 +617,12 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
 .case-doc-section.locked .case-doc-section-label::after{content:' [locked]';font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#8a90a8;}
 .case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;}
-.case-doc-section{margin-bottom:14px;}
-.case-doc-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:4px;}
-.case-doc-section-text{font-size:13px;color:var(--t2);line-height:1.6;}
-.case-doc-section.empty .case-doc-section-text{color:var(--t3);font-style:italic;}
-.case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
+.case-doc-download{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e8eaef;}
+.case-doc-download-name{font-size:10px;color:#8a90a8;display:flex;align-items:center;gap:4px;}
+.case-doc-download-btn{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;}
+.case-doc-download-btn:disabled,.case-doc-download-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
 @keyframes casePulse{0%,100%{opacity:0.4;}50%{opacity:0.8;}}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
-.case-doc-section.locked .case-doc-section-text{filter:blur(4px);user-select:none;color:var(--t3);font-style:italic;}
 .case-paywall{background:linear-gradient(135deg,rgba(123,92,252,0.06),rgba(245,207,86,0.08));border:1.5px solid rgba(123,92,252,0.2);border-radius:14px;padding:24px 22px;margin:20px 0 10px;text-align:center;}
 .case-paywall-title{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px;}
 .case-paywall-sub{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:18px;}
@@ -2911,7 +2909,8 @@ function initCaseMode(container) {
       '<div class="case-doc-section-text">' + txt + '</div>' +
       '</div>';
   });
-  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>';
+  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
+    '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
 
@@ -2947,7 +2946,8 @@ function restoreCaseUI(container, tmpl) {
       '<div class="case-doc-section-text">' + escapeHtml(text) + '</div>' +
       '</div>';
   });
-  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>';
+  var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
+    '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   container.appendChild(docPreview);
 
