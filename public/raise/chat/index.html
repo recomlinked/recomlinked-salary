@@ -615,7 +615,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
 .case-doc-section.locked{opacity:0.5;}
 .case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
-.case-doc-section.locked .case-doc-section-label::after{content:' \uD83D\uDD12';font-size:9px;}
+.case-doc-section.locked .case-doc-section-label::after{content:' [locked]';font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#8a90a8;}
 .case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;}
 .case-doc-section{margin-bottom:14px;}
 .case-doc-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:4px;}
@@ -2960,7 +2960,8 @@ function restoreCaseUI(container, tmpl) {
       var nameEl = document.getElementById('case-doc-name');
       var roleEl = document.getElementById('case-doc-role');
       if (nameEl && vals[0]) nameEl.textContent = vals[0];
-      if (roleEl && vals[1]) roleEl.textContent = vals[1];
+      if (roleEl && vals.length > 1 && vals[1]) roleEl.textContent = vals[1] + ' since last raise';
+      else if (roleEl) roleEl.textContent = '';
     } catch(e) {}
   }
 
@@ -3151,7 +3152,8 @@ function handleCaseAnswer(container, qIndex) {
       var roleEl = document.getElementById('case-doc-role');
       var vals = Object.values(p).filter(function(v){return v;});
       if (nameEl && vals[0]) nameEl.textContent = vals[0];
-      if (roleEl && vals[1]) roleEl.textContent = vals[1];
+      if (roleEl && vals.length > 1 && vals[1]) roleEl.textContent = vals[1] + ' since last raise';
+      else if (roleEl && vals[0]) roleEl.textContent = '';
     } catch(e) {}
   }
 
