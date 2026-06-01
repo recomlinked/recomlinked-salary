@@ -2425,6 +2425,8 @@ function setMode(target) {
     }
     const input = $('chat-input');
     if (input) { input.placeholder = 'Building your plan\u2026'; input.disabled = true; }
+    var inputBar = document.querySelector('.input-bar');
+    if (inputBar) inputBar.style.display = 'none';
     var sendBtn = $('send-btn');
     if (sendBtn) sendBtn.disabled = true;
     // Hide chips area in Assess mode
@@ -2447,10 +2449,14 @@ function setMode(target) {
 
     const input = $('chat-input');
     if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
+    var inputBar2 = document.querySelector('.input-bar');
+    if (inputBar2) inputBar2.style.display = 'none';
     scrollChatToBottom();
   } else if (target === 'coach') {
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
+    var inputBar3 = document.querySelector('.input-bar');
+    if (inputBar3) inputBar3.style.display = '';
 
     // If not paid, show locked coaching preview
     if (!state.paid && !coachingEl.querySelector('.user-msg') && !coachingEl.dataset.lockedShown) {
@@ -2497,6 +2503,8 @@ function setMode(target) {
     stopThinkingAnimation();
     const input = $('chat-input');
     if (input) { input.placeholder = 'Building your raise case\u2026'; input.disabled = true; }
+    var inputBar4 = document.querySelector('.input-bar');
+    if (inputBar4) inputBar4.style.display = 'none';
     var sendBtn3 = $('send-btn');
     if (sendBtn3) sendBtn3.disabled = true;
     var chipsArea3 = $('chips-area');
