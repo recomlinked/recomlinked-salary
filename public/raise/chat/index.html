@@ -629,7 +629,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .case-doc-label{font-size:13px;color:var(--t2);padding:12px 16px 8px;display:flex;align-items:center;gap:6px;}
 .case-doc-preview::before{display:none;}
-.case-doc-label-inner{font-size:13px;color:var(--t2);padding:10px 16px 8px;display:flex;align-items:center;gap:6px;background:var(--bg);margin:-1px -1px 0 -1px;border-radius:6px 6px 0 0;}
+.case-deliverables-label{font-size:13px;color:var(--t2);margin:0 0 8px;display:flex;align-items:center;gap:6px;}
 .case-email-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;overflow:hidden;}
 .case-email-tones{padding:10px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
 .case-email-tones .tone-chips{display:flex;gap:6px;}
@@ -2971,9 +2971,14 @@ function initCaseMode(container) {
   });
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
     '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
-  docPreview.innerHTML = '<div class="case-doc-label-inner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>' + topbar + docHeader + sections + footer;
-  container.appendChild(docPreview);
-  buildEmailDraft(container, t.name, accent);
+  docPreview.innerHTML = topbar + docHeader + sections + footer;
+  var deliverables = el('div', '', '');
+  deliverables.id = 'case-deliverables';
+  var docLabelHtml = '<div class="case-deliverables-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>';
+  deliverables.innerHTML = docLabelHtml;
+  deliverables.appendChild(docPreview);
+  container.appendChild(deliverables);
+  buildEmailDraft(deliverables, t.name, accent);
 
   showCaseQuestion(container, 0);
 }
@@ -3010,9 +3015,14 @@ function restoreCaseUI(container, tmpl) {
   });
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
     '<div class="case-doc-download"><span class="case-doc-download-name"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + escapeHtml(t.name) + '.pdf</span><button class="case-doc-download-btn" data-locked="true" onclick="if(this.dataset.locked){alert(\"Complete all sections first to download your PDF.\")}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button></div>';
-  docPreview.innerHTML = '<div class="case-doc-label-inner"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>' + topbar + docHeader + sections + footer;
-  container.appendChild(docPreview);
-  buildEmailDraft(container, t.name, accent);
+  docPreview.innerHTML = topbar + docHeader + sections + footer;
+  var deliverables = el('div', '', '');
+  deliverables.id = 'case-deliverables';
+  var docLabelHtml = '<div class="case-deliverables-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>';
+  deliverables.innerHTML = docLabelHtml;
+  deliverables.appendChild(docPreview);
+  container.appendChild(deliverables);
+  buildEmailDraft(deliverables, t.name, accent);
 
   // Fill header with saved Q1 data
   if (t.questions[0] && t.questions[0].type === 'row' && caseState.answers[t.questions[0].id]) {
@@ -3043,7 +3053,7 @@ function restoreCaseUI(container, tmpl) {
     }
     conf.innerHTML = '<div class="case-q-label" style="color:var(--t3);">' + escapeHtml(q.label) + '</div>' +
       '<div class="case-q-text" style="color:var(--t1);font-size:13px;">\u2713 ' + escapeHtml(displayAns).substring(0, 200) + '</div>';
-    container.insertBefore(conf, docPreview);
+    container.insertBefore(conf, $('case-deliverables'));
   }
 
   if (caseState.currentQ >= t.questions.length) {
@@ -3080,7 +3090,7 @@ function showCaseQuestion(container, qIndex) {
   var bubble = el('div', 'case-q-bubble', '');
   bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + ' \u2014 Question ' + (qIndex + 1) + ' of ' + t.questions.length + '</div>' +
     '<div class="case-q-text">' + escapeHtml(q.text) + '</div>';
-  container.insertBefore(bubble, $('case-doc-preview'));
+  container.insertBefore(bubble, $('case-deliverables'));
 
   // Input area
   var inputWrap = el('div', 'case-input-wrap case-input-active', '');
@@ -3129,7 +3139,7 @@ function showCaseQuestion(container, qIndex) {
   }
 
   inputWrap.appendChild(btnWrap);
-  container.insertBefore(inputWrap, $('case-doc-preview'));
+  container.insertBefore(inputWrap, $('case-deliverables'));
 
   // Focus first input
   setTimeout(function() {
@@ -3266,7 +3276,7 @@ function handleCaseAnswer(container, qIndex) {
     } catch(e) {}
   }
   conf.innerHTML = '<div class="case-q-text" style="color:var(--t1);font-size:13px;">\u2713 ' + escapeHtml(displayAnswer).substring(0, 200) + (displayAnswer.length > 200 ? '\u2026' : '') + '</div>';
-  container.insertBefore(conf, $('case-doc-preview'));
+  container.insertBefore(conf, $('case-deliverables'));
 
   // Next question
   showCaseQuestion(container, qIndex + 1);
@@ -3426,7 +3436,7 @@ function buildCaseReview(container) {
   reviewBubble.style.cssText = 'background:rgba(123,92,252,0.06);border-color:rgba(123,92,252,0.2);';
   reviewBubble.innerHTML = '<div class="case-q-label">Review your raise case</div>' +
     '<div class="case-q-text">Your raise case document is ready. Review and edit any section below, then generate the final PDF.</div>';
-  container.insertBefore(reviewBubble, $('case-doc-preview'));
+  container.insertBefore(reviewBubble, $('case-deliverables'));
 
   // Make doc preview sections editable
   var preview = $('case-doc-preview');
