@@ -600,6 +600,11 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-field-group{display:flex;flex-direction:column;gap:4px;}
 .case-field-label{font-size:12px;font-weight:600;color:var(--t2);padding-left:2px;}
 .case-next-btn{display:inline-flex;align-items:center;gap:6px;background:#7B5CFC;color:#fff;border:none;border-radius:10px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.case-tone-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;}
+.case-tone-chip{background:var(--card);border:1.5px solid var(--divider);border-radius:10px;padding:10px 16px;font-family:var(--sans);font-size:14px;color:var(--t1);cursor:pointer;transition:all 0.15s;font-weight:500;}
+.case-tone-chip:hover{border-color:var(--purple);background:rgba(123,92,252,0.04);}
+.case-tone-chip.selected{background:rgba(123,92,252,0.1);border-color:var(--purple);color:var(--purple);font-weight:600;}
+.case-tone-chip:disabled:not(.selected){opacity:0.4;cursor:default;}
 .case-next-btn:hover{background:#6A4CE8;transform:translateY(-1px);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
 .case-skip-btn{background:none;border:none;color:var(--t3);font-family:var(--sans);font-size:12px;cursor:pointer;margin-left:10px;}
@@ -2999,7 +3004,53 @@ function initCaseMode(container) {
   container.appendChild(deliverables);
   buildEmailDraft(deliverables, t.name, accent);
 
-  showCaseQuestion(container, 0);
+  showCaseToneQuestion(container);
+}
+
+function showCaseToneQuestion(container) {
+  var bubble = el('div', 'case-q-bubble', '');
+  bubble.innerHTML = '<div class="case-q-text">How would you describe your relationship with your manager?</div>';
+  container.insertBefore(bubble, $('case-deliverables'));
+
+  var chipsWrap = el('div', 'case-tone-chips', '');
+  var options = [
+    { label: 'We\u2019re close', value: 'close' },
+    { label: 'Professional & respectful', value: 'professional' },
+    { label: 'It\u2019s complicated', value: 'complicated' },
+    { label: 'New manager', value: 'new' }
+  ];
+  options.forEach(function(opt) {
+    var chip = document.createElement('button');
+    chip.className = 'case-tone-chip';
+    chip.textContent = opt.label;
+    chip.onclick = function() {
+      // Store tone
+      caseState.tone = opt.value;
+      saveCaseState();
+      // Disable all chips, highlight selected
+      chipsWrap.querySelectorAll('.case-tone-chip').forEach(function(c) {
+        c.disabled = true;
+        c.classList.remove('selected');
+      });
+      chip.classList.add('selected');
+      // Show confirmation
+      var conf = el('div', 'case-q-bubble', '');
+      conf.style.cssText = 'background:rgba(123,92,252,0.08);border-color:rgba(123,92,252,0.2);';
+      conf.innerHTML = '<div class="case-q-text">\u2713 ' + opt.label + '</div>';
+      container.insertBefore(conf, $('case-deliverables'));
+      // Start real questions
+      setTimeout(function() {
+        showCaseQuestion(container, 0);
+      }, 400);
+    };
+    chipsWrap.appendChild(chip);
+  });
+  container.insertBefore(chipsWrap, $('case-deliverables'));
+
+  // Scroll into view
+  setTimeout(function() {
+    bubble.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 150);
 }
 
 function restoreCaseUI(container, tmpl) {
@@ -3561,6 +3612,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
       question_text: q.text,
       raw_answer: answer,
       all_answers: caseState.answers,
+      tone_context: caseState.tone || '',
       q2_text: t.questions[1] ? t.questions[1].text : '',
     }),
   })
