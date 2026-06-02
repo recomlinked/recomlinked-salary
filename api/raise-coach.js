@@ -1428,7 +1428,7 @@ const CASE_SECTION_PROMPTS = {
 
 async function handleCasePolish(body, res) {
   try {
-    const { template, section_index, section_name, raw_answer, question_text, all_answers, q2_text } = body;
+    const { template, section_index, section_name, raw_answer, question_text, all_answers, q2_text, tone_context } = body;
 
     if (!template || section_index === undefined || !raw_answer) {
       return res.status(400).json({ error: 'Missing required fields: template, section_index, raw_answer' });
