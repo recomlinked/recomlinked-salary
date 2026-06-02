@@ -2837,7 +2837,7 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','Role Evolution','Impact Delivered','The Timeline','The Ask','Additional Leverage'],
     questions: [
-      { id: 'titles', label: 'Your role', text: "What\u2019s your current title, and what were you originally hired as?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Engineering Manager', type: 'text' },{ name: 'hired_as', placeholder: 'e.g. Senior Engineer', type: 'text' }], section: 0 },
+      { id: 'titles', label: 'Your role', text: "What\u2019s your current role/title and how long have you been doing the expanded work?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Senior Engineer', type: 'text' },{ name: 'duration', placeholder: 'e.g. 8 months', type: 'text' }], section: 0 },
       { id: 'new_responsibilities', label: 'Scope growth', text: "What new responsibilities have you taken on that weren\u2019t in your original role? Think team management, new domains, cross-functional work.", type: 'textarea', placeholder: "e.g. Took over the platform team (4 engineers). Now own the API roadmap and run weekly architecture reviews. None of this was in my original job description.", section: 1 },
       { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g.\n1. Cut P1 incidents by 60%\n2. Shipped API v2 migration on time\n3. Onboarding time: 3 weeks → 5 days", section: 2 },
       { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 1 year 6 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
@@ -3055,6 +3055,7 @@ function restoreCaseUI(container, tmpl) {
         else context = dur + ' since last raise';
       }
       else if (q1.hired_as) context = 'Originally hired as ' + q1.hired_as;
+      else if (q1.duration) context = formatDuration(q1.duration) + ' doing the extra work';
       else if (q1.location) context = q1.location;
       else if (q1.old_title) context = 'Previously ' + q1.old_title;
       if (nameEl && title) nameEl.textContent = title;
@@ -3130,7 +3131,7 @@ function showCaseQuestion(container, qIndex) {
       target: 'Target salary',
       current_title: 'Your current title',
       hired_as: 'What you were hired as',
-      duration: 'Time in expanded role',
+      duration: 'How long doing the extra work',
       last_raise: 'When was your last raise',
       location: 'Your city',
       old_title: 'Previous title',
@@ -3314,6 +3315,7 @@ function handleCaseAnswer(container, qIndex) {
         else context = dur + ' since last raise';
       }
       else if (p.hired_as) context = 'Originally hired as ' + p.hired_as;
+      else if (p.duration) context = formatDuration(p.duration) + ' doing the extra work';
       else if (p.location) context = p.location;
       else if (p.old_title) context = 'Previously ' + p.old_title;
       if (nameEl && title) nameEl.textContent = title;
