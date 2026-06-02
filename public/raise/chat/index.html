@@ -2988,6 +2988,7 @@ function initCaseMode(container) {
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   var deliverables = el('div', '', '');
   deliverables.id = 'case-deliverables';
+  deliverables.style.display = 'none';
   var docLabelHtml = '<div class="case-deliverables-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>';
   deliverables.innerHTML = docLabelHtml;
   deliverables.appendChild(docPreview);
@@ -3107,7 +3108,8 @@ function showCaseQuestion(container, qIndex) {
 
   // Question bubble
   var bubble = el('div', 'case-q-bubble', '');
-  bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + ' \u2014 Question ' + (qIndex + 1) + ' of ' + t.questions.length + '</div>' +
+  var qCounter = qIndex < 5 ? ' \u2014 Question ' + (qIndex + 1) + ' of 5' : ' \u2014 Optional';
+  bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + qCounter + '</div>' +
     '<div class="case-q-text">' + escapeHtml(q.text) + '</div>';
   container.insertBefore(bubble, $('case-deliverables'));
 
@@ -3264,6 +3266,12 @@ function handleCaseAnswer(container, qIndex) {
 
   // Log case question answers
   logSession('case_q' + (qIndex + 1), { template: caseState.template, question: q.id });
+
+  // Show deliverables after Q1
+  if (qIndex === 0) {
+    var deliv = $('case-deliverables');
+    if (deliv) deliv.style.display = '';
+  }
 
   // Update doc header with user info from Q1
   if (qIndex === 0 && q.type === 'row') {
