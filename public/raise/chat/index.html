@@ -3111,7 +3111,7 @@ function showCaseQuestion(container, qIndex) {
 
   // Question bubble
   var bubble = el('div', 'case-q-bubble', '');
-  var qCounter = qIndex < 5 ? ' \u2014 Question ' + (qIndex + 1) + ' of 5' : ' \u2014 Optional';
+  var qCounter = qIndex < 5 ? ' \u2014 (' + (qIndex + 1) + ' of 5)' : ' \u2014 Optional';
   bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + qCounter + '</div>' +
     '<div class="case-q-text">' + escapeHtml(q.text) + '</div>';
   container.insertBefore(bubble, $('case-deliverables'));
