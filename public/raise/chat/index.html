@@ -3254,10 +3254,6 @@ function showCasePaywall(container) {
   btn.onclick = startCheckout;
   logSession('case_paywall_shown', { template: caseState.template, paywall_seen: true });
 
-  setTimeout(function() {
-    paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 200);
-
   // Make locked sections clickable → scroll to paywall
   var preview = $('case-doc-preview');
   if (preview) {
