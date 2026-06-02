@@ -3302,12 +3302,15 @@ function handleCaseAnswer(container, qIndex) {
   // Update doc preview section
   updateCaseDocSection(q.section, q, answer);
 
-  // Disable the input
+  // Remove the input and question bubble — confirmation bubble replaces them
   var active = container.querySelector('.case-input-active');
   if (active) {
-    active.querySelectorAll('input,textarea,button').forEach(function(el) { el.disabled = true; });
-    active.classList.remove('case-input-active');
-    active.style.opacity = '0.5';
+    // Find and remove the question bubble above this input
+    var prevSibling = active.previousElementSibling;
+    if (prevSibling && prevSibling.classList.contains('case-q-bubble')) {
+      prevSibling.remove();
+    }
+    active.remove();
   }
 
   // Show user's answer as a confirmation bubble
