@@ -2869,7 +2869,7 @@ var CASE_TEMPLATES = {
     questions: [
       { id: 'role_location', label: 'Your role', text: "What\u2019s your role and where are you located? This helps the document reference the right market.", type: 'row', fields: [{ name: 'role', placeholder: 'e.g. Data Analyst', type: 'text' },{ name: 'location', placeholder: 'e.g. New York, NY', type: 'text' }], section: 0 },
       { id: 'market_data', label: 'Market evidence', text: "What market data do you have? Salary sites, job postings, recruiter ranges, industry reports \u2014 anything showing you\u2019re paid below market.", type: 'textarea', placeholder: "e.g. Glassdoor median for this role in my city is $92k. LinkedIn shows 3 open roles at $95\u2013105k. My salary is $78k.", section: 1 },
-      { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 3 years or 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 1 year ago', type: 'text' }], section: 2 },
+      { id: 'tenure', label: 'Your tenure', text: "How long have you been in this role, and when was your last raise?", type: 'row', fields: [{ name: 'role_duration', placeholder: 'e.g. 3 years or 18 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 1 year ago', type: 'text' }], section: 2 },
       { id: 'responsibilities', label: 'What you do', text: "What are your main responsibilities and contributions? What would your manager miss if you left?", type: 'textarea', placeholder: "e.g. I own all executive reporting. Built the forecasting model the CFO uses weekly. Train new analysts. Lead the cross-team data council.", section: 3 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'extra_context', label: 'Anything else?', text: "Is there anything else that strengthens your case? Recruiter outreach, competing offers, certifications?", type: 'textarea', placeholder: "(Optional) e.g. Three recruiters reached out this quarter for roles paying $95\u2013110k.", optional: true, section: 5 }
@@ -3128,6 +3128,7 @@ function showCaseQuestion(container, qIndex) {
       role: 'Your role / title',
       tenure: 'Time since last raise',
       company_tenure: 'Time at this company',
+      role_duration: 'Time in this role',
       current: 'Current salary',
       target: 'Target salary',
       stay_number: 'Number to stay',
@@ -3550,6 +3551,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
       question_text: q.text,
       raw_answer: answer,
       all_answers: caseState.answers,
+      q2_text: t.questions[1] ? t.questions[1].text : '',
     }),
   })
   .then(function(res) { return res.json(); })
