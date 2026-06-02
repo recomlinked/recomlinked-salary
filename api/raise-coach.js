@@ -1428,7 +1428,7 @@ const CASE_SECTION_PROMPTS = {
 
 async function handleCasePolish(body, res) {
   try {
-    const { template, section_index, section_name, raw_answer, question_text, all_answers } = body;
+    const { template, section_index, section_name, raw_answer, question_text, all_answers, q2_text } = body;
 
     if (!template || section_index === undefined || !raw_answer) {
       return res.status(400).json({ error: 'Missing required fields: template, section_index, raw_answer' });
@@ -1476,12 +1476,12 @@ Write ONLY the polished section text. No preamble, no labels, no markdown.`;
 
     // For section 0, run polish + Q2 placeholder generation in parallel
     let q2Promise = null;
-    if (section_index === 0) {
+    if (section_index === 0 && q2_text) {
       q2Promise = client.messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 150,
-        system: 'You generate realistic placeholder examples for form inputs. Write exactly 3 brief bullet points that someone in the given role would relate to. Keep each bullet under 40 characters. No full sentences — just the key result or fact. Format: e.g.\\n1. [result]\\n2. [result]\\n3. [result]',
-        messages: [{ role: 'user', content: `Role: ${raw_answer}\nTemplate type: ${template}\nThe next question asks about their biggest measurable results or key contributions.\nWrite a placeholder in this exact format:\ne.g.\n1. [short result]\n2. [short result]\n3. [short result]` }],
+        system: 'You generate realistic placeholder examples for form inputs. Write exactly 3 brief bullet points that someone in the given role would relate to. Keep each bullet under 40 characters. No full sentences — just the key fact. Format: e.g.\\n1. [item]\\n2. [item]\\n3. [item]',
+        messages: [{ role: 'user', content: `Role: ${raw_answer}\nTemplate type: ${template}\nThe next question is: "${q2_text}"\nWrite a placeholder in this exact format:\ne.g.\n1. [short answer relevant to the question]\n2. [short answer relevant to the question]\n3. [short answer relevant to the question]` }],
       }).catch(e => { console.warn('[case_polish] q2 placeholder failed:', e.message); return null; });
     }
 
