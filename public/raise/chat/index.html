@@ -587,8 +587,9 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-q-bubble{background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:16px 18px;margin:0 0 14px;}
 .case-q-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#7B5CFC;margin-bottom:6px;}
 .case-q-text{font-size:14px;color:var(--t1);line-height:1.5;margin:0;}
-.case-input-wrap{margin:0 0 18px;}
+.case-input-wrap{margin:0 0 28px;}
 .case-input-wrap input,.case-input-wrap textarea{width:100%;border:1.5px solid var(--divider);border-radius:10px;padding:12px 14px;font-family:var(--sans);font-size:16px;color:var(--t1);background:var(--card);resize:vertical;transition:border-color 0.15s;}
+.case-input-wrap textarea{min-height:110px;}
 .case-input-wrap input::placeholder,.case-input-wrap textarea::placeholder{color:#bbb;opacity:1;font-style:italic;}
 .case-input-wrap input.input-error,.case-input-wrap textarea.input-error{border-color:#E24B4A;animation:inputShake 0.4s ease;}
 @keyframes inputShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
@@ -3141,7 +3142,7 @@ function showCaseQuestion(container, qIndex) {
 
   // Buttons
   var btnWrap = el('div', '', '');
-  btnWrap.style.cssText = 'margin-top:10px;display:flex;align-items:center;';
+  btnWrap.style.cssText = 'margin-top:10px;margin-bottom:8px;display:flex;align-items:center;';
   var nextBtn = document.createElement('button');
   nextBtn.className = 'case-next-btn';
   nextBtn.textContent = qIndex < t.questions.length - 1 ? 'Next \u2192' : 'Build my raise case \u2192';
