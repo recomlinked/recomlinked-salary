@@ -2966,8 +2966,7 @@ function initCaseMode(container) {
   var pw = t.paywallAfter || 2;
 
   var welcome = el('div', 'case-q-bubble', '');
-  welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + '</div>' +
-    '<div class="case-q-text">' + escapeHtml(t.tagline) + ' Answer a few quick questions and your raise case document will build itself below.</div>';
+  welcome.innerHTML = '<div class="case-q-text">' + escapeHtml(t.tagline) + ' Answer 5 quick questions and your raise case document and email draft will build itself below.</div>';
   container.appendChild(welcome);
 
   var docPreview = el('div', 'case-doc-preview', '');
@@ -3008,8 +3007,7 @@ function restoreCaseUI(container, tmpl) {
   logSession('case_resumed', { template: tmpl });
 
   var welcome = el('div', 'case-q-bubble', '');
-  welcome.innerHTML = '<div class="case-q-label">' + escapeHtml(t.name) + ' \u2014 Resuming</div>' +
-    '<div class="case-q-text">Welcome back. Your progress has been saved. Continuing where you left off.</div>' +
+  welcome.innerHTML = '<div class="case-q-text">Welcome back. Your progress has been saved. Continuing where you left off.</div>' +
     '<div style="margin-top:8px;"><a href="#" style="font-size:12px;color:var(--t3);" onclick="clearCaseState();window.location.href=\'/raise/chat/?mode=case&template=' + tmpl + '\';return false;">Start over</a></div>';
   container.appendChild(welcome);
 
