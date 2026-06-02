@@ -2837,10 +2837,10 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','Role Evolution','Impact Delivered','The Timeline','The Ask','Additional Leverage'],
     questions: [
-      { id: 'titles', label: 'Your role', text: "What\u2019s your current role/title and how long have you been doing the expanded work?", type: 'row', fields: [{ name: 'current_title', placeholder: 'e.g. Senior Engineer', type: 'text' },{ name: 'duration', placeholder: 'e.g. 8 months', type: 'text' }], section: 0 },
+      { id: 'titles', label: 'Your role', text: "What\u2019s your current role or title?", type: 'text', placeholder: 'e.g. Senior Engineer', section: 0 },
       { id: 'new_responsibilities', label: 'Scope growth', text: "What new responsibilities have you taken on that weren\u2019t in your original role? Think team management, new domains, cross-functional work.", type: 'textarea', placeholder: "e.g. Took over the platform team (4 engineers). Now own the API roadmap and run weekly architecture reviews. None of this was in my original job description.", section: 1 },
-      { id: 'results', label: 'Impact', text: "What measurable results have you delivered in the expanded role?", type: 'textarea', placeholder: "e.g.\n1. Cut P1 incidents by 60%\n2. Shipped API v2 migration on time\n3. Onboarding time: 3 weeks → 5 days", section: 2 },
-      { id: 'duration', label: 'Timeline', text: "How long have you been doing the expanded role, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 1 year 6 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
+      { id: 'results', label: 'Impact', text: "What measurable results have you delivered since taking on the extra work?", type: 'textarea', placeholder: "e.g.\n1. Cut P1 incidents by 60%\n2. Shipped API v2 migration on time\n3. Onboarding time: 3 weeks → 5 days", section: 2 },
+      { id: 'duration', label: 'Timeline', text: "How long have you been doing the extra work, and when was your last raise?", type: 'row', fields: [{ name: 'duration', placeholder: 'e.g. 1 year 6 months', type: 'text' },{ name: 'last_raise', placeholder: 'e.g. 2 years ago', type: 'text' }], section: 3 },
       { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number are you asking for?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Target salary', type: 'text' }], section: 4 },
       { id: 'extra_leverage', label: 'Anything else?', text: "Is there anything else that strengthens your case? Market data, recruiter interest, a competing offer?", type: 'textarea', placeholder: "(Optional) e.g. The market rate for Engineering Managers in my city is $160\u2013180k. I\u2019m at $135k.", optional: true, section: 5 }
     ]
@@ -3304,7 +3304,6 @@ function handleCaseAnswer(container, qIndex) {
       var p = JSON.parse(answer);
       var nameEl = document.getElementById('case-doc-name');
       var roleEl = document.getElementById('case-doc-role');
-      // Extract role/title by field name, not position
       var title = p.role || p.current_title || p.new_title || '';
       var context = '';
       if (p.tenure && (p.role || !p.current_title)) {
@@ -3321,6 +3320,9 @@ function handleCaseAnswer(container, qIndex) {
       if (nameEl && title) nameEl.textContent = title;
       if (roleEl) roleEl.textContent = context;
     } catch(e) {}
+  } else if (qIndex === 0 && q.type !== 'row') {
+    var nameEl2 = document.getElementById('case-doc-name');
+    if (nameEl2 && answer) nameEl2.textContent = answer;
   }
 
   saveCaseState();
