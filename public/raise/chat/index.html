@@ -3104,12 +3104,7 @@ function showCaseQuestion(container, qIndex) {
     // Delay paywall so user sees the value
     setTimeout(function() {
       showCasePaywall(container);
-      // Scroll paywall into view after it appears
-      setTimeout(function() {
-        var paywall = $('case-paywall');
-        if (paywall) paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 300);
-    }, 3000);
+    }, 4000);
     return;
   }
 
