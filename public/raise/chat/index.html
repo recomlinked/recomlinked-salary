@@ -595,8 +595,10 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 @keyframes inputShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
 .case-input-wrap input:focus,.case-input-wrap textarea:focus{outline:none;border-color:#7B5CFC;}
 .case-input-wrap textarea{min-height:80px;}
-.case-row{display:flex;gap:10px;}
-.case-row input{flex:1;}
+.case-row{display:flex;flex-direction:column;gap:12px;}
+.case-row input{width:100%;}
+.case-field-group{display:flex;flex-direction:column;gap:4px;}
+.case-field-label{font-size:12px;font-weight:600;color:var(--t2);padding-left:2px;}
 .case-next-btn{display:inline-flex;align-items:center;gap:6px;background:#7B5CFC;color:#fff;border:none;border-radius:10px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
 .case-next-btn:hover{background:#6A4CE8;transform:translateY(-1px);}
 .case-next-btn:disabled{opacity:0.4;pointer-events:none;}
@@ -3123,13 +3125,36 @@ function showCaseQuestion(container, qIndex) {
     ta.id = 'case-input-' + q.id;
     inputWrap.appendChild(ta);
   } else if (q.type === 'row') {
+    var fieldLabels = {
+      role: 'Your role / title',
+      tenure: 'Time since last raise',
+      current: 'Current salary',
+      target: 'Target salary',
+      current_title: 'Your current title',
+      hired_as: 'What you were hired as',
+      duration: 'Time in expanded role',
+      last_raise: 'When was your last raise',
+      location: 'Your city',
+      old_title: 'Previous title',
+      new_title: 'New title',
+      market_rate: 'Market rate for new title',
+      deadline: 'Offer expires',
+      decision_date: 'Need answer by'
+    };
     var row = el('div', 'case-row', '');
     q.fields.forEach(function(f) {
+      var fieldGroup = el('div', 'case-field-group', '');
+      var label = document.createElement('label');
+      label.className = 'case-field-label';
+      label.textContent = fieldLabels[f.name] || f.name;
+      label.setAttribute('for', 'case-input-' + q.id + '-' + f.name);
+      fieldGroup.appendChild(label);
       var inp = document.createElement('input');
       inp.type = f.type || 'text';
       inp.placeholder = f.placeholder || '';
       inp.id = 'case-input-' + q.id + '-' + f.name;
-      row.appendChild(inp);
+      fieldGroup.appendChild(inp);
+      row.appendChild(fieldGroup);
     });
     inputWrap.appendChild(row);
   } else {
