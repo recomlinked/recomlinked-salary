@@ -3302,16 +3302,9 @@ function handleCaseAnswer(container, qIndex) {
   // Update doc preview section
   updateCaseDocSection(q.section, q, answer);
 
-  // Remove the input and question bubble — confirmation bubble replaces them
+  // Remove the input — confirmation bubble replaces it
   var active = container.querySelector('.case-input-active');
-  if (active) {
-    // Find and remove the question bubble above this input
-    var prevSibling = active.previousElementSibling;
-    if (prevSibling && prevSibling.classList.contains('case-q-bubble')) {
-      prevSibling.remove();
-    }
-    active.remove();
-  }
+  if (active) active.remove();
 
   // Show user's answer as a confirmation bubble
   var conf = el('div', 'case-q-bubble', '');
