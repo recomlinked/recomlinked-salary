@@ -2852,10 +2852,10 @@ var CASE_TEMPLATES = {
     paywallAfter: 2,
     sections: ['Opening Statement','The Situation','Why I Want to Stay','What Would Be Lost','The Ask & Timeline','Additional Context'],
     questions: [
-      { id: 'tenure_role', label: 'About you', text: "How long have you been at this company, and what\u2019s your current role?", type: 'row', fields: [{ name: 'tenure', placeholder: 'e.g. 4 years or 3.5 years', type: 'text' },{ name: 'role', placeholder: 'e.g. Product Manager', type: 'text' }], section: 0 },
+      { id: 'tenure_role', label: 'About you', text: "How long have you been at this company, and what\u2019s your current role?", type: 'row', fields: [{ name: 'company_tenure', placeholder: 'e.g. 4 years or 3.5 years', type: 'text' },{ name: 'role', placeholder: 'e.g. Product Manager', type: 'text' }], section: 0 },
       { id: 'offer_details', label: 'The offer', text: "What\u2019s the competing offer? Company, role, and compensation package. Be as specific as you can.", type: 'textarea', placeholder: "e.g. Series B company, Senior PM role. $165k base + equity package worth ~$40k/year. They want an answer by June 15.", section: 1 },
       { id: 'why_stay', label: 'Why you want to stay', text: "Why do you want to stay at your current company? What do you value here that the other offer doesn\u2019t have?", type: 'textarea', placeholder: "e.g. I believe in the product roadmap. I\u2019ve built strong relationships with my team. I don\u2019t want to start over \u2014 I want to keep building here.", section: 2 },
-      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number would make you stay?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'target', placeholder: 'Number to stay', type: 'text' }], section: 4 },
+      { id: 'salary', label: 'The numbers', text: "What\u2019s your current salary and what number would make you stay?", type: 'row', fields: [{ name: 'current', placeholder: 'Current salary', type: 'text' },{ name: 'stay_number', placeholder: 'Number to stay', type: 'text' }], section: 4 },
       { id: 'deadline', label: 'Timeline', text: "When does the offer expire, and when do you need an answer from your current employer?", type: 'row', fields: [{ name: 'deadline', placeholder: 'e.g. June 15', type: 'text' },{ name: 'decision_date', placeholder: 'e.g. by end of this week', type: 'text' }], section: 3 },
       { id: 'extra_context', label: 'Anything else?', text: "Is there anything else your manager should know? Other offers, personal circumstances, specific concerns?", type: 'textarea', placeholder: "(Optional) e.g. I\u2019ve turned down two other calls this quarter because I wanted to make this work here first.", optional: true, section: 5 }
     ]
@@ -3048,7 +3048,7 @@ function restoreCaseUI(container, tmpl) {
       var roleEl = document.getElementById('case-doc-role');
       var title = q1.role || q1.current_title || q1.new_title || '';
       var context = '';
-      if (q1.tenure && (q1.role || !q1.current_title)) {
+      if ((q1.tenure || q1.company_tenure) && (q1.role || !q1.current_title)) {
         var dur = formatDuration(q1.tenure);
         if (tmpl === 'offer') context = dur + ' at the company';
         else if (tmpl === 'market') context = dur + ' in this role';
@@ -3127,8 +3127,10 @@ function showCaseQuestion(container, qIndex) {
     var fieldLabels = {
       role: 'Your role / title',
       tenure: 'Time since last raise',
+      company_tenure: 'Time at this company',
       current: 'Current salary',
       target: 'Target salary',
+      stay_number: 'Number to stay',
       current_title: 'Your current title',
       hired_as: 'What you were hired as',
       duration: 'How long doing the extra work',
@@ -3306,9 +3308,11 @@ function handleCaseAnswer(container, qIndex) {
       var roleEl = document.getElementById('case-doc-role');
       var title = p.role || p.current_title || p.new_title || '';
       var context = '';
-      if (p.tenure && (p.role || !p.current_title)) {
+      if ((p.tenure || p.company_tenure) && (p.role || !p.current_title)) {
         var tmplKey = caseState.template;
         var dur = formatDuration(p.tenure);
+        var tenureVal = p.tenure || p.company_tenure;
+        var dur = formatDuration(tenureVal);
         if (tmplKey === 'offer') context = dur + ' at the company';
         else if (tmplKey === 'market') context = dur + ' in this role';
         else context = dur + ' since last raise';
@@ -3421,6 +3425,7 @@ function formatDuration(val) {
 
 function getCustomPlaceholder(q, qIndex) {
   if (qIndex !== 1) return q.placeholder || '';
+  if (caseState.template === 'offer') return q.placeholder || '';
   var tmpl = caseState.template;
   var q1 = caseState.answers && Object.values(caseState.answers)[0];
   if (!q1) return q.placeholder || '';
