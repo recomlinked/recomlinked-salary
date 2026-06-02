@@ -600,7 +600,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-field-group{display:flex;flex-direction:column;gap:4px;}
 .case-field-label{font-size:12px;font-weight:600;color:var(--t2);padding-left:2px;}
 .case-next-btn{display:inline-flex;align-items:center;gap:6px;background:#7B5CFC;color:#fff;border:none;border-radius:10px;padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.15s;}
-.case-tone-chips{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin:0 0 18px;}
+.case-tone-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;}
 .case-tone-chip{background:var(--card);border:1.5px solid var(--divider);border-radius:12px;padding:10px 14px;font-size:12.5px;font-weight:500;color:var(--t2);cursor:pointer;font-family:var(--sans);transition:all 0.15s;text-align:left;display:inline-flex;align-items:center;gap:10px;line-height:1.3;}
 .case-tone-chip:hover{border-color:var(--navy);color:var(--t1);background:rgba(30,61,114,0.04);}
 .case-tone-chip:active{transform:scale(0.97);}
@@ -649,7 +649,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-email-header{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .case-doc-label{font-size:13px;color:var(--t2);padding:12px 16px 8px;display:flex;align-items:center;gap:6px;}
 .case-doc-preview::before{display:none;}
-.case-deliverables-label{font-size:13px;color:var(--t2);margin:0 0 8px;display:flex;align-items:center;gap:6px;}
+.case-deliverables-label{font-size:13px;color:var(--t2);margin:0 0 8px;padding-top:20px;border-top:1px solid var(--divider);display:flex;align-items:center;gap:6px;}
 .case-email-card{background:var(--card);border:1px solid var(--divider);border-radius:10px;overflow:hidden;}
 .case-email-tones{padding:10px 16px;border-bottom:1px solid var(--divider);display:flex;align-items:center;justify-content:space-between;}
 .case-email-tones .tone-chips{display:flex;gap:6px;}
@@ -3002,7 +3002,7 @@ function initCaseMode(container) {
   docPreview.innerHTML = topbar + docHeader + sections + footer;
   var deliverables = el('div', '', '');
   deliverables.id = 'case-deliverables';
-  deliverables.style.display = 'none';
+  // Visible during Q0 (skeleton — "here's what you're building")
   var docLabelHtml = '<div class="case-deliverables-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Your raise case document</div>';
   deliverables.innerHTML = docLabelHtml;
   deliverables.appendChild(docPreview);
@@ -3045,6 +3045,9 @@ function showCaseToneQuestion(container) {
       conf.style.cssText = 'background:rgba(123,92,252,0.08);border-color:rgba(123,92,252,0.2);';
       conf.innerHTML = '<div class="case-q-text">\u2713 ' + opt.label + '</div>';
       container.insertBefore(conf, $('case-deliverables'));
+      // Hide skeleton for Q1 (clean screen — focus on typing)
+      var deliv0 = $('case-deliverables');
+      if (deliv0) deliv0.style.display = 'none';
       // Start real questions
       setTimeout(function() {
         showCaseQuestion(container, 0);
@@ -3181,8 +3184,9 @@ function showCaseQuestion(container, qIndex) {
 
   // Question bubble
   var bubble = el('div', 'case-q-bubble', '');
-  var qCounter = qIndex < 5 ? ' \u2014 (' + (qIndex + 1) + ' of 5)' : ' \u2014 Optional';
-  bubble.innerHTML = '<div class="case-q-label">' + escapeHtml(q.label) + qCounter + '</div>' +
+  var timeLabels = ['about 2 minutes left', 'about 90 seconds left', 'under a minute left', 'about 30 seconds left', 'almost done'];
+  var qCounter = qIndex < 5 ? (qIndex + 1) + ' of 5 \u00b7 ' + timeLabels[qIndex] : 'Optional';
+  bubble.innerHTML = '<div class="case-q-label">' + qCounter + '</div>' +
     '<div class="case-q-text">' + escapeHtml(q.text) + '</div>';
   container.insertBefore(bubble, $('case-deliverables'));
 
