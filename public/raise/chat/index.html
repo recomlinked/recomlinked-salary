@@ -623,6 +623,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-section.empty .case-doc-section-text{color:#8a90a8;font-style:italic;font-size:9px;}
 .case-doc-section.empty{opacity:0.3;}
 .case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
+.case-doc-section.just-updated{animation:sectionGlow 2s ease;border-left:2px solid var(--purple);}
 .case-doc-section.locked{opacity:0.25;}
 .case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
 .case-doc-section.locked .case-doc-section-label::after{content:' [locked]';font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#8a90a8;}
@@ -659,6 +660,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-email-copy-btn{display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;border:none;border-radius:6px;cursor:pointer;font-family:var(--sans);}
 .case-email-copy-btn[data-locked]{opacity:0.4;cursor:not-allowed;}
 @keyframes casePulse{0%,100%{opacity:0.4;}50%{opacity:0.8;}}
+@keyframes sectionGlow{0%{background:rgba(123,92,252,0.08);}50%{background:rgba(123,92,252,0.04);}100%{background:transparent;}}
 .mode-toggle.locked{opacity:0.5;pointer-events:none;}
 .case-paywall{background:linear-gradient(135deg,rgba(123,92,252,0.06),rgba(245,207,86,0.08));border:1.5px solid rgba(123,92,252,0.2);border-radius:14px;padding:24px 22px;margin:20px 0 10px;text-align:center;}
 .case-paywall-title{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:6px;}
@@ -3089,9 +3091,25 @@ function showCaseQuestion(container, qIndex) {
   var t = CASE_TEMPLATES[caseState.template];
   var pw = t.paywallAfter || 2;
 
-  // If we've hit the paywall point and haven't paid, show paywall
+  // If we've hit the paywall point and haven't paid, scroll to doc first
   if (qIndex >= pw && !caseState.paid) {
-    showCasePaywall(container);
+    // Scroll to PDF preview so user sees their sections
+    var docPreview = $('case-doc-preview');
+    if (docPreview) {
+      docPreview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Pulse the last updated section
+      var sections = docPreview.querySelectorAll('.case-doc-section:not(.empty):not(.locked)');
+      sections.forEach(function(sec) { sec.classList.add('just-updated'); });
+    }
+    // Delay paywall so user sees the value
+    setTimeout(function() {
+      showCasePaywall(container);
+      // Scroll paywall into view after it appears
+      setTimeout(function() {
+        var paywall = $('case-paywall');
+        if (paywall) paywall.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    }, 3000);
     return;
   }
 
@@ -3557,6 +3575,8 @@ function updateCaseDocSection(sectionIndex, q, answer) {
   .then(function(res) { return res.json(); })
   .then(function(data) {
     sec.classList.remove('generating');
+    sec.classList.remove('empty');
+    sec.classList.add('just-updated');
     var polished = data.polished || answer;
     caseState.polished[sectionIndex] = polished;
     saveCaseState();
