@@ -282,7 +282,7 @@
     }
     .cta-btn:hover { background: var(--gold-hover); transform: translateY(-1px); box-shadow: var(--shadow-gold-hover); text-decoration: none; }
     @media (max-width: 420px) { .cta-btn { padding: 14px 28px; font-size: 14.5px; } }
-    .hiw-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 20px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; color: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; box-shadow: var(--shadow-sm); }
+    .hiw-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 20px; margin-bottom: 8px; display: flex; gap: 14px; align-items: flex-start; color: inherit; cursor: pointer; transition: all 0.2s; text-decoration: none; box-shadow: var(--shadow-sm); }
     .hiw-card:hover { border-color: var(--purple); box-shadow: var(--shadow-md); transform: translateY(-2px); text-decoration: none; }
     .hiw-card:active { transform: scale(0.995); }
     .hiw-card * { text-decoration: none; }
@@ -346,6 +346,35 @@
     .cross-link-cta { font-size: 12px; font-weight: 700; color: var(--purple); white-space: nowrap; flex-shrink: 0; }
 
     /* ── 13. FAQ ────────────────────────────── */
+
+    /* ── Q&A Transform Animation ────────────── */
+    .qa-preview{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin:8px 0 24px;box-shadow:var(--shadow-sm);}
+    .qa-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:16px;text-align:center;}
+    .qa-transform{display:flex;align-items:center;gap:10px;}
+    .qa-input-side,.qa-output-side{flex:1;}
+    .qa-input-label,.qa-output-label{font-size:10px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;}
+    .qa-input-box{font-size:12px;color:var(--text);background:var(--bg);padding:10px 12px;border-radius:6px;border:1px solid var(--border);margin-bottom:6px;opacity:0;animation:qaSlideIn 6s infinite;}
+    .qa-short-line{height:6px;background:var(--border);border-radius:3px;}
+    .qa-anim-in1{animation-delay:0s;}
+    .qa-anim-in2{animation-delay:0.6s;}
+    .qa-anim-in3{animation-delay:1.2s;}
+    .qa-arrow-col{flex-shrink:0;display:flex;align-items:center;opacity:0;animation:qaArrowPulse 6s infinite;animation-delay:1.8s;}
+    .qa-output-side{opacity:0;animation:qaOutputReveal 6s infinite;animation-delay:2.2s;}
+    .qa-output-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;position:relative;}
+    .qa-section-head{font-size:9px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+    .qa-section-line{height:6px;background:var(--border);border-radius:3px;margin-bottom:5px;width:0;}
+    .qa-line1{animation:qaLine1 6s infinite;animation-delay:2.6s;}
+    .qa-line2{animation:qaLine2 6s infinite;animation-delay:2.9s;}
+    .qa-line3{animation:qaLine3 6s infinite;animation-delay:3.2s;}
+    .qa-line4{animation:qaLine4 6s infinite;animation-delay:3.5s;}
+    @keyframes qaSlideIn{0%{opacity:0;transform:translateX(-8px);}8%{opacity:1;transform:translateX(0);}75%{opacity:1;}100%{opacity:0;}}
+    @keyframes qaArrowPulse{0%,25%{opacity:0;}30%{opacity:1;}75%{opacity:1;}100%{opacity:0;}}
+    @keyframes qaOutputReveal{0%,30%{opacity:0;transform:translateX(8px);}38%{opacity:1;transform:translateX(0);}75%{opacity:1;}100%{opacity:0;}}
+    @keyframes qaLine1{0%,38%{width:0;}48%{width:92%;}75%{width:92%;}100%{width:0;}}
+    @keyframes qaLine2{0%,38%{width:0;}48%{width:78%;}75%{width:78%;}100%{width:0;}}
+    @keyframes qaLine3{0%,38%{width:0;}48%{width:85%;}75%{width:85%;}100%{width:0;}}
+    @keyframes qaLine4{0%,38%{width:0;}48%{width:55%;}75%{width:55%;}100%{width:0;}}
+    @media(max-width:560px){.qa-transform{flex-direction:column;gap:8px;}.qa-arrow-col{transform:rotate(90deg);}.qa-input-box{font-size:11px;padding:6px 10px;}}
     .faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
     .faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);gap:12px;user-select:none;transition:background 0.15s;}
     .faq-q:hover{background:var(--purple-light);}
@@ -407,8 +436,8 @@
 
   <!-- HERO -->
   <section class="hero" fetchpriority="high">
-    <h1>How to Ask for a Raise <span class="accent" style="white-space:nowrap;">via Email</span><br><span style="font-weight:400;">with a <span style="color:var(--purple);">Professional Attachment</span></span></h1>
-    <p class="hero-sub">Skip the awkward conversation. The doc makes your case.</p>
+    <h1>Ask for a pay raise <span class="accent" style="white-space:nowrap;">via email</span></h1>
+    <p class="hero-sub"><b>If you don't know how to start the conversation</b></p>
     <div class="cta-stack">
       <a class="cta-btn" href="#templates">
         Generate my raise case
@@ -420,10 +449,19 @@
 
 
   <!-- HOW IT WORKS -->
-  <section class="section" id="templates">
-    <h2 class="section-title">Pick the <span style="color:var(--purple);">email template</span> that matches your situation</h2>
-    <p class="section-sub">Each template is built around a different type of raise request.</p>
+  <section class="section" style="padding-top:20px;padding-bottom:0;">
+    <h2 class="section-title"><span style="color:var(--purple);">In <span style="font-size:1.3em;">3</span> simple steps</span></h2>
 
+<a href="#templates" class="hiw-card">
+      <div class="hiw-num">1</div>
+      <div class="hiw-body">
+        <div class="hiw-title">Choose your email template</div>
+        <div class="hiw-desc">Pick the email template that matches your situation and leverage. Each template uses <b>different structure</b>. A competing offer case reads nothing like a market rate gap or performance case.</div>
+        <div class="hiw-cta">Pick yours below <span>↓</span></div>
+      </div>
+    </a>
+
+    <div id="templates" style="margin:8px 0 0;">
     <div class="templates-grid">
 
       <!-- Template 1: Performance -->
@@ -786,29 +824,47 @@
       </div>
 
     </div>
-  </section>
+    </div>
 
-  <div class="divider"></div>
+    <div class="divider" style="margin:8px 0 16px;"></div>
 
-  <section class="section" style="padding-top:20px;">
-    <h2 class="section-title"><span style="color:var(--purple);">In <span style="font-size:1.3em;">3</span> simple steps,</span> ask for a raise via email</h2>
-
-    <a href="#templates" class="hiw-card">
-      <div class="hiw-num">1</div>
-      <div class="hiw-body">
-        <div class="hiw-title">Choose your template</div>
-        <div class="hiw-desc">Pick the situation that matches your leverage. Each template uses <b>different structure</b>. A competing offer case reads nothing like a market rate gap or performance case.</div>
-        <div class="hiw-cta">Pick yours above <span>↑</span></div>
-      </div>
-    </a>
-    <a href="#templates" class="hiw-card">
+<a href="#templates" class="hiw-card">
       <div class="hiw-num">2</div>
       <div class="hiw-body">
         <div class="hiw-title">Answer 5 questions</div>
         <div class="hiw-desc">Each short answer you give becomes a section in your raise case. The questions pull out your specific leverage and <b>the AI drafts every section for you</b> so the doc is consistent.</div>
       </div>
     </a>
-    <a href="#templates" class="hiw-card">
+
+    <!-- Animated: short answer → polished section -->
+    <div class="qa-preview">
+      <div class="qa-label">Short answers in → polished sections out</div>
+      <div class="qa-transform">
+        <div class="qa-input-side">
+          <div class="qa-input-label">Your short answers</div>
+          <div class="qa-input-box qa-anim-in1"><div class="qa-short-line" style="width:60%;"></div></div>
+          <div class="qa-input-box qa-anim-in2"><div class="qa-short-line" style="width:45%;"></div></div>
+          <div class="qa-input-box qa-anim-in3"><div class="qa-short-line" style="width:52%;"></div></div>
+        </div>
+        <div class="qa-arrow-col">
+          <svg class="qa-arrow-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+        <div class="qa-output-side">
+          <div class="qa-output-label">AI-polished section</div>
+          <div class="qa-output-box qa-anim-out">
+            <div class="qa-section-head">KEY RESULTS</div>
+            <div class="qa-section-line qa-line1"></div>
+            <div class="qa-section-line qa-line2"></div>
+            <div class="qa-section-line qa-line3"></div>
+            <div class="qa-section-line qa-line4"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin:8px 0 16px;"></div>
+
+<a href="#templates" class="hiw-card">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
         <div class="hiw-title">Download and hand it over</div>
@@ -820,8 +876,9 @@
 
 
 
+
   <!-- ADVANTAGE CARDS -->
-  <section class="section" style="padding:28px 0 8px;">
+  <section class="section" style="padding:8px 0 8px;">
     <div class="advantage-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
 
       <!-- Card 1: Fast -->
