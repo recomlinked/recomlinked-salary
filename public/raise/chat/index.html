@@ -6478,19 +6478,15 @@ function showFutureEmailSection(chatArea) {
         '<div class="fe-chip" onclick="fePickChip(this,\'in 3 months\')">In 3 months</div>',
       '</div>',
       '<div class="fe-preview">',
-        '<div class="fe-meta">To: <span id="fe-to">your@email.com</span><br>From: <span>you, today</span><br>Arrives: <span id="fe-arrives">in one week</span></div>',
+        '<div class="fe-meta">To: <span id="fe-to">you, future</span><br>From: <span>you, today</span><br>Arrives: <span id="fe-arrives">in one week</span></div>',
         '<div class="fe-subject">Congratulations, you did it 🎉</div>',
         '<div class="fe-body">',
-          'You asked for your raise.<br><br>',
-          'A few weeks ago, you sat down and built your raise plan. You knew your negotiation position was <b>' + posWord + '</b>. You prepared for this with confidence.<br><br>',
-          'You just needed to start the conversation.<br><br>',
-          'So you did. And you proved something to yourself. You&#39;re not the person who keeps thinking about it.<br><br>',
-          '<b>You&#39;re the person who asked and got it :)</b>',
+          'You asked for your raise. A few weeks ago you built your plan. Your negotiation position was <b>' + posWord + '</b>. You prepared for this with confidence. You just needed to start the conversation. So you did. You&#39;re the person who asked and got it :)',
           '<div class="fe-sig">Written by you on ' + today + ', using your raise negotiation plan.</div>',
         '</div>',
       '</div>',
       '<div class="fe-field">Your email</div>',
-      '<input class="fe-input" id="fe-email" type="email" placeholder="you, future" oninput="var v=this.value;var t=document.getElementById(\'fe-to\');if(t)t.textContent=v||\'your@email.com\';">',
+      '<input class="fe-input" id="fe-email" type="email" placeholder="you, future" oninput="var v=this.value;var t=document.getElementById(\'fe-to\');if(t)t.textContent=v||\'you, future\';">',
       '<button class="fe-btn" id="fe-send-btn" onclick="feSend()">',
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">',
           '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
@@ -6501,7 +6497,6 @@ function showFutureEmailSection(chatArea) {
   ].join('');
 
   chatArea.appendChild(wrap);
-  setTimeout(function() { wrap.scrollIntoView({behavior:'smooth',block:'center'}); }, 200);
 }
 
 function fePickChip(el, label) {
