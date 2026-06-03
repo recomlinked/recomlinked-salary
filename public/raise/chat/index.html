@@ -5185,6 +5185,12 @@ function autoExpandPlanCards() {
     var el = document.querySelector('[data-block-key="' + k + '"]');
     if (el && el.getAttribute('data-expanded') === '0') togglePlanBlock(el, k);
   });
+  // Show email section 3s after plan fully builds (strategy done, not paid, not yet shown)
+  if (discStrategyDone && !state.paid && !window.feShown) {
+    window.feShown = true;
+    var chatArea = $('disc-chat');
+    setTimeout(function() { showFutureEmailSection(chatArea); }, 3000);
+  }
 }
 function setCanvasHTML(el) {
   if (!el) return;
@@ -6484,12 +6490,12 @@ function showFutureEmailSection(chatArea) {
         '</div>',
       '</div>',
       '<div class="fe-field">Your email</div>',
-      '<input class="fe-input" id="fe-email" type="email" placeholder="you@example.com" oninput="var v=this.value;var t=document.getElementById(\'fe-to\');if(t)t.textContent=v||\'your@email.com\';">',
+      '<input class="fe-input" id="fe-email" type="email" placeholder="you, future" oninput="var v=this.value;var t=document.getElementById(\'fe-to\');if(t)t.textContent=v||\'your@email.com\';">',
       '<button class="fe-btn" id="fe-send-btn" onclick="feSend()">',
         '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">',
           '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
         '</svg>',
-        'Send this letter \u2192',
+        'Send this letter',
       '</button>',
     '</div>'
   ].join('');
@@ -6549,8 +6555,7 @@ function feSend() {
 }
 
 function showDiscPaywall() {
-  var chatArea = $('disc-chat');
-  setTimeout(function() { showFutureEmailSection(chatArea); }, 3000);
+  lockFreeModes();
 }
 
 function triggerPlanPaywall() {
