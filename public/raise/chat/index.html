@@ -618,6 +618,9 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-topbar{padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;}
 .case-doc-topbar-title{font-size:8px;font-weight:600;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.08em;}
 .case-doc-topbar-name{font-size:15px;font-weight:600;color:#fff;margin-top:2px;}
+.case-doc-topbar-name[contenteditable]{outline:none;cursor:text;border-bottom:1px dashed rgba(255,255,255,0.35);display:inline-block;min-width:80px;padding-bottom:1px;transition:border-color 0.15s;}
+.case-doc-topbar-name[contenteditable]:hover,.case-doc-topbar-name[contenteditable]:focus{border-bottom-color:rgba(255,255,255,0.8);}
+.case-doc-topbar-name[contenteditable]:empty::before{content:attr(data-ph);color:rgba(255,255,255,0.45);}
 .case-doc-topbar-role{font-size:10px;color:rgba(255,255,255,0.6);margin-top:1px;}
 .case-doc-topbar-pdf{color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;cursor:pointer;align-self:flex-start;}
 .case-doc-topbar-pdf:hover{color:#fff;}
@@ -631,11 +634,26 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .case-doc-bullets li{position:relative;padding:3px 0 3px 10px;font-size:10px;line-height:1.6;color:#2a3650;}
 .case-doc-bullets li::before{content:'';position:absolute;left:0;top:9px;width:3px;height:3px;border-radius:50%;background:var(--case-accent,#3a6ea5);}
 .case-doc-section.empty .case-doc-section-text{color:#8a90a8;font-style:italic;font-size:9px;}
-.case-doc-section.empty{opacity:0.3;}
+.case-doc-section.empty{opacity:0.6;}
 .case-doc-section.generating .case-doc-section-text{animation:casePulse 1.5s ease infinite;}
 .case-doc-section.just-updated{animation:sectionGlow 2s ease;border-left:2px solid var(--purple);}
 .case-doc-section.locked{opacity:0.25;}
 .case-doc-section.locked .case-doc-section-text{filter:blur(3px);user-select:none;}
+.case-result-card{padding:6px 0 6px 11px;border-left:2px solid var(--case-accent,#3a6ea5);margin-bottom:8px;}
+.case-result-card:last-child{margin-bottom:0;}
+.case-result-title{font-size:10px;font-weight:700;line-height:1.4;margin:0;}
+.case-result-desc{font-size:9.5px;color:#2a3650;line-height:1.55;margin:2px 0 0;}
+.case-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.case-badge{padding:3px 8px;border-radius:3px;background:color-mix(in srgb,var(--case-accent,#3a6ea5) 8%,transparent);font-size:8px;color:var(--case-accent,#3a6ea5);font-weight:600;}
+.case-badge.gold{background:rgba(201,168,76,0.15);color:#294d73;}
+.case-callout{background:color-mix(in srgb,var(--case-accent,#3a6ea5) 3%,transparent);border-radius:5px;padding:9px 12px;border-left:3px solid var(--case-accent,#3a6ea5);}
+.case-callout p{font-size:9.5px;color:#2a3650;line-height:1.6;margin:0;}
+.case-ask-box{background:#f1f5f9;border:1px solid rgba(139,111,165,0.2);border-radius:5px;padding:11px;text-align:center;}
+.case-ask-label{font-size:7px;font-weight:600;color:#315e8c;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;}
+.case-ask-numbers{font-size:17px;font-weight:600;color:#294d73;}
+.case-ask-sub{font-size:8px;color:#315e8c;margin-top:3px;}
+.case-wait .case-result-desc,.case-wait p,.case-wait .case-ask-sub,.case-wait-text{color:#8a90a8;font-style:italic;}
+.case-wait{opacity:0.7;}
 .case-doc-section.locked .case-doc-section-label::after{content:' [locked]';font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#8a90a8;}
 .case-doc-footer{padding:6px 20px;border-top:1px solid #e8eaef;font-size:7.5px;color:#8a90a8;display:flex;justify-content:space-between;opacity:0.35;}
 .case-doc-download{padding:10px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #e8eaef;opacity:0.55;}
@@ -2985,16 +3003,14 @@ function initCaseMode(container) {
   docPreview.id = 'case-doc-preview';
   var accent = t.accent || '#3a6ea5';
   docPreview.style.setProperty('--case-accent', accent);
-  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name">Your Name</div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div></div>';
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name" contenteditable="true" spellcheck="false" data-ph="Your name" onfocus="caseNameFocus(this)" onblur="caseNameBlur(this)" oninput="caseNameInput(this)"></div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div></div>';
   var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
   t.sections.forEach(function(name, i) {
-    var cls = 'case-doc-section empty';
-    var txt = 'Waiting for your answer\u2026';
-    sections += '<div class="' + cls + '" id="case-sec-' + i + '">' +
+    sections += '<div class="case-doc-section empty" id="case-sec-' + i + '">' +
       '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
-      '<div class="case-doc-section-text">' + txt + '</div>' +
+      '<div class="case-doc-section-text">' + renderWaitingSection(i) + '</div>' +
       '</div>';
   });
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
@@ -3008,6 +3024,7 @@ function initCaseMode(container) {
   deliverables.appendChild(docPreview);
   container.appendChild(deliverables);
   buildEmailDraft(deliverables, t.name, accent);
+  populateCaseName();
 
   showCaseToneQuestion(container);
 }
@@ -3078,18 +3095,16 @@ function restoreCaseUI(container, tmpl) {
   docPreview.id = 'case-doc-preview';
   var accent = t.accent || '#3a6ea5';
   docPreview.style.setProperty('--case-accent', accent);
-  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name">Your Name</div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div></div>';
+  var topbar = '<div class="case-doc-topbar" style="background:' + accent + ';"><div><div class="case-doc-topbar-title">Compensation review request</div><div class="case-doc-topbar-name" id="case-doc-name" contenteditable="true" spellcheck="false" data-ph="Your name" onfocus="caseNameFocus(this)" onblur="caseNameBlur(this)" oninput="caseNameInput(this)"></div><div class="case-doc-topbar-role" id="case-doc-role">Your Role</div></div></div>';
   var docHeader = '<div class="case-doc-body"><div class="case-doc-header">Compensation Review Request</div>';
   docHeader += '<div class="case-doc-sub">Your raise case document builds here as you answer</div>';
   var sections = '';
   t.sections.forEach(function(name, i) {
     var hasPolished = caseState.polished[i];
-    var isLocked = false;
     var cssClass = hasPolished ? 'case-doc-section' : 'case-doc-section empty';
-    var text = hasPolished || 'Waiting for your answer\u2026';
     sections += '<div class="' + cssClass + '" id="case-sec-' + i + '">' +
       '<div class="case-doc-section-label">' + escapeHtml(name) + '</div>' +
-      '<div class="case-doc-section-text">' + (hasPolished ? formatPolishedText(text) : escapeHtml(text)) + '</div>' +
+      '<div class="case-doc-section-text">' + (hasPolished ? renderCaseSection(hasPolished, i) : renderWaitingSection(i)) + '</div>' +
       '</div>';
   });
   var footer = '</div><div class="case-doc-footer"><span>Prepared with salary.recomlinked.com</span><span>Confidential</span></div>' +
@@ -3102,6 +3117,7 @@ function restoreCaseUI(container, tmpl) {
   deliverables.appendChild(docPreview);
   container.appendChild(deliverables);
   buildEmailDraft(deliverables, t.name, accent);
+  populateCaseName();
 
   // Fill header with saved Q1 data
   if (t.questions[0] && t.questions[0].type === 'row' && caseState.answers[t.questions[0].id]) {
@@ -3571,6 +3587,105 @@ function getCustomPlaceholder(q, qIndex) {
   return q.placeholder || '';
 }
 
+var CASE_CARD_SECTIONS = { performance: 1, scope: 2, market: 1, promotion: 2 };
+
+var CASE_SECTION_TYPES = {
+  performance: ['prose','cards','badges','callout','ask','prose'],
+  scope:       ['prose','callout','cards','prose','ask','prose'],
+  offer:       ['prose','callout','prose','prose','ask','prose'],
+  market:      ['prose','cards','prose','prose','ask','prose'],
+  promotion:   ['prose','prose','cards','prose','ask','prose']
+};
+
+function renderWaitingSection(sectionIndex) {
+  var types = CASE_SECTION_TYPES[caseState.template] || [];
+  var type = types[sectionIndex] || 'prose';
+  var accent = (CASE_TEMPLATES[caseState.template] || {}).accent || '#3a6ea5';
+  var wait = 'Waiting for your answer\u2026';
+  if (type === 'cards') {
+    var c = '';
+    for (var k = 0; k < 3; k++) {
+      c += '<div class="case-result-card case-wait" style="border-left-color:' + accent + ';"><p class="case-result-desc">' + wait + '</p></div>';
+    }
+    return c;
+  }
+  if (type === 'callout') {
+    return '<div class="case-callout case-wait" style="border-left-color:' + accent + ';"><p>' + wait + '</p></div>';
+  }
+  if (type === 'ask') {
+    return '<div class="case-ask-box case-wait"><div class="case-ask-label">Proposed adjustment</div><div class="case-ask-sub">' + wait + '</div></div>';
+  }
+  return '<span class="case-wait-text">' + wait + '</span>';
+}
+
+function parseResultCards(text) {
+  var lines = text.split(/\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+  var cards = [];
+  lines.forEach(function(l) {
+    l = l.replace(/^[\u2022\-\*\d\.\)]+\s*/, '');
+    var m = l.match(/^\*\*(.+?)\*\*\s*[\u2014\-:]\s*(.+)$/) || l.match(/^(.{2,40}?)\s+[\u2014]\s+(.+)$/);
+    if (m) {
+      cards.push({ title: m[1].replace(/\*\*/g, '').trim(), desc: m[2].trim() });
+    } else if (l.replace(/\*\*/g, '').trim()) {
+      cards.push({ title: '', desc: l.replace(/\*\*/g, '').trim() });
+    }
+  });
+  return cards;
+}
+
+function renderCaseSection(text, sectionIndex) {
+  if (!text) return '';
+  var accent = (CASE_TEMPLATES[caseState.template] || {}).accent || '#3a6ea5';
+
+  var askM = text.match(/\[\[ask\]\]\s*(.+?)\s*\|\s*(.+)/);
+  if (askM) {
+    return '<div class="case-ask-box"><div class="case-ask-label">Proposed adjustment</div>' +
+      '<div class="case-ask-numbers">' + escapeHtml(askM[1]) + '</div>' +
+      '<div class="case-ask-sub">' + escapeHtml(askM[2]) + '</div></div>';
+  }
+  if (/\[\[callout\]\]/.test(text)) {
+    var ctxt = text.replace(/\[\[callout\]\]\s*/, '');
+    return '<div class="case-callout"><p>' + escapeHtml(ctxt) + '</p></div>';
+  }
+  var badgeM = text.match(/\[\[badges:\s*(.+?)\]\]/);
+  if (badgeM) {
+    var prose = text.replace(/\[\[badges:.+?\]\]/, '').trim();
+    var html = prose ? '<p>' + escapeHtml(prose) + '</p>' : '';
+    html += '<div class="case-badges">';
+    badgeM[1].split('|').forEach(function(b) {
+      b = b.trim();
+      var gold = /^gold:/.test(b);
+      if (gold) b = b.replace(/^gold:\s*/, '');
+      html += '<span class="case-badge' + (gold ? ' gold' : '') + '">' + escapeHtml(b) + '</span>';
+    });
+    html += '</div>';
+    return html;
+  }
+  var cardIdx = CASE_CARD_SECTIONS[caseState.template];
+  if (cardIdx === sectionIndex) {
+    var cards = parseResultCards(text);
+    if (cards.length) {
+      var h = '';
+      cards.forEach(function(c) {
+        h += '<div class="case-result-card" style="border-left-color:' + accent + ';">';
+        if (c.title) h += '<p class="case-result-title" style="color:' + accent + ';">' + escapeHtml(c.title) + '</p>';
+        h += '<p class="case-result-desc">' + escapeHtml(c.desc) + '</p>';
+        h += '</div>';
+      });
+      return h;
+    }
+  }
+  return formatPolishedText(text);
+}
+
+function caseNameInput(el) { caseState.caseName = el.textContent.trim(); saveCaseState(); }
+function caseNameBlur(el) { caseState.caseName = el.textContent.trim(); saveCaseState(); }
+function caseNameFocus(el) {}
+function populateCaseName() {
+  var el = document.getElementById('case-doc-name');
+  if (el && caseState.caseName) el.textContent = caseState.caseName;
+}
+
 function formatPolishedText(text) {
   if (!text) return '';
   // Split on bullet markers (•, -, *) at line start or after newline
@@ -3635,7 +3750,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
     var polished = data.polished || answer;
     caseState.polished[sectionIndex] = polished;
     saveCaseState();
-    if (textEl) textEl.innerHTML = formatPolishedText(polished);
+    if (textEl) textEl.innerHTML = renderCaseSection(polished, sectionIndex);
 
     // Update Q2 placeholder with AI-generated example
     if (data.q2_placeholder && sectionIndex === 0) {
@@ -3660,7 +3775,7 @@ function updateCaseDocSection(sectionIndex, q, answer) {
       } catch(e) {}
     }
     caseState.polished[sectionIndex] = displayText;
-    if (textEl) textEl.innerHTML = formatPolishedText(displayText);
+    if (textEl) textEl.innerHTML = renderCaseSection(displayText, sectionIndex);
   });
 }
 
