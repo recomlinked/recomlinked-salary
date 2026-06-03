@@ -5111,7 +5111,7 @@ function togglePosBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;transform:rotate(180deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0 0 8px;">' + teaser + '</p>' +
-      '<a href="#" onclick="event.stopPropagation();event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis \u2192</a>';
+      '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis \u2192</a>';
   } else {
     el.setAttribute('data-expanded', '0');
     el.style.padding = '10px 14px';
@@ -5157,7 +5157,7 @@ function togglePlanBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + preview + '</p>' +
-      '<a href="#" onclick="event.stopPropagation();event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see your full ' + lbl.toLowerCase() + ' \u2192</a>';
+      '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see your full ' + lbl.toLowerCase() + ' \u2192</a>';
   }
 }
 
@@ -5410,7 +5410,7 @@ function renderCanvasHTML() {
   // Download bar — always active
   html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
   html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>raise-negotiation-plan.pdf</span>';
-  html += '<button onclick="generateCanvasPDF()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
+  html += '<button onclick="state&&state.paid?generateCanvasPDF():triggerPlanPaywall()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
   html += '</div>';
 
   html += '</div>';
