@@ -1064,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
           });
           if (hasStrat) discStrategyDone = true;
           var lc = document.getElementById('disc-canvas-live');
-          if (lc) lc.innerHTML = renderCanvasHTML();
+          if (lc) setCanvasHTML(lc);
         }
       } catch(e) {}
     }
@@ -5161,6 +5161,18 @@ function togglePlanBlock(el, key) {
   }
 }
 
+function autoExpandPlanCards() {
+  ['opening_script', 'pushback'].forEach(function(k) {
+    var el = document.querySelector('[data-block-key="' + k + '"]');
+    if (el && el.getAttribute('data-expanded') === '0') togglePlanBlock(el, k);
+  });
+}
+function setCanvasHTML(el) {
+  if (!el) return;
+  el.innerHTML = renderCanvasHTML();
+  setTimeout(autoExpandPlanCards, 20);
+}
+
 function renderCanvasHTML() {
   // Parse **bold** markers in insight text
   function formatInsight(text) {
@@ -5691,7 +5703,7 @@ function insertDiscRadar() {
   // Canvas below radar
   var canvasDiv = el('div', '', '');
   canvasDiv.id = 'disc-canvas-live';
-  canvasDiv.innerHTML = renderCanvasHTML();
+  setCanvasHTML(canvasDiv);
   radarMsg.appendChild(canvasDiv);
 
   chatArea.appendChild(radarMsg);
@@ -6030,7 +6042,7 @@ async function generateDiscInsights() {
   }
   // Strategy shimmer already running — just update position blocks
   var liveCanvas = $('disc-canvas-live');
-  if (liveCanvas) liveCanvas.innerHTML = renderCanvasHTML();
+  if (liveCanvas) setCanvasHTML(liveCanvas);
 
   // Handle strategy (may already be done or still in flight)
   try {
@@ -6055,14 +6067,14 @@ async function generateDiscInsights() {
       discStrategyLoading = false;
       discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
-      if (lc2) lc2.innerHTML = renderCanvasHTML();
+      if (lc2) setCanvasHTML(lc2);
     } else {
       console.warn('[disc_insights] Empty strategy response, generating fallbacks');
       generateClientFallbacks();
       discStrategyLoading = false;
       discStrategyDone = true;
       var lc2 = $('disc-canvas-live');
-      if (lc2) lc2.innerHTML = renderCanvasHTML();
+      if (lc2) setCanvasHTML(lc2);
     }
   } catch (e) {
     console.error('[disc_insights] Strategy API error:', e);
@@ -6070,7 +6082,7 @@ async function generateDiscInsights() {
     discStrategyLoading = false;
     discStrategyDone = true;
     var lc2 = $('disc-canvas-live');
-    if (lc2) lc2.innerHTML = renderCanvasHTML();
+    if (lc2) setCanvasHTML(lc2);
   }
 
   // Save all insights
@@ -6201,7 +6213,7 @@ function showTailorQuestion(chatArea, idx) {
     var newCanvasWrap = el('div', 'coach-msg', '');
     var newCanvasDiv = el('div', '', '');
     newCanvasDiv.id = 'disc-canvas-tailored';
-    newCanvasDiv.innerHTML = renderCanvasHTML();
+    setCanvasHTML(newCanvasDiv);
     newCanvasWrap.appendChild(newCanvasDiv);
     chatArea.appendChild(newCanvasWrap);
 
