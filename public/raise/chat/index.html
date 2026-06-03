@@ -920,6 +920,25 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 
 /* Keep back toolbar visible even when bottom panel is dimmed */
 
+
+
+.future-email-card{background:#fff;border:0.5px solid #d0d4df;border-radius:14px;padding:16px;margin:10px 0;}
+.fe-label{font-size:10px;font-weight:700;color:#8a90a8;text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:5px;}
+.fe-title{font-size:14px;font-weight:600;color:#1e2d5a;line-height:1.45;margin-bottom:14px;}
+.fe-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.fe-chip{padding:6px 12px;border-radius:20px;border:1px solid #d0d4df;background:#fff;font-size:11px;font-weight:500;color:#3a4a6e;cursor:pointer;transition:all .15s;}
+.fe-chip.active{background:#1e2d5a;border-color:#1e2d5a;color:#fff;}
+.fe-preview{background:#f4f6fb;border-radius:10px;border:0.5px solid #d0d4df;padding:12px;margin-bottom:12px;}
+.fe-meta{font-size:10px;color:#8a90a8;line-height:1.8;border-bottom:0.5px solid #e0e4ef;padding-bottom:8px;margin-bottom:8px;}
+.fe-meta span{color:#1e2d5a;font-weight:600;}
+.fe-subject{font-size:12px;font-weight:700;color:#1a6b3a;margin-bottom:8px;}
+.fe-body{font-size:11.5px;color:#3a4a6e;line-height:1.8;}
+.fe-body b{color:#1e2d5a;}
+.fe-sig{margin-top:10px;padding-top:8px;border-top:0.5px solid #e0e4ef;font-size:10px;color:#8a90a8;font-style:italic;}
+.fe-field{font-size:11px;color:#6b7494;margin-bottom:5px;font-weight:500;}
+.fe-input{width:100%;border:1px solid #d0d4df;border-radius:8px;padding:9px 11px;font-size:12px;color:#1e2d5a;background:#fff;outline:none;margin-bottom:12px;}
+.fe-input:focus{border-color:#4a6dd4;}
+.fe-btn{width:100%;background:#E8A800;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:700;color:#1a1200;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;}
 </style>
 </head>
 
@@ -5347,12 +5366,12 @@ function renderCanvasHTML() {
 
   // YOUR POSITION
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
   html += block('evidence', 'Evidence', 'Your next question');
   html += block('timing', 'Timing', 'Your next question');
   html += '</div>';
   html += block('manager', 'Manager', 'Your next question');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
   html += block('company', 'Company', 'Your next question');
   html += block('market', 'Market', 'Your next question');
   html += '</div>';
@@ -5385,7 +5404,7 @@ function renderCanvasHTML() {
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
   html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
-  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">';
+  html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
   html += planBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
   html += planBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
   html += '</div>';
@@ -6431,17 +6450,117 @@ function showTailorConsent(chatArea) {
   }, 600);
 }
 
+
+
+function showFutureEmailSection(chatArea) {
+  if (!chatArea) return;
+  var nScore = (typeof calculateNegotiationScore === 'function') ? calculateNegotiationScore() : 50;
+  var nLabel = (typeof getNegotiationLabel === 'function') ? getNegotiationLabel(nScore) : {label:'solid'};
+  var rawLabel = (nLabel.label || 'solid');
+  var posWord = rawLabel.split('\u2014')[0].split('\u2013')[0].trim().toLowerCase();
+  var today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+  var wrap = el('div','coach-msg','');
+  wrap.innerHTML = [
+    '<div class="future-email-card">',
+      '<div class="fe-label">',
+        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">',
+          '<path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>',
+        '</svg> A letter to your future self',
+      '</div>',
+      '<p class="fe-title">Send yourself a congratulations email, from today&#39;s you.</p>',
+      '<div class="fe-field">When should this arrive?</div>',
+      '<div class="fe-chips">',
+        '<div class="fe-chip active" onclick="fePickChip(this,\'in one week\')">In one week</div>',
+        '<div class="fe-chip" onclick="fePickChip(this,\'in one month\')">In one month</div>',
+        '<div class="fe-chip" onclick="fePickChip(this,\'in 3 months\')">In 3 months</div>',
+      '</div>',
+      '<div class="fe-preview">',
+        '<div class="fe-meta">To: <span id="fe-to">your@email.com</span><br>From: <span>you, today</span><br>Arrives: <span id="fe-arrives">in one week</span></div>',
+        '<div class="fe-subject">Congratulations \u2014 you did it.</div>',
+        '<div class="fe-body">',
+          'You asked for your raise.<br><br>',
+          'A few weeks ago, you sat down and built your raise plan. You knew your negotiation position was <b>' + posWord + '</b>. You prepared for this with confidence.<br><br>',
+          'You just needed to start the conversation.<br><br>',
+          'So you did. And you proved something to yourself. You&#39;re not the person who keeps thinking about it.<br><br>',
+          '<b>You&#39;re the person who asked and got it :)</b>',
+          '<div class="fe-sig">Written by you on ' + today + ', using your raise negotiation plan.</div>',
+        '</div>',
+      '</div>',
+      '<div class="fe-field">Your email</div>',
+      '<input class="fe-input" id="fe-email" type="email" placeholder="you@example.com" oninput="var v=this.value;var t=document.getElementById(\'fe-to\');if(t)t.textContent=v||\'your@email.com\';">',
+      '<button class="fe-btn" id="fe-send-btn" onclick="feSend()">',
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">',
+          '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+        '</svg>',
+        'Send this letter \u2192',
+      '</button>',
+    '</div>'
+  ].join('');
+
+  chatArea.appendChild(wrap);
+  setTimeout(function() { wrap.scrollIntoView({behavior:'smooth',block:'center'}); }, 200);
+}
+
+function fePickChip(el, label) {
+  document.querySelectorAll('.fe-chip').forEach(function(c) { c.classList.remove('active'); });
+  el.classList.add('active');
+  var a = document.getElementById('fe-arrives');
+  if (a) a.textContent = label;
+}
+
+function feSend() {
+  var inp = document.getElementById('fe-email');
+  var email = inp ? inp.value : '';
+  if (!email) { if (inp) inp.focus(); return; }
+  var chip = document.querySelector('.fe-chip.active');
+  var when = chip ? chip.textContent.toLowerCase() : 'in one week';
+
+  // Log to session
+  logSession('future_email_set', {email: email, arrives: when});
+
+  // TODO: replace with real email endpoint
+  // fetch('/api/raise-email', {
+  //   method: 'POST',
+  //   headers: {'Content-Type':'application/json'},
+  //   body: JSON.stringify({email: email, arrives: when})
+  // });
+
+  // TODO: replace SHEETS_WEBHOOK_URL with your Google Sheet webhook
+  // fetch(SHEETS_WEBHOOK_URL, {
+  //   method: 'POST',
+  //   headers: {'Content-Type':'application/json'},
+  //   body: JSON.stringify({email: email, arrives: when, date: new Date().toISOString()})
+  // });
+
+  var btn = document.getElementById('fe-send-btn');
+  if (btn) {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg> Sent!';
+    btn.style.background = '#1a6b3a';
+    btn.style.color = '#fff';
+    btn.style.pointerEvents = 'none';
+  }
+  var card = document.querySelector('.future-email-card');
+  if (card) {
+    card.setAttribute('data-sent','1');
+    var confirm = document.createElement('p');
+    confirm.style.cssText = 'font-size:12px;color:#1a6b3a;font-weight:500;text-align:center;margin-top:10px;';
+    confirm.textContent = 'You will receive it ' + when + '.';
+    card.appendChild(confirm);
+  }
+  var chatArea = $('disc-chat');
+  setTimeout(function() { appendStandardPaywall(chatArea); lockFreeModes(); }, 3000);
+}
+
 function showDiscPaywall() {
-  // Lock Practice and Coaching tabs (always)
-  lockFreeModes();
-  // Paywall only shown when user clicks PDF download — see triggerPlanPaywall()
+  var chatArea = $('disc-chat');
+  showFutureEmailSection(chatArea);
 }
 
 function triggerPlanPaywall() {
   if (state && state.paid) return;
   var chatArea = $('disc-chat');
   if (!chatArea) return;
-  // Avoid duplicate paywall bubbles
   if (chatArea.querySelector('.paywall-bubble')) {
     var existing = chatArea.querySelector('.paywall-bubble');
     existing.scrollIntoView({ behavior: 'smooth', block: 'center' });
