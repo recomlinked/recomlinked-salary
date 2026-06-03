@@ -6457,17 +6457,13 @@ function showFutureEmailSection(chatArea) {
   var nScore = (typeof calculateNegotiationScore === 'function') ? calculateNegotiationScore() : 50;
   var nLabel = (typeof getNegotiationLabel === 'function') ? getNegotiationLabel(nScore) : {label:'solid'};
   var rawLabel = (nLabel.label || 'solid');
-  var posWord = rawLabel.split('\u2014')[0].split('\u2013')[0].trim().toLowerCase();
+  var posWord = rawLabel.split(/[\s\u2014\u2013]/)[0].toLowerCase();
   var today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
 
   var wrap = el('div','coach-msg','');
   wrap.innerHTML = [
     '<div class="future-email-card">',
-      '<div class="fe-label">',
-        '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">',
-          '<path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>',
-        '</svg> A letter to your future self',
-      '</div>',
+
       '<p class="fe-title">Send yourself a congratulations email, from today&#39;s you.</p>',
       '<div class="fe-field">When should this arrive?</div>',
       '<div class="fe-chips">',
@@ -6477,7 +6473,7 @@ function showFutureEmailSection(chatArea) {
       '</div>',
       '<div class="fe-preview">',
         '<div class="fe-meta">To: <span id="fe-to">your@email.com</span><br>From: <span>you, today</span><br>Arrives: <span id="fe-arrives">in one week</span></div>',
-        '<div class="fe-subject">Congratulations \u2014 you did it.</div>',
+        '<div class="fe-subject">Congratulations, you did it 🎉</div>',
         '<div class="fe-body">',
           'You asked for your raise.<br><br>',
           'A few weeks ago, you sat down and built your raise plan. You knew your negotiation position was <b>' + posWord + '</b>. You prepared for this with confidence.<br><br>',
@@ -6554,7 +6550,7 @@ function feSend() {
 
 function showDiscPaywall() {
   var chatArea = $('disc-chat');
-  showFutureEmailSection(chatArea);
+  setTimeout(function() { showFutureEmailSection(chatArea); }, 3000);
 }
 
 function triggerPlanPaywall() {
