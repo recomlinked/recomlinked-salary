@@ -5773,8 +5773,8 @@ function drawDiscRadarOnCanvas(canvas) {
     ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
     ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
 
-    var lx = cx + (r + 16) * Math.cos(a);
-    var ly = cy + (r + 16) * Math.sin(a);
+    var lx = cx + (r + 20) * Math.cos(a);
+    var ly = cy + (r + 20) * Math.sin(a);
     ctx.fillStyle = discActive[keys[i]] ? activeColor : inactiveColor;
     ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '11px system-ui';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -5810,15 +5810,44 @@ function drawDiscRadarOnCanvas(canvas) {
     }
   }
 
-  for (var i = 0; i < n; i++) {
-    if (discActive[keys[i]]) continue;
-    var a = (Math.PI * 2 * i / n) - Math.PI / 2;
-    ctx.beginPath();
-    ctx.arc(cx + r * 0.15 * Math.cos(a), cy + r * 0.15 * Math.sin(a), 4, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(128,128,128,0.2)';
-    ctx.fill();
-  }
   ctx.restore();
+}
+
+
+// Animate radar — dots slide along their axis spoke
+var _radarAnimFrame = null;
+function animateDiscRadar(canvas) {
+  if (_radarAnimFrame) { cancelAnimationFrame(_radarAnimFrame); _radarAnimFrame = null; }
+  if (!canvas) return;
+  var keys = ['evidence','timing','market','manager','company'];
+  var start = null;
+  function frame(ts) {
+    if (!start) start = ts;
+    var c = canvas;
+    if (!c || !c.isConnected) { _radarAnimFrame = null; return; }
+    drawDiscRadarOnCanvas(c);
+    var ctx2 = c.getContext('2d');
+    var dpr = window.devicePixelRatio || 1;
+    var cx = 100, cy = 100, r = 70, n = 5;
+    ctx2.save();
+    ctx2.scale(dpr, dpr);
+    for (var i = 0; i < n; i++) {
+      if (discActive[keys[i]]) continue;
+      var a = (Math.PI * 2 * i / n) - Math.PI / 2;
+      // All dots pulse together — same phase, all big then all small
+      var t = (ts - start) / 6000; // 6s cycle
+      var size = 3 + 1.5 * (0.5 + 0.5 * Math.sin(t * Math.PI * 2));
+      var px = cx + r * 0.2 * Math.cos(a);
+      var py = cy + r * 0.2 * Math.sin(a);
+      ctx2.beginPath();
+      ctx2.arc(px, py, size, 0, Math.PI * 2);
+      ctx2.fillStyle = 'rgba(201,168,76,0.55)';
+      ctx2.fill();
+    }
+    ctx2.restore();
+    _radarAnimFrame = requestAnimationFrame(frame);
+  }
+  _radarAnimFrame = requestAnimationFrame(frame);
 }
 
 function renderDiscQuestion(idx) {
@@ -5852,6 +5881,27 @@ function renderDiscQuestion(idx) {
   });
   chipsWrap.appendChild(opts);
   chatArea.appendChild(chipsWrap);
+
+  // At Q1 only: show empty pulsing radar below chips as a teaser
+  if (idx === 0) {
+    var teaserMsg = el('div', 'coach-msg disc-radar-msg', '');
+    var teaserWrap = el('div', '', '');
+    teaserWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;padding:6px 0 2px;';
+    var teaserTitle = el('div','','');
+    teaserTitle.style.cssText = 'font-size:11px;font-weight:600;color:var(--t3);text-align:center;margin-bottom:8px;letter-spacing:0.03em;text-transform:uppercase;';
+    teaserTitle.textContent = 'Your negotiation leverage';
+    teaserWrap.appendChild(teaserTitle);
+    var tc = document.createElement('canvas');
+    var dpr = window.devicePixelRatio || 1;
+    tc.width = 200 * dpr; tc.height = 200 * dpr;
+    tc.style.width = '200px'; tc.style.height = '200px';
+    tc.className = 'disc-radar-canvas';
+    teaserWrap.appendChild(tc);
+    teaserMsg.appendChild(teaserWrap);
+    chatArea.appendChild(teaserMsg);
+    drawDiscRadarOnCanvas(tc);
+    animateDiscRadar(tc);
+  }
 
   setTimeout(function() {
     var wrap = $('chat-wrap');
@@ -5939,6 +5989,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
   logSession('disc_' + q.id, { answer: opt.val, type: opt.type, step: discStep + 1 });
 
+  if (_radarAnimFrame) { cancelAnimationFrame(_radarAnimFrame); _radarAnimFrame = null; }
   insertDiscRadar();
 
   // Smooth scroll to user's answer
