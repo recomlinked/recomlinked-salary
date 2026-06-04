@@ -5695,10 +5695,10 @@ function insertDiscRadar() {
 
   var canvas = document.createElement('canvas');
   var dpr = window.devicePixelRatio || 1;
-  canvas.width = 200 * dpr;
-  canvas.height = 200 * dpr;
-  canvas.style.width = '200px';
-  canvas.style.height = '200px';
+  canvas.width = 240 * dpr;
+  canvas.height = 240 * dpr;
+  canvas.style.width = '240px';
+  canvas.style.height = '240px';
   canvas.className = 'disc-radar-canvas';
   radarWrap.appendChild(canvas);
 
@@ -5742,7 +5742,7 @@ function drawDiscRadarOnCanvas(canvas) {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var dpr = window.devicePixelRatio || 1;
-  var w = 200, h = 200, cx = 100, cy = 100, r = 70;
+  var w = 240, h = 240, cx = 120, cy = 120, r = 65;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
   ctx.scale(dpr, dpr);
@@ -5773,8 +5773,8 @@ function drawDiscRadarOnCanvas(canvas) {
     ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a));
     ctx.strokeStyle = 'rgba(128,128,128,0.12)'; ctx.lineWidth = 0.5; ctx.stroke();
 
-    var lx = cx + (r + 20) * Math.cos(a);
-    var ly = cy + (r + 20) * Math.sin(a);
+    var lx = cx + (r + 16) * Math.cos(a);
+    var ly = cy + (r + 16) * Math.sin(a);
     ctx.fillStyle = discActive[keys[i]] ? activeColor : inactiveColor;
     ctx.font = (discActive[keys[i]] ? '600 ' : '400 ') + '11px system-ui';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -5828,14 +5828,14 @@ function animateDiscRadar(canvas) {
     drawDiscRadarOnCanvas(c);
     var ctx2 = c.getContext('2d');
     var dpr = window.devicePixelRatio || 1;
-    var cx = 100, cy = 100, r = 70, n = 5;
+    var cx = 120, cy = 120, r = 65, n = 5;
     ctx2.save();
     ctx2.scale(dpr, dpr);
     for (var i = 0; i < n; i++) {
       if (discActive[keys[i]]) continue;
       var a = (Math.PI * 2 * i / n) - Math.PI / 2;
       // All dots pulse together — same phase, all big then all small
-      var t = (ts - start) / 6000; // 6s cycle
+      var t = (ts - start) / 3000; // 3s cycle
       var size = 3 + 1.5 * (0.5 + 0.5 * Math.sin(t * Math.PI * 2));
       var px = cx + r * 0.2 * Math.cos(a);
       var py = cy + r * 0.2 * Math.sin(a);
@@ -5893,8 +5893,8 @@ function renderDiscQuestion(idx) {
     teaserWrap.appendChild(teaserTitle);
     var tc = document.createElement('canvas');
     var dpr = window.devicePixelRatio || 1;
-    tc.width = 200 * dpr; tc.height = 200 * dpr;
-    tc.style.width = '200px'; tc.style.height = '200px';
+    tc.width = 240 * dpr; tc.height = 240 * dpr;
+    tc.style.width = '240px'; tc.style.height = '240px';
     tc.className = 'disc-radar-canvas';
     teaserWrap.appendChild(tc);
     teaserMsg.appendChild(teaserWrap);
