@@ -5189,7 +5189,15 @@ function autoExpandPlanCards() {
   if (discStrategyDone && !state.paid && !window.feShown) {
     window.feShown = true;
     var chatArea = $('disc-chat');
+    // 3s: email section
     setTimeout(function() { showFutureEmailSection(chatArea); }, 3000);
+    // 10s: paywall (if user hasn't already triggered it via CTA or email send)
+    setTimeout(function() {
+      if (!state.paid && !chatArea.querySelector('.paywall-bubble')) {
+        appendStandardPaywall(chatArea);
+        lockFreeModes();
+      }
+    }, 10000);
   }
 }
 function setCanvasHTML(el) {
