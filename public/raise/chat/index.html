@@ -1221,7 +1221,7 @@ function logSession(stage, extra) {
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000;
 
 // Price — single source of truth. Change here to retest.
-const PRICE_USD = 19;
+const PRICE_USD = 29;
 
 // Promo discount — shown on second paywall view (returning users)
 const PROMO_CODE       = 'RAISE26';
@@ -1345,9 +1345,9 @@ const OBSTACLE_HOOKS = {
 // All lines frame $19 as trivial vs the dollar value or time-value of a raise.
 const PROOF_LINES = [
   { text: `<strong>Your first raise pays this back over 60×.</strong>`,                                    weight: { all: 2 } },
-  { text: `<strong>$19 once, for a conversation that adds thousands to your salary.</strong>`,             weight: { all: 2 } },
+  { text: `<strong>$29 once, for a conversation that adds thousands to your salary.</strong>`,             weight: { all: 2 } },
   { text: `<strong>Your raise pays this back in week one.</strong>`,                                       weight: { all: 2 } },
-  { text: `<strong>$19 once, a raise that lasts years.</strong>`,                                          weight: { all: 2 } },
+  { text: `<strong>$29 once, a raise that lasts years.</strong>`,                                          weight: { all: 2 } },
 ];
 
 function pickProofLine(obstacleCode) {
@@ -3267,7 +3267,7 @@ function showCasePaywall(container) {
     '<p class="paywall-headline"><strong>' + (pw === 1 ? 'Your first section is ready.' : 'Your first ' + pw + ' sections are ready.') + ' Complete your raise case document.</strong></p>' +
     '<p>Unlock the remaining sections to download your finished PDF and email draft.</p>' +
     '<p style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E8C044" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M12 7v17"/><path d="M3 11h18"/><path d="M7.5 7h9l-4.5-4-4.5 4z"/></svg> Plus: a negotiation plan and scripts for when you sit down to talk.</p>' +
-    '<button class="btn-pay" id="case-paywall-btn">Unlock the full Raise Negotiation toolkit \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<button class="btn-pay" id="case-paywall-btn">I’m asking for my raise \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
     '</div>';
   var deliverables = $('case-deliverables');
@@ -5531,11 +5531,12 @@ function showLockedCoaching(container) {
 }
 
 function appendStandardPaywall(container) {
-  var PRICE_USD = 19;
+  var PRICE_USD = 29;
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
-    '<p class="paywall-headline"><strong>Don\u2019t risk thousands. Your raise could be bigger, sooner.</strong></p>' +
-    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">Unlock the full Raise Negotiation toolkit \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<p class="paywall-headline"><strong>You built your plan. Now commit to the ask.</strong></p>' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:14px;">Paying $' + PRICE_USD + ' is the moment you stop delaying and decide to actually ask.</p>' +
+    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">I\u2019m asking for my raise \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
@@ -8073,8 +8074,8 @@ function getPaywallCTA(price) {
   var mode = SIM_STATE.currentMode || 'discovery';
   if (mode === 'sim') return 'Unlock all scenarios \u00b7 ' + price;
   if (mode === 'coach') return 'Unlock full coaching \u00b7 ' + price;
-  if (mode === 'case') return 'Unlock the full Raise Negotiation toolkit \u00b7 ' + price;
-  return 'Practice every scenario \u00b7 ' + price;
+  if (mode === 'case') return 'I\u2019m asking for my raise \u00b7 ' + price;
+  return 'I\u2019m asking for my raise \u00b7 ' + price;
 }
 // ── Unlock toast — nudge users who click chips after paywall ──
 function showUnlockToast(anchorEl) {
@@ -9451,7 +9452,7 @@ async function renderPaywallBubble(opts) {
   const displayPrice = PRICE_USD;
   const ctaPrice = `$${PRICE_USD}`;
 
-  const headline = `Don’t risk thousands without a plan. Your raise could be bigger, sooner.`;
+  const headline = `You built your plan. Now commit to the ask.`;
 
   const wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = `
@@ -9540,7 +9541,7 @@ async function renderPaywallBubble(opts) {
 const SOLUTION_QUOTES = [
   { name: "Linda W.", role: "Operations Coordinator", raise: "10%", img: "linda_w.png", text: "My manager never brings it up. So I did." },
   { name: "David L.", role: "Logistics Manager", raise: "8%", img: "david.png", text: "I just accepted whatever they offered my whole career. Not this time." },
-  { name: "Tamika J.", role: "HR Generalist", raise: "$8,200", img: "tamika.png", text: "Best $19 I\u2019ve spent. Not even close." },
+  { name: "Tamika J.", role: "HR Generalist", raise: "$8,200", img: "tamika.png", text: "Best $29 I\u2019ve spent. Not even close." },
   { name: "Angela D.", role: "Dental Hygienist", raise: "12%", img: "angela.png", text: "Practiced 30 minutes Sunday. Asked Monday. Done!" },
   { name: "Carlos G.", role: "Facilities Coordinator", raise: "9%", img: "carlos.png", text: "He said no budget. I had a response ready. We found budget :)" },
   { name: "Sandra H.", role: "Insurance Underwriter", raise: "10%", img: "sandra.png", text: "Last time I asked I cried in my car. This time I drove home smiling." },
@@ -9771,7 +9772,7 @@ async function handleCoachingChat(userText) {
     const ctaPrice = `$${PRICE_USD}`;
     limitWrap.innerHTML = `
       <div class="bubble paywall-bubble">
-        <p class="paywall-headline"><strong>Don’t risk thousands without a plan. Your raise could be bigger, sooner.</strong></p>
+        <p class="paywall-headline"><strong>You built your plan. Now commit to the ask.</strong></p>
         <div class="paywall-pitch"></div>
         <button class="btn-pay paywall-cta" onclick="startCheckout()">
           ${getPaywallCTA(ctaPrice)} <span class="btn-pay-arrow">\u2192</span>
