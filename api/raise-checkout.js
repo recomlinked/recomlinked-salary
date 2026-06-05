@@ -1,10 +1,9 @@
 // api/raise-checkout.js
 // Salary Negotiation Coach — Stripe Checkout session creator
-// Called when user clicks "Practice every scenario · $19" on the paywall.
 //
 // Embeds the profile_hash in metadata so the webhook can retrieve the
 // pre-computed enrichment plan and merge it into the paid user record.
-// Uses STRIPE_RAISE_PRICE_ID env var for the price.
+// Supports 3 price tiers ($19 / $29 / $49) — all give identical access.
 
 const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -24,8 +23,15 @@ try {
 
 const CHECKOUT_STASH_TTL = 60 * 60 * 24 * 7; // 7 days
 
-// Informational — actual price is in Stripe via STRIPE_RAISE_PRICE_ID.
-const PRICE_USD = 19;
+// Price ID map — set all three in your Vercel/Railway env vars.
+// STRIPE_RAISE_PRICE_ID is kept as fallback for $29 (your existing price).
+const PRICE_ID_MAP = {
+  19: process.env.STRIPE_RAISE_PRICE_ID_19,
+  29: process.env.STRIPE_RAISE_PRICE_ID_29 || process.env.STRIPE_RAISE_PRICE_ID,
+  49: process.env.STRIPE_RAISE_PRICE_ID_49,
+};
+
+const VALID_PRICES = [19, 29, 49];
 
 async function logToSheet(data) {
   try {
@@ -60,14 +66,19 @@ module.exports = async function handler(req, res) {
     obstacle,
     email,
     refSource,
+    price,
   } = req.body || {};
 
   if (!profile_hash || !profile || !final_range) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  if (!process.env.STRIPE_RAISE_PRICE_ID) {
-    return res.status(500).json({ error: 'Raise price not configured' });
+  // Resolve selected price — default to $29 if not sent or invalid
+  const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 29;
+  const priceId = PRICE_ID_MAP[selectedPrice];
+
+  if (!priceId) {
+    return res.status(500).json({ error: `Price ID not configured for $${selectedPrice}` });
   }
 
   const obs = obstacle || { code: '', label: '', free_text: '' };
@@ -79,7 +90,7 @@ module.exports = async function handler(req, res) {
       billing_address_collection: 'auto',
       payment_method_types: ['card'],
       line_items: [{
-        price:    process.env.STRIPE_RAISE_PRICE_ID,
+        price:    priceId,
         quantity: 1,
       }],
       allow_promotion_codes: false,
@@ -99,6 +110,7 @@ module.exports = async function handler(req, res) {
         obstacle_label:      metaStr(obs.label, 480),
         obstacle_free_text:  metaStr(obs.free_text, 480),
         refSource:    metaStr(refSource),
+        price_usd:    String(selectedPrice),
       },
     });
 
@@ -114,6 +126,7 @@ module.exports = async function handler(req, res) {
             obstacle: obs,
             email:    email || '',
             refSource: refSource || '',
+            price_usd: selectedPrice,
             created_at: Date.now(),
           }),
           { ex: CHECKOUT_STASH_TTL }
@@ -134,7 +147,7 @@ module.exports = async function handler(req, res) {
       final_ceil:    final_range.ceiling,
       obstacle_code: obs.code || '',
       stripeSession: session.id,
-      price_usd:     PRICE_USD,
+      price_usd:     selectedPrice,
       refSource:     refSource || '',
       source:        'salary.recomlinked.com',
     });
