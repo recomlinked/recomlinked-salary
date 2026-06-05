@@ -285,7 +285,12 @@ async function init(){
   // Save token + mark paid — write paid flag unconditionally on valid verify.
   // Token write is separate so missing access_token doesn't block paywall unlock.
   try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');cs.paid=true;cs.paid_at=Date.now();if(dash.token)cs.paid_token=dash.token;localStorage.setItem(LS_STATE,JSON.stringify(cs));localStorage.removeItem(LS_TAP);}catch(e){}
-  if(dash.token){try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}}
+  if(dash.token){
+    try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}
+    // Update all Continue practicing links to pass token directly to chat
+    var _chatUrl = '/raise/chat/?paid_token=' + encodeURIComponent(dash.token);
+    document.querySelectorAll('a[href="/raise/chat/"]').forEach(function(a){ a.href = _chatUrl; });
+  }
   if(urlSession||urlToken)history.replaceState({},'','/raise/paid/');
 
   showScreen('dashboard');renderPaid();
