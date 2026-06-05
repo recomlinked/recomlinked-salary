@@ -8631,33 +8631,27 @@ async function init() {
   const profile = loadProfile();
   state.profile = profile;
 
-  // Silent token check — if user has a token but state.paid isn't set,
-  // verify against server and restore paid status. Handles fresh sessions
-  // after payment or when localStorage state was cleared.
-  if (!state.paid) {
+  // ── Silent token verification ─────────────────────────────
+  // Runs AFTER state is loaded to avoid race with staleness check.
+  // Checks rl_raise_access_token and verifies against server.
+  async function silentTokenCheck() {
     try {
-      var _storedToken = localStorage.getItem('rl_raise_access_token');
-      if (_storedToken) {
-        var _vRes = await fetch('/api/raise-verify?token=' + encodeURIComponent(_storedToken));
-        if (_vRes.ok) {
-          var _vData = await _vRes.json();
-          if (_vData && _vData.profile) {
-            state.paid = true;
-            state.paid_token = _storedToken;
-            try {
-              var _cs = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
-              _cs.paid = true; _cs.paid_token = _storedToken;
-              localStorage.setItem(LS_STATE, JSON.stringify(_cs));
-            } catch (e) {}
-          }
-        }
+      var _t = localStorage.getItem('rl_raise_access_token');
+      if (!_t) return;
+      var _r = await fetch('/api/raise-verify?token=' + encodeURIComponent(_t));
+      if (!_r.ok) return;
+      var _d = await _r.json();
+      if (_d && _d.valid && _d.profile) {
+        state.paid = true;
+        state.paid_token = _t;
       }
-    } catch (e) { /* non-fatal — continue as free user */ }
+    } catch (e) { /* non-fatal */ }
   }
 
   // Staleness check — if state is older than STALE_AFTER_MS, discard
   if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
+    await silentTokenCheck();
   } else if (saved && saved.profile && saved.current_exchange > 0) {
     Object.assign(state, saved);
     if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
@@ -8665,8 +8659,11 @@ async function init() {
     }
     if (!Array.isArray(state.exchange_messages[1])) state.exchange_messages[1] = [];
     if (!Array.isArray(state.exchange_messages[2])) state.exchange_messages[2] = [];
+    if (!state.paid) await silentTokenCheck();
     await resumeFromState();
     return;
+  } else {
+    await silentTokenCheck();
   }
 
   const minDelay = sleep(2800);
