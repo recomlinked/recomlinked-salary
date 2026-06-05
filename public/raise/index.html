@@ -2120,5 +2120,14 @@ document.addEventListener('click', function(e) {
   }
 });
 </script>
+<script>
+// Persist affiliate ref from URL so it survives navigation to /raise/chat/
+(function() {
+  try {
+    var ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref) localStorage.setItem('rl_ref', ref);
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
