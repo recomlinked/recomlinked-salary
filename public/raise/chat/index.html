@@ -8617,9 +8617,23 @@ function showHeaderPurchaseButton(opts) {
     const showDiscount = opts.discounted && isPromoActive();
     btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Unlock full access';
     btn.onclick = function() {
-      var pw = document.querySelector('.paywall-bubble');
-      if (pw) { pw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-      else if (typeof showPaywall === 'function') { showPaywall(); }
+      // Switch to Plan/discovery mode first so paywall is visible
+      var discEl = $('disc-chat') || $('messages');
+      var discMode = $('mode-btn-disc') || $('mode-btn-plan');
+      if (discMode && !discMode.classList.contains('active')) {
+        setMode('discovery');
+      }
+      // Short delay to let mode switch render, then scroll to paywall
+      setTimeout(function() {
+        var pw = document.querySelector('.paywall-bubble');
+        if (pw) {
+          pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // No paywall yet — scroll to bottom where it would appear
+          var chatWrap = $('chat-wrap') || discEl;
+          if (chatWrap) chatWrap.scrollTop = chatWrap.scrollHeight;
+        }
+      }, 100);
     };
   }
   right.appendChild(btn);
