@@ -5486,6 +5486,13 @@ function renderCanvasHTML() {
   html += '<button onclick="state&&state.paid?generateCanvasPDF():triggerPlanPaywall()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
   html += '</div>';
 
+  html += '<div style="padding:12px;border-top:1px solid var(--divider);text-align:center;">';
+  html += '<button onclick="if(confirm(\'Start a fresh plan? Your current plan will be cleared.\')){'
+        + 'try{localStorage.removeItem(\'rl_raise_state\');localStorage.removeItem(\'rl_raise_profile\');}catch(e){}'
+        + 'window.location.replace(\'/raise/\');}" '
+        + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">↺ Start a new plan</button>';
+  html += '</div>';
+
   html += '</div>';
   return html;
 }
@@ -7070,6 +7077,19 @@ function renderOpeningChips() {
   $('messages').appendChild(wrap);
   simBranchAnchor = wrap;
 
+  // Start over link — lets paid users try a different scenario
+  if (state.paid) {
+    const restartWrap = el('div', 'coach-msg', '');
+    restartWrap.innerHTML = '<div style="text-align:center;padding:4px 0;">'
+      + '<button onclick="if(confirm(\'Start a new practice scenario?\')){'
+      + 'SIM_STATE.branch_history=[];SIM_STATE.context={};SIM_STATE.user_opening=\'\';'
+      + 'state.sim_branch_history=[];state.sim_context={};state.sim_user_opening=\'\';'
+      + 'saveState();window.location.replace(\'/raise/\');}" '
+      + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">'
+      + '\u21ba Try a different scenario</button></div>';
+    $('messages').appendChild(restartWrap);
+  }
+
   // Gift tip encourager banner — collapses on first tap
   if (!state.paid) {
     const banner = el('div', 'coach-msg', '');
@@ -7805,6 +7825,18 @@ function renderReplyPillsFlat(replies, scenario) {
 
   // Input stays active here — user can tap a reply pill OR type their
   // own response. Both paths converge on showSimulationPaywall().
+  // Start over link for paid users — mid-conversation
+  if (state.paid) {
+    const simRestart = el('div', 'coach-msg', '');
+    simRestart.innerHTML = '<div style="text-align:center;padding:2px 0;"><button onclick="if(confirm(\'Try a completely different scenario?\')){'
+      + 'SIM_STATE.branch_history=[];SIM_STATE.context={};SIM_STATE.user_opening=\'\';'
+      + 'state.sim_branch_history=[];state.sim_context={};state.sim_user_opening=\'\';'
+      + 'saveState();window.location.replace(\'/raise/\');}" '
+      + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">'
+      + '\u21ba Try a different scenario</button></div>';
+    $('messages').appendChild(simRestart);
+  }
+
   enableInput('Tap a reply or type your own\u2026');
   awaitFreeText(submitCustomReply);
 }
