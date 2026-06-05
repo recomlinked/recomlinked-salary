@@ -228,7 +228,7 @@ module.exports = async function handler(req, res) {
   if (meta.refSource) {
     try {
       const COMMISSION_RATE = 0.40;
-      const salePrice  = meta.price_usd ? parseFloat(meta.price_usd) : (session.amount_total / 100);
+      const salePrice  = session.amount_total / 100; // actual charged amount after any coupons/discounts
       const commission = parseFloat((salePrice * COMMISSION_RATE).toFixed(2));
       const todayKey   = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
       const weekKey    = todayKey; // index by week-start date
@@ -309,33 +309,25 @@ module.exports = async function handler(req, res) {
 
       await resend.emails.send({
         from:    'Milad Bakhti <support@recomlinked.com>',
+        reply_to: 'milad.b@recomlinked.com',
         to:      email,
-        subject: 'Your Salary Negotiation Coach is ready — 30 days of coaching starts now',
+        subject: `Your raise plan is ready, ${firstName || 'there'}`,
         text: `${greeting}
 
-Your coaching plan is ready, and your coach has been briefed on your specific situation.
-
-Open your plan and start coaching:
+Your raise plan is ready. Here's your link:
 ${paidUrl}
 
-This link is personal to you and valid for 30 days. Bookmark it — your coach remembers every conversation within this window, so come back as often as you need while you prepare.
+Bookmark it — you have 30 days to practice the conversation, work through pushback, and talk to your coach anytime.
 
-Here's the arc I'd suggest:
-Week 1 — read your plan, practise your opening with role-play mode, build your evidence.
-Week 2 — have informal check-ins with your manager, test the waters.
-Week 3 — have the actual conversation.
-Week 4 — follow up, counter if needed, lock in the outcome.
+A personal note:
 
-A personal note.
+I built this because I know too many people who deserve a raise and never ask for one. Not because they don't deserve it — because no one ever helped them get comfortable with the ask. If it works for you, I want to hear about it.
 
-I built this because most people I know who deserve a raise don't get one — not because they don't deserve it, but because they never get comfortable asking. If it works for you, I want to know. If something falls flat, I want to know that more.
+My personal email:
+milad.b@recomlinked.com
 
-Reply to this email and I'll read it personally.
-
-Milad Bakhti
-Co-founder, Recomlinked
-
-Recomlinked Technologies Inc. · 407 9th Ave SE, Calgary, AB, Canada`,
+Milad
+Co-founder, Recomlinked`,
       });
     }
   } catch (emailErr) {
