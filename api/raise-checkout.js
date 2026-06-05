@@ -93,7 +93,7 @@ module.exports = async function handler(req, res) {
         price:    priceId,
         quantity: 1,
       }],
-      allow_promotion_codes: false,
+      allow_promotion_codes: true,
       success_url: `${BASE}/raise/paid/?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url:  `${BASE}/raise/chat/`,
       metadata: {
