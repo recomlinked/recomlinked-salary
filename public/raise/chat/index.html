@@ -1128,6 +1128,15 @@ const _UTM = (function() {
   };
 })();
 
+
+// Persist affiliate ref — survives navigation and page reloads within session
+(function() {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var ref = p.get('ref');
+    if (ref) localStorage.setItem('rl_ref', ref);
+  } catch(e) {}
+})();
 // ── Persistent user ID — survives across sessions/blockers ──
 const LS_USER_ID = 'rl_user_id';
 function getUserId() {
@@ -9350,7 +9359,7 @@ async function startCheckout(selectedPrice) {
 
   try {
     const params = new URLSearchParams(location.search);
-    const refSource = params.get('ref') || (state.profile && state.profile.refSource) || '';
+    const refSource = params.get('ref') || (state.profile && state.profile.refSource) || (function(){ try{ return localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })();
     // Fallback values for Path B users who skip profiling
     const checkoutProfile = state.profile || {
       role: 'Not specified',
