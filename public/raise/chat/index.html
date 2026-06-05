@@ -2990,7 +2990,7 @@ function loadCaseState() {
 }
 
 function clearCaseState() {
-  caseState = { template: null, currentQ: 0, answers: {}, polished: {}, reviewing: false, paid: false };
+  caseState = { template: null, currentQ: 0, answers: {}, polished: {}, reviewing: false, paid: !!state.paid };
   try { localStorage.removeItem(LS_CASE_STATE); } catch(e) {}
 }
 
@@ -3022,7 +3022,7 @@ function initCaseMode(container) {
   caseState.answers = {};
   caseState.polished = {};
   caseState.reviewing = false;
-  caseState.paid = false;
+  caseState.paid = !!state.paid; // sync with global paid status
   saveCaseState();
 
   container.innerHTML = '';
