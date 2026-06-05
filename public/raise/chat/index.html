@@ -4504,7 +4504,7 @@ function _generatePDFPrintFallback() {
       var text = (b.insight || b.note || '').replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
 
       // Teaser for strategy/plan blocks (free users)
-      if (isStratPlan && b.teaser) {
+      if (isStratPlan && b.teaser && !state.paid) {
         var clean = (b.insight || '').replace(/\*\*/g, '');
         var teaserText = '', teaserBadge = '';
         if (item.key === 'leverage_risk') {
@@ -4738,7 +4738,7 @@ function _generatePDFWithJsPDF() {
     var padX = 5, padY = 6;
     var emptyText = section === 'position' ? 'Your next question' : 'Will fill after answering your 5 questions';
 
-    if (filled && b.teaser) {
+    if (filled && b.teaser && !state.paid) {
       // Teaser mode: short preview + badge + unlock
       var c = getBlockColors(b.strength);      var clean = insight.replace(/\*\*/g, '');
       var teaserText = '', teaserBadge = '';
@@ -4864,7 +4864,7 @@ function _generatePDFWithJsPDF() {
     var maxH = 0;
     blocks.forEach(function(block) {
       var b = discCanvasBlocks[block];
-      if (b && b.filled && b.teaser) {
+      if (b && b.filled && b.teaser && !state.paid) {
         doc.setFontSize(7.5);
         var teaser = getFirstSentencePDF(b.insight || '');
         var lines = wrapText(teaser, colW - 10);
@@ -4903,7 +4903,7 @@ function _generatePDFWithJsPDF() {
     var fullW = W - mx * 2;
     var b = discCanvasBlocks[block];
     var estH = 18;
-    if (b && b.filled && b.teaser) {
+    if (b && b.filled && b.teaser && !state.paid) {
       doc.setFontSize(7.5);
       var teaser = getFirstSentencePDF(b.insight || '');
       var lines = wrapText(teaser, fullW - 10);
@@ -5154,7 +5154,7 @@ function togglePosBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;transform:rotate(180deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:0 0 8px;">' + teaser + '</p>' +
-      '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis \u2192</a>';
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis \u2192</a>');
   } else {
     el.setAttribute('data-expanded', '0');
     el.style.padding = '10px 14px';
@@ -5199,8 +5199,8 @@ function togglePlanBlock(el, key) {
       (badge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;">' + badge + '</span>' : '') +
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
-      '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + preview + '</p>' +
-      '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see your full ' + lbl.toLowerCase() + ' \u2192</a>';
+      '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + (state.paid && discCanvasBlocks && discCanvasBlocks[key] && discCanvasBlocks[key].insight ? formatInsight(discCanvasBlocks[key].insight) : preview) + '</p>' +
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see your full ' + lbl.toLowerCase() + ' \u2192</a>');
   }
 }
 
@@ -5327,7 +5327,7 @@ function renderCanvasHTML() {
   function planBlock(key, label, subtitle) {
     var b = discCanvasBlocks[key];
     var ic = icons[key] || '';
-    if (b && b.filled && b.teaser) {
+    if (b && b.filled && b.teaser && !state.paid) {
       // Collapsed mode: header + badge + lock icon only — tappable to expand teaser
       var t = getTeaserForBlock(key, b.insight);
       var BADGES = {
@@ -5350,7 +5350,7 @@ function renderCanvasHTML() {
         '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>';
     }
-    if (b && b.filled && !b.teaser) {
+    if (b && b.filled && (!b.teaser || state.paid)) {
       // Full mode (paid)
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
@@ -8602,6 +8602,13 @@ async function init() {
     }
     // discovery/null: reason stays null, but we need it for the flow
     if (!reason) reason = 'other';
+  }
+
+  if (reason) {
+    // Paid users skip the fresh-start flow — resume their existing state instead
+    if (state.paid && !forceReset) {
+      reason = null; // fall through to normal resume/loadState path below
+    }
   }
 
   if (reason) {
