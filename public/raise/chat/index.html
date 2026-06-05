@@ -1086,8 +1086,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (el.dataset.origHtml) el.innerHTML = el.dataset.origHtml;
       });
       try {
-        var s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
-        if (!s.paid) {
+        if (!state.paid) {
           ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
@@ -2517,7 +2516,7 @@ function setMode(target) {
     const input = $('chat-input');
     if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
     var inputBar2 = document.querySelector('.input-row');
-    if (inputBar2) inputBar2.style.display = 'none';
+    if (inputBar2) inputBar2.style.display = state.paid ? '' : 'none';
     scrollChatToBottom();
   } else if (target === 'coach') {
     coachingEl.style.display = 'block';
@@ -7912,10 +7911,7 @@ try {
 
 function incrementSimTaps() {
   // Paid users never hit the paywall
-  try {
-    const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
-    if (s.paid) return false;
-  } catch (e) {}
+  if (state.paid) return false;
   simTapCount++;
   try { localStorage.setItem(LS_TAP_COUNT, String(simTapCount)); } catch (e) {}
   return simTapCount >= SIM_FREE_TAPS;
@@ -8496,7 +8492,7 @@ function showHeaderPurchaseButton(opts) {
   
   // Check if paid
   let isPaid = false;
-  try { isPaid = JSON.parse(localStorage.getItem(LS_STATE) || '{}').paid === true; } catch (e) {}
+  isPaid = !!state.paid;
 
   const btn = document.createElement(isPaid ? 'a' : 'button');
   btn.id = 'header-buy-btn';
