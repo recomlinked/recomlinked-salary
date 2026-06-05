@@ -227,15 +227,45 @@ module.exports = async function handler(req, res) {
   // ── Referral credit — tracks affiliate conversions in Redis ──
   if (meta.refSource) {
     try {
+      const COMMISSION_RATE = 0.40;
+      const salePrice  = meta.price_usd ? parseFloat(meta.price_usd) : (session.amount_total / 100);
+      const commission = parseFloat((salePrice * COMMISSION_RATE).toFixed(2));
+      const todayKey   = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+      const weekKey    = todayKey; // index by week-start date
+
+      // Total record
       const refRaw = await redis.get(`ref:${meta.refSource}`);
       const ref = refRaw
         ? (typeof refRaw === 'string' ? JSON.parse(refRaw) : refRaw)
-        : { source: meta.refSource, conversions: 0, raise_conversions: 0, created_at: now };
-      ref.conversions = (ref.conversions || 0) + 1;
+        : { source: meta.refSource, conversions: 0, raise_conversions: 0, total_earned: 0, pending_payout: 0, created_at: now };
+      ref.conversions       = (ref.conversions || 0) + 1;
       ref.raise_conversions = (ref.raise_conversions || 0) + 1;
+      ref.total_earned      = parseFloat(((ref.total_earned || 0) + commission).toFixed(2));
+      ref.pending_payout    = parseFloat(((ref.pending_payout || 0) + commission).toFixed(2));
       ref.last_conversion_at = now;
-      ref.last_price_usd = meta.price_usd || (session.amount_total / 100);
-      await redis.set(`ref:${meta.refSource}`, JSON.stringify(ref), { ex: TTL_30_DAYS * 3 });
+      ref.last_price_usd    = salePrice;
+
+      // Daily record
+      const dailyRaw = await redis.get(`ref:${meta.refSource}:daily:${todayKey}`);
+      const daily = dailyRaw
+        ? (typeof dailyRaw === 'string' ? JSON.parse(dailyRaw) : dailyRaw)
+        : { conversions: 0, earned: 0 };
+      daily.conversions = (daily.conversions || 0) + 1;
+      daily.earned      = parseFloat(((daily.earned || 0) + commission).toFixed(2));
+
+      // Weekly record
+      const weekRaw = await redis.get(`ref:${meta.refSource}:week:${weekKey}`);
+      const week = weekRaw
+        ? (typeof weekRaw === 'string' ? JSON.parse(weekRaw) : weekRaw)
+        : { conversions: 0, earned: 0, paid: false };
+      week.conversions = (week.conversions || 0) + 1;
+      week.earned      = parseFloat(((week.earned || 0) + commission).toFixed(2));
+
+      await Promise.all([
+        redis.set(`ref:${meta.refSource}`,                          JSON.stringify(ref),   { ex: TTL_30_DAYS * 12 }),
+        redis.set(`ref:${meta.refSource}:daily:${todayKey}`,        JSON.stringify(daily), { ex: 60 * 60 * 48 }),
+        redis.set(`ref:${meta.refSource}:week:${weekKey}`,          JSON.stringify(week),  { ex: TTL_30_DAYS * 3 }),
+      ]);
     } catch (e) { /* non-fatal */ }
   }
 
