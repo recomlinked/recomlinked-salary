@@ -8547,6 +8547,17 @@ async function startSimulationFromPathA() {
 }
 
 async function init() {
+  // ── Restore paid status immediately — before ANY state clearing ──────────
+  // localStorage gets wiped by the reason/reset flows below.
+  // Reading paid into the in-memory state object here means it survives.
+  try {
+    const _early = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+    if (_early.paid) {
+      state.paid = true;
+      if (_early.paid_token) state.paid_token = _early.paid_token;
+    }
+  } catch(e) {}
+
   // Check for simulation path FIRST — chip click from landing page
   const params = new URLSearchParams(location.search);
   let reason = params.get('reason');
