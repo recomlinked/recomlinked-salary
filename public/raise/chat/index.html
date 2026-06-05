@@ -8765,8 +8765,9 @@ function firstCoachMessageFor(range) {
 async function resumeFromState() {
   stopThinkingAnimation();
 
-  // Path A requires current_range; Path B (simulation, exchange=10) doesn't
-  if (!state.current_range && state.current_exchange !== 10) {
+  // Path A requires current_range; Path B (simulation, exchange=10) doesn't.
+  // Paid users skip this check entirely — they have full access regardless of state shape.
+  if (!state.paid && !state.current_range && state.current_exchange !== 10) {
     clearAll();
     window.location.replace('/raise/');
     return;
