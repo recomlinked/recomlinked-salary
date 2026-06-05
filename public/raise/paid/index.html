@@ -91,7 +91,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
   <div class="header-right">
     
-    <a class="header-cta" id="header-cta" href="/raise/chat/">Continue practicing →</a>
+    <a class="header-cta" id="header-cta" href="/raise/chat/">Open your full plan →</a>
   </div>
 </header>
 
@@ -137,7 +137,7 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
     <div id="ctx-chips"></div>
     <a href="/raise/chat/" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--teal);font-weight:600;text-decoration:none;">Answer in chat →</a>
   </div>
-  <a href="/raise/chat/" class="cta-btn" id="cta-continue">Continue practicing →</a>
+  <a href="/raise/chat/" class="cta-btn" id="cta-continue">Open your full plan →</a>
   <div class="cta-sub">Unlimited scenarios · Fully customized · Coaching mode available</div>
   <div class="footer-links">
     <a href="mailto:support@recomlinked.com">Support</a>
@@ -285,15 +285,15 @@ async function init(){
   // Save token + mark paid — write paid flag unconditionally on valid verify.
   // Token write is separate so missing access_token doesn't block paywall unlock.
   try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');cs.paid=true;cs.paid_at=Date.now();if(dash.token)cs.paid_token=dash.token;localStorage.setItem(LS_STATE,JSON.stringify(cs));localStorage.removeItem(LS_TAP);}catch(e){}
-  if(dash.token){
-    try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}
-    // Update all Continue practicing links to pass token directly to chat
-    var _chatUrl = '/raise/chat/?paid_token=' + encodeURIComponent(dash.token);
-    document.querySelectorAll('a[href="/raise/chat/"]').forEach(function(a){ a.href = _chatUrl; });
-  }
+  if(dash.token){try{localStorage.setItem(LS_TOKEN,dash.token);}catch(e){}}
   if(urlSession||urlToken)history.replaceState({},'','/raise/paid/');
 
   showScreen('dashboard');renderPaid();
+  // Update Continue practicing links AFTER renderPaid creates them
+  if(dash.token){
+    var _chatUrl = '/raise/chat/?paid_token=' + encodeURIComponent(dash.token);
+    document.querySelectorAll('a[href="/raise/chat/"]').forEach(function(a){ a.href = _chatUrl; });
+  }
 }
 
 function renderPaid(demo){
@@ -307,7 +307,7 @@ function renderPaid(demo){
   const explored=branches.length;$('stat-explored').textContent=explored;
   const oc=demo?'underpaid':(dash.obstacle?.code||''),ol=demo?BLOCKER_LABELS.underpaid:(dash.obstacle?.label||BLOCKER_LABELS[oc]||'');
   if(ol){$('blocker-badge').textContent='Your focus: '+ol;$('blocker-badge').hidden=false;}
-  if(explored>0){$('welcome-title').textContent='Welcome back.';$('welcome-sub').textContent=`You've explored ${explored} path${explored===1?'':'s'}. Pick up where you left off.`;$('cta-continue').textContent='Continue where you left off →';}
+  if(explored>0){$('welcome-title').textContent='Welcome back.';$('welcome-sub').textContent=`You've explored ${explored} path${explored===1?'':'s'}. Pick up where you left off.`;$('cta-continue').textContent='Continue — all modes unlocked →';}
 
   renderTree(branches);renderContext(context);
 }
