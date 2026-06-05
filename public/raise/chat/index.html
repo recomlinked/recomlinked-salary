@@ -997,7 +997,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
             </svg>
             <span>Plan</span>
           </button>
-          <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Practice scenarios — tap manager replies and your responses">
+          <button class="mode-toggle-btn sim" id="mode-btn-sim" type="button" onclick="setMode('sim')" role="tab" aria-selected="false" title="Simulate scenarios — tap manager replies and your responses">
             <!-- Strategy clipboard: tactical-planning icon (X / O / arrow) -->
             <svg viewBox="0 0 20 20" fill="none" width="14" height="14">
               <rect x="4" y="3.5" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
@@ -1007,7 +1007,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
               <path d="M13.6 13.5l-0.5-0.6M13.6 13.5l0.6-0.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
               <circle cx="8" cy="14" r="1" stroke="currentColor" stroke-width="1.4"/>
             </svg>
-            <span>Practice</span>
+            <span>Simulation</span>
           </button>
           <button class="mode-toggle-btn coach" id="mode-btn-coach" type="button" onclick="setMode('coach')" role="tab" aria-selected="false" title="Get coaching feedback on the scenarios you've explored">
             <!-- Coach: chat bubble with insight dot -->
@@ -5533,23 +5533,90 @@ function showLockedCoaching(container) {
 }
 
 function appendStandardPaywall(container) {
-  var PRICE_USD = 29;
+  var selectedPrice = 29;
+  var plans = { 19: 'Raise Plan', 29: 'Plan + Simulation', 49: 'Full Coaching' };
+  var uid = Date.now();
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>You built your plan. Now commit to the ask.</strong></p>' +
-    '<p style="font-size:13px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:14px;">Paying $' + PRICE_USD + ' is the moment you stop delaying and decide to actually ask.</p>' +
-    '<button class="btn-pay" id="std-btn-pay-' + Date.now() + '">I\u2019m asking for my raise \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span></button>' +
-    '<div class="trust-row paywall-trust"><span>One-time payment</span><span class="dot">\u00b7</span><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:18px;">Paying is the moment you stop delaying and decide actually to ask.</p>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">' +
+      '<div id="pw-opt-19-' + uid + '" style="border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);">' +
+        '<div style="padding-right:12px;">' +
+          '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Raise Plan</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5;">Opening script, pushback playbook, meeting email &amp; raise case brief</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,0.8);">$19</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.4);">one time</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="pw-opt-29-' + uid + '" style="border:2px solid #F5CF56;border-radius:10px;padding:14px 16px;cursor:pointer;background:rgba(245,207,86,0.1);position:relative;">' +
+        '<div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#F5CF56;color:#1a1520;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;letter-spacing:0.04em;text-transform:uppercase;">Most popular</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+          '<div style="padding-right:12px;">' +
+            '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Plan + Simulation</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;">Everything in Raise Plan + unlimited conversation scenarios</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;">' +
+            '<div style="font-size:18px;font-weight:800;color:#F5CF56;">$29</div>' +
+            '<div style="font-size:10px;color:rgba(245,207,86,0.6);">one time</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="pw-opt-49-' + uid + '" style="border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);">' +
+        '<div style="padding-right:12px;">' +
+          '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Full Coaching</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5;">Plan + Simulation + AI coaching \u00b7 30 days access</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,0.8);">$49</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.4);">one time</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn-pay" id="pw-cta-' + uid + '">Plan + Simulation \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
 
-  var btn = wrap.querySelector('.btn-pay');
-  if (btn) btn.onclick = function() {
-    if (typeof startCheckout === 'function') startCheckout();
-    else if (typeof initiateCheckout === 'function') initiateCheckout();
+  function applyState(price, hovered) {
+    [19, 29, 49].forEach(function(p) {
+      var optEl = wrap.querySelector('#pw-opt-' + p + '-' + uid);
+      if (!optEl) return;
+      var isSel = p === selectedPrice;
+      if (isSel) {
+        optEl.style.border = '2px solid #F5CF56';
+        optEl.style.background = 'rgba(245,207,86,0.1)';
+      } else if (hovered === p) {
+        optEl.style.border = '1.5px solid rgba(255,255,255,0.5)';
+        optEl.style.background = 'rgba(255,255,255,0.08)';
+      } else {
+        optEl.style.border = '1.5px solid rgba(255,255,255,0.2)';
+        optEl.style.background = 'rgba(255,255,255,0.04)';
+      }
+    });
+  }
+
+  [19, 29, 49].forEach(function(p) {
+    var optEl = wrap.querySelector('#pw-opt-' + p + '-' + uid);
+    var ctaBtn = wrap.querySelector('#pw-cta-' + uid);
+    if (!optEl) return;
+    optEl.addEventListener('click', function() {
+      selectedPrice = p;
+      applyState(p, null);
+      if (ctaBtn) ctaBtn.innerHTML = plans[p] + ' \u00b7 $' + p + ' <span class="btn-pay-arrow">\u2192</span>';
+    });
+    optEl.addEventListener('mouseenter', function() { applyState(selectedPrice, p); });
+    optEl.addEventListener('mouseleave', function() { applyState(selectedPrice, null); });
+  });
+
+  var ctaBtn = wrap.querySelector('#pw-cta-' + uid);
+  if (ctaBtn) ctaBtn.onclick = function() {
+    if (typeof startCheckout === 'function') startCheckout(selectedPrice);
+    else if (typeof initiateCheckout === 'function') initiateCheckout(selectedPrice);
   };
 
-  // Show header CTA
   if (typeof showHeaderPurchaseButton === 'function') showHeaderPurchaseButton({});
 }
 
@@ -8404,7 +8471,11 @@ function showHeaderPurchaseButton(opts) {
   } else {
     const showDiscount = opts.discounted && isPromoActive();
     btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Unlock full access';
-    btn.onclick = startCheckout;
+    btn.onclick = function() {
+      var pw = document.querySelector('.paywall-bubble');
+      if (pw) { pw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      else if (typeof showPaywall === 'function') { showPaywall(); }
+    };
   }
   right.appendChild(btn);
 }
@@ -9240,11 +9311,12 @@ function fireEnrichment() {
   } catch (e) {}
 }
 
-async function startCheckout() {
+async function startCheckout(selectedPrice) {
+  var checkoutPrice = selectedPrice || PRICE_USD;
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'checkout_started', {
-        product: 'raise', value: PRICE_USD, currency: 'USD', transport_type: 'beacon',
+        product: 'raise', value: checkoutPrice, currency: 'USD', transport_type: 'beacon',
         final_floor: (state && state.current_range) ? state.current_range.floor : null,
         final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
         obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
@@ -9349,6 +9421,7 @@ async function startCheckout() {
         obstacle: checkoutObstacle,
         refSource,
         promo_code: undefined,
+        price: checkoutPrice,
       }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
