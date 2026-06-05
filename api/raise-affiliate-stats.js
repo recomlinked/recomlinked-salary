@@ -21,9 +21,18 @@ module.exports = async function handler(req, res) {
   if (!ref) return res.status(400).json({ error: 'Missing ref' });
 
   try {
-    // Total stats
-    const raw = await redis.get(`ref:${ref}`);
-    if (!raw) return res.status(404).json({ error: 'Affiliate not found' });
+    // Total stats — auto-create empty record on first visit so creator sees
+    // their dashboard with zeros rather than an error page.
+    let raw = await redis.get(`ref:${ref}`);
+    if (!raw) {
+      const empty = {
+        source: ref, conversions: 0, raise_conversions: 0,
+        total_earned: 0, pending_payout: 0,
+        created_at: new Date().toISOString(),
+      };
+      await redis.set(`ref:${ref}`, JSON.stringify(empty), { ex: 60 * 60 * 24 * 365 });
+      raw = JSON.stringify(empty);
+    }
     const total = typeof raw === 'string' ? JSON.parse(raw) : raw;
 
     // Today's stats
