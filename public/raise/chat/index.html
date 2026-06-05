@@ -8664,8 +8664,11 @@ async function init() {
 
   // Staleness check — if state is older than STALE_AFTER_MS, discard
   if (saved && saved.saved_at && (Date.now() - saved.saved_at) > STALE_AFTER_MS) {
+    const _stalePaid = saved.paid;
+    const _staleToken = saved.paid_token;
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
-    if (!state.paid) await silentTokenCheck();
+    if (_stalePaid) { state.paid = true; if (_staleToken) state.paid_token = _staleToken; }
+    else if (!state.paid) await silentTokenCheck();
   } else if (saved && saved.profile && saved.current_exchange > 0) {
     const _wasPaid = state.paid; // preserve token-verified paid status
     Object.assign(state, saved);
