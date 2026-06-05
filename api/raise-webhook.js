@@ -224,16 +224,18 @@ module.exports = async function handler(req, res) {
     // recoverable via retry. Log and move on so the user can still reach /raise/paid/.
   }
 
-  // ── Referral credit (reuses FA referral infra if refSource present) ──
+  // ── Referral credit — tracks affiliate conversions in Redis ──
   if (meta.refSource) {
     try {
       const refRaw = await redis.get(`ref:${meta.refSource}`);
-      if (refRaw) {
-        const ref = typeof refRaw === 'string' ? JSON.parse(refRaw) : refRaw;
-        ref.conversions = (ref.conversions || 0) + 1;
-        ref.raise_conversions = (ref.raise_conversions || 0) + 1;
-        await redis.set(`ref:${meta.refSource}`, JSON.stringify(ref), { ex: TTL_30_DAYS * 3 });
-      }
+      const ref = refRaw
+        ? (typeof refRaw === 'string' ? JSON.parse(refRaw) : refRaw)
+        : { source: meta.refSource, conversions: 0, raise_conversions: 0, created_at: now };
+      ref.conversions = (ref.conversions || 0) + 1;
+      ref.raise_conversions = (ref.raise_conversions || 0) + 1;
+      ref.last_conversion_at = now;
+      ref.last_price_usd = meta.price_usd || (session.amount_total / 100);
+      await redis.set(`ref:${meta.refSource}`, JSON.stringify(ref), { ex: TTL_30_DAYS * 3 });
     } catch (e) { /* non-fatal */ }
   }
 
@@ -259,6 +261,7 @@ module.exports = async function handler(req, res) {
           final_ceil:    meta.final_ceil,
           obstacle_code: meta.obstacle_code || '',
           amountPaid:    `$${(session.amount_total / 100).toFixed(2)} ${session.currency?.toUpperCase()}`,
+          price_usd:     meta.price_usd || (session.amount_total / 100),
           stripeSession: session.id,
           refSource:     meta.refSource || '',
           source:        'salary.recomlinked.com',
