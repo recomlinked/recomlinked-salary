@@ -8676,7 +8676,9 @@ async function init() {
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
     if (!state.paid) await silentTokenCheck();
   } else if (saved && saved.profile && saved.current_exchange > 0) {
+    const _wasPaid = state.paid; // preserve token-verified paid status
     Object.assign(state, saved);
+    if (_wasPaid) state.paid = true; // don't let old saved state overwrite paid=true
     if (!state.exchange_messages || typeof state.exchange_messages !== 'object') {
       state.exchange_messages = { 1: [], 2: [] };
     }
