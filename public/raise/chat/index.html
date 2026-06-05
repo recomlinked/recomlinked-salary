@@ -1422,6 +1422,9 @@ function saveState() {
     if (SIM_STATE.user_opening) {
       state.sim_user_opening = SIM_STATE.user_opening;
     }
+    if (typeof simConversation !== 'undefined' && simConversation.length > 0) {
+      state.sim_conversation = simConversation.slice(-30); // keep last 30 turns
+    }
     state.saved_at = Date.now();
     const json = JSON.stringify(state);
     // Guard: if state is too large (>4MB), trim chat_log to last 50 entries
@@ -1454,6 +1457,80 @@ function clearAll() {
     localStorage.removeItem(LS_PROFILE);
     localStorage.removeItem(LS_STATE);
   } catch (e) {}
+}
+
+// Start a new session while preserving paid access.
+// Clears session data but keeps the paid token so the user
+// doesn't lose access after starting over.
+// Get full plan content from enrichment API for a given key.
+// The enrichment plan uses sections.script, sections.pushback, sections.email etc.
+function getEnrichedContent(key) {
+  var p = state.enriched_plan;
+  if (!p) return null;
+  var s = p.sections || {};
+
+  function fmtBlockers(bl) {
+    if (!bl || !bl.top_3_blockers) return '';
+    return bl.top_3_blockers.map(function(b){
+      return '\u25cf ' + b.blocker + '\n' + b.why + '\n\u2192 ' + b.fix;
+    }).join('\n\n');
+  }
+  function fmtScript(sc) {
+    if (!sc) return '';
+    var out = '';
+    if (sc.one_liner) out += 'Opening line:\n\u201c' + sc.one_liner + '\u201d\n\n';
+    if (sc.full_opener) out += 'Full opener:\n' + sc.full_opener;
+    if (sc.why_it_works) out += '\n\nWhy it works: ' + sc.why_it_works;
+    return out;
+  }
+  function fmtPushback(pb) {
+    if (!pb || !pb.pushback_responses) return '';
+    return pb.pushback_responses.map(function(r){
+      return 'Manager: \u201c' + r.pushback + '\u201d\nYou: \u201c' + r.response + '\u201d';
+    }).join('\n\n');
+  }
+  function fmtEmail(em) {
+    if (!em || !em.email_template) return '';
+    return 'Subject: ' + (em.email_template.subject || '') + '\n\n' + (em.email_template.body || '');
+  }
+  function fmtPrep(pr) {
+    if (!pr || !pr['30_day_prep_plan']) return '';
+    return pr['30_day_prep_plan'].map(function(w){
+      return 'Week ' + w.week + ' — ' + w.theme + ':\n' + (w.actions || []).map(function(a){ return '  \u2022 ' + a; }).join('\n');
+    }).join('\n\n');
+  }
+  function fmtTiming(ti) {
+    if (!ti) return '';
+    var out = ti.timing_recommendation || '';
+    if (ti.window_options && ti.window_options.length) {
+      out += '\n\n' + ti.window_options.map(function(w){ return '\u25cf ' + w.window + ': ' + w.why; }).join('\n');
+    }
+    return out;
+  }
+
+  var map = {
+    opening_script: fmtScript(s.script),
+    pushback:       fmtPushback(s.pushback),
+    meeting_email:  fmtEmail(s.email),
+    leverage_risk:  fmtBlockers(s.blockers),
+    emphasize:      p.amount_range ? ('Target ' + p.amount_range.low_pct + '\u2013' + p.amount_range.high_pct + '%\n' + (p.amount_range.explanation || '')) : '',
+    avoid:          fmtTiming(s.timing),
+    raise_case:     fmtPrep(s.prep),
+  };
+  return map[key] || null;
+}
+
+function startOverSession(msg) {
+  if (!confirm(msg || 'Start a new session? Your current plan will be cleared.')) return;
+  try {
+    var _token = (typeof localStorage !== 'undefined' && localStorage.getItem('rl_raise_access_token')) || (state && state.paid_token) || '';
+    var _isPaid = !!(state && state.paid);
+    localStorage.removeItem(LS_PROFILE);
+    var freshState = {};
+    if (_isPaid) { freshState.paid = true; if (_token) freshState.paid_token = _token; }
+    localStorage.setItem(LS_STATE, JSON.stringify(freshState));
+  } catch(e) {}
+  window.location.replace('/raise/');
 }
 
 function profileHash() {
@@ -5361,13 +5438,14 @@ function renderCanvasHTML() {
         '</div>';
     }
     if (b && b.filled && (!b.teaser || state.paid)) {
-      // Full mode (paid)
+      // Full mode (paid) — prefer enrichment plan content, fall back to discovery insight
+      var _fullContent = (state.paid && getEnrichedContent(key)) || formatInsight(b.insight);
       return '<div style="background:#E8EFF8;border:1px solid rgba(30,61,114,0.15);border-radius:8px;padding:14px 16px;min-height:48px;">' +
         '<div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">' +
         '<span style="color:var(--navy);">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;">' + label + '</span>' +
         '</div>' +
-        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;">' + formatInsight(b.insight) + '</p>' +
+        '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;white-space:pre-line;">' + escapeHtml(_fullContent) + '</p>' +
         '</div>';
     }
     if (discStrategyLoading) {
@@ -5487,10 +5565,7 @@ function renderCanvasHTML() {
   html += '</div>';
 
   html += '<div style="padding:12px;border-top:1px solid var(--divider);text-align:center;">';
-  html += '<button onclick="if(confirm(\'Start a fresh plan? Your current plan will be cleared.\')){'
-        + 'try{localStorage.removeItem(\'rl_raise_state\');localStorage.removeItem(\'rl_raise_profile\');}catch(e){}'
-        + 'window.location.replace(\'/raise/\');}" '
-        + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">↺ Start a new plan</button>';
+  html += '<button onclick="startOverSession(\'Start a new plan? Your current plan will be cleared.\')" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">\u21ba Start a new plan</button>';
   html += '</div>';
 
   html += '</div>';
@@ -7081,10 +7156,7 @@ function renderOpeningChips() {
   if (state.paid) {
     const restartWrap = el('div', 'coach-msg', '');
     restartWrap.innerHTML = '<div style="text-align:center;padding:4px 0;">'
-      + '<button onclick="if(confirm(\'Start a new practice scenario?\')){'
-      + 'SIM_STATE.branch_history=[];SIM_STATE.context={};SIM_STATE.user_opening=\'\';'
-      + 'state.sim_branch_history=[];state.sim_context={};state.sim_user_opening=\'\';'
-      + 'saveState();window.location.replace(\'/raise/\');}" '
+      + '<button onclick="startOverSession(\'Try a different scenario? Your current session will be cleared.\')" '
       + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">'
       + '\u21ba Try a different scenario</button></div>';
     $('messages').appendChild(restartWrap);
@@ -7828,10 +7900,8 @@ function renderReplyPillsFlat(replies, scenario) {
   // Start over link for paid users — mid-conversation
   if (state.paid) {
     const simRestart = el('div', 'coach-msg', '');
-    simRestart.innerHTML = '<div style="text-align:center;padding:2px 0;"><button onclick="if(confirm(\'Try a completely different scenario?\')){'
-      + 'SIM_STATE.branch_history=[];SIM_STATE.context={};SIM_STATE.user_opening=\'\';'
-      + 'state.sim_branch_history=[];state.sim_context={};state.sim_user_opening=\'\';'
-      + 'saveState();window.location.replace(\'/raise/\');}" '
+    simRestart.innerHTML = '<div style="text-align:center;padding:2px 0;">'
+      + '<button onclick="startOverSession(\'Try a different scenario? Your current session will be cleared.\')" '
       + 'style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">'
       + '\u21ba Try a different scenario</button></div>';
     $('messages').appendChild(simRestart);
@@ -8586,13 +8656,31 @@ async function startSimulationFromPathA() {
 
 async function init() {
   // ── Restore paid status immediately — before ANY state clearing ──────────
-  // localStorage gets wiped by the reason/reset flows below.
-  // Reading paid into the in-memory state object here means it survives.
   try {
     const _early = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
     if (_early.paid) {
       state.paid = true;
       if (_early.paid_token) state.paid_token = _early.paid_token;
+      if (_early.enriched_plan) {
+        state.enriched_plan = _early.enriched_plan;
+      } else {
+        // Fetch full plan from verify in background and cache it
+        const _tok = _early.paid_token || localStorage.getItem('rl_raise_access_token');
+        if (_tok) {
+          fetch('/api/raise-verify?token=' + encodeURIComponent(_tok))
+            .then(function(r){ return r.ok ? r.json() : null; })
+            .then(function(d){
+              if (d && d.plan) {
+                state.enriched_plan = d.plan;
+                try {
+                  var _cs = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+                  _cs.enriched_plan = d.plan;
+                  localStorage.setItem('rl_raise_state', JSON.stringify(_cs));
+                } catch(e) {}
+              }
+            }).catch(function(){});
+        }
+      }
     }
   } catch(e) {}
 
@@ -8647,10 +8735,15 @@ async function init() {
   }
 
   if (reason) {
-    // Paid users skip the fresh-start flow — resume their existing state instead
-    if (state.paid && !forceReset) {
-      reason = null; // fall through to normal resume/loadState path below
-    }
+    // Paid users with an existing session skip the fresh-start flow (resume instead).
+    // Paid users WITHOUT a session (just started over) should continue normally.
+    try {
+      var _existingSession = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+      var _hasSession = !!(_existingSession.current_exchange > 0 || _existingSession.chat_log && _existingSession.chat_log.length > 0);
+      if (state.paid && !forceReset && _hasSession) {
+        reason = null; // fall through to resume
+      }
+    } catch(e) {}
   }
 
   if (reason) {
@@ -8888,23 +8981,25 @@ async function resumeFromState() {
     SIM_STATE.blocker = blocker;
     SIM_STATE.context = state.sim_context || {};
     SIM_STATE.branch_history = state.sim_branch_history || [];
+    if (state.sim_conversation) simConversation = state.sim_conversation;
 
-    // Show previous simulation conversation as context
-    if (SIM_STATE.branch_history.length > 0) {
-      const lastBranch = SIM_STATE.branch_history[SIM_STATE.branch_history.length - 1];
-      const contextWrap = el('div', 'coach-msg', '');
-      let contextHtml = '<div class="bubble" style="background:var(--muted);border:1px solid var(--divider);font-size:12px;">';
-      contextHtml += '<p style="font-weight:600;color:var(--t2);margin:0 0 8px;">Your last practice exchange:</p>';
-      var opening = state.sim_user_opening || SIM_STATE.user_opening;
-      if (opening) {
-        contextHtml += '<p style="color:var(--t2);margin:0 0 4px;"><strong>You opened with:</strong> \u201c' + escapeHtml(opening) + '\u201d</p>';
-      }
-      if (lastBranch.reply && lastBranch.scenario !== 'opening') {
-        contextHtml += '<p style="color:var(--t2);margin:0;"><strong>You were responding to:</strong> a manager pushback</p>';
-      }
-      contextHtml += '</div>';
-      contextWrap.innerHTML = contextHtml;
-      $('messages').appendChild(contextWrap);
+    // Replay previous simulation conversation in the practice tab
+    var _practiceContainer = $('practice-messages') || $('messages');
+    if (state.sim_conversation && state.sim_conversation.length > 0) {
+      var _resumeNote = el('div', 'coach-msg', '');
+      _resumeNote.innerHTML = '<div class="bubble" style="opacity:0.6;font-size:12px;"><p>Continuing your practice session:</p></div>';
+      _practiceContainer.appendChild(_resumeNote);
+      state.sim_conversation.forEach(function(turn) {
+        if (turn.role === 'user') {
+          var _ub = el('div', 'user-msg', '');
+          _ub.innerHTML = '<div class="user-bubble">' + escapeHtml(turn.text) + '</div>';
+          _practiceContainer.appendChild(_ub);
+        } else if (turn.role === 'manager') {
+          var _mb = el('div', 'coach-msg', '');
+          _mb.innerHTML = '<div class="bubble"><span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span><p>\u201c' + escapeHtml(turn.text) + '\u201d</p></div>';
+          _practiceContainer.appendChild(_mb);
+        }
+      });
     }
     showToolbar();
     showModeToggle();
