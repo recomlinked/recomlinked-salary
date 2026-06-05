@@ -13,8 +13,26 @@ function todayKey() {
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // ── POST { action: 'paywall_view', ref } — log a paywall impression ──
+  if (req.method === 'POST') {
+    const { action, ref: postRef } = req.body || {};
+    if (action !== 'paywall_view' || !postRef) return res.status(400).json({ error: 'Invalid' });
+    const key = `ref:${postRef.toLowerCase().trim()}`;
+    try {
+      const raw = await redis.get(key);
+      if (raw) {
+        const rec = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        rec.paywall_views = (rec.paywall_views || 0) + 1;
+        await redis.set(key, JSON.stringify(rec), { ex: 60 * 60 * 24 * 365 });
+      }
+    } catch (e) { /* non-fatal */ }
+    return res.status(200).json({ ok: true });
+  }
+
   if (req.method !== 'GET') return res.status(405).end();
 
   const ref = (req.query?.ref || '').toLowerCase().trim();
@@ -65,6 +83,7 @@ module.exports = async function handler(req, res) {
       today_earned:  today.earned || 0,
       pending:       total.pending_payout || 0,
       commission:    COMMISSION,
+      paywall_views: total.paywall_views || 0,
       last_sale_at:  total.last_conversion_at || null,
       history,
     });
