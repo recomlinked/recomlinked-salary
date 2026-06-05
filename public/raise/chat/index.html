@@ -8585,6 +8585,8 @@ async function showSimulationPaywall(lastScenario) {
 // reachable after the paywall has been shown, even as the user scrolls.
 function showHeaderPurchaseButton(opts) {
   opts = opts || {};
+  // Only show after paywall has been seen, or for paid users
+  if (!state.paid && !state.paywall_shown) return;
   if ($('header-buy-btn')) {
     // Update existing button text if discount changed
     const existing = $('header-buy-btn');
@@ -8617,23 +8619,24 @@ function showHeaderPurchaseButton(opts) {
     const showDiscount = opts.discounted && isPromoActive();
     btn.innerHTML = showDiscount ? ('Unlock · $' + PROMO_PRICE_USD) : 'Unlock full access';
     btn.onclick = function() {
-      // Switch to Plan/discovery mode first so paywall is visible
-      var discEl = $('disc-chat') || $('messages');
-      var discMode = $('mode-btn-disc') || $('mode-btn-plan');
-      if (discMode && !discMode.classList.contains('active')) {
+      // Switch to Plan/discovery mode if not already there
+      var discBtn = $('mode-btn-disc');
+      if (discBtn && !discBtn.classList.contains('active')) {
         setMode('discovery');
       }
-      // Short delay to let mode switch render, then scroll to paywall
+      // Scroll to paywall within the chat-wrap scroll container
       setTimeout(function() {
         var pw = document.querySelector('.paywall-bubble');
-        if (pw) {
-          pw.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } else {
-          // No paywall yet — scroll to bottom where it would appear
-          var chatWrap = $('chat-wrap') || discEl;
-          if (chatWrap) chatWrap.scrollTop = chatWrap.scrollHeight;
+        var chatWrap = $('chat-wrap');
+        if (pw && chatWrap) {
+          var pwTop = pw.getBoundingClientRect().top;
+          var wrapTop = chatWrap.getBoundingClientRect().top;
+          var offset = pwTop - wrapTop + chatWrap.scrollTop - (chatWrap.clientHeight / 2) + (pw.offsetHeight / 2);
+          chatWrap.scrollTo({ top: offset, behavior: 'smooth' });
+        } else if (chatWrap) {
+          chatWrap.scrollTo({ top: chatWrap.scrollHeight, behavior: 'smooth' });
         }
-      }, 100);
+      }, 150);
     };
   }
   right.appendChild(btn);
