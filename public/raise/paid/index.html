@@ -259,8 +259,20 @@ async function init(){
   else verifyUrl=`${API_VERIFY}?token=${encodeURIComponent(token)}`;
 
   let data;
-  try{const res=await fetch(verifyUrl);if(!res.ok){if(res.status===401){showScreen('expired-screen');return;}throw new Error('HTTP '+res.status);}data=await res.json();}
-  catch(err){$('loading-title').textContent='Could not load your session.';$('loading-body').textContent='Check your connection and refresh.';return;}
+  // Retry verify up to 6 times with delay — handles race between
+  // Stripe redirect and webhook creating the session record in Redis.
+  let verifyRes = null;
+  for(let attempt = 0; attempt < 6; attempt++){
+    if(attempt > 0) await new Promise(r => setTimeout(r, 1500));
+    try{
+      const res = await fetch(verifyUrl);
+      if(res.ok){ verifyRes = res; break; }
+      if(res.status === 401 && attempt < 5) continue; // retry — webhook may not have fired yet
+      if(res.status === 401){ showScreen('expired-screen'); return; }
+      throw new Error('HTTP ' + res.status);
+    }catch(e){ if(attempt === 5) throw e; }
+  }
+  try{ data = await verifyRes.json(); }catch(err){ $('loading-title').textContent='Could not load your session.';$('loading-body').textContent='Check your connection and refresh.';return; }
   if(!data.valid){showScreen('expired-screen');return;}
 
   dash.profile=data.profile;dash.plan=data.plan||null;dash.days_left=data.days_left||0;
