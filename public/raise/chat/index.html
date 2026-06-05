@@ -943,6 +943,22 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 </head>
 
 <body>
+<script>
+// Runs synchronously before chat init — sets paid state from URL token.
+// Token was already verified by the paid page, no need to re-verify here.
+(function() {
+  try {
+    var t = new URLSearchParams(location.search).get('paid_token');
+    if (!t) return;
+    localStorage.setItem('rl_raise_access_token', t);
+    var s = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+    s.paid = true;
+    s.paid_token = t;
+    localStorage.setItem('rl_raise_state', JSON.stringify(s));
+    history.replaceState({}, '', '/raise/chat/');
+  } catch(e) {}
+})();
+</script>
 
 <header class="site-header">
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
@@ -8625,31 +8641,6 @@ async function init() {
     simTapCount = 0;
     promoShownThisSession = false;
     try { history.replaceState(null, '', location.pathname); } catch (e) {}
-  }
-
-  // ── URL token check (from paid page "Continue practicing" link) ──
-  // This is the most reliable path — token passed directly in URL.
-  const _urlParams = new URLSearchParams(location.search);
-  const _urlPaidToken = _urlParams.get('paid_token');
-  if (_urlPaidToken) {
-    try {
-      const _vr = await fetch('/api/raise-verify?token=' + encodeURIComponent(_urlPaidToken));
-      if (_vr.ok) {
-        const _vd = await _vr.json();
-        if (_vd && _vd.valid) {
-          state.paid = true;
-          state.paid_token = _urlPaidToken;
-          try { localStorage.setItem('rl_raise_access_token', _urlPaidToken); } catch(e) {}
-          try {
-            const _cs = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
-            _cs.paid = true; _cs.paid_token = _urlPaidToken;
-            localStorage.setItem(LS_STATE, JSON.stringify(_cs));
-          } catch(e) {}
-        }
-      }
-    } catch(e) {}
-    // Clean token from URL without reload
-    try { history.replaceState({}, '', '/raise/chat/'); } catch(e) {}
   }
 
   const saved = loadState();
