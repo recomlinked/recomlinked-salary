@@ -5542,6 +5542,18 @@ function showLockedCoaching(container) {
 }
 
 function appendStandardPaywall(container) {
+  // Log paywall view for affiliate tracking — fire and forget
+  try {
+    var _ref = localStorage.getItem('rl_ref');
+    if (_ref) {
+      fetch('/api/raise-affiliate-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'paywall_view', ref: _ref }),
+      }).catch(function() {});
+    }
+  } catch(e) {}
+
   var selectedPrice = 29;
   var plans = { 19: 'Raise Plan', 29: 'Plan + Simulation', 49: 'Full Coaching' };
   var uid = Date.now();
