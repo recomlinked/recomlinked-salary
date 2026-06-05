@@ -180,13 +180,14 @@ main { max-width: 520px; margin: 0 auto; padding: 32px 24px 64px; }
         <div class="stat-sub">40% commission</div>
       </div>
       <div class="stat-card">
+        <div class="card-label">Paywall views</div>
+        <div class="stat-value purple" id="el-paywall-views">0</div>
+        <div class="stat-sub">from your link</div>
+      </div>
+      <div class="stat-card">
         <div class="card-label">Today</div>
         <div class="stat-value purple" id="el-today-sales">0</div>
         <div class="stat-sub" id="el-today-earned">$0.00 earned</div>
-      </div>
-      <div class="stat-card">
-        <div class="card-label">Last sale</div>
-        <div class="stat-value muted" id="el-last-sale">—</div>
       </div>
     </div>
 
@@ -259,6 +260,7 @@ async function load() {
 
     document.getElementById('el-total-sales').textContent  = d.total_sales || 0;
     document.getElementById('el-total-earned').textContent = fmt(d.total_earned);
+    document.getElementById('el-paywall-views').textContent = d.paywall_views || 0;
     document.getElementById('el-today-sales').textContent  = d.today_sales || 0;
     document.getElementById('el-today-earned').textContent = fmt(d.today_earned) + ' earned today';
     document.getElementById('el-pending').textContent      = fmt(d.pending);
