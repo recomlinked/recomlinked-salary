@@ -1412,6 +1412,16 @@ function colorFor(range) {
 
 function saveState() {
   try {
+    // Persist simulation context so it survives refresh
+    if (SIM_STATE.branch_history && SIM_STATE.branch_history.length > 0) {
+      state.sim_branch_history = SIM_STATE.branch_history;
+    }
+    if (SIM_STATE.context && Object.keys(SIM_STATE.context).length > 0) {
+      state.sim_context = SIM_STATE.context;
+    }
+    if (SIM_STATE.user_opening) {
+      state.sim_user_opening = SIM_STATE.user_opening;
+    }
     state.saved_at = Date.now();
     const json = JSON.stringify(state);
     // Guard: if state is too large (>4MB), trim chat_log to last 50 entries
@@ -8844,8 +8854,26 @@ async function resumeFromState() {
     const reason = state.sim_reason || 'other';
     const blocker = BLOCKER_MAP[reason] || BLOCKER_MAP.other;
     SIM_STATE.blocker = blocker;
-    SIM_STATE.context = {};
-    SIM_STATE.branch_history = [];
+    SIM_STATE.context = state.sim_context || {};
+    SIM_STATE.branch_history = state.sim_branch_history || [];
+
+    // Show previous simulation conversation as context
+    if (SIM_STATE.branch_history.length > 0) {
+      const lastBranch = SIM_STATE.branch_history[SIM_STATE.branch_history.length - 1];
+      const contextWrap = el('div', 'coach-msg', '');
+      let contextHtml = '<div class="bubble" style="background:var(--muted);border:1px solid var(--divider);font-size:12px;">';
+      contextHtml += '<p style="font-weight:600;color:var(--t2);margin:0 0 8px;">Your last practice exchange:</p>';
+      var opening = state.sim_user_opening || SIM_STATE.user_opening;
+      if (opening) {
+        contextHtml += '<p style="color:var(--t2);margin:0 0 4px;"><strong>You opened with:</strong> \u201c' + escapeHtml(opening) + '\u201d</p>';
+      }
+      if (lastBranch.reply && lastBranch.scenario !== 'opening') {
+        contextHtml += '<p style="color:var(--t2);margin:0;"><strong>You were responding to:</strong> a manager pushback</p>';
+      }
+      contextHtml += '</div>';
+      contextWrap.innerHTML = contextHtml;
+      $('messages').appendChild(contextWrap);
+    }
     showToolbar();
     showModeToggle();
     unlockModeToggle();
