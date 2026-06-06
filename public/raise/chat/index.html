@@ -570,10 +570,10 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .mode-toggle-btn{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:14px;border:none;background:transparent;cursor:pointer;font-family:var(--sans);font-size:11.5px;font-weight:600;color:var(--t3);transition:all 0.15s;white-space:nowrap;}
 .mode-toggle-btn:hover{color:var(--t1);}
 .mode-toggle-btn.active{color:#07090f;}
-.mode-toggle-btn.active.sim{background:rgba(30,61,114,0.18);color:var(--navy);font-weight:700;}
-.mode-toggle-btn.active.coach{background:rgba(201,168,76,0.25);color:#7a6428;font-weight:700;}
-.mode-toggle-btn.active.disc{background:rgba(56,132,244,0.18);color:#185FA5;font-weight:700;}
-.mode-toggle-btn.active.rcase{background:rgba(123,92,252,0.18);color:#5B3CC4;font-weight:700;}
+.mode-toggle-btn.active.sim{background:rgba(30,61,114,0.12);color:var(--navy);}
+.mode-toggle-btn.active.coach{background:rgba(201,168,76,0.18);color:#7a6428;}
+.mode-toggle-btn.active.disc{background:rgba(56,132,244,0.12);color:#185FA5;}
+.mode-toggle-btn.active.rcase{background:rgba(123,92,252,0.12);color:#5B3CC4;}
 .mode-toggle-btn svg{flex-shrink:0;}
 
 /* ── Case Mode ─────────────── */
@@ -3141,7 +3141,7 @@ function initCaseMode(container) {
   }
 
   // Not paid — show skeleton + instant paywall like coaching/practice
-  appendStandardPaywall(container, 'Send the doc first. Let it have the hard conversation for you.');
+  appendStandardPaywall(container);
 }
 
 
@@ -5628,8 +5628,8 @@ function showLockedPractice(container) {
   chipsWrap.appendChild(inner);
   container.appendChild(chipsWrap);
 
-  // Standard paywall — simulation-specific headline
-  appendStandardPaywall(container, 'Practice every response until the conversation can\'t surprise you.');
+  // Standard paywall
+  appendStandardPaywall(container);
 }
 
 function showLockedCoaching(container) {
