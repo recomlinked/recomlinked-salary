@@ -5745,8 +5745,6 @@ function appendStandardPaywall(container) {
     else if (typeof initiateCheckout === 'function') initiateCheckout(selectedPrice);
   };
 
-  state.paywall_shown = true;
-  saveState();
   if (typeof showHeaderPurchaseButton === 'function') showHeaderPurchaseButton({});
 }
 
