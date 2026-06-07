@@ -4981,7 +4981,7 @@ function renderCanvasHTML() {
         '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0;white-space:pre-line;">' + _fullContent + '</p>' +
         '</div>';
     }
-    if (discStrategyLoading) {
+    if (discStrategyLoading || discPlanLoading) {
       var loadingMessages = {
         leverage_risk: 'Analyzing your leverage points',
         emphasize: 'Identifying what to lead with',
@@ -5052,26 +5052,26 @@ function renderCanvasHTML() {
     html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
     html += '<span style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:0.04em;">Overall Negotiation Position</span>';
     html += '</div>';
-    html += '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">Will fill after answering your 5 questions</p>';
+    html += '<p style="font-size:10px;color:var(--t4);margin:4px 0 0;font-style:italic;">' + (discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions') + '</p>';
     html += '</div>';
   }
 
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += planBlock('leverage_risk', 'Leverage & risk', 'Will fill after answering your 5 questions');
+  html += planBlock('leverage_risk', 'Leverage & risk', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
   html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
-  html += planBlock('emphasize', 'Emphasize', 'Will fill after answering your 5 questions');
-  html += planBlock('avoid', 'Avoid', 'Will fill after answering your 5 questions');
+  html += planBlock('emphasize', 'Emphasize', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
+  html += planBlock('avoid', 'Avoid', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
   html += '</div>';
 
   // YOUR PLAN
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
-  html += planBlock('opening_script', 'Opening script', 'Will fill after answering your 5 questions');
-  html += planBlock('pushback', 'Pushback playbook', 'Will fill after answering your 5 questions');
-  html += planBlock('meeting_email', 'Meeting email', 'Will fill after answering your 5 questions');
-  html += planBlock('raise_case', 'Raise case brief', 'Will fill after answering your 5 questions');
+  html += planBlock('opening_script', 'Opening script', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
+  html += planBlock('pushback', 'Pushback playbook', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
+  html += planBlock('meeting_email', 'Meeting email', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
+  html += planBlock('raise_case', 'Raise case brief', discPlanLoading ? 'Loading your plan…' : 'Will fill after answering your 5 questions');
 
   // CHECKLIST card (web preview)
   if (answeredCount >= 5) {
