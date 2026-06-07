@@ -7483,7 +7483,8 @@ async function init() {
   }
 
   // Refresh with no URL params — restore saved mode from localStorage
-  if (!caseMode && !reason) {
+  // Skip if ?open= was explicitly provided (paid page direct mode link)
+  if (!caseMode && !reason && !openMode) {
     var _savedMode = null;
     try { _savedMode = localStorage.getItem('rl_chat_mode'); } catch(e) {}
     if (_savedMode === 'case') {
@@ -7504,6 +7505,11 @@ async function init() {
     }
     // discovery/null: reason stays null, but we need it for the flow
     if (!reason) reason = 'other';
+  }
+
+  // If ?open= was provided with no reason, inject a reason so the paid resume path fires
+  if (openMode && !reason && !caseMode) {
+    reason = 'other';
   }
 
   if (reason) {
