@@ -7831,8 +7831,10 @@ async function resumeFromState() {
       }
 
     } else {
-      // ── No history: fresh sim — show opening chips directly ───────────────
-      // SIM_STATE.blocker is already set above; just render the opening chips.
+      // ── No history: fresh sim — render opening chips once ─────────────────
+      // Set simInitialized BEFORE setMode so the guard in setMode doesn't also fire
+      var _pm2 = $('practice-messages') || $('messages');
+      if (_pm2) _pm2.dataset.simInitialized = 'true';
       setMode('sim');
       var _introWrap = el('div', 'coach-msg', '');
       _introWrap.innerHTML = '<div class="bubble"><p>How you open sets the tone for everything after it — <strong>Tap one to start.</strong></p></div>';
