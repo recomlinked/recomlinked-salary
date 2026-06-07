@@ -32,6 +32,15 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png"/>
 <link rel="manifest" href="/manifest.json"/>
 <style>
+/* Size-adjusted fallback font to minimise CLS when DM Sans loads */
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  ascent-override: 94%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 103%;
+}
 /* ═══════════════════════════════════════════
    RAISE — Clean CSS
    Color system: Purple brand + Gold CTAs
@@ -43,7 +52,7 @@
   --card: #ffffff;
   --text: #2c2438;
   --text2: #6b5f7a;
-  --text3: #9a8faa;
+  --text3: #6e6278;
   --purple: #7B5CFC;
   --purple-hover: #6A4CE8;
   --purple-light: #f0e8f6;
@@ -57,7 +66,7 @@
   --shadow-gold: 0 2px 12px rgba(232,184,76,0.25);
   --shadow-gold-hover: 0 4px 20px rgba(232,184,76,0.35);
   --radius: 12px;
-  --sans: 'DM Sans', system-ui, sans-serif;
+  --sans: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
 }
 
 /* ── 2. RESET & BASE ──────────────────────── */
@@ -413,7 +422,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
   <a class="mobile-menu-cta" href="/raise/chat/?reason=other">Start now →</a>
 </div>
 
-<div class="main">
+<main class="main">
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ──  LANDING CONTENT                                  ── -->
@@ -804,7 +813,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ──  ASSESSMENT CONTENT                               ── -->
-</div><!-- /main -->
+</main><!-- /main -->
 
 
 <script>
@@ -888,6 +897,7 @@ if (document.getElementById('proof-rotator')) {
 /* ───────────────────────────────────────────────────────── */
 /* ── Compound-raise calculator                            ── */
 /* ───────────────────────────────────────────────────────── */
+setTimeout(function(){
 (function initCalc() {
   const salaryEl = document.getElementById('calc-salary');
   const raiseEl = document.getElementById('calc-raise');
@@ -1112,6 +1122,7 @@ if (document.getElementById('proof-rotator')) {
   }
 })();
 
+}, 50);
 
 
 // Scroll fade-in
