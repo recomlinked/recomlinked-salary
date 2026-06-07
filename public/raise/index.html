@@ -58,7 +58,6 @@
   --shadow-gold-hover: 0 4px 20px rgba(232,184,76,0.35);
   --radius: 12px;
   --sans: 'DM Sans', system-ui, sans-serif;
-  --serif: 'Playfair Display', Georgia, serif;
 }
 
 /* ── 2. RESET & BASE ──────────────────────── */
@@ -85,7 +84,6 @@ button { font-family: var(--sans); cursor: pointer; }
 
 @media (max-width: 480px) { .main { padding: 0 20px 48px; } }
 
-
 /* ── 4. HEADER ────────────────────────────── */
 .site-header.menu-open { background: var(--card); }
     .site-header {
@@ -99,14 +97,7 @@ button { font-family: var(--sans); cursor: pointer; }
 .logo-wrap:hover { text-decoration: none; }
 .logo-recom { background: var(--gold); color: var(--gold-text); padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
 .logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--purple-light); border-radius: 0 3px 3px 0; }
-.nav-right { display: flex; align-items: center; gap: 12px; }
-.header-cta {
-  background: var(--gold); color: var(--gold-text);
-  padding: 8px 20px; border-radius: 10px;
-  font-size: 13px; font-weight: 700; text-decoration: none;
-  transition: background 0.15s;
-}
-.header-cta:hover { background: var(--gold-hover); text-decoration: none; }
+
 @media (max-width: 480px) { .site-header.menu-open { background: var(--card); }
     .site-header { padding: 12px 16px; } }
 .header-nav { display: flex; align-items: center; gap: 20px; }
@@ -153,11 +144,9 @@ button { font-family: var(--sans); cursor: pointer; }
   z-index: 10;
 }
 .hero h1 .accent { color: var(--purple); font-size: 1.25em; }
-.hero h1 .accent-soft { color: var(--purple); opacity: 0.7; }
+
 .hero h1 .hero-h1-line2 { font-weight: 500; display: inline-block; margin-top: 4px; }
-.hero-sub { font-size: clamp(15px, 2.6vw, 18px); line-height: 1.5; font-weight: 400; font-style: italic; color: var(--text2); max-width: 520px; margin: 0 auto 8px; }
-.hero-trust { font-size: 11px; color: var(--text3); letter-spacing: 0.04em; margin-top: 20px; text-transform: uppercase; }
-.hero-trust span { margin: 0 6px; }
+
 .cta-stack { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 28px auto 0; }
 @media (max-width: 480px) { .hero { padding: 80px 20px 44px; } .hero h1 { letter-spacing: -0.6px; font-size: 26px; } }
 
@@ -177,29 +166,22 @@ button { font-family: var(--sans); cursor: pointer; }
 .cta-btn:hover { background: var(--gold-hover); transform: translateY(-1px); box-shadow: var(--shadow-gold-hover); text-decoration: none; }
 .cta-btn:active { transform: translateY(0); }
 .cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
-.cta-btn.secondary { background: transparent; color: var(--text2); border: 1.5px solid var(--border); box-shadow: none; }
-.cta-btn.secondary:hover { background: var(--purple-light); color: var(--text); border-color: var(--purple); }
-.cta-btn.outline-gold { background: transparent; color: var(--purple); border: 1.5px solid var(--border); padding: 13px 26px; font-size: 14.5px; box-shadow: none; }
-.cta-btn.outline-gold:hover { background: var(--purple-light); border-color: var(--purple); }
+
 @media (max-width: 420px) { .cta-btn { padding: 14px 28px; font-size: 14.5px; } .cta-stack { gap: 10px; margin-top: 20px; } }
 
 /* Text-style CTAs (links that look like CTAs) */
 .demo-text-cta { color: var(--gold-hover); font-weight: 700; font-size: 14.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; }
 .demo-text-cta:hover { text-decoration: underline; }
-.demo-text-cta-arrow { display: inline-block; transition: transform 0.15s; }
-.demo-text-cta:hover .demo-text-cta-arrow { transform: translateX(3px); }
+
+.demo-text-cta:hover 
 
 /* ── 7. SECTION TITLES ────────────────────── */
 .section-title { font-family: var(--sans); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; line-height: 1.35; }
 .divider { height: 1px; background: var(--border); margin: 36px 0; }
 
 /* ── 8. STATS ─────────────────────────────── */
-.stats { display: flex; gap: 14px; margin: 0 0 32px; }
-.stat-card { flex: 1; text-align: center; padding: 22px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
-.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.stat-num { font-family: var(--sans); font-size: 34px; font-weight: 700; color: var(--purple); margin-bottom: 4px; }
-.stat-label { font-size: 12px; color: var(--text2); line-height: 1.5; }
-@media (max-width: 480px) { .stats { flex-direction: column; gap: 10px; } .stat-num { font-size: 28px; } }
+
+@media (max-width: 480px) {   }
 
 /* ── 9. SHARE CARD ────────────────────────── */
 /* (styled inline in HTML — no conflicts) */
@@ -286,7 +268,6 @@ button { font-family: var(--sans); cursor: pointer; }
 .calc-result-num { font-size: 28px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; }
 .calc-result-sub { font-size: 12px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
 .calc-result-disclaimer { font-size: 10px; color: var(--text3); font-style: italic; }
-.calc-cta { text-align: center; margin-top: 20px; }
 
 /* ── 15. PROOF ROTATOR ────────────────────── */
 .proof-rotator { text-align: center; padding: 16px 0; margin: 16px 0; }
@@ -330,40 +311,6 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 .fade-in.visible { opacity: 1; transform: translateY(0); }
 
 /* ── 20. UTILITIES ────────────────────────── */
-.hiw-continue { text-align: center; margin: 20px 0 8px; }
-.hiw-continue-hint { font-size: 11px; color: var(--text2); letter-spacing: 0.04em; margin-top: 10px; text-transform: uppercase; }
-
-
-/* ── DEMO STEPS (coaching visualization) ──── */
-.ds{display:flex;gap:12px;position:relative;opacity:0.5;transition:opacity 0.6s ease,transform 0.6s ease;transform:scale(0.97) translateX(-4px);}
-.ds.active{opacity:1;transform:scale(1.02) translateX(0);}
-.ds.active .dd{box-shadow:0 0 12px rgba(123,92,252,0.2);}
-.ds.active .dc{background:rgba(123,92,252,0.03);border-radius:8px;padding:8px 10px 18px;margin:-8px -10px 0;}
-.ds::before{content:'';position:absolute;left:13px;top:28px;bottom:-2px;width:1.5px;background:var(--border);}
-.ds:last-child::before{display:none;}
-.dd{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;z-index:1;}
-.dd svg{width:14px;height:14px;}
-.dd.c{background:rgba(245,207,86,0.12);border:1.5px solid rgba(245,207,86,0.35);}
-.dd.c svg{color:var(--gold);}
-.dd.u{background:rgba(29,180,160,0.08);border:1.5px solid rgba(29,180,160,0.2);}
-.dd.u svg{color:#1db4a0;}
-.dd.i{background:rgba(245,207,86,0.08);border:1.5px dashed rgba(245,207,86,0.3);}
-.dd.i svg{color:var(--gold);}
-.dd.m{background:var(--purple-light);border:1.5px solid var(--purple);}
-.dd.m svg{color:var(--purple);}
-.dc{flex:1;padding-bottom:18px;}
-.dl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:4px;}
-.dl.cl{color:var(--gold-hover);}
-.dl.ul{color:#1db4a0;}
-.dl.il{color:var(--gold-hover);}
-.dl.ml{color:var(--purple);}
-.dp-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
-.dp{padding:5px 10px;border-radius:5px;font-size:11.5px;font-weight:500;background:var(--card);border:1px solid var(--border);color:var(--text);}
-.dp.sel{border-color:#1db4a0;color:#1db4a0;background:rgba(29,180,160,0.04);}
-.di-card{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:8px 12px;margin-top:5px;display:inline-flex;gap:14px;flex-wrap:wrap;}
-.di{font-size:11px;color:var(--text2);line-height:1.3;}
-.di b{color:var(--text);font-weight:600;display:block;font-size:10.5px;margin-bottom:1px;}
-
 
 /* ── CALCULATOR (full) ────────────────────── */
 .calc-inputs{display:flex;gap:10px;align-items:stretch;margin-bottom:20px;max-width:340px;margin-left:auto;margin-right:auto;}
@@ -406,8 +353,6 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 #calc-result-sticky{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.2px;display:inline-block;margin-bottom:4px;}
 .calc-result-disclaimer{display:inline-block;font-size:10px;color:var(--text3);font-style:italic;}
 .calc-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;text-align:center;}
-.calc-cta{text-align:center;margin-top:20px;}
-
 
 /* ── FAQ ──────────────────────────────────── */
 .faq-item{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}
@@ -420,15 +365,11 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 .faq-a.open{display:block;}
 .faq-a a{color:var(--gold-hover);}
 
-
 /* ── RESPONSIVE ───────────────────────────── */
-@media (max-width: 600px) {
-  /* Share card: stack vertically, edge-to-edge, image centered */
-  .share-card-wrap { flex-direction: column; margin-left: -20px; margin-right: -20px; border-radius: 0; padding: 24px 20px; }
-  .share-card-wrap > div[onclick] { margin: 0 auto; }
+
   
   /* Raise case preview */
-  .case-preview-wrap { width: 100%; overflow: hidden; }
+  
   
   /* Closing pitch */
   .closing-pitch { margin-left: 0; margin-right: 0; border-radius: 16px; padding: 32px 20px; }
@@ -443,9 +384,9 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
 </head>
 
 <body>
@@ -1221,297 +1162,6 @@ function shareLink() {
     });
   }
 }
-</script>
-
-<!-- Scenario tree auto-animation ─────────────────────── -->
-<script>
-(function(){
-  const MGR='#00c4a0',YOU='#c9a84c';
-  const TREE={id:"root",label:"You bring up compensation",short:"You bring it up",role:"start",children:[
-    {id:"m1",role:"mgr",short:"Budget's frozen",label:"I hear you, but budgets are locked until Q2",children:[
-      {id:"y1a",role:"you",short:"Lock in Q2 date",label:"Can we put a specific date on the calendar for Q2?",children:[
-        {id:"m2a",role:"mgr",short:"Can't promise",label:"I can't promise anything will be different by then",children:[
-          {id:"y3a",role:"you",short:"What needs to change?",label:"What specifically would need to change for this to be a yes?",children:[
-            {id:"m4x",role:"mgr",short:"Hit Q1 targets",label:"Hit your Q1 targets and I'll have ammunition to take upstairs",children:[]}
-          ]},{id:"y3b",role:"you",short:"Share market data",label:"I have market data I think is relevant",children:[]}
-        ]},{id:"m2b",role:"mgr",short:"OK, calendared",label:"Sure, let me send you an invite for early April",children:[
-          {id:"y3c",role:"you",short:"Make it formal",label:"Can we frame that as a formal comp review?",children:[]}
-        ]}
-      ]},{id:"y1b",role:"you",short:"Show market data",label:"I'd like to share what I've found about market rates",children:[
-        {id:"m2c",role:"mgr",short:"Sites aren't accurate",label:"Those salary sites aren't always reliable for our market",children:[
-          {id:"y3d",role:"you",short:"3 sources checked",label:"I cross-referenced three sources — can I walk you through?",children:[]},
-          {id:"y3e",role:"you",short:"What does HR use?",label:"What benchmarking source does HR use?",children:[]}
-        ]}
-      ]},{id:"y1c",role:"you",short:"Title change?",label:"Would a title adjustment be possible in the meantime?",children:[
-        {id:"m2d",role:"mgr",short:"I can look into that",label:"Title changes don't need budget — let me look into it",children:[]}
-      ]}
-    ]},{id:"m2",role:"mgr",short:"What number?",label:"What number did you have in mind?",children:[
-      {id:"y2a",role:"you",short:"12-15% to market",label:"Based on my research, 12-15% would bring me to market",children:[
-        {id:"m3a",role:"mgr",short:"Higher than expected",label:"That's significantly higher than what I was expecting",children:[
-          {id:"y4a",role:"you",short:"Walk through evidence",label:"I can walk you through exactly how I got there",children:[
-            {id:"m5a",role:"mgr",short:"Show me",label:"Walk me through it — I need something for my director",children:[]}
-          ]},{id:"y4b",role:"you",short:"What works for you?",label:"What range would you feel comfortable approving?",children:[]}
-        ]}
-      ]},{id:"y2b",role:"you",short:"What's realistic?",label:"Before I anchor — what range is realistic on your end?",children:[
-        {id:"m3b",role:"mgr",short:"Check with HR",label:"I'd need to check with HR on the band",children:[
-          {id:"y4c",role:"you",short:"Send case in writing",label:"Can I send my case in writing for that conversation?",children:[]}
-        ]}
-      ]}
-    ]},{id:"m3",role:"mgr",short:"Appreciates it",label:"I appreciate you being direct about this",children:[
-      {id:"y5a",role:"you",short:"Set follow-up",label:"Can we set a specific follow-up date?",children:[]},
-      {id:"y5b",role:"you",short:"What do you need?",label:"What would you need from me to make this happen?",children:[]}
-    ]},{id:"m4",role:"mgr",short:"Not now",label:"This really isn't a good time — we're mid-reorg",children:[
-      {id:"y6a",role:"you",short:"When then?",label:"When do you think would be the right time?",children:[]},
-      {id:"y6b",role:"you",short:"Being recruited",label:"I want to be transparent — I've been approached by a recruiter",children:[
-        {id:"m7b",role:"mgr",short:"Let me act fast",label:"I didn't realize that. Let me see what I can do this week",children:[]}
-      ]}
-    ]}
-  ]};
-
-  const SCRIPT=[
-    {act:'reveal',ids:['root'],ms:500},{act:'pause',ms:500},
-    {act:'stagger',ids:['m1','m2','m3','m4'],ms:180},{act:'pause',ms:900},
-    {act:'walk',id:'m1',ms:1300},{act:'stagger',ids:['y1a','y1b','y1c'],ms:180},{act:'pause',ms:500},
-    {act:'walk',id:'y1a',ms:1100},{act:'stagger',ids:['m2a','m2b'],ms:200},{act:'pause',ms:400},
-    {act:'walk',id:'m2a',ms:1000},{act:'stagger',ids:['y3a','y3b'],ms:200},{act:'pause',ms:400},
-    {act:'walk',id:'y3a',ms:900},{act:'reveal',ids:['m4x'],ms:300},{act:'walk',id:'m4x',ms:1600},
-    {act:'backto',id:'m1',ms:900},
-    {act:'walk',id:'y1c',ms:800},{act:'reveal',ids:['m2d'],ms:300},{act:'walk',id:'m2d',ms:1400},
-    {act:'backto',id:'root',ms:900},
-    {act:'walk',id:'m2',ms:1100},{act:'stagger',ids:['y2a','y2b'],ms:200},{act:'pause',ms:400},
-    {act:'walk',id:'y2a',ms:900},{act:'reveal',ids:['m3a'],ms:300},{act:'walk',id:'m3a',ms:900},
-    {act:'stagger',ids:['y4a','y4b'],ms:200},{act:'pause',ms:400},
-    {act:'walk',id:'y4a',ms:900},{act:'reveal',ids:['m5a'],ms:300},{act:'walk',id:'m5a',ms:1800},
-    {act:'backto',id:'root',ms:900},
-    {act:'walk',id:'m4',ms:1100},{act:'stagger',ids:['y6a','y6b'],ms:200},{act:'pause',ms:400},
-    {act:'walk',id:'y6b',ms:1000},{act:'reveal',ids:['m7b'],ms:300},{act:'walk',id:'m7b',ms:2200},
-    {act:'reset',ms:3000}
-  ];
-
-  // Utils
-  var nodeMap={}, allNodes=[];
-  function findParent(t,id,p){if(t.id===id)return p||null;for(var i=0;i<(t.children||[]).length;i++){var f=findParent(t.children[i],id,t.id);if(f)return f;}return null;}
-  function ancestors(id){var p=[],c=id;while(c){p.unshift(c);c=findParent(TREE,c);}return p;}
-
-  function layoutTree(node,depth,xMin,xMax){
-    var x=(xMin+xMax)/2, y=depth*62+35;
-    var r=[{id:node.id,short:node.short,label:node.label,role:node.role,x:x,y:y,depth:depth,kids:node.children||[]}];
-    var kids=node.children||[];
-    if(!kids.length)return r;
-    for(var i=0;i<kids.length;i++){
-      var w=(xMax-xMin)/kids.length;
-      r=r.concat(layoutTree(kids[i],depth+1,xMin+w*i+2,xMin+w*(i+1)-2));
-    }
-    return r;
-  }
-
-  allNodes=layoutTree(TREE,0,0,800);
-  allNodes.forEach(function(n){nodeMap[n.id]=n;});
-
-  // State
-  var revealed=new Set(), explored=new Set(), activeId=null, pathCount=0;
-  var convoMsgs=[], scriptIdx=0, timer=null;
-  var vbx=0,vby=0,vbw=800,vbh=300; // current viewBox
-  var tvbx=0,tvby=0,tvbw=800,tvbh=300; // target viewBox
-
-  var svg=document.getElementById('st-svg');
-  var chatBody=document.getElementById('st-chat-body');
-  var exploredEl=document.getElementById('st-explored');
-  var pathsEl=document.getElementById('st-paths');
-  var depthEl=document.getElementById('st-depth');
-
-  function updateCounters(){
-    exploredEl.textContent=explored.size;
-    pathsEl.textContent=pathCount;
-    var d=activeId?ancestors(activeId).length-1:0;
-    depthEl.textContent='depth '+d;
-  }
-
-  function computeViewBox(){
-    if(!activeId||!nodeMap[activeId]){tvbx=0;tvby=0;tvbw=800;tvbh=300;return;}
-    var pathIds=ancestors(activeId);
-    var nodes=pathIds.map(function(id){return nodeMap[id];}).filter(Boolean);
-    // Add siblings
-    var pid=findParent(TREE,activeId);
-    if(pid){
-      var pTree=null;
-      (function find(t){if(t.id===pid){pTree=t;return;}(t.children||[]).forEach(find);})(TREE);
-      if(pTree)(pTree.children||[]).forEach(function(c){if(nodeMap[c.id])nodes.push(nodeMap[c.id]);});
-    }
-    // Add children of current
-    var cur=nodeMap[activeId];
-    if(cur)cur.kids.forEach(function(c){if(nodeMap[c.id])nodes.push(nodeMap[c.id]);});
-    if(!nodes.length)return;
-    var xs=nodes.map(function(n){return n.x;}),ys=nodes.map(function(n){return n.y;});
-    var pad=100,pady=40;
-    tvbw=Math.max(Math.max.apply(null,xs)-Math.min.apply(null,xs)+pad*2,300);
-    tvbh=Math.max(Math.max.apply(null,ys)-Math.min.apply(null,ys)+pady*2,180);
-    tvbx=Math.min.apply(null,xs)-pad;
-    tvby=Math.min.apply(null,ys)-pady;
-  }
-
-  // Smooth viewBox animation
-  var vbAnim=null;
-  function animateViewBox(){
-    if(vbAnim)cancelAnimationFrame(vbAnim);
-    var sx=vbx,sy=vby,sw=vbw,sh=vbh,start=performance.now(),dur=600;
-    function tick(now){
-      var t=Math.min((now-start)/dur,1);
-      var e=t<0.5?2*t*t:-1+(4-2*t)*t;
-      vbx=sx+(tvbx-sx)*e;vby=sy+(tvby-sy)*e;vbw=sw+(tvbw-sw)*e;vbh=sh+(tvbh-sh)*e;
-      svg.setAttribute('viewBox',Math.round(vbx)+' '+Math.round(vby)+' '+Math.round(vbw)+' '+Math.round(vbh));
-      if(t<1)vbAnim=requestAnimationFrame(tick);
-    }
-    vbAnim=requestAnimationFrame(tick);
-  }
-
-  function renderTree(){
-    var ap=activeId?new Set(ancestors(activeId)):new Set();
-    var svgContent='<defs><filter id="stg6"><feGaussianBlur stdDeviation="6"/></filter></defs>';
-
-    // Grid dots
-    for(var gx=0;gx<40;gx++)for(var gy=0;gy<Math.ceil(400/22);gy++){
-      svgContent+='<circle cx="'+(gx*22+10)+'" cy="'+(gy*22+8)+'" r="0.25" fill="rgba(255,255,255,0.025)"/>';
-    }
-
-    // Edges
-    allNodes.forEach(function(n){
-      if(n.id==='root'||!revealed.has(n.id))return;
-      var pid=findParent(TREE,n.id);var pn=nodeMap[pid];
-      if(!pn||!revealed.has(pid))return;
-      var isAct=ap.has(n.id)&&ap.has(pid);
-      var isExp=explored.has(n.id)&&!isAct;
-      var col=n.role==='mgr'?MGR:YOU;
-      var y1=pn.y+12,y2=n.y-10,cp1y=pn.y+30,cp2y=n.y-30;
-      var path='M'+pn.x+','+y1+' C'+pn.x+','+cp1y+' '+n.x+','+cp2y+' '+n.x+','+y2;
-      if(isAct)svgContent+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="10" opacity="0.1" filter="url(#stg6)"/>';
-      svgContent+='<path d="'+path+'" fill="none" stroke="'+(isAct?col:isExp?col+'50':'rgba(255,255,255,0.18)')+'" stroke-width="'+(isAct?2.5:isExp?1.2:1)+'"'+(isAct||isExp?'':' stroke-dasharray="3,6"')+'/>';
-      if(isAct)svgContent+='<circle r="2" fill="'+col+'" opacity="0.8"><animateMotion dur="1.8s" repeatCount="indefinite" path="'+path+'"/></circle>';
-    });
-
-    // Nodes
-    allNodes.forEach(function(n){
-      if(!revealed.has(n.id))return;
-      var isAct=ap.has(n.id);var isCur=activeId===n.id;
-      var isExp=explored.has(n.id)&&!isAct;var isRoot=n.id==='root';
-      var isMgr=n.role==='mgr';var col=isRoot?'#fff':isMgr?MGR:YOU;
-      var op=isCur?1:isAct?1:isExp?0.65:0.8;
-      var bw=isRoot?120:isCur?86:72, bh=isRoot?24:20;
-
-      svgContent+='<g opacity="'+op+'">';
-      if(isCur){
-        svgContent+='<ellipse cx="'+n.x+'" cy="'+n.y+'" rx="'+(bw/2+18)+'" ry="'+(bh/2+14)+'" fill="'+col+'" opacity="0.03" filter="url(#stg6)"><animate attributeName="opacity" values="0.04;0.01;0.04" dur="3s" repeatCount="indefinite"/></ellipse>';
-      }
-      // Shadow
-      svgContent+='<rect x="'+(n.x-bw/2+1)+'" y="'+(n.y-bh/2+1.5)+'" width="'+bw+'" height="'+bh+'" rx="6" fill="rgba(0,0,0,0.3)" opacity="'+(isCur?0.5:0.15)+'"/>';
-      // Card
-      var fill=isCur?(isMgr?'rgba(0,196,160,0.18)':isRoot?'rgba(255,255,255,0.12)':'rgba(201,168,76,0.18)')
-        :isAct?(isMgr?'rgba(0,196,160,0.1)':'rgba(201,168,76,0.1)')
-        :isExp?(isMgr?'rgba(0,196,160,0.06)':'rgba(201,168,76,0.06)')
-        :'rgba(255,255,255,0.06)';
-      var stroke=isCur?col:isAct?col+'aa':isExp?col+'33':'rgba(255,255,255,0.12)';
-      var sw2=isCur?1.5:isAct?1:0.6;
-      svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="'+bw+'" height="'+bh+'" rx="6" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw2+'"/>';
-      // Accent bar
-      if(!isRoot&&(isAct||isCur||isExp)){
-        svgContent+='<rect x="'+(n.x-bw/2)+'" y="'+(n.y-bh/2)+'" width="2.5" height="'+bh+'" rx="1.2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.7:0.2)+'"/>';
-      }
-      // Role dot
-      if(!isRoot)svgContent+='<circle cx="'+(n.x-bw/2+9)+'" cy="'+n.y+'" r="2" fill="'+col+'" opacity="'+(isCur?1:isAct?0.8:0.7)+'"/>';
-      // Label
-      var txtFill=isCur?'#fff':isAct?'#ddd':isExp?'#aaa':'#aaa';
-      var fs=isRoot?7:5.2, fw=isCur?700:isAct?600:500;
-      var anchor=isRoot?'middle':'start', tx=isRoot?n.x:(n.x-bw/2+16);
-      var label=(n.short||'').substring(0,22);
-      svgContent+='<text x="'+tx+'" y="'+(n.y+1)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="'+txtFill+'" font-size="'+fs+'" font-weight="'+fw+'" font-family="DM Sans,system-ui,sans-serif">'+label+'</text>';
-      // Children badge
-      if(isCur&&n.kids.length>0&&!isRoot){
-        svgContent+='<rect x="'+(n.x+bw/2-16)+'" y="'+(n.y-bh/2-4)+'" width="14" height="10" rx="5" fill="'+col+'" opacity="0.85"/>';
-        svgContent+='<text x="'+(n.x+bw/2-9)+'" y="'+(n.y-bh/2+2)+'" text-anchor="middle" dominant-baseline="middle" fill="#000" font-size="5" font-weight="800" font-family="DM Sans,system-ui,sans-serif">'+n.kids.length+'</text>';
-      }
-      // Pulse ring
-      if(isCur&&!isRoot){
-        svgContent+='<rect x="'+(n.x-bw/2-2)+'" y="'+(n.y-bh/2-2)+'" width="'+(bw+4)+'" height="'+(bh+4)+'" rx="8" fill="none" stroke="'+col+'" stroke-width="0.6"><animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite"/></rect>';
-      }
-      svgContent+='</g>';
-    });
-
-    svg.innerHTML=svgContent;
-    computeViewBox();
-    animateViewBox();
-    updateCounters();
-  }
-
-  function addChatMsg(role,label){
-    // Remove placeholder
-    var ph=chatBody.querySelector('.st-chat-placeholder');if(ph)ph.remove();
-    // Keep last 5
-    while(chatBody.children.length>5)chatBody.removeChild(chatBody.firstChild);
-    if(role==='system'){
-      var d=document.createElement('div');d.className='st-sys';
-      d.innerHTML='<div class="st-sys-line"></div><span class="st-sys-text">'+label+'</span><div class="st-sys-line"></div>';
-      chatBody.appendChild(d);
-    }else{
-      var isMgr=role==='mgr';
-      var d=document.createElement('div');d.className='st-msg '+(isMgr?'mgr':'you');
-      d.innerHTML='<div class="st-msg-bubble"><div class="st-msg-role"><span class="st-msg-role-dot"></span>'+(isMgr?'Manager':'You')+'</div><div class="st-msg-text"></div></div>';
-      chatBody.appendChild(d);
-      // Type text
-      var txtEl=d.querySelector('.st-msg-text');
-      var clean=label.replace(/^"|"$/g,'');
-      var i=0,speed=Math.max(12,Math.min(25,500/clean.length));
-      var cursor=document.createElement('span');cursor.className='st-typing-cursor';
-      txtEl.appendChild(cursor);
-      var iv=setInterval(function(){
-        i++;txtEl.textContent=clean.substring(0,i);txtEl.appendChild(cursor);
-        if(i>=clean.length){clearInterval(iv);if(cursor.parentNode)cursor.remove();}
-      },speed);
-    }
-    chatBody.scrollTop=chatBody.scrollHeight;
-  }
-
-  // Animation runner
-  function runScript(){
-    var idx=scriptIdx%SCRIPT.length;
-    var a=SCRIPT[idx];scriptIdx++;
-    if(a.act==='pause'){timer=setTimeout(runScript,a.ms);}
-    else if(a.act==='reveal'){a.ids.forEach(function(id){revealed.add(id);});renderTree();timer=setTimeout(runScript,a.ms);}
-    else if(a.act==='stagger'){
-      var i=0;
-      function next(){if(i>=a.ids.length){timer=setTimeout(runScript,150);return;}
-        revealed.add(a.ids[i]);renderTree();i++;timer=setTimeout(next,a.ms);}
-      next();
-    }
-    else if(a.act==='walk'){
-      activeId=a.id;explored.add(a.id);renderTree();
-      var n=nodeMap[a.id];if(n)addChatMsg(n.role,n.label);
-      timer=setTimeout(runScript,a.ms);
-    }
-    else if(a.act==='backto'){
-      activeId=a.id;pathCount++;renderTree();
-      addChatMsg('system','← trying a different path');
-      timer=setTimeout(runScript,a.ms);
-    }
-    else if(a.act==='reset'){
-      revealed=new Set();explored=new Set();activeId=null;pathCount=0;
-      chatBody.innerHTML='<div class="st-chat-placeholder">The conversation unfolds as paths are explored...</div>';
-      renderTree();timer=setTimeout(runScript,a.ms);
-    }
-  }
-
-  // Start when visible
-  var stEl=document.getElementById('scenario-tree');
-  if('IntersectionObserver' in window && stEl){
-    var obs=new IntersectionObserver(function(entries){
-      if(entries[0].isIntersecting){obs.disconnect();renderTree();timer=setTimeout(runScript,600);}
-    },{threshold:0.2});
-    obs.observe(stEl);
-  }else if(stEl){
-    renderTree();timer=setTimeout(runScript,600);
-  }
-})();
-
-
 </script>
 
 <!-- FAQ Schema (structured data for Google) -->
