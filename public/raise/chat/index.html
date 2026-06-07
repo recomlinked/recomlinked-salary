@@ -7615,10 +7615,12 @@ async function init() {
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
     if (_stalePaid) { state.paid = true; if (_staleToken) state.paid_token = _staleToken; }
     else if (!state.paid) await silentTokenCheck();
-  } else if (saved && saved.profile && saved.current_exchange > 0) {
-    const _wasPaid = state.paid; // preserve token-verified paid status
+  } else if (saved && (saved.current_exchange === 10 || (saved.profile && saved.current_exchange > 0))) {
+    // Resume: Path B sim users (current_exchange=10, no profile object)
+    // OR Path A users (have profile + exchange > 0)
+    const _wasPaid = state.paid;
     Object.assign(state, saved);
-    if (_wasPaid || saved.paid) state.paid = true; // respect both token check and saved paid flag
+    if (_wasPaid || saved.paid) state.paid = true;
     if (!state.paid) await silentTokenCheck();
     await resumeFromState();
     return;
