@@ -5384,6 +5384,64 @@ function initDiscoveryMode(container) {
       var successBubble = el('div', 'coach-msg', '');
       successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Raise Negotiation Plan</strong> is ready. All sections are unlocked \u2014 opening script, pushback responses, meeting email, and raise case brief. Download your full PDF anytime.</p></div>';
       chatArea.appendChild(successBubble);
+
+      // Check if we only have hooks (short content) — re-fire strategy immediately
+      var _hasFullPlan = discCanvasBlocks.opening_script && discCanvasBlocks.opening_script.filled &&
+                         (discCanvasBlocks.opening_script.insight || '').length > 200;
+      if (!_hasFullPlan) {
+        // Set loading flags FIRST so canvas shows "Loading your plan..." not "Will fill after..."
+        discStrategyDone = true;
+        discPlanLoading = true;
+        // Mark strategy blocks as unfilled so they show loading state
+        var _stratKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+        _stratKeys.forEach(function(k) { if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; } });
+        // Render canvas with loading state immediately
+        var _lc = $('disc-canvas-live');
+        if (_lc) setCanvasHTML(_lc);
+
+        var _bc2 = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'no_script';
+        var _ans2 = {};
+        if (discOrderedQuestions && discOrderedQuestions.length > 0) {
+          discOrderedQuestions.slice(0, 5).forEach(function(q) { _ans2[q.dimTag] = SIM_STATE.context[q.id] || ''; });
+        }
+        var _base = { mode: 'disc_insights', blocker: _bc2, answers: _ans2, dims: discDims, levers: discLevers, weaks: discWeaks };
+        var _posKeys = ['evidence','timing','manager','company','market'];
+        var _done = 0;
+
+        function _applyAndRender(data) {
+          if (!data || !data.insights) return;
+          Object.keys(data.insights).forEach(function(dim) {
+            if (discCanvasBlocks[dim] !== undefined) {
+              discCanvasBlocks[dim].insight = data.insights[dim];
+              discCanvasBlocks[dim].filled  = true;
+              discCanvasBlocks[dim].teaser  = false;
+              if (_posKeys.indexOf(dim) >= 0) {
+                var sc = discDims && discDims[dim] ? discDims[dim] : 50;
+                discCanvasBlocks[dim].strength = sc >= 60 ? 'strong' : sc < 40 ? 'weak' : 'neutral';
+              }
+            }
+          });
+          _done++;
+          // Only clear loading after BOTH calls complete
+          if (_done >= 2) discPlanLoading = false;
+          var lc2 = $('disc-canvas-live');
+          if (lc2) {
+            setCanvasHTML(lc2);
+            if (_done >= 2) {
+              lc2.querySelectorAll('[data-expanded="0"][onclick*="togglePosBlock"]').forEach(function(el) {
+                var m = el.getAttribute('onclick').match(/togglePosBlock\(this,'(\w+)'\)/);
+                if (m) togglePosBlock(el, m[1]);
+              });
+              try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
+            }
+          }
+        }
+
+        fetch('/api/raise-coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({}, _base, { part: 'strategy_position' })) })
+          .then(function(r) { return r.json(); }).then(_applyAndRender).catch(function() { _done++; });
+        fetch('/api/raise-coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({}, _base, { part: 'strategy_plan' })) })
+          .then(function(r) { return r.json(); }).then(_applyAndRender).catch(function() { _done++; });
+      }
     } else {
       showDiscPaywall();
     }
@@ -7630,8 +7688,16 @@ async function init() {
     const _wasPaid = state.paid;
     Object.assign(state, saved);
     if (_wasPaid || saved.paid) state.paid = true;
-    // Paid users: clear paywall_shown from free session so plan renders fully
-    if (state.paid) state.paywall_shown = false;
+    // Paid users: clear paywall_shown and teaser flags from free session
+    if (state.paid) {
+      state.paywall_shown = false;
+      // Strip teaser flags so paid users see full content not hooks
+      if (state.discovery && state.discovery.canvasBlocks) {
+        Object.values(state.discovery.canvasBlocks).forEach(function(b) {
+          if (b) b.teaser = false;
+        });
+      }
+    }
     if (!state.paid) await silentTokenCheck();
     await resumeFromState();
     return;
