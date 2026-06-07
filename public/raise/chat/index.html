@@ -930,7 +930,6 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   <a href="/raise/" class="logo-wrap"><span class="logo-r">Recom</span><span class="logo-l">linked</span></a>
 </header>
 
-
 <!-- Mode navigation — standalone, outside bottom-panel so dimmed state never affects it -->
 <div id="mode-nav" style="display:none;padding:5px 16px;background:var(--bg);">
   <div style="display:flex;justify-content:center;width:100%;">
@@ -975,6 +974,12 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   </button>
 </div>
   </div>
+</div>
+
+<!-- Recovery toast — only shown when prior paid session token is now invalid -->
+<div id="recovery-banner" style="display:none;margin:8px 16px 0;background:#fff3cd;border:1px solid #f0c040;border-radius:10px;padding:10px 14px;font-size:12px;color:#7a5800;text-align:center;max-width:700px;margin-left:auto;margin-right:auto;">
+  Lost your session? Check your email for the access link, or
+  <a href="/raise/enter/" style="color:#7a5800;font-weight:700;text-decoration:underline;">recover access here →</a>
 </div>
 
 <div class="page-wrap">
@@ -7553,9 +7558,29 @@ async function init() {
   async function silentTokenCheck() {
     try {
       var _t = localStorage.getItem('rl_raise_access_token');
-      if (!_t) return;
+      // Only show recovery banner if the user previously had a paid session
+      // (saved state has paid:true) but token is now missing or invalid.
+      var _hadPaidState = false;
+      try {
+        var _ls = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+        _hadPaidState = !!(_ls.paid || _ls.paid_token || _ls.paid_at);
+      } catch(e) {}
+
+      if (!_t) {
+        if (_hadPaidState) {
+          var _rb = document.getElementById('recovery-banner');
+          if (_rb) _rb.style.display = '';
+        }
+        return;
+      }
       var _r = await fetch('/api/raise-verify?token=' + encodeURIComponent(_t));
-      if (!_r.ok) return;
+      if (!_r.ok) {
+        if (_hadPaidState) {
+          var _rb = document.getElementById('recovery-banner');
+          if (_rb) _rb.style.display = '';
+        }
+        return;
+      }
       var _d = await _r.json();
       if (_d && _d.valid && _d.profile) {
         state.paid = true;
@@ -7703,7 +7728,7 @@ async function resumeFromState() {
     unlockModeToggle();
 
     // Free users go to Canvas mode; paid users resume in Practice
-    // Coach landing page (start=sim) opens simulation directly
+    // Respect entryMode from URL param (plan/sim/coach from paid page)
     if (SIM_STATE.entryMode === 'sim') {
       setMode('sim');
     } else if (SIM_STATE.entryMode === 'coach') {
@@ -7711,7 +7736,8 @@ async function resumeFromState() {
     } else if (!state.paid) {
       setMode('discovery');
     } else {
-      setMode('sim');
+      // Default for paid users with existing session: discovery (Plan mode)
+      setMode('discovery');
     }
 
     // Repopulate coaching mode — replay saved messages if available, else show welcome
@@ -7767,13 +7793,22 @@ async function resumeFromState() {
     }
   } else {
     // Unknown resume state.
-    // Paid users start fresh in the chat — show Plan mode with full access.
+    // Paid users start fresh — respect entryMode from URL param.
     if (state.paid) {
       showToolbar();
       showModeToggle();
       unlockModeToggle();
       var _bp3 = $('bottom-panel'); if (_bp3) _bp3.classList.remove('dimmed');
-      beginSimulationFlow(state.sim_reason || 'other');
+      if (SIM_STATE.entryMode === 'coach') {
+        beginSimulationFlow(state.sim_reason || 'other');
+        setMode('coach');
+      } else if (SIM_STATE.entryMode === 'sim') {
+        beginSimulationFlow(state.sim_reason || 'other');
+      } else {
+        // Plan mode (default for paid users)
+        beginSimulationFlow(state.sim_reason || 'other');
+        setMode('discovery');
+      }
     } else {
       window.location.replace('/raise/');
     }
