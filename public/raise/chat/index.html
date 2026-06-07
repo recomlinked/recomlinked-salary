@@ -7750,11 +7750,13 @@ async function resumeFromState() {
       return;
     }
 
-    // Replay previous simulation conversation in the practice tab
+    var _hasHistory = state.sim_conversation && state.sim_conversation.length > 0;
     var _practiceContainer = $('practice-messages') || $('messages');
-    if (state.sim_conversation && state.sim_conversation.length > 0) {
+
+    if (_hasHistory) {
+      // ── Has prior practice: replay history then continue ──────────────────
       var _resumeNote = el('div', 'coach-msg', '');
-      _resumeNote.innerHTML = '<div class="bubble" style="opacity:0.6;font-size:12px;"><p>Continuing your practice session:</p></div>';
+      _resumeNote.innerHTML = '<div class="bubble" style="opacity:0.6;font-size:12px;"><p>Continuing your practice session…</p></div>';
       _practiceContainer.appendChild(_resumeNote);
       state.sim_conversation.forEach(function(turn) {
         if (turn.role === 'user') {
@@ -7763,69 +7765,66 @@ async function resumeFromState() {
           _practiceContainer.appendChild(_ub);
         } else if (turn.role === 'manager') {
           var _mb = el('div', 'coach-msg', '');
-          _mb.innerHTML = '<div class="bubble"><span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span><p>\u201c' + escapeHtml(turn.text) + '\u201d</p></div>';
+          _mb.innerHTML = '<div class="bubble"><span class="sim-mgr-label"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Manager</span><p>“' + escapeHtml(turn.text) + '”</p></div>';
           _practiceContainer.appendChild(_mb);
         }
       });
-    }
 
-    // Default: open sim mode (or discovery for free users)
-    if (!state.paid) {
-      setMode('discovery');
-    } else {
-      setMode('sim');
-    }
+      // Reset button at the bottom of history
+      var _resetWrap = el('div', 'coach-msg', '');
+      _resetWrap.innerHTML = '<div style="text-align:center;padding:8px 0;"><button onclick="startOverSession()" style="background:none;border:1px solid var(--divider);border-radius:8px;padding:6px 14px;font-size:11px;color:var(--t3);cursor:pointer;font-family:var(--sans);">Start over →</button></div>';
+      _practiceContainer.appendChild(_resetWrap);
 
-    // Repopulate coaching mode — replay saved messages if available, else show welcome
-    const coachingEl = $('coaching-messages');
-    if (coachingEl) {
-      if (state.coaching_log && state.coaching_log.length > 0) {
-        // Replay saved coaching messages
-        coachingEl.innerHTML = '';
-        state.coaching_log.forEach(function(msg) {
-          if (msg.text) {
-            const wrap = el('div', 'coach-msg', '');
-            wrap.innerHTML = '<div class="bubble"><p>' + escapeHtml(msg.text) + '</p></div>';
-            coachingEl.appendChild(wrap);
-          }
-        });
-        coachingMessages = state.coaching_log.slice();
+      // Show coaching content
+      var _cEl = $('coaching-messages');
+      if (_cEl) {
+        if (state.coaching_log && state.coaching_log.length > 0) {
+          _cEl.innerHTML = '';
+          state.coaching_log.forEach(function(msg) {
+            if (msg.text) {
+              var w = el('div', 'coach-msg', '');
+              w.innerHTML = '<div class="bubble"><p>' + escapeHtml(msg.text) + '</p></div>';
+              _cEl.appendChild(w);
+            }
+          });
+          coachingMessages = state.coaching_log.slice();
+        } else {
+          var w = el('div', 'coach-msg', '');
+          w.innerHTML = '<div class="bubble"><p>' + escapeHtml(getCoachingWelcome(blocker.code)) + '</p></div>';
+          _cEl.appendChild(w);
+        }
+      }
+
+      // Default: open sim mode (or discovery for free users)
+      if (!state.paid) { setMode('discovery'); } else { setMode('sim'); }
+
+      // Load next scenario pills to continue
+      if (!state.paywall_shown) {
+        disableInput('Loading scenarios…');
+        showCoachTyping();
+        try {
+          var _r2 = await fetch('/api/raise-coach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mode: 'simulate_scenarios', blocker: blocker, context: SIM_STATE.context, session_id: profileHash() }),
+          });
+          var _d2 = await _r2.json();
+          hideCoachTyping();
+          renderScenarioLabels((_d2.scenarios && _d2.scenarios.length >= 2) ? _d2.scenarios : getDefaultScenarios(blocker.code));
+          showCoachPreviewCard('opening_picked', { theme: '' });
+        } catch(e) {
+          hideCoachTyping();
+          renderScenarioLabels(getDefaultScenarios(blocker.code));
+        }
       } else {
-        // No saved coaching — show welcome
-        const welcomeText = getCoachingWelcome(blocker.code);
-        const wrap = el('div', 'coach-msg', '');
-        wrap.innerHTML = '<div class="bubble"><p>' + escapeHtml(welcomeText) + '</p></div>';
-        coachingEl.appendChild(wrap);
+        disableInput('');
       }
-    }
 
-    if (state.paywall_shown) {
-        enableInput('Ask your coach anything\u2026');
-      disableInput('');
     } else {
-      // Re-enter simulation — show scenario pills without re-typing intro
-      disableInput('Loading scenarios\u2026');
-      showCoachTyping();
-      try {
-        const res2 = await fetch('/api/raise-coach', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mode: 'simulate_scenarios',
-            blocker: blocker,
-            context: SIM_STATE.context,
-            session_id: profileHash(),
-          }),
-        });
-        const data2 = await res2.json();
-        hideCoachTyping();
-        renderScenarioLabels((data2.scenarios && data2.scenarios.length >= 2) ? data2.scenarios : getDefaultScenarios(blocker.code));
-        // Show coach insight card after pills
-        showCoachPreviewCard('opening_picked', { theme: '' });
-      } catch (e) {
-        hideCoachTyping();
-        renderScenarioLabels(getDefaultScenarios(blocker.code));
-      }
+      // ── No history: fresh sim start — show opening chips ──────────────────
+      // Use beginSimulationFlow which naturally renders the intro + opening chips
+      setMode('sim');
+      await beginSimulationFlow(reason);
     }
   } else {
     // Unknown resume state.
