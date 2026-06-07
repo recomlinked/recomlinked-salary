@@ -1233,11 +1233,10 @@ const state = {
   profile: null,
   initial_floor: null,
   current_range: null,
-  current_exchange: 0,          // 0 = pre-analyze, 10 = simulation active, 5 = paywall shown
-  accumulated: {},              // { ex1: {...}, ex2: {...} }
+  current_exchange: 0,          // 0 = no session, 10 = simulation session active
   chat_log: [],                 // array of log entries — drives transcript replay on refresh
   timing: null,                 // 'this_week' | 'few_weeks' | 'this_quarter' | 'exploring'
-  obstacle: null,               // { code, label, free_text?, coach_line? } — composes paywall copy
+  blocker: null,                // { code, label, free_text?, coach_line? } — the user's focus area
   saved_at: null,               // ms timestamp — used for 24h staleness check
   paywall_shown: false,         // whether the main paywall bubble has been rendered
 };
@@ -1315,7 +1314,7 @@ function loadState() {
     const raw = localStorage.getItem(LS_STATE);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    console.log('[loadState] exchange:', parsed.current_exchange, 'chat_log:', parsed.chat_log?.length, 'paywall_shown:', parsed.paywall_shown);
+    console.log('[loadState] stage:', parsed.current_exchange, 'chat_log:', parsed.chat_log?.length, 'paywall_shown:', parsed.paywall_shown);
     return parsed;
   } catch (e) { return null; }
 }
@@ -1410,10 +1409,7 @@ function profileHash() {
   if (state.sim_session_id) return state.sim_session_id;
 
   const p = state.profile || {};
-  const ex = state.accumulated || {};
-  const s = `${p.country}|${p.company_situation}|${p.last_raise}|${p.seniority}|${p.company_size}`
-          + `|${ex.ex1?.signal || ''}|${ex.ex2?.signal || ''}`
-          + `|${ex.ex3?.signal || ''}|${state.obstacle?.code || ''}`;
+  const s = state.sim_session_id || `${state.sim_reason || 'other'}|${state.blocker?.code || ''}`;
   try {
     return btoa(unescape(encodeURIComponent(s))).replace(/[^a-zA-Z0-9]/g, '').slice(0, 40);
   } catch (e) {
@@ -1427,7 +1423,7 @@ function profileHash() {
 //   'coach_bubble'    { text }
 //   'user_bubble'     { text }
 //   'score_card'      { range, reason_line, stage }
-//   'paywall'         — rendered from state.obstacle + current_range
+//   'paywall'         — rendered from state.blocker + current_range
 //   'obstacle_q'      — triggers obstacle-question render
 function logEntry(type, payload) {
   if (!state.chat_log) state.chat_log = [];
@@ -3755,7 +3751,6 @@ function showModeToggle() {
 }
 
 function unlockModeToggle() {
-  SIM_STATE.unlocked = true;
   var nav = $('mode-nav');
   if (nav) { nav.style.display = 'flex'; nav.style.alignItems = 'center'; nav.style.justifyContent = 'center'; }
   updateModeToggleUI();
@@ -3820,7 +3815,7 @@ async function beginSimulationFlow(reasonParam) {
   // If user already hit the paywall in a previous session,
   // go straight to Canvas mode with locked Practice/Coaching.
   if (state.paywall_shown && !state.paid) {
-    state.obstacle = blocker;
+    state.blocker = blocker;
     state.current_exchange = 10;
     state.sim_reason = reasonParam;
     state.sim_session_id = 'simB_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
@@ -3841,7 +3836,7 @@ async function beginSimulationFlow(reasonParam) {
   }
 
   state.profile = { country: 'us', company_situation: 'stable', last_raise: '1_2_years', seniority: 'mid', company_size: '250_1000' };
-  state.obstacle = blocker;
+  state.blocker = blocker;
   state.chat_log = [];
   state.current_exchange = 10;
   state.sim_reason = reasonParam;
@@ -7704,7 +7699,7 @@ async function resumeFromState() {
       // Legacy entry type (pre-v3) — reason is now inside the score card.
       // Ignore silently during replay; the card above will already show it.
     } else if (entry.type === 'paywall') {
-      // Paywall rendered from state.obstacle + state.current_range
+      // Paywall rendered from state.blocker + state.current_range
       // No promo
       renderPaywallBubble({ discounted: false });
     }
@@ -7874,8 +7869,8 @@ async function resumeFromState() {
 function fireEnrichment() {
   const body = {
     profile:      state.profile,
-    exchanges:    state.accumulated,
-    obstacle:     state.obstacle,
+    exchanges:    null,
+    obstacle:     state.blocker,
     timing:       state.timing || 'exploring',
     final_range:  state.current_range,
     profile_hash: profileHash(),
@@ -7898,7 +7893,7 @@ async function startCheckout(selectedPrice) {
         product: 'raise', value: checkoutPrice, currency: 'USD', transport_type: 'beacon',
         final_floor: (state && state.current_range) ? state.current_range.floor : null,
         final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
-        obstacle_code: (state && state.obstacle && state.obstacle.code) || '',
+        obstacle_code: (state && state.blocker && state.blocker.code) || '',
         promo_code: '',
       });
     }
@@ -7940,7 +7935,7 @@ async function startCheckout(selectedPrice) {
       company_size: 'unknown',
     };
     const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
-    const checkoutObstacle = state.obstacle || SIM_STATE.blocker || { code: 'other', label: 'Other' };
+    const checkoutObstacle = state.blocker || SIM_STATE.blocker || { code: 'other', label: 'Other' };
 
     // Always fire full strategy generation on checkout — replaces the lighter teasers
     // with full content so when user returns from Stripe, they see the real plan
