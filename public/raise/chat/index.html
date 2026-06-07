@@ -1282,6 +1282,14 @@ function saveState() {
     if (typeof simConversation !== 'undefined' && simConversation.length > 0) {
       state.sim_conversation = simConversation.slice(-30); // keep last 30 turns
     }
+    // Persist coaching messages so they survive refresh
+    if (typeof coachingMessages !== 'undefined' && coachingMessages.length > 0) {
+      state.coaching_log = coachingMessages.slice(-50);
+    }
+    // Persist case state snapshot
+    if (typeof caseState !== 'undefined' && caseState.currentQ > 0) {
+      state.case_state_snapshot = caseState;
+    }
     state.saved_at = Date.now();
     const json = JSON.stringify(state);
     // Guard: if state is too large (>4MB), trim chat_log to last 50 entries
@@ -1378,7 +1386,13 @@ function startOverSession(msg) {
     if (_isPaid) { freshState.paid = true; if (_token) freshState.paid_token = _token; }
     localStorage.setItem(LS_STATE, JSON.stringify(freshState));
   } catch(e) {}
-  window.location.replace('/raise/');
+  // Paid users go directly to chat with reset flag — no landing page redirect
+  // which would strip their paid status and treat them as free users
+  if (state && state.paid) {
+    window.location.replace('/raise/chat/?reason=other&reset=1');
+  } else {
+    window.location.replace('/raise/');
+  }
 }
 
 function profileHash() {
@@ -7481,15 +7495,13 @@ async function init() {
   }
 
   if (reason) {
-    // Paid users with an existing session skip the fresh-start flow (resume instead).
-    // Paid users WITHOUT a session (just started over) should continue normally.
-    try {
-      var _existingSession = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
-      var _hasSession = !!(_existingSession.current_exchange > 0 || _existingSession.chat_log && _existingSession.chat_log.length > 0);
-      if (state.paid && !forceReset && _hasSession) {
-        reason = null; // fall through to resume
-      }
-    } catch(e) {}
+    // Paid users always skip the fresh-start flow and resume their session.
+    // Exception: ?reset=1 forces a fresh start even for paid users.
+    // A paid user with no prior session (just paid) will fall through to
+    // resumeFromState() which handles the empty-state case gracefully.
+    if (state.paid && !forceReset) {
+      reason = null; // fall through to resume
+    }
   }
 
   if (reason) {
@@ -7573,6 +7585,18 @@ async function init() {
     } else if (!state.paid) {
       await silentTokenCheck();
     }
+  }
+
+  // Paid users with no prior session: show Plan mode with full access
+  // (they just paid — start fresh but with all modes unlocked)
+  if (state.paid) {
+    stopThinkingAnimation();
+    showToolbar();
+    showModeToggle();
+    unlockModeToggle();
+    var _bp = $('bottom-panel'); if (_bp) _bp.classList.remove('dimmed');
+    beginSimulationFlow('other');
+    return;
   }
 
   // Path A removed — no assessment profile flow.
@@ -7687,14 +7711,27 @@ async function resumeFromState() {
       setMode('sim');
     }
 
-    // Repopulate coaching mode with welcome + video
-    // addCoachingVideo(blocker.code); // REMOVED — videos dropped conversion
-    const welcomeText = getCoachingWelcome(blocker.code);
+    // Repopulate coaching mode — replay saved messages if available, else show welcome
     const coachingEl = $('coaching-messages');
     if (coachingEl) {
-      const wrap = el('div', 'coach-msg', '');
-      wrap.innerHTML = `<div class="bubble"><p>${escapeHtml(welcomeText)}</p></div>`;
-      coachingEl.appendChild(wrap);
+      if (state.coaching_log && state.coaching_log.length > 0) {
+        // Replay saved coaching messages
+        coachingEl.innerHTML = '';
+        state.coaching_log.forEach(function(msg) {
+          if (msg.text) {
+            const wrap = el('div', 'coach-msg', '');
+            wrap.innerHTML = '<div class="bubble"><p>' + escapeHtml(msg.text) + '</p></div>';
+            coachingEl.appendChild(wrap);
+          }
+        });
+        coachingMessages = state.coaching_log.slice();
+      } else {
+        // No saved coaching — show welcome
+        const welcomeText = getCoachingWelcome(blocker.code);
+        const wrap = el('div', 'coach-msg', '');
+        wrap.innerHTML = '<div class="bubble"><p>' + escapeHtml(welcomeText) + '</p></div>';
+        coachingEl.appendChild(wrap);
+      }
     }
 
     if (state.paywall_shown) {
@@ -7726,8 +7763,17 @@ async function resumeFromState() {
       }
     }
   } else {
-    // Unknown resume state — redirect to landing
-    window.location.replace('/raise/');
+    // Unknown resume state.
+    // Paid users start fresh in the chat — show Plan mode with full access.
+    if (state.paid) {
+      showToolbar();
+      showModeToggle();
+      unlockModeToggle();
+      var _bp3 = $('bottom-panel'); if (_bp3) _bp3.classList.remove('dimmed');
+      beginSimulationFlow(state.sim_reason || 'other');
+    } else {
+      window.location.replace('/raise/');
+    }
   }
 }
 
