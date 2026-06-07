@@ -5817,70 +5817,108 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // API call: hooks for free users, full strategy for paid users
+  // API call: paid users fire strategy_plan + strategy_position in parallel
+  // Free users fire hooks only
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, 5).forEach(function(q) {
     answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
 
-  var apiBody = {
+  var baseBody = {
     mode: 'disc_insights',
     blocker: blockerCode,
     answers: answers,
     dims: discDims,
     levers: discLevers,
     weaks: discWeaks,
-    part: state.paid ? 'strategy' : 'hooks',
   };
 
-  console.log('[disc_insights] Sending', apiBody.part, ':', JSON.stringify({ blocker: blockerCode, answers: answers }));
+  console.log('[disc_insights] Sending', state.paid ? 'strategy (parallel)' : 'hooks', JSON.stringify({ blocker: blockerCode }));
+
+  function applyInsights(insights, isPlanSection) {
+    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+    var positionKeys  = ['evidence','timing','manager','company','market'];
+    Object.keys(insights).forEach(function(dim) {
+      if (discCanvasBlocks[dim] !== undefined) {
+        discCanvasBlocks[dim].insight = insights[dim];
+        discInsights[dim] = insights[dim];
+        if (stratPlanKeys.indexOf(dim) >= 0) {
+          discCanvasBlocks[dim].filled   = true;
+          discCanvasBlocks[dim].teaser   = !state.paid;
+          discCanvasBlocks[dim].strength = 'plan';
+        } else if (positionKeys.indexOf(dim) >= 0) {
+          discCanvasBlocks[dim].filled = true;
+          var score = discDims && discDims[dim] ? discDims[dim] : 50;
+          discCanvasBlocks[dim].strength = score >= 60 ? 'strong' : score < 40 ? 'weak' : 'neutral';
+        }
+      }
+    });
+  }
 
   try {
-    var resp = await fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(apiBody),
-    });
-    var data = await resp.json();
-    console.log('[disc_insights] Response:', JSON.stringify(data).slice(0, 200));
-
-    if (data && data.insights && Object.keys(data.insights).length > 0) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
-      var positionKeys  = ['evidence','timing','manager','company','market'];
-      Object.keys(data.insights).forEach(function(dim) {
-        if (discCanvasBlocks[dim] !== undefined) {
-          discCanvasBlocks[dim].insight = data.insights[dim];
-          discInsights[dim] = data.insights[dim];
-          if (stratPlanKeys.indexOf(dim) >= 0) {
-            discCanvasBlocks[dim].filled  = true;
-            discCanvasBlocks[dim].teaser  = !state.paid;
-            discCanvasBlocks[dim].strength = 'plan';
-          } else if (positionKeys.indexOf(dim) >= 0) {
-            discCanvasBlocks[dim].filled = true;
-            // Set strength from dims scores
-            var score = discDims && discDims[dim] ? discDims[dim] : 50;
-            discCanvasBlocks[dim].strength = score >= 60 ? 'strong' : score < 40 ? 'weak' : 'neutral';
-          }
-        }
+    if (state.paid) {
+      // Fire both in parallel — position is fast (~2s), plan is heavy (~15s)
+      var planFetch = fetch('/api/raise-coach', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({}, baseBody, { part: 'strategy_plan' })),
       });
+      var posFetch = fetch('/api/raise-coach', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({}, baseBody, { part: 'strategy_position' })),
+      });
+
+      // Remove loading spinner as soon as position returns
+      var posResp = await posFetch;
+      var posData = await posResp.json();
+      console.log('[disc_insights] Position response:', JSON.stringify(posData).slice(0, 200));
+      if (posData && posData.insights) applyInsights(posData.insights, false);
+
+      var loading = $('disc-loading');
+      if (loading) { if (loading._arcStop) loading._arcStop(); if (loading._phraseStop) loading._phraseStop(); loading.remove(); }
+      discStrategyLoading = false;
+      discStrategyDone = true;
+      var liveCanvas = $('disc-canvas-live');
+      if (liveCanvas) setCanvasHTML(liveCanvas);
+
+      // Plan sections fill in when ready
+      var planResp = await planFetch;
+      var planData = await planResp.json();
+      console.log('[disc_insights] Plan response:', JSON.stringify(planData).slice(0, 200));
+      if (planData && planData.insights) {
+        applyInsights(planData.insights, true);
+        var lc2 = $('disc-canvas-live');
+        if (lc2) setCanvasHTML(lc2);
+        try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
+      }
+
+    } else {
+      // Free users: hooks only
+      var resp = await fetch('/api/raise-coach', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({}, baseBody, { part: 'hooks' })),
+      });
+      var data = await resp.json();
+      console.log('[disc_insights] Hooks response:', JSON.stringify(data).slice(0, 200));
+      if (data && data.insights) applyInsights(data.insights, false);
+
+      var loading = $('disc-loading');
+      if (loading) { if (loading._arcStop) loading._arcStop(); if (loading._phraseStop) loading._phraseStop(); loading.remove(); }
+      discStrategyLoading = false;
+      discStrategyDone = true;
+      var liveCanvas = $('disc-canvas-live');
+      if (liveCanvas) setCanvasHTML(liveCanvas);
     }
   } catch (e) {
     console.error('[disc_insights] API error:', e);
+    var loading = $('disc-loading');
+    if (loading) { if (loading._arcStop) loading._arcStop(); if (loading._phraseStop) loading._phraseStop(); loading.remove(); }
     if (!state.paid) generateClientFallbacks();
+    discStrategyLoading = false;
+    discStrategyDone = true;
+    var liveCanvas = $('disc-canvas-live');
+    if (liveCanvas) setCanvasHTML(liveCanvas);
   }
-
-  // Remove loading spinner and render canvas
-  var loading = $('disc-loading');
-  if (loading) {
-    if (loading._arcStop) loading._arcStop();
-    if (loading._phraseStop) loading._phraseStop();
-    loading.remove();
-  }
-  discStrategyLoading = false;
-  discStrategyDone = true;
-  var liveCanvas = $('disc-canvas-live');
-  if (liveCanvas) setCanvasHTML(liveCanvas);
 
   // Save all insights
   try {
@@ -7927,19 +7965,21 @@ async function startCheckout(selectedPrice) {
         dims: discDims,
         levers: discLevers,
         weaks: discWeaks,
-        part: 'strategy',
+        part: 'strategy_plan',
         tailor: {
           role_change:      tailorAnswers && tailorAnswers.role_change      || '',
           manager_reaction: tailorAnswers && tailorAnswers.manager_reaction || '',
           timing:           tailorAnswers && tailorAnswers.timing           || '',
         },
       };
-      // Fire and forget — don't await, Stripe redirect takes priority
-      fetch('/api/raise-coach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(enrichedBody),
-      }).then(function(r) { return r.json(); }).then(function(data) {
+      var enrichedPosBody = Object.assign({}, enrichedBody, { part: 'strategy_position' });
+      // Fire both in parallel — fire and forget before Stripe redirect
+      [enrichedBody, enrichedPosBody].forEach(function(body) {
+        fetch('/api/raise-coach', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
           var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
@@ -7959,7 +7999,8 @@ async function startCheckout(selectedPrice) {
           } catch(e) {}
         }
       }).catch(function() { /* non-fatal */ });
-    }
+      }); // end forEach
+    } // end block scope
 
     const res = await fetch(API_CHECKOUT, {
       method: 'POST',
