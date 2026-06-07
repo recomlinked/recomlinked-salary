@@ -7711,6 +7711,37 @@ async function resumeFromState() {
     SIM_STATE.branch_history = state.sim_branch_history || [];
     if (state.sim_conversation) simConversation = state.sim_conversation;
 
+    showToolbar();
+    showModeToggle();
+    unlockModeToggle();
+
+    // If user arrived from paid page with an explicit non-sim mode,
+    // skip the sim engine entirely and just open the requested mode.
+    const _requestedMode = SIM_STATE.entryMode;
+    if (_requestedMode === 'discovery' || _requestedMode === 'coach') {
+      // Restore coaching content
+      const _cEl = $('coaching-messages');
+      if (_cEl) {
+        if (state.coaching_log && state.coaching_log.length > 0) {
+          _cEl.innerHTML = '';
+          state.coaching_log.forEach(function(msg) {
+            if (msg.text) {
+              const w = el('div', 'coach-msg', '');
+              w.innerHTML = '<div class="bubble"><p>' + escapeHtml(msg.text) + '</p></div>';
+              _cEl.appendChild(w);
+            }
+          });
+          coachingMessages = state.coaching_log.slice();
+        } else {
+          const w = el('div', 'coach-msg', '');
+          w.innerHTML = '<div class="bubble"><p>' + escapeHtml(getCoachingWelcome(blocker.code)) + '</p></div>';
+          _cEl.appendChild(w);
+        }
+      }
+      setMode(_requestedMode === 'coach' ? 'coach' : 'discovery');
+      return;
+    }
+
     // Replay previous simulation conversation in the practice tab
     var _practiceContainer = $('practice-messages') || $('messages');
     if (state.sim_conversation && state.sim_conversation.length > 0) {
@@ -7729,21 +7760,12 @@ async function resumeFromState() {
         }
       });
     }
-    showToolbar();
-    showModeToggle();
-    unlockModeToggle();
 
-    // Free users go to Canvas mode; paid users resume in Practice
-    // Respect entryMode from URL param (plan/sim/coach from paid page)
-    if (SIM_STATE.entryMode === 'sim') {
-      setMode('sim');
-    } else if (SIM_STATE.entryMode === 'coach') {
-      setMode('coach');
-    } else if (!state.paid) {
+    // Default: open sim mode (or discovery for free users)
+    if (!state.paid) {
       setMode('discovery');
     } else {
-      // Default for paid users with existing session: discovery (Plan mode)
-      setMode('discovery');
+      setMode('sim');
     }
 
     // Repopulate coaching mode — replay saved messages if available, else show welcome
