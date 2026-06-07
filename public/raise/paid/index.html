@@ -86,9 +86,14 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 </div>
 
 <div class="screen" id="expired-screen">
-  <div style="font-size:40px;margin-bottom:12px;">⏰</div>
-  <div style="font-size:16px;font-weight:700;">Your session has expired</div>
-  <div style="font-size:13px;color:var(--t2);margin-top:8px;max-width:300px;">Your 30-day practice session has ended. Email <a href="mailto:support@recomlinked.com" style="color:var(--teal);">support@recomlinked.com</a> if you need anything.</div>
+  <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Can't find your session</div>
+  <div style="font-size:13px;color:var(--t2);margin-bottom:20px;max-width:300px;line-height:1.5;">Enter your email to get a new access link sent to your inbox.</div>
+  <div style="width:100%;max-width:320px;">
+    <input type="email" id="recover-email" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:1.5px solid var(--divider);border-radius:10px;font-size:14px;font-family:var(--sans);margin-bottom:10px;outline:none;"/>
+    <button onclick="sendRecovery()" style="width:100%;padding:13px;border-radius:10px;background:var(--teal);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;">Send access link →</button>
+    <div id="recover-msg" style="font-size:12px;color:var(--teal);margin-top:10px;text-align:center;display:none;"></div>
+    <div style="font-size:11px;color:var(--t3);margin-top:14px;text-align:center;">Session fully expired? Email <a href="mailto:support@recomlinked.com" style="color:var(--t3);">support@recomlinked.com</a></div>
+  </div>
 </div>
 
 <div class="main" id="dashboard">
@@ -313,6 +318,25 @@ function demoBranches(){return[
   {type:'opening',label:'Ask for a comp review',text:"I'd like to do a compensation review...",explored:false,score:4,children:[]},
 ];}
 
+async function sendRecovery(){
+  var email=document.getElementById('recover-email').value.trim();
+  if(!email||!email.includes('@')){document.getElementById('recover-msg').textContent='Enter a valid email address.';document.getElementById('recover-msg').style.display='block';return;}
+  var btn=document.querySelector('#expired-screen button');
+  btn.textContent='Sending…';btn.disabled=true;
+  try{
+    var res=await fetch('/api/raise-magic-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
+    var d=await res.json();
+    var msg=document.getElementById('recover-msg');
+    if(res.ok&&d.sent){msg.textContent='Link sent — check your inbox.';msg.style.color='var(--teal)';}
+    else if(d.error==='not_found'){msg.textContent='No account found for that email.';msg.style.color='var(--red)';}
+    else{msg.textContent='Something went wrong. Email support@recomlinked.com';msg.style.color='var(--red)';}
+    msg.style.display='block';
+  }catch(e){
+    var msg=document.getElementById('recover-msg');
+    msg.textContent='Could not connect. Check your connection and try again.';msg.style.color='var(--red)';msg.style.display='block';
+  }
+  btn.textContent='Send access link →';btn.disabled=false;
+}
 $('delete-btn').onclick=()=>{$('confirm-overlay').hidden=false;};
 $('confirm-cancel').onclick=()=>{$('confirm-overlay').hidden=true;};
 $('confirm-delete').onclick=async()=>{
