@@ -732,147 +732,188 @@ async function handleDiscInsights(body, res) {
     return res.status(400).json({ error: 'answers required' });
   }
 
-  // Build tailor context block if answers provided
-  const tailorBlock = tailor && (tailor.role_change || tailor.manager_reaction || tailor.timing)
-    ? `\nADDITIONAL CONTEXT (from follow-up questions):\n` +
-      (tailor.role_change      ? `- Role growth: ${tailor.role_change}\n`           : '') +
-      (tailor.manager_reaction ? `- Expected manager reaction: ${tailor.manager_reaction}\n` : '') +
-      (tailor.timing           ? `- Conversation timing: ${tailor.timing}\n`         : '')
-    : '';
-
   const dimDescriptions = {
     evidence: { label: 'Evidence & Leverage' },
-    timing: { label: 'Timing & Window' },
-    manager: { label: 'Manager' },
-    company: { label: 'Company & Environment' },
-    market: { label: 'Market & Positioning' },
+    timing:   { label: 'Timing & Window'     },
+    manager:  { label: 'Manager'              },
+    company:  { label: 'Company & Environment'},
+    market:   { label: 'Market & Positioning' },
   };
 
   const answeredDims = Object.entries(dimDescriptions)
     .filter(([k]) => answers[k])
     .map(([k, v]) => {
-      const score = dims && dims[k] ? dims[k] : 50;
+      const score    = dims && dims[k] ? dims[k] : 50;
       const strength = score >= 60 ? 'strong' : score >= 40 ? 'medium' : 'weak';
       return `- ${v.label} (${k}): user answered "${answers[k]}" — rated ${strength} (score ${score}/100)`;
     })
     .join('\n');
 
   const blockerContext = blocker || 'unknown';
-  const leverList = (levers || []).join(', ') || 'none identified';
-  const weakList = (weaks || []).join(', ') || 'none identified';
+  const leverList      = (levers || []).join(', ') || 'none identified';
+  const weakList       = (weaks  || []).join(', ') || 'none identified';
+
+  // Tailor context block (used by strategy only)
+  const tailorBlock = tailor && (tailor.role_change || tailor.manager_reaction || tailor.timing)
+    ? '\nADDITIONAL CONTEXT:\n' +
+      (tailor.role_change      ? `- Role growth: ${tailor.role_change}\n`           : '') +
+      (tailor.manager_reaction ? `- Expected manager reaction: ${tailor.manager_reaction}\n` : '') +
+      (tailor.timing           ? `- Conversation timing: ${tailor.timing}\n`         : '')
+    : '';
 
   let system, userMessage, maxTokens;
 
-  if (part === 'teasers') {
-    system = `You are a senior salary negotiation coach. Generate ONE hook sentence per section that creates urgency to read more.
+  // ── HOOKS — merged position + teasers (one call at paywall) ────────────────
+  // Generates one sharp hook sentence per section (all 12 blocks).
+  // Position hooks: diagnostic insight the user didn't know.
+  // Strategy hooks: counterintuitive setup that makes them want the full section.
+  if (part === 'hooks' || part === 'teasers') {
 
-User preparing to ask for a raise. Blocker: "${blockerContext}".
-Leverage: ${leverList}. Weak spots: ${weakList}.
+    system = `You are a senior salary negotiation coach. Generate ONE hook sentence per section.
 
-For each section, write EXACTLY ONE single sentence (no more) that:
-1. Reveals a non-obvious insight personalized to their situation
-2. Makes the reader think "I need to read the rest"
-3. NEVER restates their input or states the obvious
-4. Uses **bold** for the most important phrase if it helps
+The user is preparing to ask for a raise.
+Blocker: "${blockerContext}"
+Leverage: ${leverList}
+Weak spots: ${weakList}
 
-EXAMPLES OF GOOD HOOKS:
-- leverage_risk: "Your competing offer is your strongest asset — but lead with it and you become a flight risk, not a star."
-- emphasize: "Most people emphasize what they've done — the people who get raises emphasize what they will stop doing if they leave."
-- avoid: "The fastest way to lose a raise conversation is apologizing before you ask — it tells them you're already prepared to back down."
-- opening_script: "Your first 30 seconds set the tempo — managers decide their answer before you finish your second sentence."
-- pushback: "Every objection is really one of two things — a real constraint or a test of how serious you are. Treat them differently."
-- meeting_email: "Managers ignore compensation emails that sound like a request — they open ones that sound like a decision."
-- raise_case: "Most one-pagers fail because they argue what you deserve — yours should prove what you cost to replace."
+WHAT A HOOK MUST DO:
+- Reveal something the user didn't already know — a hidden risk, counterintuitive dynamic, or non-obvious move
+- Be specific to THEIR situation — not generic advice that works for anyone
+- Make them think "I need to read more" — not "I already knew that"
+- NEVER restate their input back to them
+- NEVER state the obvious
 
-Respond ONLY with valid JSON, single sentence per key:
-{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
-    userMessage = `Position:\n${answeredDims}\n\nGenerate 7 hook sentences.`;
-    maxTokens = 600;
+POSITION HOOKS (evidence/timing/manager/company/market):
+These are diagnostic — name the hidden risk or opportunity IN their specific dimension score.
+Strong dimensions: reveal the trap of assuming it's enough, or how to weaponize it properly.
+Weak dimensions: name the specific consequence of this weakness in their situation.
+Examples:
+- evidence (strong, recruiters): "Recruiter interest is third-party validation — but only if you can quote a specific range, not just 'I've been approached.'"
+- evidence (weak): "No documented wins means you're asking for trust instead of payment for proven value — a losing position in any environment."
+- timing (strong, review soon): "The review window is your best shot, but managers who expect the conversation are also more prepared to deflect it."
+- manager (weak, distant): "A distant manager won't fight for you — they'll defer upward, which means your real audience is their boss."
+- company (weak, cutting): "Cost-cutting environments kill raises that sound like overhead and approve raises that sound like retention insurance."
 
+STRATEGY HOOKS (leverage_risk/emphasize/avoid/opening_script/pushback/meeting_email/raise_case):
+These are conversion hooks — make the locked section feel essential.
+Examples:
+- leverage_risk: "Your competing offer is your strongest card — but play it first and you become a flight risk, not a valued employee."
+- emphasize: "Most people lead with what they've done — the ones who get raises lead with what it would cost to lose them."
+- avoid: "The fastest way to lose this conversation is apologizing before you ask — it signals you're already prepared to back down."
+- opening_script: "Your first 30 seconds decide the manager's posture for the rest of the meeting — most people waste it."
+- pushback: "Every objection is one of two things: a real constraint or a test of how serious you are — and you handle them completely differently."
+- meeting_email: "Managers ignore comp emails that sound like a request — they open ones that sound like a decision has already been made."
+- raise_case: "Most one-pagers fail because they argue what the person deserves — the ones that work prove what it costs to lose them."
+
+Respond ONLY with valid JSON, one sentence per key, no markdown:
+{"evidence":"...","timing":"...","manager":"...","company":"...","market":"...","leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
+
+    userMessage = `User's position:\n${answeredDims}\n\nGenerate 12 hook sentences — one per key.`;
+    maxTokens   = 800;
+
+  // ── STRATEGY — full plan at checkout (all 12 sections) ─────────────────────
+  // Generates complete content for all sections.
+  // Position sections: 2-3 sentences of deep tactical insight.
+  // Strategy sections: full tactical content with exact volume specified.
   } else if (part === 'strategy') {
-    system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
 
-User preparing to ask for a raise. Blocker: "${blockerContext}".
-Leverage: ${leverList}. Weak spots: ${weakList}.
+    system = `You are a senior salary negotiation coach writing a complete, personalized raise negotiation plan.
 
-CRITICAL — FIRST SENTENCE RULE:
-The first sentence of every block must be a HOOK — a counterintuitive insight, a hidden risk, or a surprising tactical move that makes the reader think "I need to read this." NEVER restate what the user told you. NEVER say something obvious like "Your strong leverage is X." Instead reveal the non-obvious dynamic underneath their situation.
+The user is preparing to ask for a raise.
+Blocker: "${blockerContext}"
+Leverage: ${leverList}
+Weak spots: ${weakList}
 
-EXAMPLES OF GOOD FIRST SENTENCES (study these patterns):
-- leverage_risk: "Your competing offer is your single most powerful asset — but lead with it and you lose the room."
-- emphasize (#1): "Lead with the cost of replacing you, not the value of keeping you — managers approve risk mitigation faster than rewards."
-- avoid (#1): "Don't apologize before you ask — 'I know this is a tough time, but...' tells them you're already prepared to back down."
-- opening_script Option 1: "I want to talk about my compensation — I've been doing more than my title reflects, and I think it's time to align both."
-- pushback "Budget is tight": "Your response: 'I understand. Can we talk about the timeline instead? I want to know what would unlock this and when.'"
-- meeting_email subject: "Subject: 30 minutes to discuss next steps — open early next week?"
-- raise_case: "Over the past 18 months I've taken on [scope] and delivered [outcome], which puts my contribution at [level] — meanwhile my comp is still at [band]."
+WRITING RULES — apply to every section:
+- Write for THIS specific person. Reference their answers, their blocker, their leverage and weak spots.
+- Every sentence must contain information they didn't already know.
+- Lead with the counterintuitive move, not the obvious one.
+- Use **bold** for the single most important phrase per section only.
+- Plain text with line breaks for structure. No headers inside sections.
+- Tone: a coach who has seen 1,000 of these conversations — direct, warm, zero filler.
 
-NOTICE: each opens with a tactical move, a specific phrase, or a reframe. None of them restate the user's input or state the obvious.
+SECTION SPECIFICATIONS:
 
-QUALITY BAR:
-- Every sentence must contain new information they didn't already know.
-- Avoid generic advice that applies to anyone. Every paragraph must reference their specific position.
-- Use **bold** sparingly — only for the single most important tactic per block.
-- Tone: a smart coach who's seen 1,000 of these conversations, not a textbook.
+POSITION SECTIONS (diagnostic — what their score means and what to do about it):
 
-Sections (each opens with a HOOK SENTENCE that's insightful and personalized, then the content):
+evidence:
+  Strong (score ≥60): Name the specific way to deploy this leverage so it lands — exact timing, exact framing, what to say and what NOT to say. 3 sentences.
+  Weak (score <40): Name the specific consequence of weak evidence in their situation. Then give one concrete thing they can do in the next 7 days to strengthen it. 3 sentences.
 
-- leverage_risk: Hook + 2-3 sentences on the non-obvious dynamic. Then how to deploy it.
-- emphasize: Hook sentence revealing what most people get wrong about emphasis in this situation. Then 5 numbered points, each ONE sentence with a concrete tactic.
-- avoid: Hook sentence revealing the most common self-sabotage pattern given their position. Then 4 numbered points, each ONE sentence with the actual phrase to avoid AND why.
-- opening_script: Hook sentence about why their first 30 seconds matters more than the rest of the conversation. Then 4 different opening scripts in first person, numbered 1-4. Each opens with different psychological framing (collaborative, data-driven, future-focused, direct). Label "**Option 1:**", "**Option 2:**", etc.
-- pushback: Hook sentence about the trap of most pushback responses. Then 8 likely objections with responses. Format: "**If they say:** '...'" / "**Your response:** '...'" — cover budget freeze, timing, performance, HR process, surprise, wait for review, need to check, and a curveball.
-- meeting_email: Hook sentence about what makes managers actually open a comp email. Then the email with subject line.
-- raise_case: Hook sentence about why most one-pagers fail to land. Then the one-paragraph summary.
+timing:
+  Strong (score ≥60): Identify the exact window and what to do the week before, the day before, and the moment they sit down. 3 sentences.
+  Weak (score <40): Name why the timing is working against them AND one move that could shift it. 3 sentences.
 
-CRITICAL: The hook sentence MUST be the very first sentence — it's what the user sees in the teaser before unlocking. It must:
-1. Reveal a non-obvious insight personalized to their situation
-2. Make them think "I need to read the rest"
-3. NOT restate their input or the obvious
+manager:
+  Strong (score ≥60): Name the specific way to use a supportive manager as a lever — and the mistake people make with supportive managers. 3 sentences.
+  Weak (score <40): Name the specific dynamic at play and the one thing that changes the outcome with this type of manager. 3 sentences.
 
-EXAMPLES OF GOOD HOOK SENTENCES PER SECTION:
-- leverage_risk: "Your competing offer is your strongest asset — but lead with it and you become a flight risk, not a star."
-- emphasize: "Most people emphasize what they've done — the people who get raises emphasize what they will stop doing if they leave."
-- avoid: "The fastest way to lose a raise conversation is apologizing before you ask — it tells them you're already prepared to back down."
-- opening_script: "Your first 30 seconds set the tempo — managers decide their answer before you finish your second sentence."
-- pushback: "Every objection is really one of two things — a real constraint or a test of how serious you are. Treat them differently."
-- meeting_email: "Managers ignore compensation emails that sound like a request — they open ones that sound like a decision."
-- raise_case: "Most one-pagers fail because they argue what you deserve — yours should prove what you cost to replace."
+company:
+  Strong (score ≥60): Name what a healthy company environment enables them to do that they probably aren't doing. 3 sentences.
+  Weak (score <40): Name the specific constraint the company situation creates and the frame that bypasses it. 3 sentences.
 
-Return ALL 7 keys. Respond ONLY with valid JSON (no markdown, no backticks):
-{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
-    userMessage = `Position:\n${answeredDims}${tailorBlock}\n\nGenerate strategy and plan.`;
-    maxTokens = 2500;
+market:
+  Strong (score ≥60): Name exactly how to use market data in the conversation — the format, the source, the moment to introduce it. 3 sentences.
+  Weak (score <40): Name the one piece of market data they can gather in 48 hours that's more credible than a salary survey. 3 sentences.
+
+STRATEGY SECTIONS (tactical — what to do, what to say):
+
+leverage_risk:
+  The non-obvious dynamic of their specific leverage. How to deploy it without triggering a negative reaction. What to say and what to avoid. 4-5 sentences.
+
+emphasize:
+  What most people get wrong about emphasis given their specific position.
+  Then 5 numbered points — each ONE sentence with a concrete tactic specific to their situation:
+  1. [tactic]
+  2. [tactic]
+  3. [tactic]
+  4. [tactic]
+  5. [tactic]
+
+avoid:
+  The most common self-sabotage pattern for someone in their position.
+  Then 4 numbered points — each ONE sentence naming the exact phrase or behavior to avoid AND why:
+  1. [phrase/behavior] — [why it backfires]
+  2. [phrase/behavior] — [why it backfires]
+  3. [phrase/behavior] — [why it backfires]
+  4. [phrase/behavior] — [why it backfires]
+
+opening_script:
+  Why the first 30 seconds matters more than the rest of the conversation for their specific situation.
+  Then 4 complete opening scripts, each taking a different psychological angle:
+  **Option 1 — Collaborative:** [full 2-3 sentence opening in first person]
+  **Option 2 — Data-driven:** [full 2-3 sentence opening in first person]
+  **Option 3 — Future-focused:** [full 2-3 sentence opening in first person]
+  **Option 4 — Direct:** [full 2-3 sentence opening in first person]
+  Each option should feel meaningfully different — different frame, different emotional register.
+
+pushback:
+  The key insight about how to categorize objections before responding.
+  Then 8 specific manager objections with responses, formatted exactly as:
+  **"[manager objection]"**
+  → [their response, 1-2 sentences, specific and non-defensive]
+  Cover these 8 scenarios: budget frozen, timing/wait for review, needs to check with HR, performance not there yet, surprised by the ask, vague deferral ("let me think about it"), threatening the relationship, and one curveball specific to their blocker.
+
+meeting_email:
+  What makes managers actually open and respond to comp emails.
+  Then the complete email:
+  Subject: [specific subject line — not generic]
+  
+  [Full email body, 120-160 words. First person. Confident but not aggressive. Ends with a clear ask for 20-30 minutes.]
+
+raise_case:
+  Why most one-paragraph raise cases fail to land — the specific mistake.
+  Then the one-paragraph raise case they can hand their manager or paste into an email:
+  [2-4 sentences. Leads with scope/impact, not tenure. Includes a specific number or range. Ends with the ask.]
+
+Return ALL 12 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
+{"evidence":"...","timing":"...","manager":"...","company":"...","market":"...","leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
+
+    userMessage  = `User's position:\n${answeredDims}${tailorBlock}\n\nGenerate the complete 12-section plan.`;
+    maxTokens    = 4000;
 
   } else {
-    system = `You are a senior salary negotiation coach. Counterintuitive, specific, tactical advice only.
-
-User preparing to ask for a raise. Blocker: "${blockerContext}".
-Leverage: ${leverList}. Weak spots: ${weakList}.
-
-CRITICAL — FIRST SENTENCE RULE:
-The first sentence of every insight must be a HOOK that reveals a non-obvious dynamic — what most people miss about this dimension in their situation. NEVER restate what the user told you ("You have a competing offer" is forbidden). NEVER state the obvious ("Recruiters reaching out is a strong signal" is forbidden). Instead reveal the trap, the hidden lever, or the counterintuitive move.
-
-EXAMPLES OF GOOD FIRST SENTENCES (study these patterns):
-- Evidence (weak): "No documented wins means you're asking for trust instead of payment for proven value — a losing position in any environment."
-- Evidence (strong): "Your competing offer cuts both ways — lead with it and you label yourself a flight risk; bury it and you waste your only leverage."
-- Timing (strong): "1-2 years in is the single best window — long enough to show competence, short enough that they fear losing you before recouping hiring costs."
-- Manager (neutral): "A neutral manager won't fight for you, but they also won't block you — they'll defer upward, which means your real audience is their boss."
-- Company (weak): "Cost-cutting environments kill raises that feel like overhead and approve raises that feel like risk mitigation."
-- Market (strong): "Recruiters reaching out is third-party validation that's more credible than any salary survey — but only if you can quote a specific range."
-
-NOTICE: each first sentence names the dynamic, the trap, or the reframe. Each gives them something they couldn't say themselves.
-
-QUALITY BAR:
-- Each insight 2-3 sentences. Use **bold** for the single key tactic only.
-- Every sentence must give them something they couldn't have said themselves.
-- WEAK dimensions (score < 40): add a "**If they say:** '...'" / "**Your response:** '...'" example because this is where they'll get pushback.
-- STRONG dimensions (score >= 60): tell HOW to deploy this leverage — the specific phrase, the specific moment.
-
-Return ALL dimensions. Respond ONLY with valid JSON (no markdown, no backticks):
-{"evidence":"...","timing":"...","manager":"...","company":"...","market":"..."}`;
-    userMessage = `Dimensions:\n${answeredDims}\n\nGenerate insights.`;
-    maxTokens = 800;
+    return res.status(400).json({ error: `Unknown part: ${part}` });
   }
 
   try {
@@ -886,23 +927,21 @@ Return ALL dimensions. Respond ONLY with valid JSON (no markdown, no backticks):
     const raw = (response.content[0]?.text || '').trim();
     let insights = {};
     try {
-      const cleaned = raw.replace(/\`\`\`json|\`\`\`/g, '').trim();
+      const cleaned = raw.replace(/```json|```/g, '').trim();
       insights = JSON.parse(cleaned);
     } catch (parseErr) {
-      console.error('[disc_insights] JSON parse error:', parseErr, 'raw:', raw.slice(0, 200));
+      console.error('[disc_insights] JSON parse error:', parseErr.message, 'raw:', raw.slice(0, 200));
       insights = {};
     }
 
-    return res.status(200).json({ insights, mode: 'disc_insights', part: part || 'position' });
+    return res.status(200).json({ insights, mode: 'disc_insights', part: part || 'hooks' });
   } catch (err) {
     console.error('[disc_insights] API error:', err);
-    return res.status(200).json({ insights: {}, mode: 'disc_insights', part: part || 'position' });
+    return res.status(200).json({ insights: {}, mode: 'disc_insights', part: part || 'hooks' });
   }
 }
 
-// ════════════════════════════════════════════════════════════
-// ══ SIMULATE OPENINGS — generate 3 personalized openers   ══
-// ════════════════════════════════════════════════════════════
+
 async function handleSimulateOpenings(body, res) {
   const { context, blocker } = body;
   const role = context?.role || 'professional';
