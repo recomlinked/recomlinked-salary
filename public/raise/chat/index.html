@@ -7673,10 +7673,9 @@ async function resumeFromState() {
   if (state.paywall_shown) {
   }
 
-  // Replay the transcript from chat_log instantly (no animation) so refresh
-  // preserves everything the user saw. Then resume from the current_exchange
-  // cursor for whatever prompt/chip UI needs to reappear.
-  const log = Array.isArray(state.chat_log) ? state.chat_log : [];
+  // Replay the transcript from chat_log for discovery sessions.
+  // Simulation sessions reconstruct from state.sim_conversation instead — skip here.
+  const log = (Array.isArray(state.chat_log) && state.current_exchange !== 10) ? state.chat_log : [];
   if (log.length > 0) {
     // Show a brief context message so user knows they're resuming
     const resumeWrap = el('div', 'coach-msg', '');
