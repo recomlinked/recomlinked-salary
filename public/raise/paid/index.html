@@ -42,31 +42,9 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .stat-card{flex:1;background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:14px;text-align:center;}
 .stat-num{font-size:24px;font-weight:800;}
 .stat-label{font-size:10px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:0.05em;}
-.section-card{background:var(--card);border:1px solid var(--divider);border-radius:16px;padding:20px;margin-bottom:20px;}
-.section-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:4px;}
-.section-sub{font-size:12px;color:var(--t3);margin-bottom:14px;}
-.tree-node{position:relative;}
-.tree-node-inner{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;margin-bottom:4px;border-radius:10px;transition:all 0.15s;border:1px solid rgba(0,0,0,0.04);background:rgba(0,0,0,0.015);}
-.tree-node-inner.explored.opening{background:rgba(201,168,76,0.06);border-color:rgba(201,168,76,0.15);}
-.tree-node-inner.explored.manager{background:rgba(0,196,160,0.04);border-color:rgba(0,196,160,0.12);}
-.tree-node-inner.explored.reply{background:rgba(201,168,76,0.04);border-color:rgba(201,168,76,0.1);}
-.tree-node-inner.unexplored{opacity:0.5;}
-.tree-icon{width:18px;height:18px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;}
-.tree-icon.filled{color:#fff;}
-.tree-icon.empty{background:transparent;color:var(--t4);border:1.5px solid var(--divider);}
-.tree-icon.opening-color{background:var(--gold);}
-.tree-icon.manager-color{background:var(--teal);}
-.tree-icon.reply-color{background:var(--gold);}
-.tree-children{padding-left:18px;}
-.tree-connector{position:absolute;left:7px;top:0;bottom:0;width:1px;}
-.legend{display:flex;gap:12px;margin-bottom:14px;font-size:11px;color:var(--t3);}
-.legend-dot{width:8px;height:8px;border-radius:3px;flex-shrink:0;}
-.best-badge{font-size:8px;font-weight:700;color:var(--teal);background:rgba(0,196,160,0.1);padding:1px 4px;border-radius:3px;}
 .ctx-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:8px;font-size:12px;margin:3px;}
 .ctx-chip.done{background:rgba(0,196,160,0.04);border:1px solid rgba(0,196,160,0.15);color:var(--teal);font-weight:600;}
 .ctx-chip.pending{background:#fafafa;border:1px solid var(--muted);color:var(--t3);}
-.progress-bar{height:3px;background:var(--muted);border-radius:2px;margin-bottom:14px;}
-.progress-fill{height:3px;border-radius:2px;background:var(--teal);transition:width 0.3s;}
 .cta-btn{display:block;width:100%;padding:16px;border-radius:12px;background:var(--gold);color:#07090f;font-size:15px;font-weight:700;text-align:center;text-decoration:none;border:none;cursor:pointer;margin-bottom:12px;}
 .cta-btn:hover{opacity:0.9;}
 .cta-sub{font-size:11px;color:var(--t3);text-align:center;margin-bottom:20px;}
@@ -75,6 +53,12 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 .footer-links button{background:none;border:none;color:var(--red);font-size:11px;cursor:pointer;text-decoration:underline;margin:0 8px;}
 .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
 .confirm-overlay[hidden]{display:none;}
+.modes-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.mode-card{background:var(--card);border:1px solid var(--divider);border-radius:12px;padding:14px 12px;text-decoration:none;color:var(--t1);display:flex;flex-direction:column;gap:4px;transition:border-color 0.15s,box-shadow 0.15s;}
+.mode-card:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(0,196,160,0.1);text-decoration:none;}
+.mode-icon{font-size:18px;line-height:1;}
+.mode-name{font-size:13px;font-weight:700;color:var(--t1);}
+.mode-status{font-size:11px;color:var(--t3);line-height:1.4;margin-top:2px;}
 .confirm-box{background:var(--card);border-radius:16px;padding:24px;max-width:340px;width:100%;}
 .confirm-box h3{font-size:16px;font-weight:700;margin-bottom:8px;}
 .confirm-box p{font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:16px;}
@@ -117,28 +101,34 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
     <div class="stat-card"><div class="stat-num" id="stat-days" style="color:var(--gold);">—</div><div class="stat-label">Days left</div></div>
     <div class="stat-card"><div class="stat-num" id="stat-explored" style="color:var(--teal);">0</div><div class="stat-label">Paths explored</div></div>
   </div>
-  <div class="section-card">
-    <div class="section-title">Your practice map</div>
-    <div class="section-sub">Tap to expand explored paths.</div>
-    <div class="legend">
-      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--gold);"></div> Your moves</div>
-      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--teal);"></div> Manager responses</div>
-      <div style="display:flex;align-items:center;gap:4px;"><div class="legend-dot" style="background:var(--divider);"></div> Unexplored</div>
-    </div>
-    <div id="tree-container"></div>
-  </div>
-  <div class="section-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-      <div class="section-title">Your context</div>
-      <span style="font-size:10px;font-weight:700;color:var(--t3);background:rgba(0,0,0,0.03);padding:2px 8px;border-radius:10px;" id="ctx-count">0/7</span>
-    </div>
-    <div class="section-sub">The more we know, the more realistic your practice. Answer these in the chat.</div>
-    <div class="progress-bar"><div class="progress-fill" id="ctx-progress" style="width:0%;"></div></div>
-    <div id="ctx-chips"></div>
-    <a href="/raise/chat/" style="display:block;text-align:center;margin-top:14px;font-size:12px;color:var(--teal);font-weight:600;text-decoration:none;">Answer in chat →</a>
-  </div>
+
   <a href="/raise/chat/" class="cta-btn" id="cta-continue">Open your full plan →</a>
   <div class="cta-sub">Unlimited scenarios · Fully customized · Coaching mode available</div>
+
+  <!-- 4 mode cards -->
+  <div class="modes-grid">
+    <a class="mode-card" id="mode-plan" href="/raise/chat/?reason=other">
+      <div class="mode-icon">📋</div>
+      <div class="mode-name">Plan</div>
+      <div class="mode-status" id="mode-plan-status">Build your negotiation strategy</div>
+    </a>
+    <a class="mode-card" id="mode-sim" href="/raise/chat/?reason=no_script&start=sim">
+      <div class="mode-icon">🎯</div>
+      <div class="mode-name">Simulation</div>
+      <div class="mode-status" id="mode-sim-status">Practice the conversation</div>
+    </a>
+    <a class="mode-card" id="mode-coach" href="/raise/chat/?reason=other">
+      <div class="mode-icon">💬</div>
+      <div class="mode-name">Coaching</div>
+      <div class="mode-status" id="mode-coach-status">Get move-by-move analysis</div>
+    </a>
+    <a class="mode-card" id="mode-email" href="/raise/chat/?mode=case">
+      <div class="mode-icon">✉️</div>
+      <div class="mode-name">Email</div>
+      <div class="mode-status" id="mode-email-status">Draft your raise case</div>
+    </a>
+  </div>
+
   <div class="footer-links">
     <a href="mailto:support@recomlinked.com">Support</a>
     <button id="delete-btn">Delete my data</button>
@@ -159,69 +149,10 @@ body{background:var(--page);color:var(--t1);font-family:var(--sans);font-size:14
 <script>
 const LS_TOKEN='rl_raise_access_token',LS_STATE='rl_raise_state',LS_TAP='rl_raise_tap_count';
 const API_VERIFY='/api/raise-verify',API_DELETE='/api/raise-delete';
-const CTX_KEYS=[
-  {key:'role',label:'Your role'},{key:'evidence',label:'Strongest evidence'},
-  {key:'company_situation',label:'Company situation'},{key:'company_size',label:'Company size'},
-  {key:'last_raise',label:'Last raise'},{key:'manager_type',label:'Manager style'},
-  {key:'target_number',label:'Target number'},
-];
 const BLOCKER_LABELS={underpaid:"I think I'm underpaid but I can't prove it",quiet:"I'm a strong performer but quiet",no_script:"I don't know how to start the conversation",unknown_amount:"I don't know what number to ask for",fear_no:"What if they say no?",no_advocate:"My manager doesn't advocate for me",prior_no:"I already asked and got nothing",timing:"I'm not sure if now is the right time"};
 const dash={token:null,profile:null,plan:null,days_left:0,obstacle:null};
 function $(id){return document.getElementById(id);}
 function showScreen(id){document.querySelectorAll('.screen,.main').forEach(s=>s.classList.remove('active'));const e=$(id);if(e)e.classList.add('active');}
-
-function createStarSVG(score){
-  const f=(score||3)/5,ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');
-  svg.setAttribute('width','13');svg.setAttribute('height','13');svg.setAttribute('viewBox','0 0 24 24');
-  svg.style.flexShrink='0';const id='s'+Math.random().toString(36).slice(2,8);
-  svg.innerHTML=`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0"><stop offset="${f*100}%" stop-color="#00c4a0"/><stop offset="${f*100}%" stop-color="rgba(0,0,0,0.06)"/></linearGradient></defs><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="url(#${id})" stroke="rgba(0,196,160,0.25)" stroke-width="0.7"/>`;
-  return svg;
-}
-
-function renderTree(branches){
-  const c=$('tree-container');c.innerHTML='';
-  if(!branches||!branches.length){c.innerHTML='<div style="text-align:center;padding:20px;color:var(--t3);font-size:13px;">No paths explored yet. Start practicing to see your map.</div>';return;}
-  branches.forEach(b=>c.appendChild(mkNode(b,0)));
-}
-function mkNode(n,d){
-  const w=document.createElement('div');w.className='tree-node';
-  if(d>0){const cn=document.createElement('div');cn.className='tree-connector';cn.style.background=n.explored?'rgba(0,196,160,0.15)':'rgba(0,0,0,0.05)';w.appendChild(cn);}
-  const inner=document.createElement('div'),t=n.type||'opening';
-  inner.className=`tree-node-inner ${n.explored?'explored':'unexplored'} ${t}`;
-  const colors={opening:'var(--gold)',manager:'var(--teal)',reply:'var(--gold)'},roles={opening:'You',manager:'Manager',reply:'You'};
-  const has=n.children&&n.children.length>0;
-  const icon=document.createElement('div');icon.className=`tree-icon ${n.explored?'filled '+t+'-color':'empty'}`;
-  icon.textContent=has?'▸':(n.explored?'✓':'');inner.appendChild(icon);
-  const content=document.createElement('div');content.style.cssText='flex:1;min-width:0;';
-  const rr=document.createElement('div');rr.style.cssText='display:flex;align-items:center;gap:5px;';
-  const role=document.createElement('span');role.style.cssText=`font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;opacity:0.7;color:${colors[t]||'var(--gold)'}`;
-  role.textContent=roles[t]||'You';rr.appendChild(role);
-  if(n.score){const sw=document.createElement('span');sw.style.cssText='flex-shrink:0;padding-top:2px;';sw.appendChild(createStarSVG(n.score));rr.appendChild(sw);}
-  if(n.score===5&&n.explored){const b=document.createElement('span');b.className='best-badge';b.textContent='Best move';rr.appendChild(b);}
-  content.appendChild(rr);
-  const label=document.createElement('div');label.style.cssText=`font-size:12.5px;font-weight:600;margin-top:2px;color:${n.explored?'var(--t1)':'var(--t3)'}`;
-  label.textContent=n.label||'';content.appendChild(label);
-  if(n.explored&&n.text){const tx=document.createElement('div');tx.style.cssText='font-size:11px;color:var(--t3);font-style:italic;margin-top:3px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;';tx.textContent=n.text;content.appendChild(tx);}
-  if(!n.explored&&has){const h=document.createElement('div');h.style.cssText='font-size:10px;color:var(--t4);margin-top:2px;';h.textContent=`${n.children.length} path${n.children.length>1?'s':''} to explore`;content.appendChild(h);}
-  inner.appendChild(content);w.appendChild(inner);
-  if(has){
-    const cw=document.createElement('div');cw.className='tree-children';cw.style.display=n.explored?'block':'none';
-    n.children.forEach(c=>cw.appendChild(mkNode(c,d+1)));w.appendChild(cw);
-    inner.style.cursor='pointer';
-    inner.onclick=()=>{const s=cw.style.display!=='none';cw.style.display=s?'none':'block';icon.textContent=s?'▸':'▾';};
-    if(n.explored)icon.textContent='▾';
-  }
-  return w;
-}
-
-function renderContext(ctx){
-  ctx=ctx||{};const a=CTX_KEYS.filter(q=>ctx[q.key]).length,t=CTX_KEYS.length;
-  $('ctx-count').textContent=`${a}/${t}`;
-  $('ctx-progress').style.width=`${(a/t)*100}%`;
-  if(a===t){$('ctx-count').style.color='var(--teal)';$('ctx-count').style.background='rgba(0,196,160,0.08)';}
-  const ch=$('ctx-chips');ch.innerHTML='';
-  CTX_KEYS.forEach(q=>{const d=!!ctx[q.key],c=document.createElement('span');c.className=`ctx-chip ${d?'done':'pending'}`;c.innerHTML=`<span style="font-size:11px;">${d?'✓':'○'}</span> ${q.label}`;ch.appendChild(c);});
-}
 
 async function init(){
   const params=new URLSearchParams(location.search),urlToken=params.get('token'),urlSession=params.get('session_id');
@@ -245,8 +176,7 @@ async function init(){
         $('header-cta').textContent='Practice every scenario · $19';$('header-cta').href='/raise/chat/';
         $('cta-continue').textContent='Practice every scenario · $19 →';$('cta-continue').href='/raise/chat/';
         $('stat-days').textContent='—';$('stat-explored').textContent=(cs.sim_branch_history||[]).length;
-        renderTree(cs.sim_branch_history||[]);renderContext(cs.sim_context||{});
-        document.querySelector('.footer-links').style.display='none';return;
+              document.querySelector('.footer-links').style.display='none';return;
       }
     }catch(e){}
     window.location.replace('/raise/');return;
@@ -312,16 +242,37 @@ function renderPaid(demo){
   const days=demo?27:dash.days_left;
   $('stat-days').textContent=days;
 
-  let branches=[],context={};
-  if(demo){branches=demo.branches||[];context=demo.context||{};}
-  else{try{const cs=JSON.parse(localStorage.getItem(LS_STATE)||'{}');branches=cs.sim_branch_history||[];context=cs.sim_context||{};}catch(e){}}
-
-  const explored=branches.length;$('stat-explored').textContent=explored;
+  const explored=0;$('stat-explored').textContent=explored;
   const oc=demo?'underpaid':(dash.obstacle?.code||''),ol=demo?BLOCKER_LABELS.underpaid:(dash.obstacle?.label||BLOCKER_LABELS[oc]||'');
   if(ol){$('blocker-badge').textContent='Your focus: '+ol;$('blocker-badge').hidden=false;}
   if(explored>0){$('welcome-title').textContent='Welcome back.';$('welcome-sub').textContent=`You've explored ${explored} path${explored===1?'':'s'}. Pick up where you left off.`;$('cta-continue').textContent='Continue — all modes unlocked →';}
 
-  renderTree(branches);renderContext(context);
+  // Populate mode cards from localStorage
+  try {
+    var cs = JSON.parse(localStorage.getItem(LS_STATE)||'{}');
+    // Plan — last blocker/reason
+    var planReason = cs.sim_reason || cs.obstacle?.code || '';
+    if(planReason){ $('mode-plan-status').textContent = 'Last: ' + (BLOCKER_LABELS[planReason] || planReason).slice(0,38) + '…'; }
+    // Simulation — paths explored
+    var paths = (cs.sim_branch_history||[]).length;
+    var simTurns = (cs.sim_conversation||[]).length;
+    if(paths>0) $('mode-sim-status').textContent = paths + ' path' + (paths===1?'':'s') + ' explored · ' + (simTurns>0?simTurns+' turns':'continue');
+    // Coaching — message count
+    var coachCount = (cs.coaching_log||[]).length;
+    if(coachCount>0) $('mode-coach-status').textContent = coachCount + ' insight' + (coachCount===1?'':'s') + ' saved';
+    // Email — draft progress
+    var caseSnap = cs.case_state_snapshot;
+    if(caseSnap && caseSnap.currentQ>0) $('mode-email-status').textContent = 'Draft in progress · Q' + caseSnap.currentQ + ' of 7';
+  } catch(e){}
+
+  // Wire mode card links with token
+  if(dash.token){
+    var t=encodeURIComponent(dash.token);
+    $('mode-plan').href='/raise/chat/?reason=other&paid_token='+t;
+    $('mode-sim').href='/raise/chat/?reason=no_script&start=sim&paid_token='+t;
+    $('mode-coach').href='/raise/chat/?reason=other&paid_token='+t;
+    $('mode-email').href='/raise/chat/?mode=case&paid_token='+t;
+  }
 }
 
 function demoBranches(){return[
