@@ -27,7 +27,7 @@
   ],
   "functions": {
     "api/raise-webhook.js":      { "memory": 256 },
-    "api/raise-coach.js":        { "memory": 256, "maxDuration": 30 },
+    "api/raise-coach.js":        { "memory": 256, "maxDuration": 60 },
     "api/raise-notes-update.js": { "memory": 256, "maxDuration": 30 }
   }
 }
