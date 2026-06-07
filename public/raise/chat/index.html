@@ -3828,7 +3828,7 @@ async function beginSimulationFlow(reasonParam) {
     showToolbar();
     showModeToggle();
     unlockModeToggle();
-    setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
+    setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : SIM_STATE.entryMode === 'coach' ? 'coach' : 'discovery');
     return;
   }
 
@@ -6284,7 +6284,7 @@ async function startSimulationAtBlocker() {
   unlockModeToggle();
 
   // Start in Discovery mode by default; Coach landing page (start=sim) opens Practice
-  setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : 'discovery');
+  setMode(SIM_STATE.entryMode === 'sim' ? 'sim' : SIM_STATE.entryMode === 'coach' ? 'coach' : 'discovery');
 }
 
 // ── Blocker-specific opening lines ──
@@ -7451,6 +7451,7 @@ async function init() {
   // start=sim → coach landing page wants simulation mode (not discovery)
   const startMode = params.get('start');
   if (startMode === 'sim') { SIM_STATE.entryMode = 'sim'; }
+  if (startMode === 'coach') { SIM_STATE.entryMode = 'coach'; }
 
   // mode=case → raise case landing page, enter case mode directly
   const caseMode = params.get('mode');
@@ -7705,6 +7706,8 @@ async function resumeFromState() {
     // Coach landing page (start=sim) opens simulation directly
     if (SIM_STATE.entryMode === 'sim') {
       setMode('sim');
+    } else if (SIM_STATE.entryMode === 'coach') {
+      setMode('coach');
     } else if (!state.paid) {
       setMode('discovery');
     } else {
