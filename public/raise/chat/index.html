@@ -7504,6 +7504,9 @@ async function init() {
       SIM_STATE.entryMode = 'sim';
       reason = 'other';
     } else if (_savedMode === 'coach') {
+      SIM_STATE.entryMode = 'coach';
+      reason = 'other';
+    } else if (_savedMode === 'discovery' || !_savedMode) {
       SIM_STATE.entryMode = 'discovery';
       reason = 'other';
     }
