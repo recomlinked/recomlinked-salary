@@ -7724,6 +7724,7 @@ async function resumeFromState() {
     // If user arrived from paid page with an explicit non-sim mode,
     // skip the sim engine entirely and just open the requested mode.
     const _requestedMode = SIM_STATE.entryMode;
+    console.log('[resumeFromState] entryMode:', _requestedMode);
     if (_requestedMode === 'discovery' || _requestedMode === 'coach') {
       // Restore coaching content
       const _cEl = $('coaching-messages');
