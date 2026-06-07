@@ -4,9 +4,7 @@
 // Silently ignores all other events (including FA events, if Stripe sends them to this endpoint).
 //
 // On checkout.session.completed:
-//   1. Try to load enrichment plan from raise:enrich|{profile_hash}
 //      → if missing, read checkout stash raise:checkout:{session_id} (Round 2)
-//      → if stash present, trigger enrich regeneration (fire-and-forget)
 //   2. Create paid user record raise:user:{email}      (30-day TTL)
 //      Now includes `obstacle` from Round 2 metadata
 //   3. Store plan        raise:user:{email}:plan       (30-day TTL)
@@ -17,7 +15,6 @@
 // ── Round 2 updates ──────────────────────────────────────
 // • Reads checkout stash (set by raise-checkout.js) when the primary enrich
 //   key is missing. Gives us the profile/exchanges/obstacle needed to retry.
-// • Triggers enrich regeneration via HTTP POST to /api/raise-enrich (fire-
 //   and-forget) — user record is created immediately, plan populates async.
 // • Stores `obstacle` in user record so raise-coach.js and the paid page
 //   can read it consistently.
@@ -61,23 +58,6 @@ async function readCheckoutStash(sessionId) {
   } catch (e) {
     console.warn('[raise-webhook] stash read failed:', e.message);
     return null;
-  }
-}
-
-async function triggerEnrichRegeneration({ profile, exchanges, obstacle, final_range, profile_hash }) {
-  // Fire-and-forget POST to /api/raise-enrich. The endpoint replies 202 then
-  // runs Claude in background. Once done, raise:enrich|{hash} is populated
-  // and the paid page will pick it up on poll.
-  try {
-    await fetch(`${BASE_URL}/api/raise-enrich`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        profile, exchanges: exchanges || {}, obstacle, final_range, profile_hash,
-      }),
-    });
-  } catch (e) {
-    console.warn('[raise-webhook] enrich trigger failed:', e.message);
   }
 }
 
@@ -146,35 +126,9 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ received: true, error: 'no_profile_hash' });
   }
 
-  // ── Load pre-computed enrichment plan ────────────────────
+  // Plan is generated on-demand via disc_insights — not pre-computed
   let plan = null;
-  try {
-    const raw = await redis.get(`raise:enrich|${profileHash}`);
-    if (raw) plan = typeof raw === 'string' ? JSON.parse(raw) : raw;
-  } catch (e) {
-    console.error('[raise-webhook] plan fetch failed:', e.message);
-  }
-
-  // ── Round 2: if plan missing, try checkout stash + re-trigger enrich ──
   let stash = null;
-  if (!plan) {
-    stash = await readCheckoutStash(session.id);
-    if (stash) {
-      console.log(`[raise-webhook] plan missing for hash=${profileHash}, found stash — triggering enrich`);
-      // Fire-and-forget — don't await. Paid page will poll.
-      triggerEnrichRegeneration({
-        profile:      stash.profile,
-        exchanges:    stash.exchanges || {},  // stash may not include exchanges;
-                                              // enrich will produce a less-rich
-                                              // plan but still workable
-        obstacle:     stash.obstacle,
-        final_range:  stash.final_range,
-        profile_hash: stash.profile_hash || profileHash,
-      });
-    } else {
-      console.warn(`[raise-webhook] plan missing for hash=${profileHash} and no stash — paid page will retry`);
-    }
-  }
 
   // Assemble obstacle from metadata — works even without stash
   const obstacleFromMeta = {
