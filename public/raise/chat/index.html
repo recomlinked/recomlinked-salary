@@ -2284,6 +2284,14 @@ function setMode(target) {
     const sendBtn = $('send-btn');
     if (sendBtn) sendBtn.disabled = !state.paid;
     if (state.paid) {
+      // Show welcome if coaching tab is empty (first time opening it)
+      if (!coachingEl.dataset.coachInitialized && coachingEl.children.length === 0) {
+        coachingEl.dataset.coachInitialized = 'true';
+        var _cWelcome = el('div', 'coach-msg', '');
+        var _blocker = (SIM_STATE.blocker && SIM_STATE.blocker.code) || (state.sim_reason) || 'other';
+        _cWelcome.innerHTML = '<div class="bubble"><p>' + escapeHtml(getCoachingWelcome(_blocker)) + '</p></div>';
+        coachingEl.appendChild(_cWelcome);
+      }
       renderCoachingUnseenHeader();
       if (unseenCoachCount > 0) {
         const allMsgs = coachingEl.querySelectorAll('.coach-msg, .user-msg');
