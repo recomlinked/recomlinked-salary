@@ -5847,14 +5847,20 @@ async function generateDiscInsights() {
 
     if (data && data.insights && Object.keys(data.insights).length > 0) {
       var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+      var positionKeys  = ['evidence','timing','manager','company','market'];
       Object.keys(data.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim] !== undefined) {
           discCanvasBlocks[dim].insight = data.insights[dim];
           discInsights[dim] = data.insights[dim];
           if (stratPlanKeys.indexOf(dim) >= 0) {
+            discCanvasBlocks[dim].filled  = true;
+            discCanvasBlocks[dim].teaser  = !state.paid;
+            discCanvasBlocks[dim].strength = 'plan';
+          } else if (positionKeys.indexOf(dim) >= 0) {
             discCanvasBlocks[dim].filled = true;
-            // Paid users get full content (no teaser), free users get hooks (teaser)
-            discCanvasBlocks[dim].teaser = !state.paid;
+            // Set strength from dims scores
+            var score = discDims && discDims[dim] ? discDims[dim] : 50;
+            discCanvasBlocks[dim].strength = score >= 60 ? 'strong' : score < 40 ? 'weak' : 'neutral';
           }
         }
       });
