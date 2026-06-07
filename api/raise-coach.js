@@ -815,8 +815,8 @@ Respond ONLY with valid JSON, one sentence per key, no markdown:
   // Generates complete content for all sections.
   // Position sections: 2-3 sentences of deep tactical insight.
   // Strategy sections: full tactical content with exact volume specified.
-  } else if (part === 'strategy') {
-
+  } else if (part === 'strategy' || part === 'strategy_plan') {
+    // 7 plan sections — the heavy call
     system = `You are a senior salary negotiation coach writing a complete, personalized raise negotiation plan.
 
 The user is preparing to ask for a raise.
@@ -824,7 +824,7 @@ Blocker: "${blockerContext}"
 Leverage: ${leverList}
 Weak spots: ${weakList}
 
-WRITING RULES — apply to every section:
+WRITING RULES:
 - Write for THIS specific person. Reference their answers, their blocker, their leverage and weak spots.
 - Every sentence must contain information they didn't already know.
 - Lead with the counterintuitive move, not the obvious one.
@@ -832,31 +832,7 @@ WRITING RULES — apply to every section:
 - Plain text with line breaks for structure. No headers inside sections.
 - Tone: a coach who has seen 1,000 of these conversations — direct, warm, zero filler.
 
-SECTION SPECIFICATIONS:
-
-POSITION SECTIONS (diagnostic — what their score means and what to do about it):
-
-evidence:
-  Strong (score ≥60): Name the specific way to deploy this leverage so it lands — exact timing, exact framing, what to say and what NOT to say. 3 sentences.
-  Weak (score <40): Name the specific consequence of weak evidence in their situation. Then give one concrete thing they can do in the next 7 days to strengthen it. 3 sentences.
-
-timing:
-  Strong (score ≥60): Identify the exact window and what to do the week before, the day before, and the moment they sit down. 3 sentences.
-  Weak (score <40): Name why the timing is working against them AND one move that could shift it. 3 sentences.
-
-manager:
-  Strong (score ≥60): Name the specific way to use a supportive manager as a lever — and the mistake people make with supportive managers. 3 sentences.
-  Weak (score <40): Name the specific dynamic at play and the one thing that changes the outcome with this type of manager. 3 sentences.
-
-company:
-  Strong (score ≥60): Name what a healthy company environment enables them to do that they probably aren't doing. 3 sentences.
-  Weak (score <40): Name the specific constraint the company situation creates and the frame that bypasses it. 3 sentences.
-
-market:
-  Strong (score ≥60): Name exactly how to use market data in the conversation — the format, the source, the moment to introduce it. 3 sentences.
-  Weak (score <40): Name the one piece of market data they can gather in 48 hours that's more credible than a salary survey. 3 sentences.
-
-STRATEGY SECTIONS (tactical — what to do, what to say):
+SECTIONS:
 
 leverage_risk:
   The non-obvious dynamic of their specific leverage. How to deploy it without triggering a negative reaction. What to say and what to avoid. 4-5 sentences.
@@ -892,25 +868,47 @@ pushback:
   Then 8 specific manager objections with responses, formatted exactly as:
   **"[manager objection]"**
   → [their response, 1-2 sentences, specific and non-defensive]
-  Cover these 8 scenarios: budget frozen, timing/wait for review, needs to check with HR, performance not there yet, surprised by the ask, vague deferral ("let me think about it"), threatening the relationship, and one curveball specific to their blocker.
+  Cover: budget frozen, timing/wait for review, needs to check with HR, performance not there yet, surprised by the ask, vague deferral ("let me think about it"), threatening the relationship, and one curveball specific to their blocker.
 
 meeting_email:
   What makes managers actually open and respond to comp emails.
   Then the complete email:
-  Subject: [specific subject line — not generic]
+  Subject: [specific subject line]
   
   [Full email body, 120-160 words. First person. Confident but not aggressive. Ends with a clear ask for 20-30 minutes.]
 
 raise_case:
-  Why most one-paragraph raise cases fail to land — the specific mistake.
-  Then the one-paragraph raise case they can hand their manager or paste into an email:
+  Why most one-paragraph raise cases fail to land.
+  Then the one-paragraph raise case:
   [2-4 sentences. Leads with scope/impact, not tenure. Includes a specific number or range. Ends with the ask.]
 
-Return ALL 12 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
-{"evidence":"...","timing":"...","manager":"...","company":"...","market":"...","leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
+Return ONLY these 7 keys as valid JSON. Values are plain text strings with \n for line breaks. No markdown fences. No preamble.
+{"leverage_risk":"...","emphasize":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","raise_case":"..."}`;
 
-    userMessage  = `User's position:\n${answeredDims}${tailorBlock}\n\nGenerate the complete 12-section plan.`;
-    maxTokens    = 4000;
+    userMessage  = `User's position:\n${answeredDims}${tailorBlock}\n\nGenerate the 7 plan sections.`;
+    maxTokens    = 2500;
+
+  } else if (part === 'strategy_position') {
+    // 5 position sections — the fast call (runs in parallel with strategy_plan)
+    system = `You are a senior salary negotiation coach. Write 2-3 sentences of deep tactical insight for each of the user's 5 position dimensions.
+
+The user is preparing to ask for a raise.
+Blocker: "${blockerContext}"
+Leverage: ${leverList}
+Weak spots: ${weakList}
+
+For each dimension, calibrate by score:
+- Strong (score ≥60): Name the hidden risk of assuming it's enough, OR the exact way to weaponize it. 2-3 sentences.
+- Medium (score 40-59): Name the dynamic and one specific move to strengthen or leverage it. 2-3 sentences.
+- Weak (score <40): Name the specific consequence AND one concrete action they can take in 7 days. 2-3 sentences.
+
+Use **bold** for the single key tactic only. Direct, specific — no generic advice.
+
+Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
+{"evidence":"...","timing":"...","manager":"...","company":"...","market":"..."}`;
+
+    userMessage = `User's position:\n${answeredDims}\n\nGenerate the 5 position insights.`;
+    maxTokens   = 800;
 
   } else {
     return res.status(400).json({ error: `Unknown part: ${part}` });
