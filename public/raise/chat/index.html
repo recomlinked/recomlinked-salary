@@ -2245,12 +2245,23 @@ function setMode(target) {
       // Scroll to top of sim content so user sees bridge text first, not the paywall
       var chatWrap = $('chat-wrap');
       if (chatWrap) { chatWrap.scrollTop = practiceEl.offsetTop - 16; }
+    } else if (state.paid && !practiceEl.dataset.simInitialized &&
+                !practiceEl.querySelector('.sim-reply-pill') &&
+                !practiceEl.querySelector('.user-msg')) {
+      // Paid user switching to sim tab with empty container — render opening chips
+      practiceEl.dataset.simInitialized = 'true';
+      var _iWrap = el('div', 'coach-msg', '');
+      _iWrap.innerHTML = '<div class="bubble"><p>How you open sets the tone for everything after it — <strong>Tap one to start.</strong></p></div>';
+      practiceEl.appendChild(_iWrap);
+      renderOpeningChips();
+      var chatWrap2 = $('chat-wrap');
+      if (chatWrap2) setTimeout(function() { chatWrap2.scrollTop = 0; }, 50);
     } else {
       scrollChatToBottom();
     }
 
     const input = $('chat-input');
-    if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
+    if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own…' : 'Unlock full access to practice…'; input.disabled = !state.paid; }
     var inputBar2 = document.querySelector('.input-row');
     if (inputBar2) inputBar2.style.display = '';
   } else if (target === 'coach') {
@@ -7821,10 +7832,13 @@ async function resumeFromState() {
       }
 
     } else {
-      // ── No history: fresh sim start — show opening chips ──────────────────
-      // Use beginSimulationFlow which naturally renders the intro + opening chips
+      // ── No history: fresh sim — show opening chips directly ───────────────
+      // SIM_STATE.blocker is already set above; just render the opening chips.
       setMode('sim');
-      await beginSimulationFlow(reason);
+      var _introWrap = el('div', 'coach-msg', '');
+      _introWrap.innerHTML = '<div class="bubble"><p>How you open sets the tone for everything after it — <strong>Tap one to start.</strong></p></div>';
+      (_practiceContainer).appendChild(_introWrap);
+      renderOpeningChips();
     }
   } else {
     // Unknown resume state.
