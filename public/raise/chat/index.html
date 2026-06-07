@@ -2224,13 +2224,17 @@ function setMode(target) {
     if (!state.paid && !practiceEl.querySelector('.user-msg') && !practiceEl.dataset.lockedShown) {
       showLockedPractice(practiceEl);
       practiceEl.dataset.lockedShown = 'true';
+      // Scroll to top of sim content so user sees bridge text first, not the paywall
+      var chatWrap = $('chat-wrap');
+      if (chatWrap) { chatWrap.scrollTop = practiceEl.offsetTop - 16; }
+    } else {
+      scrollChatToBottom();
     }
 
     const input = $('chat-input');
     if (input) { input.placeholder = state.paid ? 'Tap an opening or type your own\u2026' : 'Unlock full access to practice\u2026'; input.disabled = !state.paid; }
     var inputBar2 = document.querySelector('.input-row');
     if (inputBar2) inputBar2.style.display = '';
-    scrollChatToBottom();
   } else if (target === 'coach') {
     coachingEl.style.display = 'block';
     coachingEl.classList.add('active-chat');
