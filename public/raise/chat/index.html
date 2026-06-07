@@ -7457,10 +7457,16 @@ async function init() {
   const startMode = params.get('start');
   if (startMode === 'sim') { SIM_STATE.entryMode = 'sim'; }
   if (startMode === 'coach') { SIM_STATE.entryMode = 'coach'; }
+  // ?open= from paid page — direct mode entry for returning paid users
+  const openMode = params.get('open');
+  if (openMode === 'plan')    { SIM_STATE.entryMode = 'discovery'; }
+  if (openMode === 'sim')     { SIM_STATE.entryMode = 'sim'; }
+  if (openMode === 'coach')   { SIM_STATE.entryMode = 'coach'; }
+  if (openMode === 'email')   { SIM_STATE.entryMode = 'email'; }
 
-  // mode=case → raise case landing page, enter case mode directly
+  // mode=case or open=email → email mode directly
   const caseMode = params.get('mode');
-  if (caseMode === 'case') {
+  if (caseMode === 'case' || openMode === 'email') {
     // Save template before stripping URL
     var _caseTemplate = params.get('template') || 'performance';
     try { localStorage.setItem('rl_case_template', _caseTemplate); } catch(e) {}
