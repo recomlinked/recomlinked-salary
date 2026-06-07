@@ -7633,6 +7633,8 @@ async function init() {
     const _wasPaid = state.paid;
     Object.assign(state, saved);
     if (_wasPaid || saved.paid) state.paid = true;
+    // Paid users: clear paywall_shown from free session so plan renders fully
+    if (state.paid) state.paywall_shown = false;
     if (!state.paid) await silentTokenCheck();
     await resumeFromState();
     return;
@@ -7717,9 +7719,10 @@ async function resumeFromState() {
       // Legacy entry type (pre-v3) — reason is now inside the score card.
       // Ignore silently during replay; the card above will already show it.
     } else if (entry.type === 'paywall') {
-      // Paywall rendered from state.blocker + state.current_range
-      // No promo
-      renderPaywallBubble({ discounted: false });
+      // Only replay paywall for unpaid users — paid users have unlocked access
+      if (!state.paid) {
+        renderPaywallBubble({ discounted: false });
+      }
     }
   }
 
