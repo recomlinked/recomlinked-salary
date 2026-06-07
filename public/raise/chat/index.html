@@ -6157,6 +6157,51 @@ function showTailorQuestion(chatArea, idx) {
 
 
 function showDiscPaywall() {
+  // Paid users redoing their plan — skip the paywall entirely,
+  // fire the full strategy call to fill all 12 sections immediately.
+  if (state.paid) {
+    var blockerCode = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'no_script';
+    var answers = {};
+    if (discOrderedQuestions && discOrderedQuestions.length > 0) {
+      discOrderedQuestions.slice(0, 5).forEach(function(q) {
+        answers[q.dimTag] = SIM_STATE.context[q.id] || '';
+      });
+    }
+    var stratBody = {
+      mode: 'disc_insights',
+      blocker: blockerCode,
+      answers: answers,
+      dims: discDims,
+      levers: discLevers,
+      weaks: discWeaks,
+      part: 'strategy',
+    };
+    discStrategyLoading = false;
+    fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(stratBody),
+    }).then(function(r) { return r.json(); }).then(function(data) {
+      if (data && data.insights && Object.keys(data.insights).length > 0) {
+        var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+        Object.keys(data.insights).forEach(function(dim) {
+          if (discCanvasBlocks[dim] !== undefined) {
+            discCanvasBlocks[dim].insight = data.insights[dim];
+            if (stratPlanKeys.indexOf(dim) >= 0) {
+              discCanvasBlocks[dim].filled = true;
+              discCanvasBlocks[dim].teaser = false;
+            }
+          }
+        });
+        discStrategyDone = true;
+        var lc = $('disc-canvas-live');
+        if (lc) setCanvasHTML(lc);
+        try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
+      }
+    }).catch(function() {});
+    return;
+  }
+
   state.paywall_shown = true;
   saveState();
   var chatArea = $('disc-chat');
