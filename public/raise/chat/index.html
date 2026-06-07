@@ -5883,7 +5883,16 @@ async function generateDiscInsights() {
       discStrategyDone = true;
       discPlanLoading = true; // set before render so plan blocks show "Loading..."
       var liveCanvas = $('disc-canvas-live');
-      if (liveCanvas) setCanvasHTML(liveCanvas);
+      if (liveCanvas) {
+        setCanvasHTML(liveCanvas);
+        // Auto-expand all position blocks for paid users
+        if (state.paid) {
+          liveCanvas.querySelectorAll('[data-expanded="0"][onclick*="togglePosBlock"]').forEach(function(el) {
+            var m = el.getAttribute('onclick').match(/togglePosBlock\(this,'(\w+)'\)/);
+            if (m) togglePosBlock(el, m[1]);
+          });
+        }
+      }
 
       // Plan sections fill in when ready
       var planResp = await planFetch;
@@ -5894,8 +5903,9 @@ async function generateDiscInsights() {
         applyInsights(planData.insights, true);
         var lc2 = $('disc-canvas-live');
         if (lc2) setCanvasHTML(lc2);
-        try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
       }
+      // Save after both calls complete with full content
+      try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; state.discovery.insights = discInsights; saveState(); } catch(e) {}
 
     } else {
       // Free users: hooks only
@@ -5924,13 +5934,6 @@ async function generateDiscInsights() {
     var liveCanvas = $('disc-canvas-live');
     if (liveCanvas) setCanvasHTML(liveCanvas);
   }
-
-  // Save all insights
-  try {
-    state.discovery.insights = discInsights;
-    state.discovery.canvasBlocks = discCanvasBlocks;
-    saveState();
-  } catch (e) {}
 
   // Log and show paywall
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
