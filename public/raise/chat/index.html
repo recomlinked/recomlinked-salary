@@ -1405,9 +1405,8 @@ function startOverSession(msg) {
 }
 
 function profileHash() {
-  // Path B simulation: use the unique per-session ID so each user gets
-  // their own row in the Google Sheet (the default hash is identical for
-  // all Path B users because they share a dummy profile).
+  // Simulation users: use unique per-session ID so each user gets
+  // their own row in the Google Sheet.
   if (state.sim_session_id) return state.sim_session_id;
 
   const p = state.profile || {};
@@ -1816,7 +1815,7 @@ const SIM_STATE = {
 
 // ── Optional context questions ──
 // Each question carries a small set of predefined options so tapping a
-// context chip in the toolbar panel feels the same as Path A's exchange
+// context chip in the toolbar panel
 // chips: question → tappable options → optional "+ Something else…" for
 // free text. Without these, tapping a context chip dropped the user into
 // a blank text input, which felt jarring next to the chip-driven sim flow.
@@ -1924,7 +1923,7 @@ let ctxPanelOpen = false;
 // Render a context question's predefined options as user-side chips, with
 // a "+ Something else…" free-text escape. Saves the picked value into
 // SIM_STATE.context[key] and follows up with a brief coach acknowledgment.
-// Pattern matches Path A's exchange chips so context questions feel like
+// Context questions styled like simulation chips so they feel consistent
 // the same kind of step.
 //
 // We save the previous pendingSubmitHandler before overriding it, so that
@@ -1949,7 +1948,7 @@ function askContextQuestion(q) {
   };
 
   // Free-text-only questions (like role): no chips, just input.
-  // Matches Path A's "describe it naturally" pattern.
+  // Free-text input for context questions.
   if (q.freeTextOnly) {
     enableInput('Describe your role\u2026');
     $('chat-input')?.focus();
@@ -3809,7 +3808,7 @@ const BLOCKER_MAP = {
   putting_off:      { code: 'putting_off',    label: "I keep putting it off",                            scene: "You've finally started the conversation. Your manager says:" },
 };
 
-// ── Path B: Chip click → coach insight → timing → simulation at blocker ──
+// ── Simulation flow: chip click → coach insight → timing → simulation at blocker ──
 async function beginSimulationFlow(reasonParam) {
   const blocker = BLOCKER_MAP[reasonParam] || BLOCKER_MAP.other;
   SIM_STATE.blocker = blocker;
@@ -7616,8 +7615,7 @@ async function init() {
     if (_stalePaid) { state.paid = true; if (_staleToken) state.paid_token = _staleToken; }
     else if (!state.paid) await silentTokenCheck();
   } else if (saved && (saved.current_exchange === 10 || (saved.profile && saved.current_exchange > 0))) {
-    // Resume: Path B sim users (current_exchange=10, no profile object)
-    // OR Path A users (have profile + exchange > 0)
+    // Resume: simulation users (current_exchange=10) or users with saved profile
     const _wasPaid = state.paid;
     Object.assign(state, saved);
     if (_wasPaid || saved.paid) state.paid = true;
@@ -7646,9 +7644,8 @@ async function init() {
     return;
   }
 
-  // Path A removed — no assessment profile flow.
-  // All entry is via ?reason= (Path B). If we reach here without a reason,
-  // redirect to the landing page.
+  // All entry is via ?reason= from landing pages. If we reach here without
+  // a valid session, redirect to the landing page.
   stopThinkingAnimation();
   window.location.replace('/raise/');
 }
@@ -7658,7 +7655,7 @@ async function init() {
 async function resumeFromState() {
   stopThinkingAnimation();
 
-  // Path A requires current_range; Path B (simulation, exchange=10) doesn't.
+  // Simulation sessions use current_exchange=10 with no current_range.
   // Paid users skip this check entirely — they have full access regardless of state shape.
   if (!state.paid && !state.current_range && state.current_exchange !== 10) {
     clearAll();
@@ -7718,7 +7715,7 @@ async function resumeFromState() {
   // Resume interaction based on cursor
   const where = state.current_exchange;
   if (where === 10) {
-    // Path B simulation
+    // Simulation session resume
     const reason = state.sim_reason || 'other';
     const blocker = BLOCKER_MAP[reason] || BLOCKER_MAP.other;
     SIM_STATE.blocker = blocker;
@@ -7933,7 +7930,7 @@ async function startCheckout(selectedPrice) {
   try {
     const params = new URLSearchParams(location.search);
     const refSource = params.get('ref') || (state.profile && state.profile.refSource) || (function(){ try{ return localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })();
-    // Fallback values for Path B users who skip profiling
+    // Fallback values for simulation users who skip profiling
     const checkoutProfile = state.profile || {
       role: 'Not specified',
       country: 'US',
