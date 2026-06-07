@@ -1094,7 +1094,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 const LS_STATE   = 'rl_raise_state';
-const API_ENRICH   = '/api/raise-enrich';
 const API_CHECKOUT = '/api/raise-checkout';
 const API_LOG      = '/api/raise-webhook';
 
@@ -6208,7 +6207,6 @@ function showDiscPaywall() {
   }
   appendStandardPaywall(chatArea, { mode: 'discovery' });
   lockFreeModes();
-  fireEnrichment();
   var pw = chatArea.querySelector('.paywall-bubble');
   if (pw) setTimeout(function() { pw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
 }
@@ -7443,26 +7441,7 @@ async function init() {
     if (_early.paid) {
       state.paid = true;
       if (_early.paid_token) state.paid_token = _early.paid_token;
-      if (_early.enriched_plan) {
-        state.enriched_plan = _early.enriched_plan;
-      } else {
-        // Fetch full plan from verify in background and cache it
-        const _tok = _early.paid_token || localStorage.getItem('rl_raise_access_token');
-        if (_tok) {
-          fetch('/api/raise-verify?token=' + encodeURIComponent(_tok))
-            .then(function(r){ return r.ok ? r.json() : null; })
-            .then(function(d){
-              if (d && d.plan) {
-                state.enriched_plan = d.plan;
-                try {
-                  var _cs = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
-                  _cs.enriched_plan = d.plan;
-                  localStorage.setItem('rl_raise_state', JSON.stringify(_cs));
-                } catch(e) {}
-              }
-            }).catch(function(){});
-        }
-      }
+
     }
   } catch(e) {}
 
@@ -7909,25 +7888,6 @@ async function resumeFromState() {
 /* ── PAYWALL (main) — dynamic, coach-voice                ── */
 /* ───────────────────────────────────────────────────────── */
 
-function fireEnrichment() {
-  const body = {
-    profile:      state.profile,
-    exchanges:    null,
-    obstacle:     state.blocker,
-    timing:       state.timing || 'exploring',
-    final_range:  state.current_range,
-    profile_hash: profileHash(),
-  };
-  try {
-    fetch(API_ENRICH, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      keepalive: true,
-    }).catch(() => {});
-  } catch (e) {}
-}
-
 async function startCheckout(selectedPrice) {
   var checkoutPrice = selectedPrice || PRICE_USD;
   try {
@@ -8092,7 +8052,6 @@ async function renderPaywallBubble(opts) {
   appendStandardPaywall(container, { mode: mode });
   scrollChatToBottom();
   // Pre-generate paid dashboard in background so it loads instantly after purchase
-  fireEnrichment();
 }
 
 
