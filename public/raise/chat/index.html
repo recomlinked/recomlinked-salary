@@ -4153,13 +4153,8 @@ function _generatePDFPrintFallback() {
 
       var h = '<div class="block ' + cls + '"><div class="block-label">' + icon + item.label;
       if (badge) h += '<span class="block-badge">' + badge + '</span>';
-      // Lock position blocks for unpaid users (consistent with web)
-      if (section === 'position' && !isPaid) {
-        h += '</div></div>';
-        return h;
-      }
-      // Collapse position blocks once strategy is fully done (paid view)
-      if (section === 'position' && discStrategyDone && !isPaid) {
+      // Lock position blocks for unpaid users
+      if (section === 'position' && !state.paid) {
         h += '</div></div>';
         return h;
       }
@@ -5822,13 +5817,12 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Single hooks call — replaces parallel position+teasers (saves ~1400 tokens per paywall)
+  // API call: hooks for free users, full strategy for paid users
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, 5).forEach(function(q) {
     answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
-  console.log('[disc_insights] Sending hooks:', JSON.stringify({ blocker: blockerCode, answers: answers }));
 
   var apiBody = {
     mode: 'disc_insights',
@@ -5837,8 +5831,10 @@ async function generateDiscInsights() {
     dims: discDims,
     levers: discLevers,
     weaks: discWeaks,
-    part: 'hooks',
+    part: state.paid ? 'strategy' : 'hooks',
   };
+
+  console.log('[disc_insights] Sending', apiBody.part, ':', JSON.stringify({ blocker: blockerCode, answers: answers }));
 
   try {
     var resp = await fetch('/api/raise-coach', {
@@ -5847,29 +5843,28 @@ async function generateDiscInsights() {
       body: JSON.stringify(apiBody),
     });
     var data = await resp.json();
-    console.log('[disc_insights] Hooks response:', JSON.stringify(data).slice(0, 200));
+    console.log('[disc_insights] Response:', JSON.stringify(data).slice(0, 200));
 
     if (data && data.insights && Object.keys(data.insights).length > 0) {
-      // Apply hooks to all 12 blocks
       var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       Object.keys(data.insights).forEach(function(dim) {
         if (discCanvasBlocks[dim] !== undefined) {
           discCanvasBlocks[dim].insight = data.insights[dim];
           discInsights[dim] = data.insights[dim];
-          // Mark strategy blocks as filled+teaser so they show the hook
           if (stratPlanKeys.indexOf(dim) >= 0) {
             discCanvasBlocks[dim].filled = true;
-            discCanvasBlocks[dim].teaser = true;
+            // Paid users get full content (no teaser), free users get hooks (teaser)
+            discCanvasBlocks[dim].teaser = !state.paid;
           }
         }
       });
     }
   } catch (e) {
-    console.error('[disc_insights] Hooks API error:', e);
-    generateClientFallbacks();
+    console.error('[disc_insights] API error:', e);
+    if (!state.paid) generateClientFallbacks();
   }
 
-  // Remove loading spinner and render canvas with hooks
+  // Remove loading spinner and render canvas
   var loading = $('disc-loading');
   if (loading) {
     if (loading._arcStop) loading._arcStop();
@@ -6157,50 +6152,8 @@ function showTailorQuestion(chatArea, idx) {
 
 
 function showDiscPaywall() {
-  // Paid users redoing their plan — skip the paywall entirely,
-  // fire the full strategy call to fill all 12 sections immediately.
-  if (state.paid) {
-    var blockerCode = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'no_script';
-    var answers = {};
-    if (discOrderedQuestions && discOrderedQuestions.length > 0) {
-      discOrderedQuestions.slice(0, 5).forEach(function(q) {
-        answers[q.dimTag] = SIM_STATE.context[q.id] || '';
-      });
-    }
-    var stratBody = {
-      mode: 'disc_insights',
-      blocker: blockerCode,
-      answers: answers,
-      dims: discDims,
-      levers: discLevers,
-      weaks: discWeaks,
-      part: 'strategy',
-    };
-    discStrategyLoading = false;
-    fetch('/api/raise-coach', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(stratBody),
-    }).then(function(r) { return r.json(); }).then(function(data) {
-      if (data && data.insights && Object.keys(data.insights).length > 0) {
-        var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
-        Object.keys(data.insights).forEach(function(dim) {
-          if (discCanvasBlocks[dim] !== undefined) {
-            discCanvasBlocks[dim].insight = data.insights[dim];
-            if (stratPlanKeys.indexOf(dim) >= 0) {
-              discCanvasBlocks[dim].filled = true;
-              discCanvasBlocks[dim].teaser = false;
-            }
-          }
-        });
-        discStrategyDone = true;
-        var lc = $('disc-canvas-live');
-        if (lc) setCanvasHTML(lc);
-        try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
-      }
-    }).catch(function() {});
-    return;
-  }
+  // Paid users: strategy already ran in the main flow — just skip the paywall
+  if (state.paid) return;
 
   state.paywall_shown = true;
   saveState();
