@@ -7854,14 +7854,6 @@ async function resumeFromState() {
 /* ── Exchange 1: Role & industry (free text only) ──────── */
 
 
-
-
-
-
-
-/* ── Call /api/raise-exchange and react to the response ── */
-
-
 /* ───────────────────────────────────────────────────────── */
 /* ── PAYWALL (main) — dynamic, coach-voice                ── */
 /* ───────────────────────────────────────────────────────── */
@@ -8071,12 +8063,6 @@ function awaitFreeText(onSubmit) {
   pendingSubmitHandler = onSubmit;
 }
 
-
-// ── Exchange message helpers ──────────────────────────────
-// Turn-by-turn conversation for Ex1/Ex2. Sent to /api/raise-exchange as
-// `messages` so the classifier sees cumulative context and decides
-// advance/nudge based on meaning, not message length. Ex3 chips + Ex4
-// obstacle still use the legacy answer shape.
 
 
 
