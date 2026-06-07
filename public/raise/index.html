@@ -330,9 +330,6 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 .fade-in.visible { opacity: 1; transform: translateY(0); }
 
 /* ── 20. UTILITIES ────────────────────────── */
-.progress { height: 3px; background: var(--bg); border-radius: 2px; overflow: hidden; margin: 8px 0; }
-.progress .pseg { height: 3px; flex: 1; background: var(--bg); border-radius: 2px; transition: background 0.25s; }
-.progress .pseg.done { background: var(--purple); }
 .hiw-continue { text-align: center; margin: 20px 0 8px; }
 .hiw-continue-hint { font-size: 11px; color: var(--text2); letter-spacing: 0.04em; margin-top: 10px; text-transform: uppercase; }
 
@@ -608,17 +605,31 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     
     
 <div class="divider"></div>
-<a href="#raise-case-sample" class="hiw-card" aria-label="Step 3: send your raise case">
+<a href="/raise/coach/" class="hiw-card" aria-label="Step 3: simulate and practice the conversation">
       <div class="hiw-num">3</div>
       <div class="hiw-body">
-        <div class="hiw-title">Email your Raise Case first</div>
-        <div class="hiw-desc">Your Raise Case is a professional document you email to your manager — your impact, market data, and a clear ask. The document makes your case, so you don’t have to find the words in the room. <span class="hiw-question">Research shows that written requests get the same results as in-person conversations.</span></div>
-        <div class="hiw-cta">See the sample below <span class="hiw-cta-arrow">↓</span></div>
+        <div class="hiw-title">Simulate and practice the conversation</div>
+        <div class="hiw-desc">Most people freeze the moment their manager pushes back. The AI coach puts you in that exact moment — budget frozen, “let’s revisit later,” “remind me what you’ve delivered” — and coaches you through it in real time. <span class="hiw-question">Practice until nothing they say can surprise you.</span></div>
+        <div class="hiw-cta">Try the AI coach <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
 
-    
+    <div class="fade-in demo-section" id="sim-practice">
+      <h2 class="section-title">How to professionally ask for a raise <span style="color:var(--purple)">in 2026</span></h2>
+      <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 24px;">In 2026, you don't need to ask for a raise unprepared. The modern way to learn <a href="/raise/coach/" style="color:var(--purple);text-decoration:none;">how to ask for a raise in 2026</a> is to practice it first — an AI coach simulates your manager's responses, coaches you on every move, and lets you practice the conversation until nothing surprises you.</p>
+      <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--text2);">The best pay raise negotiations take a few hours of prep</div>
+      <div style="text-align:center;margin-top:12px;margin-bottom:12px;"><a href="/raise/coach/" class="cta-btn">See how the AI coach works <span class="cta-arrow">→</span></a></div>
+      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px;">
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 013 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 013 0v2.5"/><path d="M14 10.5a1.5 1.5 0 013 0v1.5"/><path d="M17 11.5a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-2a6 6 0 01-5.3-3.2l-2.7-5a1.5 1.5 0 012.6-1.5l1.4 2.2"/></svg> Just tap, no typing</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 7c0-1.7 6-3.5 6-6"/><path d="M6 17c0-1.7 6-3.5 6-6"/></svg> Branching scenarios</span>
+        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5h4.5l-3.5 2.7 1.3 4.3-3.8-2.8-3.8 2.8 1.3-4.3-3.5-2.7h4.5z"/><path d="M2 12h2M20 12h2M12 20v2"/></svg> AI coaching every move</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <!-- Pro tip: raise case -->
     <div class="fade-in demo-section" id="raise-case-sample">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,207,86,0.12);border:1px solid rgba(245,207,86,0.3);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;color:#7a6428;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px;">★ Pro tip</div>
       <h2 class="section-title">Why sending a raise case is <a href="/raise/chat/?reason=other" style="color:var(--purple);text-decoration:none;">the best way to ask for a raise</a></h2>
       <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 28px;">Instead of rehearsing what to say, send a professional document first. Your manager reads your case, reviews the data, and comes to the meeting already understanding your position. <strong style="color:var(--text);">The hardest part is done before you sit down and say a word.</strong></p>
 
@@ -680,64 +691,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       <div style="margin-top:24px;margin-bottom:8px;text-align:center;"><a href="/raise-case/" class="cta-btn">Get your raise case now <span class="cta-arrow">→</span></a></div>
     </div>
 
-    <!-- Simulation demo section -->
-    <div class="divider"></div>
-    <div class="fade-in demo-section">
-      <h2 class="section-title">How to professionally ask for a raise <span style="color:var(--purple)">in 2026</span></h2>
-      <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 24px;">In 2026, you don't need to ask for a raise unprepared. The modern way to learn <a href="/raise/coach/" style="color:var(--purple);text-decoration:none;">how to ask for a raise in 2026</a> is to practice it first — an AI coach simulates your manager's responses, coaches you on every move, and lets you practice the conversation until nothing surprises you.</p>
-      <div style="text-align:center;margin-top:24px;font-size:14px;color:var(--text2);">The best pay raise negotiations take a few hours of prep</div>
-      <div style="text-align:center;margin-top:12px;margin-bottom:12px;"><a href="/raise/coach/" class="cta-btn">See how the AI coach works <span class="cta-arrow">→</span></a></div>
-      <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:20px;">
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13v-8.5a1.5 1.5 0 013 0v7.5"/><path d="M11 11.5v-2a1.5 1.5 0 013 0v2.5"/><path d="M14 10.5a1.5 1.5 0 013 0v1.5"/><path d="M17 11.5a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-2a6 6 0 01-5.3-3.2l-2.7-5a1.5 1.5 0 012.6-1.5l1.4 2.2"/></svg> Just tap, no typing</span>
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18"/><path d="M6 7c0-1.7 6-3.5 6-6"/><path d="M6 17c0-1.7 6-3.5 6-6"/></svg> Branching scenarios</span>
-        <span class="why-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--purple, #8B6FA5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5h4.5l-3.5 2.7 1.3 4.3-3.8-2.8-3.8 2.8 1.3-4.3-3.5-2.7h4.5z"/><path d="M2 12h2M20 12h2M12 20v2"/></svg> AI coaching every move</span>
-      </div>
-    </div>
-
   </section>
-
-  <!--
-  <div class="rep-section" id="rep-section">
-    <h2 class="section-title">Practice asking for a raise before you actually do it</h2>
-    <a href="#blockers" style="text-decoration:none;color:inherit;display:block;cursor:pointer;">
-    <div class="scenario-tree-widget" id="scenario-tree" style="pointer-events:none;">
-      <div class="st-header">
-        <div>
-          <div class="st-badge"><span class="st-badge-dot"></span>Scenario Planning</div>
-          <div class="st-title">Tap Through Every Scenario</div>
-        </div>
-        <div class="st-counters">
-          <div class="st-counter st-counter-g"><span class="st-counter-n" id="st-explored">0</span><span class="st-counter-l">explored</span></div>
-          <div class="st-counter st-counter-y"><span class="st-counter-n" id="st-paths">0</span><span class="st-counter-l">paths</span></div>
-        </div>
-      </div>
-      <div class="st-tree-wrap">
-        <div class="st-fade-l"></div><div class="st-fade-r"></div><div class="st-fade-b"></div>
-        <svg id="st-svg" width="100%" height="320" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <filter id="stg6"><feGaussianBlur stdDeviation="6"/></filter>
-          </defs>
-        </svg>
-      </div>
-      <div class="st-chat-section">
-        <div class="st-chat-header">
-          <div class="st-chat-header-left"><span class="st-chat-dot"></span><span>Your prepared responses</span></div>
-          <span class="st-chat-depth" id="st-depth">depth 0</span>
-        </div>
-        <div class="st-chat-body" id="st-chat-body">
-          <div class="st-chat-placeholder">The conversation unfolds as paths are explored...</div>
-        </div>
-      </div>
-    </div>
-    </a>
-  </div>
-  <div class="calc-cta">
-    <a href="#blockers" class="cta-btn">
-      <span>Start with your biggest raise blocker</span>
-      <span class="cta-arrow">→</span>
-    </a>
-  </div>
-  -->
 
 
   <div class="divider"></div>
@@ -908,148 +862,11 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 
 <!-- ═══════════════════════════════════════════════════════ -->
 <!-- ──  ASSESSMENT CONTENT                               ── -->
-<!-- ═══════════════════════════════════════════════════════ -->
-<div id="assessment-content" style="display:none;">
-
-  <div id="assessment-top" style="padding-top: 4px;"></div>
-
-  <!-- Progress ─────────────────────────────────────────── -->
-  <div class="progress">
-    <div class="pseg" id="p0"></div>
-    <div class="pseg" id="p1"></div>
-    <div class="pseg" id="p2"></div>
-  </div>
-
-  <!-- ── Step 0: Company situation ── -->
-  <div class="step active" id="step-0">
-    <div class="step-meta">Question 1 of 3</div>
-    <h2>How is your company doing right now?</h2>
-    <p class="sub">Company financial health is the single strongest structural factor shaping raise outcomes.</p>
-    <div class="opts" id="company-opts">
-      <div class="opt" data-val="growing" onclick="selectOpt(this,'company-opts')">
-        Growing fast
-        <small>Hiring, expanding, or in a healthy funding/revenue window</small>
-      </div>
-      <div class="opt" data-val="stable" onclick="selectOpt(this,'company-opts')">
-        Stable
-        <small>Steady business, no major growth or cuts</small>
-      </div>
-      <div class="opt" data-val="cutting" onclick="selectOpt(this,'company-opts')">
-        Cutting or restructuring
-        <small>Layoffs, hiring freezes, budget cuts, or pivoting</small>
-      </div>
-    </div>
-    <div class="err" id="err-0">Please select your company's current situation.</div>
-    <div class="step-nav">
-      <span class="step-counter">1 / 3</span>
-      <div class="nav-right">
-        <button class="btn-back" onclick="backToLanding()">← Back</button>
-        <button class="btn-continue" id="btn-0" onclick="goStep(1)">Continue →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Step 1: Last raise ── -->
-  <div class="step" id="step-1">
-    <div class="step-meta">Question 2 of 3</div>
-    <h2>When was your last raise?</h2>
-    <p class="sub">Timing is one of the biggest factors.</p>
-    <div class="opts" id="raise-opts">
-      <div class="opt" data-val="under_1_year" onclick="selectOpt(this,'raise-opts')">
-        Under 1 year at this job
-      </div>
-      <div class="opt" data-val="annual_raise_want_more" onclick="selectOpt(this,'raise-opts')">
-        Got a raise in the past year, want more
-      </div>
-      <div class="opt" data-val="1_2_years" onclick="selectOpt(this,'raise-opts')">
-        1-2 years since my last raise
-      </div>
-      <div class="opt" data-val="2_plus_years" onclick="selectOpt(this,'raise-opts')">
-        2+ years since my last raise
-      </div>
-      <div class="opt" data-val="never_asked" onclick="selectOpt(this,'raise-opts')">
-        Never actively asked for one
-      </div>
-    </div>
-    <div class="err" id="err-1">Please select your last raise timing.</div>
-    <div class="step-nav">
-      <span class="step-counter">2 / 3</span>
-      <div class="nav-right">
-        <button class="btn-back" onclick="goStep(0)">← Back</button>
-        <button class="btn-continue" id="btn-1" onclick="goStep(2)">Continue →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Step 2: Company size ── -->
-  <div class="step" id="step-2">
-    <div class="step-meta">Last question</div>
-    <h2>How big is your company?</h2>
-    <p class="sub">Larger companies tend to have structured raise bands. Smaller ones usually have more case-by-case flexibility.</p>
-    <div class="opts" id="size-opts">
-      <div class="opt" data-val="under_50"     onclick="selectOpt(this,'size-opts')">Under 50</div>
-      <div class="opt" data-val="50_250"       onclick="selectOpt(this,'size-opts')">50-250</div>
-      <div class="opt" data-val="250_1000"     onclick="selectOpt(this,'size-opts')">250-1,000</div>
-      <div class="opt" data-val="1000_10000"   onclick="selectOpt(this,'size-opts')">1,000-10,000</div>
-      <div class="opt" data-val="10000_plus"   onclick="selectOpt(this,'size-opts')">10,000+</div>
-    </div>
-    <div class="err" id="err-2">Please select your company size.</div>
-    <div class="step-nav">
-      <span class="step-counter">3 / 3</span>
-      <div class="nav-right">
-        <button class="btn-back" onclick="goStep(1)">← Back</button>
-        <button class="btn-continue" id="btn-2" onclick="submitAssessment()">Get my plan →</button>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /assessment-content -->
-
 </div><!-- /main -->
 
 
 <script>
 /* ───────────────────────────────────────────────────────── */
-/* ── State & initialisation                              ── */
-/* ───────────────────────────────────────────────────────── */
-
-const S = {
-  company_situation: null,
-  last_raise:        null,
-  company_size:      null,
-  currentStep:       0,
-};
-
-// If URL has ?start=1, hide landing content, show assessment
-(function initMode() {
-  const params = new URLSearchParams(location.search);
-  const startMode = params.get('start') === '1';
-  if (startMode) {
-    document.getElementById('landing-content').style.display = 'none';
-    document.getElementById('assessment-content').style.display = 'block';
-    // Scroll to top of assessment after paint
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-
-    // GA4 + Clarity — assessment_started (fires for every entry path:
-    // hero CTA, reason chips, closing CTAs — they all land here with ?start=1)
-    try {
-      const reason = params.get('reason') || '';
-      const ref    = params.get('ref')    || '';
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'assessment_started', {
-          product: 'raise',
-          reason:  reason,
-          ref:     ref,
-        });
-      }
-      if (typeof window.clarity === 'function') {
-        window.clarity('set', 'funnel_stage', 'assessment_started');
-        window.clarity('event', 'assessment_started');
-      }
-    } catch (e) { /* non-fatal */ }
-  }
-})();
-
 /* ───────────────────────────────────────────────────────── */
 /* ── FAQ toggle                                          ── */
 /* ───────────────────────────────────────────────────────── */
@@ -1060,169 +877,6 @@ function toggleFaq(qEl) {
 }
 
 /* ───────────────────────────────────────────────────────── */
-/* ── Sample report card — 4 personas, animated build     ── */
-/* ───────────────────────────────────────────────────────── */
-const PLAN_ITEMS = [
-  "Top 3 blockers identified",
-  "Your specific raise number set",
-  "Opening script drafted",
-  "Pushback responses prepared",
-  "Manager objections mapped",
-  "Counteroffer scenarios ready",
-  "Email follow-up drafted"
-];
-
-const PERSONAS = [
-  {
-    role: "Senior Nurse · Hospital System",
-    desc: "Covers extra shifts without a pay bump. Union contract helps.",
-    floor: 54, ceiling: 68, color: "amber", verdict: "Moderate chance",
-    factors: [
-      ["pos", "Performance case", "Strong"],
-      ["pos", "Scope expansion", "Significant"],
-      ["neu", "Manager relationship", "Professional"],
-      ["neg", "Last raise timing", "6 months ago"],
-      ["neg", "Review timing", "6+ weeks out"]
-    ],
-    done: [1,0,1,0,0,0,1]
-  },
-  {
-    role: "Account Manager · Consulting",
-    desc: "Strong case, recent competing offer, clear leverage.",
-    floor: 68, ceiling: 82, color: "green", verdict: "High chance",
-    factors: [
-      ["pos", "Company situation", "Stable"],
-      ["pos", "Performance case", "Exceeded"],
-      ["pos", "Market position", "Competing offer"],
-      ["neu", "Last raise timing", "14 months ago"],
-      ["pos", "Review timing", "2 weeks out"]
-    ],
-    done: [1,1,1,0,0,0,0]
-  },
-  {
-    role: "Ops Lead · Manufacturing",
-    desc: "Strong performance but the company is cutting costs.",
-    floor: 32, ceiling: 45, color: "red", verdict: "Low chance",
-    factors: [
-      ["pos", "Performance case", "Strong"],
-      ["neu", "Manager relationship", "Professional"],
-      ["neg", "Company situation", "Cost-cutting"],
-      ["neg", "Last raise timing", "3 months ago"],
-      ["neg", "Market position", "Underpaid"]
-    ],
-    done: [1,0,0,0,1,0,1]
-  },
-  {
-    role: "Engineering Manager · Fintech",
-    desc: "Took on scope without a title bump. Evidence is piling up.",
-    floor: 61, ceiling: 74, color: "amber", verdict: "Moderate chance",
-    factors: [
-      ["pos", "Scope expansion", "Significant"],
-      ["pos", "Performance case", "Strong"],
-      ["neu", "Company situation", "Stable"],
-      ["neu", "Manager relationship", "Strong"],
-      ["neg", "Last raise timing", "9 months ago"]
-    ],
-    done: [1,0,1,0,0,1,0]
-  }
-];
-
-let repIdx = 0;
-let repTimer = null;
-
-function renderRepPersona(p) {
-  const pRange   = document.getElementById('rep-range');
-  const pVerdict = document.getElementById('rep-verdict-lbl');
-  const pFill    = document.getElementById('rep-fill');
-  const pLabel   = document.getElementById('rep-persona-label');
-  const checklist= document.getElementById('rep-checklist');
-  const clCount  = document.getElementById('rep-cl-count');
-  const cMore    = document.getElementById('rep-checklist-more');
-  const chatRow  = document.getElementById('rep-chat-row');
-  if (!pRange || !pFill || !checklist) return;
-
-  pRange.className   = 'rep-range ' + p.color;
-  pVerdict.className = 'rep-verdict-lbl ' + p.color;
-  pFill.className    = 'rep-fill ' + p.color;
-
-  pRange.textContent   = p.floor + '-' + p.ceiling + '%';
-  pVerdict.textContent = p.verdict;
-  pLabel.innerHTML     = '<span class="rep-prole">' + p.role + '</span><br>' + p.desc;
-
-  pFill.style.width = '0%';
-  [pRange, pVerdict, pLabel, cMore, chatRow].forEach(e => { if (e) e.classList.remove('show'); });
-
-  const doneCount = p.done.reduce((a,b) => a + b, 0);
-  // Real product has 10 items; we show 7, hide 3 ("+3 more in your plan")
-  clCount.textContent = doneCount + ' of 10 done';
-
-  // Checklist animations start where factors used to: ~350ms after card show
-  const checklistStart = 350;
-  checklist.innerHTML = PLAN_ITEMS.map((it, i) => {
-    const d = p.done[i];
-    const delay = checklistStart + i * 60;
-    return '<div class="rep-clitem ' + (d ? 'done' : 'pending') +
-      '" style="transition-delay:' + delay + 'ms">' +
-      '<span class="rep-clmark ' + (d ? 'done' : 'pending') + '">' + (d ? '✓' : '○') + '</span>' +
-      '<span class="rep-cltext">' + it + '</span>' +
-      (d ? '' : '<span class="rep-clpill">Draft →</span>') +
-    '</div>';
-  }).join('');
-
-  const cMoreDelay = checklistStart + PLAN_ITEMS.length * 60 + 100;
-  cMore.style.transitionDelay = cMoreDelay + 'ms';
-  // Chat row appears just after the "+3 more" line — final beat in the reveal
-  if (chatRow) chatRow.style.transitionDelay = (cMoreDelay + 200) + 'ms';
-
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      pRange.classList.add('show');
-      pVerdict.classList.add('show');
-      pLabel.classList.add('show');
-      pFill.style.width = p.ceiling + '%';
-      document.querySelectorAll('#rep-checklist .rep-clitem').forEach(c => c.classList.add('show'));
-      cMore.classList.add('show');
-      if (chatRow) chatRow.classList.add('show');
-    });
-  });
-
-  const dots = document.querySelectorAll('#rep-indicator .rep-pi-dot');
-  dots.forEach((d, i) => d.classList.toggle('active', i === repIdx));
-}
-
-function rotateRep() {
-  const card = document.getElementById('rep-card');
-  if (!card) return;
-  card.classList.add('fading');
-  setTimeout(() => {
-    repIdx = (repIdx + 1) % PERSONAS.length;
-    renderRepPersona(PERSONAS[repIdx]);
-    card.classList.remove('fading');
-  }, 350);
-}
-
-function playPersonas() {
-  if (!document.getElementById('rep-section')) return;
-  // HTML is pre-rendered with PERSONAS[0] content for fast LCP paint.
-  // Skip the initial re-render; just start the rotation timer so the first
-  // animated transition happens at the 6-second mark (persona 0 → persona 1).
-  if (repTimer) clearInterval(repTimer);
-  repTimer = setInterval(rotateRep, 6000);
-}
-
-// Start when the card is in view
-if (document.getElementById('rep-section')) {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        setTimeout(playPersonas, 300);
-        obs.disconnect();
-      }
-    });
-  }, { threshold: 0.25 });
-  obs.observe(document.getElementById('rep-section'));
-}
-
 /* ───────────────────────────────────────────────────────── */
 /* ── Proof rotator — typewriter animation between sample   ── */
 /* ──  card and How it works                                ── */
@@ -1289,177 +943,6 @@ if (document.getElementById('proof-rotator')) {
   }, { threshold: 0.3 });
   pobs.observe(document.getElementById('proof-rotator'));
 }
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Option selection                                    ── */
-/* ───────────────────────────────────────────────────────── */
-function selectOpt(el, groupId) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  group.querySelectorAll('.opt').forEach(o => o.classList.remove('sel'));
-  el.classList.add('sel');
-
-  const val = el.dataset.val;
-  if (groupId === 'company-opts')    S.company_situation = val;
-  if (groupId === 'raise-opts')      S.last_raise = val;
-  if (groupId === 'size-opts')       S.company_size = val;
-
-  refreshButtons();
-  hideErr(S.currentStep);
-
-  // Ensure Continue button is visible — scrolls only if it's off-screen
-  // (FA pattern: prevents user from tapping a chip and wondering where Continue went)
-  const btn = document.getElementById('btn-' + S.currentStep);
-  if (btn) {
-    requestAnimationFrame(() => {
-      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  }
-}
-
-function refreshButtons() {
-  // Step 0 → company situation
-  setBtnActive('btn-0', !!S.company_situation);
-  // Step 1 → last raise
-  setBtnActive('btn-1', !!S.last_raise);
-  // Step 2 → company size
-  setBtnActive('btn-2', !!S.company_size);
-}
-
-function setBtnActive(id, on) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle('active', !!on);
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Step nav                                            ── */
-/* ───────────────────────────────────────────────────────── */
-function goStep(target) {
-  // Validate current step before advancing
-  if (target > S.currentStep) {
-    if (!validateStep(S.currentStep)) { showErr(S.currentStep); return; }
-  }
-
-  // Hide all, show target
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  const next = document.getElementById('step-' + target);
-  if (!next) return;
-  next.classList.add('active');
-
-  // Progress marks (all up-to-and-including active become filled)
-  for (let i = 0; i <= 2; i++) {
-    const p = document.getElementById('p' + i);
-    if (p) p.classList.toggle('done', i <= target);
-  }
-
-  S.currentStep = target;
-  hideErr(target);
-
-  // Scroll to top of assessment (not the whole page — keep header visible)
-  const top = document.getElementById('assessment-top');
-  if (top) top.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function validateStep(n) {
-  if (n === 0) return !!S.company_situation;
-  if (n === 1) return !!S.last_raise;
-  if (n === 2) return !!S.company_size;
-  return true;
-}
-
-// Back from Q1 → return to landing view (no page reload; just toggle display
-// and clean the ?start=1 query param so the URL reflects what's shown).
-function backToLanding() {
-  document.getElementById('assessment-content').style.display = 'none';
-  document.getElementById('landing-content').style.display = 'block';
-  try {
-    if (history.replaceState) {
-      const cleanUrl = location.pathname + (location.hash === '#assessment-top' ? '' : location.hash);
-      history.replaceState({}, '', cleanUrl);
-    }
-  } catch (e) { /* non-fatal */ }
-  window.scrollTo({ top: 0, behavior: 'instant' });
-}
-
-function showErr(n) {
-  const el = document.getElementById('err-' + n);
-  if (!el) return;
-  // Remove the class first so re-triggering restarts the shake animation
-  el.classList.remove('show');
-  // Force reflow so the animation re-fires on repeated taps
-  void el.offsetWidth;
-  el.classList.add('show');
-}
-function hideErr(n) {
-  const el = document.getElementById('err-' + n);
-  if (el) el.classList.remove('show');
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Submit: save to localStorage, redirect to chat      ── */
-/* ───────────────────────────────────────────────────────── */
-function submitAssessment() {
-  if (!validateStep(2)) { showErr(2); return; }
-
-  // GA4 event (best-effort) — send only the 3 captured fields
-  try {
-    if (typeof gtag === 'function') {
-      gtag('event', 'assessment_completed', {
-        product:           'raise',
-        company_situation: S.company_situation,
-        last_raise:        S.last_raise,
-        company_size:      S.company_size,
-      });
-    }
-  } catch (e) { /* non-fatal */ }
-
-  // Referral param passthrough (optional)
-  const params    = new URLSearchParams(location.search);
-  const refSource = params.get('ref') || '';
-  const reason    = params.get('reason') || '';
-
-  // Save profile — chat page picks this up and fires /api/raise-analyze
-  // NOTE: country and seniority are sent as defaults to preserve the SPEC §14
-  // backend contract. 'us' is the neutral country per SPEC §2 ("Other" defaults
-  // to US rules). 'mid' is the neutral seniority; Ex1 free-text extraction in
-  // raise-exchange.js refines it from the user's job title description.
-  const profile = {
-    country:           'us',
-    company_situation: S.company_situation,
-    last_raise:        S.last_raise,
-    seniority:         'mid',
-    company_size:      S.company_size,
-    refSource,
-    reason,
-    savedAt:           Date.now(),
-  };
-  try {
-    localStorage.setItem('rl_raise_profile', JSON.stringify(profile));
-    // New assessment submission → always clear old chat state so the chat
-    // page starts a fresh analysis. Without this, re-taking the assessment
-    // (especially with the same answers) rehydrates the previous flow and
-    // shows the old paywall/final card instead of a new run.
-    localStorage.removeItem('rl_raise_state');
-  } catch (e) {
-    // localStorage disabled — fall back to URL params
-    const q = new URLSearchParams(profile).toString();
-    window.location.href = '/raise/chat/?' + q;
-    return;
-  }
-
-  // Instant redirect — chat page shows the thinking animation
-  window.location.href = '/raise/chat/';
-}
-
-/* ───────────────────────────────────────────────────────── */
-/* ── Initial progress state                              ── */
-/* ───────────────────────────────────────────────────────── */
-(function initProgress() {
-  const p0 = document.getElementById('p0');
-  if (p0) p0.classList.add('done');
-})();
-
 /* ───────────────────────────────────────────────────────── */
 /* ── Compound-raise calculator                            ── */
 /* ───────────────────────────────────────────────────────── */
@@ -2072,34 +1555,6 @@ function shareLink() {
 
 </script>
 
-<script>
-(function(){
-var cvSteps=[
-{id:'cvd-ev',cls:'cvd-strong'},{id:'cvd-ti',cls:'cvd-strong'},
-{id:'cvd-mg',cls:'cvd-weak'},{id:'cvd-co',cls:'cvd-medium'},
-{id:'cvd-mk',cls:'cvd-strong'},{id:'cvd-lr',cls:'cvd-plan'},
-{id:'cvd-em',cls:'cvd-plan'},{id:'cvd-av',cls:'cvd-plan'},
-{id:'cvd-os',cls:'cvd-plan'},{id:'cvd-pb',cls:'cvd-plan'},
-{id:'cvd-iy',cls:'cvd-plan'},{id:'cvd-me',cls:'cvd-plan'},
-{id:'cvd-rc',cls:'cvd-plan'}
-];
-var ci=0;
-function cvReset(){document.querySelectorAll('.cvd-pill').forEach(function(b){b.className='cvd-pill cvd-empty';b.style.opacity=''})}
-function cvNext(){
-if(ci>=cvSteps.length){ci=0;cvReset();setTimeout(cvNext,1500);return}
-var s=cvSteps[ci];var el=document.getElementById(s.id);
-if(el){
-  document.querySelectorAll('.cvd-pill:not(.cvd-empty)').forEach(function(b){b.style.opacity='0.45'});
-  el.className='cvd-pill '+s.cls;
-  el.style.opacity='1';
-}
-ci++;setTimeout(cvNext,1000);
-}
-setTimeout(cvNext,800);
-})();
-
-
-</script>
 <script>
 function toggleMenu() {
   var btn = document.getElementById('hamburger');
