@@ -914,14 +914,18 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 // Token was already verified by the paid page, no need to re-verify here.
 (function() {
   try {
-    var t = new URLSearchParams(location.search).get('paid_token');
+    var params = new URLSearchParams(location.search);
+    var t = params.get('paid_token');
     if (!t) return;
     localStorage.setItem('rl_raise_access_token', t);
     var s = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
     s.paid = true;
     s.paid_token = t;
     localStorage.setItem('rl_raise_state', JSON.stringify(s));
-    history.replaceState({}, '', '/raise/chat/');
+    // Strip paid_token but preserve ?open= so init() can route to the right mode
+    var open = params.get('open');
+    var cleanUrl = '/raise/chat/' + (open ? '?open=' + encodeURIComponent(open) : '');
+    history.replaceState({}, '', cleanUrl);
   } catch(e) {}
 })();
 </script>
