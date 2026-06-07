@@ -7816,22 +7816,48 @@ async function resumeFromState() {
         }
       }
 
+      // Mark as initialized BEFORE setMode so the empty-container guard doesn't also fire
+      if (_practiceContainer) _practiceContainer.dataset.simInitialized = 'true';
+
       // Default: open sim mode (or discovery for free users)
       if (!state.paid) { setMode('discovery'); } else { setMode('sim'); }
 
-      // Load next scenario pills to continue
+      // Load next options based on last turn in conversation
       if (!state.paywall_shown) {
-        disableInput('Loading scenarios…');
+        var _lastTurn = state.sim_conversation[state.sim_conversation.length - 1];
+        disableInput('Loading…');
         showCoachTyping();
         try {
-          var _r2 = await fetch('/api/raise-coach', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mode: 'simulate_scenarios', blocker: blocker, context: SIM_STATE.context, session_id: profileHash() }),
-          });
-          var _d2 = await _r2.json();
-          hideCoachTyping();
-          renderScenarioLabels((_d2.scenarios && _d2.scenarios.length >= 2) ? _d2.scenarios : getDefaultScenarios(blocker.code));
+          if (_lastTurn && _lastTurn.role === 'manager') {
+            // Last thing manager said — show reply options
+            var _rr = await fetch('/api/raise-coach', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mode: 'simulate_replies',
+                manager_said: _lastTurn.text,
+                scenario_type: SIM_STATE.branch_history.length > 0 ? SIM_STATE.branch_history[SIM_STATE.branch_history.length-1].scenario : 'opening',
+                blocker: SIM_STATE.blocker,
+                context: SIM_STATE.context,
+                session_id: profileHash(),
+              }),
+            });
+            var _rd = await _rr.json();
+            hideCoachTyping();
+            var _replies = (_rd.replies && _rd.replies.length >= 2) ? _rd.replies : getDefaultReplies();
+            var _fakeScenario = { type: 'opening', text: _lastTurn.text };
+            renderReplyPillsFlat(_replies, _fakeScenario);
+          } else {
+            // Last thing was user — show next manager scenarios
+            var _sr = await fetch('/api/raise-coach', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ mode: 'simulate_scenarios', blocker: blocker, context: SIM_STATE.context, session_id: profileHash() }),
+            });
+            var _sd = await _sr.json();
+            hideCoachTyping();
+            renderScenarioLabels((_sd.scenarios && _sd.scenarios.length >= 2) ? _sd.scenarios : getDefaultScenarios(blocker.code));
+          }
           showCoachPreviewCard('opening_picked', { theme: '' });
         } catch(e) {
           hideCoachTyping();
