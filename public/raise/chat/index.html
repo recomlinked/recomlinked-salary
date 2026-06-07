@@ -7540,6 +7540,14 @@ async function init() {
     }
 
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
+    // Re-write paid status so it survives the state clear
+    if (state.paid) {
+      try {
+        var _ps = { paid: true };
+        if (state.paid_token) _ps.paid_token = state.paid_token;
+        localStorage.setItem(LS_STATE, JSON.stringify(_ps));
+      } catch(e) {}
+    }
     if (forceReset) {
     }
     stopThinkingAnimation();
