@@ -5822,13 +5822,13 @@ async function generateDiscInsights() {
   var wrap = $('chat-wrap');
   if (wrap) wrap.scrollTop = wrap.scrollHeight;
 
-  // Step 2: Fire BOTH API calls in parallel
+  // Single hooks call — replaces parallel position+teasers (saves ~1400 tokens per paywall)
   var blockerCode = SIM_STATE.context.blocker_code || 'no_script';
   var answers = {};
   discOrderedQuestions.slice(0, 5).forEach(function(q) {
     answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
-  console.log('[disc_insights] Sending:', JSON.stringify({ blocker: blockerCode, answers: answers, dims: discDims }));
+  console.log('[disc_insights] Sending hooks:', JSON.stringify({ blocker: blockerCode, answers: answers }));
 
   var apiBody = {
     mode: 'disc_insights',
@@ -5837,89 +5837,49 @@ async function generateDiscInsights() {
     dims: discDims,
     levers: discLevers,
     weaks: discWeaks,
+    part: 'hooks',
   };
 
-  // Start both requests simultaneously
-  var positionFetch = fetch('/api/raise-coach', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(Object.assign({}, apiBody, { part: 'position' })),
-  });
-  var strategyFetch = fetch('/api/raise-coach', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(Object.assign({}, apiBody, { part: 'teasers' })),
-  });
-
-  // Handle position (usually returns first — faster, smaller)
   try {
-    var resp = await positionFetch;
+    var resp = await fetch('/api/raise-coach', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiBody),
+    });
     var data = await resp.json();
-    console.log('[disc_insights] Position response:', JSON.stringify(data).slice(0, 200));
+    console.log('[disc_insights] Hooks response:', JSON.stringify(data).slice(0, 200));
 
     if (data && data.insights && Object.keys(data.insights).length > 0) {
+      // Apply hooks to all 12 blocks
+      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
       Object.keys(data.insights).forEach(function(dim) {
-        if (discCanvasBlocks[dim]) {
+        if (discCanvasBlocks[dim] !== undefined) {
           discCanvasBlocks[dim].insight = data.insights[dim];
           discInsights[dim] = data.insights[dim];
+          // Mark strategy blocks as filled+teaser so they show the hook
+          if (stratPlanKeys.indexOf(dim) >= 0) {
+            discCanvasBlocks[dim].filled = true;
+            discCanvasBlocks[dim].teaser = true;
+          }
         }
       });
     }
   } catch (e) {
-    console.error('[disc_insights] Position API error:', e);
+    console.error('[disc_insights] Hooks API error:', e);
+    generateClientFallbacks();
   }
 
-  // Remove loading spinner, show canvas with position insights (strategy still shimmering)
+  // Remove loading spinner and render canvas with hooks
   var loading = $('disc-loading');
   if (loading) {
     if (loading._arcStop) loading._arcStop();
     if (loading._phraseStop) loading._phraseStop();
     loading.remove();
   }
-  // Strategy shimmer already running — just update position blocks
+  discStrategyLoading = false;
+  discStrategyDone = true;
   var liveCanvas = $('disc-canvas-live');
   if (liveCanvas) setCanvasHTML(liveCanvas);
-
-  // Handle strategy (may already be done or still in flight)
-  try {
-    var resp2 = await strategyFetch;
-    var data2 = await resp2.json();
-    console.log('[disc_insights] Strategy response:', JSON.stringify(data2).slice(0, 200));
-
-    if (data2 && data2.insights && Object.keys(data2.insights).length > 0) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
-      Object.keys(data2.insights).forEach(function(dim) {
-        if (discCanvasBlocks[dim]) {
-          discCanvasBlocks[dim].insight = data2.insights[dim];
-          discInsights[dim] = data2.insights[dim];
-          if (stratPlanKeys.indexOf(dim) >= 0) {
-            discCanvasBlocks[dim].filled = true;
-            discCanvasBlocks[dim].strength = 'plan';
-            discCanvasBlocks[dim].teaser = true;
-          }
-        }
-      });
-      // Re-render canvas with strategy teasers
-      discStrategyLoading = false;
-      discStrategyDone = true;
-      var lc2 = $('disc-canvas-live');
-      if (lc2) setCanvasHTML(lc2);
-    } else {
-      console.warn('[disc_insights] Empty strategy response, generating fallbacks');
-      generateClientFallbacks();
-      discStrategyLoading = false;
-      discStrategyDone = true;
-      var lc2 = $('disc-canvas-live');
-      if (lc2) setCanvasHTML(lc2);
-    }
-  } catch (e) {
-    console.error('[disc_insights] Strategy API error:', e);
-    generateClientFallbacks();
-    discStrategyLoading = false;
-    discStrategyDone = true;
-    var lc2 = $('disc-canvas-live');
-    if (lc2) setCanvasHTML(lc2);
-  }
 
   // Save all insights
   try {
@@ -7971,11 +7931,12 @@ async function startCheckout(selectedPrice) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
           var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
-            if (discCanvasBlocks[dim]) {
+            if (discCanvasBlocks[dim] !== undefined) {
               discCanvasBlocks[dim].insight = data.insights[dim];
               if (stratPlanKeys.indexOf(dim) >= 0) {
                 discCanvasBlocks[dim].filled = true;
                 discCanvasBlocks[dim].strength = 'plan';
+                discCanvasBlocks[dim].teaser = false; // full content — remove teaser flag
               }
             }
           });
