@@ -4,20 +4,15 @@
 // Silently ignores all other events (including FA events, if Stripe sends them to this endpoint).
 //
 // On checkout.session.completed:
-//      → if missing, read checkout stash raise:checkout:{session_id} (Round 2)
-//   2. Create paid user record raise:user:{email}      (30-day TTL)
-//      Now includes `obstacle` from Round 2 metadata
-//   3. Store plan        raise:user:{email}:plan       (30-day TTL)
-//   4. Map session→email raise:session:{session_id}    (24h TTL)
-//   5. Send welcome email with 30-day magic link
+//   1. Create paid user record raise:user:{email}      (30-day TTL)
+//   2. Store plan placeholder   raise:user:{email}:plan (30-day TTL)
+//   3. Map session→email        raise:session:{session_id} (24h TTL)
+//   4. Track affiliate credit   ref:{source}
+//   5. Send welcome email with 30-day access link
 //   6. Log PAID to Google Sheet
 //
-// ── Round 2 updates ──────────────────────────────────────
-// • Reads checkout stash (set by raise-checkout.js) when the primary enrich
-//   key is missing. Gives us the profile/exchanges/obstacle needed to retry.
-//   and-forget) — user record is created immediately, plan populates async.
-// • Stores `obstacle` in user record so raise-coach.js and the paid page
-//   can read it consistently.
+// Plan is generated on-demand via disc_insights (raise-coach.js).
+// Obstacle is stored from Stripe metadata so coach + paid page can reference it.
 
 module.exports.config = { api: { bodyParser: false } };
 
@@ -50,16 +45,6 @@ function mintToken() {
   return crypto.randomBytes(16).toString('hex');
 }
 
-async function readCheckoutStash(sessionId) {
-  try {
-    const raw = await redis.get(`raise:checkout:${sessionId}`);
-    if (!raw) return null;
-    return typeof raw === 'string' ? JSON.parse(raw) : raw;
-  } catch (e) {
-    console.warn('[raise-webhook] stash read failed:', e.message);
-    return null;
-  }
-}
 
 module.exports = async function handler(req, res) {
   // CORS for browser session-logging requests
@@ -128,13 +113,12 @@ module.exports = async function handler(req, res) {
 
   // Plan is generated on-demand via disc_insights — not pre-computed
   let plan = null;
-  let stash = null;
 
-  // Assemble obstacle from metadata — works even without stash
+  // Obstacle is embedded directly in Stripe metadata by raise-checkout.js
   const obstacleFromMeta = {
-    code:      meta.obstacle_code      || (stash?.obstacle?.code || ''),
-    label:     meta.obstacle_label     || (stash?.obstacle?.label || ''),
-    free_text: meta.obstacle_free_text || (stash?.obstacle?.free_text || ''),
+    code:      meta.obstacle_code      || '',
+    label:     meta.obstacle_label     || '',
+    free_text: meta.obstacle_free_text || '',
   };
 
   // ── Build paid user record ───────────────────────────────
@@ -185,7 +169,10 @@ module.exports = async function handler(req, res) {
       const salePrice  = session.amount_total / 100; // actual charged amount after any coupons/discounts
       const commission = parseFloat((salePrice * COMMISSION_RATE).toFixed(2));
       const todayKey   = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-      const weekKey    = todayKey; // index by week-start date
+      // Week key = Monday of the current week (ISO), so all sales in the
+      // same week accumulate into one record that the stats reader can find.
+      const _d = new Date(); _d.setDate(_d.getDate() - _d.getDay() + (_d.getDay() === 0 ? -6 : 1));
+      const weekKey    = _d.toISOString().slice(0, 10);
 
       // Total record
       const refRaw = await redis.get(`ref:${meta.refSource}`);
