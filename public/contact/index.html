@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contact — Salary Negotiation Coach · Recomlinked</title>
+<meta name="description" content="Get in touch with the Recomlinked team. Questions about your plan, access issues, or just want to share how the conversation went — we read every email."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://salary.recomlinked.com/contact/"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f8f6fa;--card:#fff;--text:#2c2438;--text2:#6b5f7a;--text3:#9a8faa;
+  --purple:#7B5CFC;--purple-hover:#6A4CE8;--purple-light:#f0e8f6;
+  --gold:#F5CF56;--gold-hover:#E8C044;--gold-text:#1a1520;
+  --border:rgba(139,111,165,0.1);--shadow-sm:0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.06);--shadow-gold:0 2px 12px rgba(232,184,76,0.25);
+  --radius:12px;--sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:#f5e6d8;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--purple);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+/* ── HEADER ── */
+.site-header{background:transparent;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:100;}
+.logo-wrap{display:flex;align-items:center;font-size:18px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;}
+.logo-wrap:hover{text-decoration:none;}
+.logo-recom{background:var(--gold);color:var(--gold-text);padding:2px 7px 2px 6px;border-radius:3px 0 0 3px;}
+.logo-linked{color:var(--text);padding:2px 6px 2px 5px;background:var(--purple-light);border-radius:0 3px 3px 0;}
+.header-nav{display:flex;align-items:center;gap:20px;}
+.header-nav a{font-size:13px;font-weight:500;color:var(--text3);text-decoration:none;white-space:nowrap;transition:color 0.15s;}
+.header-nav a:hover{color:var(--text);text-decoration:none;}
+.hamburger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.mobile-menu{display:none;position:fixed;inset:0;top:50px;background:var(--card);z-index:200;padding:8px 24px 32px;border-top:1px solid var(--border);flex-direction:column;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:17px;font-weight:600;color:var(--text);padding:16px 0;text-decoration:none;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mobile-menu a:hover{color:var(--purple);text-decoration:none;}
+.mobile-menu .menu-arrow{color:var(--text3);font-size:14px;}
+.mobile-menu a.mobile-cta{margin-top:24px;background:var(--gold);color:var(--gold-text);padding:14px 20px;border-radius:10px;font-size:15px;font-weight:700;text-align:center;box-shadow:var(--shadow-gold);border:none!important;display:flex;justify-content:center;align-items:center;}
+@media(max-width:560px){.header-nav{display:none;}.hamburger{display:flex;}}
+@media(max-width:480px){.site-header{padding:12px 16px;}}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(160deg,#f5e6d8 0%,#eddce8 40%,#d8c4e8 70%,#c4aade 100%);
+  padding:80px 24px 56px;width:100vw;margin-left:calc(-50vw + 50%);
+  margin-top:-58px;margin-bottom:0;position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{content:'';position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(circle at 80% 30%,rgba(232,184,76,0.08) 0%,transparent 50%);pointer-events:none;}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;position:relative;z-index:1;}
+.hero h1{font-size:clamp(26px,4.5vw,36px);font-weight:800;letter-spacing:-0.8px;color:var(--text);line-height:1.2;margin-bottom:14px;position:relative;z-index:1;}
+.hero-sub{font-size:15px;color:var(--text2);max-width:460px;margin:0 auto;line-height:1.6;position:relative;z-index:1;}
+
+/* ── MAIN ── */
+.main{max-width:580px;margin:0 auto;padding:56px 24px 80px;}
+@media(max-width:480px){.main{padding:40px 20px 64px;}}
+
+/* Contact cards */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:40px;}
+@media(max-width:440px){.contact-grid{grid-template-columns:1fr;}}
+
+.contact-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;transition:all 0.2s;box-shadow:var(--shadow-sm);text-decoration:none;display:block;color:inherit;}
+.contact-card:hover{border-color:var(--purple);box-shadow:var(--shadow-md);transform:translateY(-2px);text-decoration:none;}
+.contact-card-icon{width:36px;height:36px;border-radius:10px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.contact-card-icon svg{color:var(--purple);}
+.contact-card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.contact-card-val{font-size:13px;color:var(--purple);font-weight:600;margin-bottom:6px;}
+.contact-card-desc{font-size:12px;color:var(--text3);line-height:1.5;}
+
+/* Reasons */
+.divider{height:1px;background:var(--border);margin:36px 0;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;}
+.section h2{font-size:18px;font-weight:700;color:var(--text);margin-bottom:16px;}
+
+.reason-list{list-style:none;padding:0;}
+.reason-list li{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text2);line-height:1.55;}
+.reason-list li:last-child{border-bottom:none;}
+.reason-list li strong{color:var(--text);font-weight:600;}
+.reason-num{width:22px;height:22px;border-radius:50%;background:var(--purple);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* Signature block */
+.sig-block{background:linear-gradient(135deg,#2c1845 0%,#4a2d6e 60%,#7b5fa0 100%);border-radius:16px;padding:28px 24px;margin-top:40px;position:relative;overflow:hidden;}
+.sig-block::before{content:'';position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(circle at 80% 30%,rgba(232,184,76,0.06) 0%,transparent 50%);pointer-events:none;}
+.sig-block p{color:rgba(255,255,255,0.8);font-size:14px;line-height:1.7;margin-bottom:12px;position:relative;z-index:1;}
+.sig-block .sig-name{color:#fff;font-weight:700;font-size:15px;position:relative;z-index:1;}
+.sig-block .sig-title{color:rgba(255,255,255,0.5);font-size:12px;margin-top:2px;position:relative;z-index:1;}
+
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo-wrap" href="/raise/">
+    <span class="logo-recom">Recom</span><span class="logo-linked">linked</span>
+  </a>
+  <nav class="header-nav">
+    <a href="/raise/">Raise Plan</a>
+    <a href="/raise/coach/">AI Coach</a>
+    <a href="/raise-case/">Raise Case</a>
+    <a href="/raise/chat/" style="background:var(--gold);color:var(--gold-text);padding:7px 16px;border-radius:8px;font-weight:700;font-size:13px;">Get my plan →</a>
+  </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/raise/">Raise Plan <span class="menu-arrow">→</span></a>
+  <a href="/raise/coach/">AI Coach <span class="menu-arrow">→</span></a>
+  <a href="/raise-case/">Raise Case <span class="menu-arrow">→</span></a>
+  <a class="mobile-cta" href="/raise/chat/">Get my negotiation plan →</a>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Get in touch</div>
+  <h1>We read every email</h1>
+  <p class="hero-sub">Questions about your plan, access issues, or just want to tell us how the conversation went — reach out directly.</p>
+</div>
+
+<main class="main">
+
+  <div class="contact-grid">
+    <a class="contact-card" href="mailto:support@recomlinked.com">
+      <div class="contact-card-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div class="contact-card-title">Support</div>
+      <div class="contact-card-val">support@recomlinked.com</div>
+      <div class="contact-card-desc">Plan questions, access issues, refund requests</div>
+    </a>
+    <a class="contact-card" href="mailto:milad.b@recomlinked.com">
+      <div class="contact-card-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="contact-card-title">Founder</div>
+      <div class="contact-card-val">milad.b@recomlinked.com</div>
+      <div class="contact-card-desc">Partnerships, feedback, or just to say hi</div>
+    </a>
+    <a class="contact-card" href="https://www.linkedin.com/company/recomlinked/" target="_blank" rel="noopener">
+      <div class="contact-card-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452H17.21V14.88c0-1.328-.024-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.67H9.985V9h3.102v1.561h.043c.432-.818 1.487-1.681 3.062-1.681 3.275 0 3.879 2.156 3.879 4.961v6.611zM5.337 7.433a1.8 1.8 0 1 1 0-3.6 1.8 1.8 0 0 1 0 3.6zM6.959 20.452H3.712V9h3.247v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.226.792 24 1.771 24h20.451C23.2 24 24 23.226 24 22.271V1.729C24 .774 23.2 0 22.225 0z"/></svg>
+      </div>
+      <div class="contact-card-title">LinkedIn</div>
+      <div class="contact-card-val">@recomlinked</div>
+      <div class="contact-card-desc">Follow us for negotiation tips and updates</div>
+    </a>
+    <div class="contact-card" style="cursor:default;">
+      <div class="contact-card-icon">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div class="contact-card-title">Office</div>
+      <div class="contact-card-val">Calgary, Alberta</div>
+      <div class="contact-card-desc">Recomlinked Technologies Inc. · Canada</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">Common questions</div>
+    <h2>What people usually write to us about</h2>
+    <ul class="reason-list">
+      <li>
+        <div class="reason-num">1</div>
+        <div><strong>Lost access or switched devices</strong> — if you can't find your plan, visit <a href="/raise/enter/">/raise/enter/</a> and enter your email. We'll send a fresh link instantly.</div>
+      </li>
+      <li>
+        <div class="reason-num">2</div>
+        <div><strong>Data deletion</strong> — you can delete your data anytime from the paid dashboard, or email us and we'll do it within 24 hours.</div>
+      </li>
+      <li>
+        <div class="reason-num">3</div>
+        <div><strong>Affiliate partnerships</strong> — if you have an audience that would benefit from the Salary Negotiation Coach, reach out to milad.b@recomlinked.com. We pay 40% commission on every sale.</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sig-block">
+    <p>If you used the coach and had the conversation — I genuinely want to know how it went. The good outcomes and the ones that didn't land. That feedback is what makes this product better. Reply to your welcome email, or reach out directly.</p>
+    <div class="sig-name">Milad Bakhti</div>
+    <div class="sig-title">Co-founder, Recomlinked · milad.b@recomlinked.com</div>
+  </div>
+
+  <div style="margin-top:40px;">
+    <div class="section-label" style="margin-bottom:12px;">Come say hi</div>
+    <p style="font-size:14px;color:var(--text2);margin-bottom:16px;">We're based at Platform Calgary — a startup hub in the heart of downtown Calgary, Alberta.</p>
+    <div style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-sm);">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2508.4880958405925!2d-114.05494069999999!3d51.044074699999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x537171972e98f985%3A0xa56947c5d9e9c063!2sPlatform!5e0!3m2!1sen!2sca!4v1780878102114!5m2!1sen!2sca"
+        width="100%" height="450" style="display:block;border:0;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade" title="Platform Calgary — Recomlinked office"></iframe>
+    </div>
+  </div>
+
+</main>
+
+
+<script defer src="/shared.js"></script>
+<script>
+function toggleMenu(){
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('open');
+  document.body.style.overflow=document.getElementById('mobile-menu').classList.contains('open')?'hidden':'';
+}
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('mobile-menu');
+  var btn=document.getElementById('hamburger');
+  if(menu.classList.contains('open')&&!menu.contains(e.target)&&!btn.contains(e.target)){
+    btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
+  }
+});
+</script>
+</body>
+</html>
