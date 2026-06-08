@@ -59,11 +59,13 @@ module.exports = async function handler(req, res) {
       ? (typeof todayRaw === 'string' ? JSON.parse(todayRaw) : todayRaw)
       : { conversions: 0, earned: 0 };
 
-    // Payment history (last 8 weeks)
+    // Payment history (last 8 weeks) — keys are Monday week-starts, matching webhook writes
     const weekKeys = [];
     for (let i = 0; i < 8; i++) {
       const d = new Date();
       d.setDate(d.getDate() - i * 7);
+      // Normalise to Monday of that week (same logic as webhook)
+      d.setDate(d.getDate() - d.getDay() + (d.getDay() === 0 ? -6 : 1));
       weekKeys.push(`ref:${ref}:week:${d.toISOString().slice(0, 10)}`);
     }
     const weekRaws = await Promise.all(weekKeys.map(k => redis.get(k).catch(() => null)));
