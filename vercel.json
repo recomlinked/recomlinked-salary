@@ -23,6 +23,13 @@
     { "src": "/raise-case",           "status": 301, "headers": { "Location": "/raise-case/" }      },
     { "src": "/raise-case/",          "dest": "/raise-case/index.html"      },
 
+    { "src": "/about",           "status": 301, "headers": { "Location": "/about/" }           },
+    { "src": "/about/",          "dest": "/about/index.html"                                   },
+    { "src": "/contact",         "status": 301, "headers": { "Location": "/contact/" }         },
+    { "src": "/contact/",        "dest": "/contact/index.html"                                 },
+    { "src": "/privacy-policy",  "status": 301, "headers": { "Location": "/privacy-policy/" }  },
+    { "src": "/privacy-policy/", "dest": "/privacy-policy/index.html"                         },
+
     { "src": "/", "dest": "/index.html" }
   ],
   "functions": {
