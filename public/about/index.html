@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>About Us — Salary Negotiation Coach · Recomlinked</title>
+<meta name="description" content="Recomlinked built the Salary Negotiation Coach because too many people who deserve a raise never ask for one. Here's why we built it and what drives us."/>
+<meta name="robots" content="index,follow"/>
+<link rel="canonical" href="https://salary.recomlinked.com/about/"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#f8f6fa;--card:#fff;--text:#2c2438;--text2:#6b5f7a;--text3:#9a8faa;
+  --purple:#7B5CFC;--purple-hover:#6A4CE8;--purple-light:#f0e8f6;
+  --gold:#F5CF56;--gold-hover:#E8C044;--gold-text:#1a1520;
+  --border:rgba(139,111,165,0.1);--shadow-sm:0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,0.06);--shadow-gold:0 2px 12px rgba(232,184,76,0.25);
+  --radius:12px;--sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:#f5e6d8;}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;overflow-x:hidden;min-height:100vh;-webkit-font-smoothing:antialiased;}
+a{color:var(--purple);text-decoration:none;}
+a:hover{text-decoration:underline;}
+
+/* ── HEADER ── */
+.site-header{background:transparent;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:100;}
+.logo-wrap{display:flex;align-items:center;font-size:18px;font-weight:800;letter-spacing:-0.5px;text-decoration:none;}
+.logo-wrap:hover{text-decoration:none;}
+.logo-recom{background:var(--gold);color:var(--gold-text);padding:2px 7px 2px 6px;border-radius:3px 0 0 3px;}
+.logo-linked{color:var(--text);padding:2px 6px 2px 5px;background:var(--purple-light);border-radius:0 3px 3px 0;}
+.header-nav{display:flex;align-items:center;gap:20px;}
+.header-nav a{font-size:13px;font-weight:500;color:var(--text3);text-decoration:none;white-space:nowrap;transition:color 0.15s;}
+.header-nav a:hover{color:var(--text);text-decoration:none;}
+.hamburger{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:4px;}
+.hamburger span{display:block;width:20px;height:2px;background:var(--text);border-radius:2px;transition:all 0.2s;}
+.hamburger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+.mobile-menu{display:none;position:fixed;inset:0;top:50px;background:var(--card);z-index:200;padding:8px 24px 32px;border-top:1px solid var(--border);flex-direction:column;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-size:17px;font-weight:600;color:var(--text);padding:16px 0;text-decoration:none;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mobile-menu a:hover{color:var(--purple);text-decoration:none;}
+.mobile-menu .menu-arrow{color:var(--text3);font-size:14px;}
+.mobile-menu a.mobile-cta{margin-top:24px;background:var(--gold);color:var(--gold-text);padding:14px 20px;border-radius:10px;font-size:15px;font-weight:700;text-align:center;box-shadow:var(--shadow-gold);border:none!important;display:flex;justify-content:center;align-items:center;}
+@media(max-width:560px){.header-nav{display:none;}.hamburger{display:flex;}}
+@media(max-width:480px){.site-header{padding:12px 16px;}}
+
+/* ── HERO BAND ── */
+.hero{
+  background:linear-gradient(160deg,#f5e6d8 0%,#eddce8 40%,#d8c4e8 70%,#c4aade 100%);
+  padding:80px 24px 56px;width:100vw;margin-left:calc(-50vw + 50%);
+  margin-top:-58px;margin-bottom:0;position:relative;overflow:hidden;text-align:center;
+}
+.hero::before{content:'';position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(circle at 80% 30%,rgba(232,184,76,0.08) 0%,transparent 50%);pointer-events:none;}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--purple);margin-bottom:14px;position:relative;z-index:1;}
+.hero h1{font-size:clamp(28px,5vw,40px);font-weight:800;letter-spacing:-1px;color:var(--text);line-height:1.2;margin-bottom:16px;position:relative;z-index:1;}
+.hero h1 .accent{color:var(--purple);}
+.hero-sub{font-size:clamp(15px,2.5vw,17px);color:var(--text2);max-width:520px;margin:0 auto;line-height:1.6;position:relative;z-index:1;}
+
+/* ── CONTENT ── */
+.main{max-width:640px;margin:0 auto;padding:56px 24px 80px;}
+@media(max-width:480px){.main{padding:40px 20px 64px;}}
+
+.section{margin-bottom:48px;}
+.section-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;}
+.section h2{font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.3;}
+.section p{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:10px;}
+.section p:last-child{margin-bottom:0;}
+
+.divider{height:1px;background:var(--border);margin:40px 0;}
+
+/* Highlight card */
+.highlight-card{background:linear-gradient(135deg,#2c1845 0%,#4a2d6e 60%,#7b5fa0 100%);border-radius:16px;padding:36px 28px;margin-bottom:48px;position:relative;overflow:hidden;}
+.highlight-card::before{content:'';position:absolute;top:0;right:0;width:50%;height:100%;background:radial-gradient(circle at 80% 30%,rgba(232,184,76,0.08) 0%,transparent 50%);pointer-events:none;}
+.highlight-card p{color:rgba(255,255,255,0.85);font-size:17px;line-height:1.7;font-weight:500;position:relative;z-index:1;margin:0;}
+.highlight-card p em{color:var(--gold);font-style:normal;font-weight:700;}
+
+/* Value list */
+.value-list{list-style:none;padding:0;margin:16px 0 0;}
+.value-list li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);line-height:1.6;}
+.value-list li:last-child{border-bottom:none;}
+.value-icon{width:28px;height:28px;border-radius:8px;background:var(--purple-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.value-icon svg{color:var(--purple);}
+.value-list li strong{color:var(--text);display:block;font-size:14px;font-weight:600;margin-bottom:2px;}
+
+/* Team card */
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;display:flex;gap:20px;align-items:flex-start;box-shadow:var(--shadow-sm);}
+@media(max-width:420px){.team-card{flex-direction:column;gap:14px;}}
+.team-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#a78bfa);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0;}
+.team-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.team-title{font-size:12px;color:var(--purple);font-weight:600;letter-spacing:0.03em;margin-bottom:8px;}
+.team-bio{font-size:13px;color:var(--text2);line-height:1.6;}
+
+/* CTA row */
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px;}
+.cta-btn{display:inline-flex;align-items:center;justify-content:center;background:var(--gold);color:var(--gold-text);border:none;border-radius:var(--radius);padding:14px 28px;font-size:14px;font-weight:700;font-family:var(--sans);text-decoration:none;transition:all 0.15s;box-shadow:var(--shadow-gold);cursor:pointer;white-space:nowrap;}
+.cta-btn:hover{background:var(--gold-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(232,184,76,0.35);text-decoration:none;}
+.cta-secondary{display:inline-flex;align-items:center;gap:6px;padding:14px 24px;border-radius:var(--radius);border:1.5px solid var(--border);background:transparent;color:var(--text2);font-size:14px;font-weight:600;font-family:var(--sans);text-decoration:none;transition:all 0.15s;cursor:pointer;}
+.cta-secondary:hover{border-color:var(--purple);color:var(--purple);text-decoration:none;}
+
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo-wrap" href="/raise/">
+    <span class="logo-recom">Recom</span><span class="logo-linked">linked</span>
+  </a>
+  <nav class="header-nav">
+    <a href="/raise/">Raise Plan</a>
+    <a href="/raise/coach/">AI Coach</a>
+    <a href="/raise-case/">Raise Case</a>
+    <a href="/raise/chat/" style="background:var(--gold);color:var(--gold-text);padding:7px 16px;border-radius:8px;font-weight:700;font-size:13px;">Get my plan →</a>
+  </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/raise/">Raise Plan <span class="menu-arrow">→</span></a>
+  <a href="/raise/coach/">AI Coach <span class="menu-arrow">→</span></a>
+  <a href="/raise-case/">Raise Case <span class="menu-arrow">→</span></a>
+  <a class="mobile-cta" href="/raise/chat/">Get my negotiation plan →</a>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">About Recomlinked</div>
+  <h1>Built for people who deserve a raise<br>and <span class="accent">never ask for one</span></h1>
+  <p class="hero-sub">We built the Salary Negotiation Coach because the gap between what people earn and what they're worth is almost never a skills problem — it's a preparation problem.</p>
+</div>
+
+<main class="main">
+
+  <div class="highlight-card">
+    <p>Most people who ask for a raise and fail didn't fail because they weren't good enough. They failed because they walked in without a script, without a plan, and without having practiced a single pushback response. <em>That's the problem we solve.</em></p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Why we built this</div>
+    <h2>The advice was everywhere. The preparation wasn't.</h2>
+    <p>There's no shortage of articles telling you to "know your worth" or "pick the right time." That advice is fine. It doesn't help you when your manager says the budget is frozen and you freeze up, or when you accept a vague "let me think about it" and never follow up.</p>
+    <p>We built the Salary Negotiation Coach to solve the practice problem — not the information problem. We don't just tell you what to say. We simulate the conversation with you until nothing surprises you when you're actually in the room.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">What makes us different</div>
+    <h2>A personalized plan. A practice partner. Not generic advice.</h2>
+    <ul class="value-list">
+      <li>
+        <div class="value-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Your situation, not a template</strong> Five questions about your evidence, timing, manager, company, and market position generate a plan that's specific to you — not a generic script anyone could have downloaded.</div>
+      </li>
+      <li>
+        <div class="value-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Practice until it's familiar</strong> The simulation mode lets you run the conversation with an AI that plays your manager — supportive, neutral, or resistant — so the real conversation feels like one you've already had.</div>
+      </li>
+      <li>
+        <div class="value-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>Pushback playbook, not just an opener</strong> Most people prepare their opening line. We prepare you for the eight most common ways a manager deflects — because that's where raises actually get won or lost.</div>
+      </li>
+      <li>
+        <div class="value-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><strong>One price, yours to keep</strong> No subscription. No monthly fee. Pay once and your full plan, simulation access, and coaching stay with you for 30 days while you prepare and have the conversation.</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">The team</div>
+    <h2>Who's behind this</h2>
+    <div class="team-card">
+      <div class="team-avatar">M</div>
+      <div>
+        <div class="team-name">Milad Bakhti</div>
+        <div class="team-title">Co-founder, Recomlinked</div>
+        <p class="team-bio">Milad spent years watching talented people leave money on the table — not because they didn't deserve more, but because they didn't know how to ask for it. Recomlinked exists to close that gap. Based in Calgary, Alberta.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-label">Also from Recomlinked</div>
+    <h2>Our other products</h2>
+    <p>Recomlinked builds tools that help people navigate the parts of their career that feel the most uncertain. The Salary Negotiation Coach is our flagship product. We also publish research on how AI is reshaping work at the task level — <a href="https://risk.recomlinked.com/" target="_blank" rel="noopener">risk.recomlinked.com</a>.</p>
+  </div>
+
+  <div class="cta-row">
+    <a href="/raise/chat/" class="cta-btn">Get my negotiation plan →</a>
+    <a href="/contact/" class="cta-secondary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Contact us
+    </a>
+  </div>
+
+</main>
+
+
+<script defer src="/shared.js"></script>
+<script>
+function toggleMenu(){
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('open');
+  document.body.style.overflow=document.getElementById('mobile-menu').classList.contains('open')?'hidden':'';
+}
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('mobile-menu');
+  var btn=document.getElementById('hamburger');
+  if(menu.classList.contains('open')&&!menu.contains(e.target)&&!btn.contains(e.target)){
+    btn.classList.remove('open');menu.classList.remove('open');document.body.style.overflow='';
+  }
+});
+</script>
+</body>
+</html>
