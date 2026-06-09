@@ -1192,6 +1192,7 @@ function logSession(stage, extra) {
     url: window.location.href,
     user_agent: navigator.userAgent.slice(0, 200),
     screen: window.innerWidth + 'x' + window.innerHeight,
+    ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })(),
     utm_term: _UTM.utm_term,
     gclid: _UTM.gclid,
     video_watched: videoWatched,
