@@ -26,12 +26,13 @@ const CHECKOUT_STASH_TTL = 60 * 60 * 24 * 7; // 7 days
 // Price ID map — set all three in your Vercel/Railway env vars.
 // STRIPE_RAISE_PRICE_ID is kept as fallback for $29 (your existing price).
 const PRICE_ID_MAP = {
-  19: process.env.STRIPE_RAISE_PRICE_ID_19,
-  29: process.env.STRIPE_RAISE_PRICE_ID_29 || process.env.STRIPE_RAISE_PRICE_ID,
-  49: process.env.STRIPE_RAISE_PRICE_ID_49,
+  9.5: process.env.STRIPE_RAISE_PRICE_ID_950,
+  19:  process.env.STRIPE_RAISE_PRICE_ID_19,
+  29:  process.env.STRIPE_RAISE_PRICE_ID_29 || process.env.STRIPE_RAISE_PRICE_ID,
+  49:  process.env.STRIPE_RAISE_PRICE_ID_49,
 };
 
-const VALID_PRICES = [19, 29, 49];
+const VALID_PRICES = [9.5, 19, 29, 49];
 
 async function logToSheet(data) {
   try {
@@ -73,8 +74,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  // Resolve selected price — default to $29 if not sent or invalid
-  const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 29;
+  // Resolve selected price — default to $9.50 if not sent or invalid
+  const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 9.5;
   const priceId = PRICE_ID_MAP[selectedPrice];
 
   if (!priceId) {
