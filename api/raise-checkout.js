@@ -29,10 +29,11 @@ const PRICE_ID_MAP = {
   9.5: process.env.STRIPE_RAISE_PRICE_ID_950,
   19:  process.env.STRIPE_RAISE_PRICE_ID_19,
   29:  process.env.STRIPE_RAISE_PRICE_ID_29 || process.env.STRIPE_RAISE_PRICE_ID,
+  39:  process.env.STRIPE_RAISE_PRICE_ID_39,
   49:  process.env.STRIPE_RAISE_PRICE_ID_49,
 };
 
-const VALID_PRICES = [9.5, 19, 29, 49];
+const VALID_PRICES = [9.5, 19, 29, 39, 49];
 
 async function logToSheet(data) {
   try {
@@ -68,6 +69,7 @@ module.exports = async function handler(req, res) {
     email,
     refSource,
     price,
+    product,
   } = req.body || {};
 
   if (!profile_hash || !profile || !final_range) {
@@ -76,6 +78,7 @@ module.exports = async function handler(req, res) {
 
   // Resolve selected price — default to $9.50 if not sent or invalid
   const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 9.5;
+  const productCode = product === 'offer' ? 'offer' : 'raise';
   const priceId = PRICE_ID_MAP[selectedPrice];
 
   if (!priceId) {
@@ -95,10 +98,12 @@ module.exports = async function handler(req, res) {
         quantity: 1,
       }],
       allow_promotion_codes: true,
-      success_url: `${BASE}/raise/paid/?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url:  `${BASE}/raise/chat/`,
+      success_url: productCode === 'offer'
+        ? `${BASE}/offer/chat/?session_id={CHECKOUT_SESSION_ID}`
+        : `${BASE}/raise/paid/?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: productCode === 'offer' ? `${BASE}/offer/chat/` : `${BASE}/raise/chat/`,
       metadata: {
-        product:      'raise',
+        product:      productCode,
         profile_hash: metaStr(profile_hash),
         country:      metaStr(profile.country),
         company_sit:  metaStr(profile.company_situation),
@@ -128,6 +133,8 @@ module.exports = async function handler(req, res) {
             email:    email || '',
             refSource: refSource || '',
             price_usd: selectedPrice,
+            product: productCode,
+            offer_context: req.body.offer_context || null,
             created_at: Date.now(),
           }),
           { ex: CHECKOUT_STASH_TTL }
@@ -141,7 +148,7 @@ module.exports = async function handler(req, res) {
     await logToSheet({
       timestamp: new Date().toISOString(),
       event:     'CHECKOUT_STARTED',
-      product:   'raise',
+      product:   productCode,
       email,
       profile_hash,
       final_floor:   final_range.floor,
