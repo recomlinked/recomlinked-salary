@@ -1278,8 +1278,9 @@ function startOverSession(msg) {
 }
 
 function profileHash() {
-  // Simulation users: use unique per-session ID so each user gets
-  // their own row in the Google Sheet.
+  // Offer chat: use stable offer_session_id (sim_session_id gets overwritten by simulation)
+  if (window.location.pathname.indexOf('/offer/') >= 0 && state.offer_session_id) return state.offer_session_id;
+  // Raise/simulation: use sim_session_id
   if (state.sim_session_id) return state.sim_session_id;
 
   const p = state.profile || {};
@@ -3861,9 +3862,9 @@ function appendStandardPaywall(container, opts) {
 
 
 function initDiscoveryMode(container) {
-  // Set stable session ID for entire offer intake
-  if (!state.sim_session_id) {
-    state.sim_session_id = 'offer_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+  // Set stable offer session ID — separate from sim_session_id which gets overwritten
+  if (!state.offer_session_id) {
+    state.offer_session_id = 'offer_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
     saveState();
   }
   logSession('disc_start', { stage: 'disc_start', product: 'offer' });
