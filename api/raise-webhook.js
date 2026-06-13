@@ -92,7 +92,7 @@ module.exports = async function handler(req, res) {
       ]);
 
       const OFFER_ALLOW = new Set([
-        'disc_start', 'offer_complete', 'offer_verdict',
+        'disc_start', 'offer_q3', 'offer_base', 'offer_complete', 'offer_verdict',
         'paywall', 'checkout', 'pdf_download',
         'sim_opening_picked', 'sim_reply_tapped',
       ]);
