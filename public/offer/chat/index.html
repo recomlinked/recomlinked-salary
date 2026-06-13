@@ -717,6 +717,8 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 .tip-card-shimmer{display:block;height:14px;width:65%;border-radius:4px;background:linear-gradient(90deg,rgba(201,168,76,0.1) 25%,rgba(201,168,76,0.2) 50%,rgba(201,168,76,0.1) 75%);background-size:200% 100%;animation:shimmer 1.5s ease infinite;}
 .tip-card.loading .tip-card-chips{opacity:0.4;pointer-events:none;}
 @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.verdict-shimmer{display:inline-block;border-radius:6px;background:linear-gradient(90deg,rgba(245,207,86,0.12) 25%,rgba(245,207,86,0.28) 50%,rgba(245,207,86,0.12) 75%);background-size:200% 100%;animation:shimmer 1.6s ease infinite;}
+.verdict-shimmer-sm{display:inline-block;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,0.08) 25%,rgba(255,255,255,0.18) 50%,rgba(255,255,255,0.08) 75%);background-size:200% 100%;animation:shimmer 1.6s ease infinite;}
 
 /* Manager + reply now flow as separate coach bubbles in the main stream
    (flat structure) rather than nested inside one card. The label still
@@ -2992,6 +2994,7 @@ var discCanvasBlocks = {
 var discStrategyLoading = false;
 var discStrategyDone = false;
 var discPlanLoading = false; // true while strategy_plan is in flight
+var discNumbersReady = false; // true after teaser API responds — blurred numbers appear with kit
 
 function generateCanvasPDF() {
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
@@ -3152,7 +3155,7 @@ function _generatePDFPrintFallback() {
   }
 
   var _intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
-  html += offerVerdictCardHtml(false, _intakeDone);
+  html += offerVerdictCardHtml(false, _intakeDone && discNumbersReady);
 
   // YOUR POSITION
   html += '<div class="section-title">YOUR POSITION</div>';
@@ -3608,7 +3611,7 @@ function renderCanvasHTML() {
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
   var _intakeDone2 = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
-  html += offerVerdictCardHtml(true, _intakeDone2);
+  html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
   // Context strip — fills answer by answer
   (function() {
@@ -4448,7 +4451,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
     if (!showNumbers) {
       // Pre-intake: dashes everywhere
       inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
-        '<div style="font-size:' + (compact?'17px':'20px') + ';font-weight:800;color:rgba(245,207,86,0.35);letter-spacing:-0.3px;margin-bottom:6px;">$xxx,xxx \u2013 $xxx,xxx</div>' +
+        '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' +
         '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:12px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
 
@@ -4478,11 +4481,11 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var isRec = idx0 === recTier0;
       return '<div style="flex:1;min-width:0;text-align:center;padding:6px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.12);border:1px solid rgba(245,207,86,0.4);' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);') + '">' +
         '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? 'rgba(245,207,86,0.7)' : 'rgba(255,255,255,0.3)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
-        '<div style="font-size:11px;font-weight:800;color:' + (isRec ? 'rgba(245,207,86,0.35)' : 'rgba(255,255,255,0.2)') + ';">$xxx,xxx</div>' +
+        '<span class="' + (isRec ? 'verdict-shimmer' : 'verdict-shimmer-sm') + '" style="height:14px;width:58px;margin:2px auto;display:block;"></span>' +
         '</div>';
     }
     inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
-      '<div style="font-size:' + (compact ? '17px' : '20px') + ';font-weight:800;color:rgba(245,207,86,0.35);letter-spacing:-0.3px;">$xxx,xxx \u2013 $xxx,xxx</div>' +
+      '<div style="margin-bottom:8px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' +
       '<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:8px;"></div>' +
       '<div style="display:flex;gap:5px;">' +
         tierLocked('SAFE', 0) + tierLocked('MODERATE', 1) + tierLocked('AMBITIOUS', 2) +
@@ -4975,10 +4978,13 @@ async function generateDiscInsights() {
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(teaserBody)
     });
+    console.log('[teaser] response status:', teaserResp.status);
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
       // API returns { insights: {...} } — not Anthropic streaming format
       var hookJson = teaserData.insights || {};
+      discNumbersReady = true; // numbers reveal with kit
+      console.log('[teaser] API response keys:', Object.keys(hookJson), 'sample:', JSON.stringify(hookJson).slice(0,200));
       // Only apply hooks to KIT SECTION keys — not position dim keys
       var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
       if (Object.keys(hookJson).length > 0) {
@@ -4998,7 +5004,7 @@ async function generateDiscInsights() {
         var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
       }
     }
-  } catch(e) { discPlanLoading = false; var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc); }
+  } catch(e) { discNumbersReady = true; discPlanLoading = false; var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc); }
 
   // ── PHASE 2: Full kit (runs on payment, triggered by webhook) ─
   // Free users stop here — the teaser hooks are their preview.
