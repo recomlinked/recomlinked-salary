@@ -88,7 +88,7 @@ module.exports = async function handler(req, res) {
       );
       const isRaiseAllowed = !isOffer && RAISE_ALLOW.has(stage);
 
-      console.log('[session-log] allowed:', isOfferAllowed || isRaiseAllowed);
+      console.log('[session-log] product=' + product + ' stage=' + stage + ' allowed=' + (isOfferAllowed || isRaiseAllowed));
 
       if (isOfferAllowed || isRaiseAllowed) {
         let body = rawBody.toString();
