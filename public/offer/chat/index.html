@@ -4392,7 +4392,8 @@ function pickDiscInput(qIdx, q, value, skipped) {
   } catch (e) {}
 
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag || '', answer: skipped ? 'skipped' : storeVal });
-  // disc_* questions logged via offer_complete milestone only — not per-question
+  // Log live progress with question ID (not index — city skip makes index unreliable)
+  if (!skipped) logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, questions_answered: discStep });
 
   if (typeof _radarAnimFrame !== 'undefined' && _radarAnimFrame) { cancelAnimationFrame(_radarAnimFrame); _radarAnimFrame = null; }
   insertDiscRadar();
@@ -4666,7 +4667,8 @@ function pickDiscAnswer(qIdx, opt, pill) {
   } catch (e) {}
 
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
-  // disc_* questions logged via offer_complete milestone only
+  // Log live progress with question ID (not index — city skip makes index unreliable)
+  logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, questions_answered: discStep });
 
   // Recompute composite dims after every answer
   (function() {
@@ -5235,12 +5237,11 @@ async function generateDiscInsights() {
 
   // Log and show paywall
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('paywall', {
+  logSession('offer_paywall', {
     product: 'offer',
-    paywall_seen: true,
+    paywall_seen: 'Yes',
     role: SIM_STATE.context.role || '',
     blocker_code: SIM_STATE.blocker || '',
-    score: calculateNegotiationScore ? calculateNegotiationScore() : 0,
   });
   showDiscPaywall();
 
