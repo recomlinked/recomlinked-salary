@@ -60,9 +60,10 @@ module.exports = async function handler(req, res) {
   try {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
-      // Skip noisy per-question disc_* stages — only log milestones
+      // For offer product: skip noisy per-question disc_* stages
       const stage = peek.stage || '';
-      const skipStage = stage.startsWith('disc_') && !['disc_start','disc_complete'].includes(stage);
+      const isOffer = peek.product === 'offer';
+      const skipStage = isOffer && stage.startsWith('disc_') && !['disc_start','disc_complete'].includes(stage);
       if (!skipStage) {
         const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
         if (webhookUrl) {
