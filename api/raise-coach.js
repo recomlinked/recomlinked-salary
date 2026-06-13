@@ -780,10 +780,16 @@ COMPUTED NUMBERS (deterministic, computed from offer mechanics \u2014 use EXACTL
 - Signing bonus ask (the trade-down lever): ${fm(signingAsk)}`;
 
   if (part === 'hooks' || part === 'teasers') {
+    // Strip computed dollar amounts from ctxBlock for hooks — they must not leak before paywall
+    const hooksCtxBlock = ctxBlock
+      .replace(/- Negotiation room:.*\n/, '- Negotiation room: [locked — do not reference in hooks]\n')
+      .replace(/- Counter number.*:\n/, '')
+      .replace(/- SAFE counter:.*\n/, '- Counter tiers: [locked — do not reference dollar amounts]\n')
+      .replace(/- Signing bonus ask.*\n/, '');
     return {
       system: `You are a senior job-offer negotiation coach. The candidate has an offer in hand and is deciding whether to counter before signing. Generate ONE hook sentence per section.
 
-${ctxBlock}
+${hooksCtxBlock}
 
 WHAT A HOOK MUST DO:
 - Reveal something the candidate didn't already know \u2014 a hidden risk, counterintuitive dynamic, or non-obvious move
