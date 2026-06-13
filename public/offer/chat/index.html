@@ -4979,32 +4979,32 @@ async function generateDiscInsights() {
       body: JSON.stringify(teaserBody)
     });
     console.log('[teaser] response status:', teaserResp.status);
+    var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
-      // API returns { insights: {...} } — not Anthropic streaming format
       var hookJson = teaserData.insights || {};
-      discNumbersReady = true; // numbers reveal with kit
       console.log('[teaser] API response keys:', Object.keys(hookJson), 'sample:', JSON.stringify(hookJson).slice(0,200));
-      // Only apply hooks to KIT SECTION keys — not position dim keys
-      var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
-      if (Object.keys(hookJson).length > 0) {
-        Object.keys(hookJson).forEach(function(k) {
-          // Skip position dim keys — those are for the radar/position cards only
-          if (KIT_KEYS.indexOf(k) === -1) return;
-          if (discCanvasBlocks[k] !== undefined) {
-            discCanvasBlocks[k].insight = hookJson[k];
-            discCanvasBlocks[k].filled = true;
-            discCanvasBlocks[k].teaser = true;
-          }
-        });
-        discPlanLoading = false;
-        var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-      } else {
-        discPlanLoading = false;
-        var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-      }
+      Object.keys(hookJson).forEach(function(k) {
+        if (KIT_KEYS.indexOf(k) === -1) return;
+        if (discCanvasBlocks[k] !== undefined) {
+          discCanvasBlocks[k].insight = hookJson[k];
+          discCanvasBlocks[k].filled = true;
+          discCanvasBlocks[k].teaser = true;
+        }
+      });
+    } else {
+      console.warn('[teaser] non-ok status:', teaserResp.status);
     }
-  } catch(e) { discNumbersReady = true; discPlanLoading = false; var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc); }
+    // Always reveal numbers and stop loading — regardless of API success
+    discNumbersReady = true;
+    discPlanLoading = false;
+    var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+  } catch(e) {
+    console.warn('[teaser] fetch error:', e.message);
+    discNumbersReady = true;
+    discPlanLoading = false;
+    var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+  }
 
   // ── PHASE 2: Full kit (runs on payment, triggered by webhook) ─
   // Free users stop here — the teaser hooks are their preview.
