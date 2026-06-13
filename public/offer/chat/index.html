@@ -4979,8 +4979,12 @@ async function generateDiscInsights() {
       var teaserData = await teaserResp.json();
       // API returns { insights: {...} } — not Anthropic streaming format
       var hookJson = teaserData.insights || {};
+      // Only apply hooks to KIT SECTION keys — not position dim keys
+      var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
       if (Object.keys(hookJson).length > 0) {
         Object.keys(hookJson).forEach(function(k) {
+          // Skip position dim keys — those are for the radar/position cards only
+          if (KIT_KEYS.indexOf(k) === -1) return;
           if (discCanvasBlocks[k] !== undefined) {
             discCanvasBlocks[k].insight = hookJson[k];
             discCanvasBlocks[k].filled = true;
