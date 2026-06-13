@@ -92,9 +92,10 @@ module.exports = async function handler(req, res) {
   const session = event.data.object;
   const meta    = session.metadata || {};
 
-  // CRITICAL: only process raise product events — ignore FA events silently
-  if (meta.product !== 'raise') {
-    return res.status(200).json({ received: true, ignored_product: meta.product || 'unknown' });
+  // CRITICAL: only process raise/offer product events — ignore FA events silently
+  const product = meta.product || 'raise';
+  if (product !== 'raise' && product !== 'offer') {
+    return res.status(200).json({ received: true, ignored_product: product });
   }
 
   const email        = normalizeEmail(session.customer_email || session.customer_details?.email);
@@ -147,6 +148,7 @@ module.exports = async function handler(req, res) {
     // Round 2 — persist obstacle so coach + paid dashboard can reference it
     obstacle: obstacleFromMeta,
     access_token: accessToken,
+    product: product,
   };
 
   try {
@@ -220,7 +222,7 @@ module.exports = async function handler(req, res) {
         body:    JSON.stringify({
           timestamp:     now,
           event:         'PAID',
-          product:       'raise',
+          product:       product,
           email,
           first_name:    firstName,
           country:       meta.country,
@@ -245,15 +247,35 @@ module.exports = async function handler(req, res) {
   try {
     if (process.env.RESEND_API_KEY) {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const paidUrl = `${BASE_URL}/raise/paid/?token=${accessToken}`;
       const greeting = firstName ? `Hi ${firstName},` : 'Hi,';
 
-      await resend.emails.send({
-        from:    'Milad Bakhti <support@recomlinked.com>',
-        reply_to: 'milad.b@recomlinked.com',
-        to:      email,
-        subject: `Your raise plan is ready, ${firstName || 'there'}`,
-        text: `${greeting}
+      let emailSubject, emailText;
+
+      if (product === 'offer') {
+        const paidUrl = `${BASE_URL}/offer/chat/?paid_token=${accessToken}`;
+        emailSubject = `Your Counter Kit is unlocked`;
+        emailText = `${greeting}
+
+Your Counter Kit is ready — your ask stack, counter email, pushback playbook, and unlimited recruiter practice for 30 days.
+
+Here's your link:
+${paidUrl}
+
+Bookmark it — you have 30 days to practice the call, work through every pushback, and go into that conversation with nothing to surprise you.
+
+A personal note:
+
+I built this because countering an offer is one of the highest-ROI conversations in anyone's career, and almost nobody does it well the first time. If it works for you, I want to hear about it.
+
+My personal email:
+milad.b@recomlinked.com
+
+Milad
+Co-founder, Recomlinked`;
+      } else {
+        const paidUrl = `${BASE_URL}/raise/paid/?token=${accessToken}`;
+        emailSubject = `Your raise plan is ready, ${firstName || 'there'}`;
+        emailText = `${greeting}
 
 Your raise plan is ready. Here's your link:
 ${paidUrl}
@@ -268,11 +290,44 @@ My personal email:
 milad.b@recomlinked.com
 
 Milad
-Co-founder, Recomlinked`,
+Co-founder, Recomlinked`;
+      }
+
+      await resend.emails.send({
+        from:    'Milad Bakhti <support@recomlinked.com>',
+        reply_to: 'milad.b@recomlinked.com',
+        to:      email,
+        subject: emailSubject,
+        text:    emailText,
       });
     }
   } catch (emailErr) {
     console.error('[raise-webhook] email send error:', emailErr.message || emailErr);
+  }
+
+  // ── Generate full Counter Kit on payment (offer product only) ──
+  // Stores results in Redis so they're ready when user lands on paid page.
+  // This avoids any loading spinner after payment.
+  if (product === 'offer' && user && user.offer_context) {
+    try {
+      const BASE_URL2 = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || 'https://salary.recomlinked.com';
+      fetch(BASE_URL2 + '/api/raise-coach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'disc_insights',
+          product: 'offer',
+          part: 'full_kit',
+          offer_ctx: user.offer_context,
+          blocker: user.offer_context.blocker || 'other',
+          answers: user.offer_context.answers || {},
+          dims: user.offer_context.dims || {},
+          levers: user.offer_context.levers || [],
+          weaks: user.offer_context.weaks || [],
+          _store_for: accessToken,
+        })
+      }).catch(function(e) { console.error('[raise-webhook] kit gen error:', e.message); });
+    } catch(e) { console.error('[raise-webhook] kit gen error:', e.message); }
   }
 
   return res.status(200).json({ received: true, processed: true });
