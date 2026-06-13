@@ -1045,6 +1045,15 @@ function getUserId() {
 const USER_ID = getUserId();
 
 function logSession(stage, extra) {
+  // Offer-only stage whitelist — drop raise-specific noise
+  var _isOffer = window.location.pathname.indexOf('/offer/') >= 0;
+  if (_isOffer) {
+    var _offerAllowed = ['disc_start','offer_q_','offer_complete','offer_paywall',
+                         'offer_verdict','offer_dropped','checkout','pdf_download',
+                         'sim_opening_picked','sim_reply_tapped'];
+    var _ok = _offerAllowed.some(function(p){ return stage === p || stage.startsWith(p); });
+    if (!_ok) return; // silently drop raise-specific stages
+  }
   var videoWatched = '';
   var videoCompleted = '';
   try { videoWatched = localStorage.getItem('rl_video_watched') || ''; videoCompleted = localStorage.getItem('rl_video_completed') || ''; } catch(e) {}
@@ -4688,8 +4697,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
       var waLbl=[{employed_stable:'Can walk away',employed_leaving:'Employed, motivated to move',between_jobs:'Between jobs',first_job:'First offer'}[emp],
                  comp==='yes'?'competing offer in hand':comp==='expecting'?'offer incoming':comp==='interviewing'?'still interviewing':''].filter(Boolean);
       discCanvasBlocks.walkaway.note = '';
-      // Milestone: walk-away assessed (Q1-Q3 done)
-      logSession('offer_q3', { product:'offer', role:ctx.role||'', employment:ctx.employment||'', competing:ctx.competing||'', risk:ctx.risk||'' });
     }
 
     // ── urgency: speed + deadline (average) ──
@@ -4705,11 +4712,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
       discCanvasBlocks.urgency.note = '';
     }
 
-    // ── offer: base salary entered (+10 to offer dim) ──
-    if (ctx.base && !discActive._baseLogged) {
-      discActive._baseLogged = true;
-      logSession('offer_base', { product:'offer', role:ctx.role||'', blocker_code:SIM_STATE.blocker||'' });
-    }
     // ── offer: anchor + extras + company_size (average, base adds +10 via input path) ──
     var anch=ctx.anchor||'', ext=ctx.extras||'', csz=ctx.company_size||'';
     var anchB=anch==='no_anchor'?75:anch==='matched'?35:anch==='below'?60:anch==='above'?70:0;
