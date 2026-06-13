@@ -257,6 +257,24 @@ async function logFreeCoachMessage(payload) {
   } catch (e) { /* non-fatal */ }
 }
 
+// When the request comes from the offer product, retarget raise-themed
+// prompts to the job-offer negotiation context (recruiter persona).
+function offerize(text, isOffer) {
+  if (!isOffer) return text;
+  return text
+    .replace(/salary negotiation coach/g, 'job-offer negotiation coach')
+    .replace(/salary negotiation/g, 'job-offer negotiation (a candidate countering their offer before signing)')
+    .replace(/raise negotiation/g, 'offer negotiation')
+    .replace(/raise conversation/g, 'offer negotiation call')
+    .replace(/asking for a raise/g, 'countering their job offer')
+    .replace(/negotiating a raise/g, 'negotiating their job offer')
+    .replace(/toward a raise/g, 'toward a better offer')
+    .replace(/Manager/g, 'Recruiter')
+    .replace(/manager/g, 'recruiter')
+    .replace(/Employee/g, 'Candidate')
+    .replace(/employee/g, 'candidate');
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -725,19 +743,256 @@ async function handleDiscoveryMode(body, res) {
 // ════════════════════════════════════════════════════════════
 // ══ DISC INSIGHTS — AI-generated canvas insights           ══
 // ════════════════════════════════════════════════════════════
+// ── OFFER product: prompts for the Counter Kit (disc_insights) ──
+// Numbers are computed client-side and passed in offer_ctx; the model
+// must use them verbatim — it never invents market rates.
+function buildOfferDiscPrompts(part, oc, answeredDims) {
+  const DL = { under_24h: 'under 24 hours', '24_72h': '24\u201372 hours', this_week: 'this week (3\u20137 days)', '1_2wk': '1\u20132 weeks', none: 'no deadline given' };
+  const fm = (n) => '$' + (Number(String(n || 0).replace(/[^\d]/g, '')) || 0).toLocaleString('en-US');
+  const baseNum = Number(String(oc.base || 0).replace(/[^\d]/g, '')) || 0;
+  const signingAsk = Math.max(500, Math.round(baseNum * 0.08 / 500) * 500);
+
+  const ctxBlock = `THE OFFER:
+- Role: ${oc.role || 'not specified'}
+- Base offered: ${fm(oc.base)}
+- Response deadline: ${DL[oc.deadline] || 'not specified'}
+- Competing offer: ${oc.competing || 'no'}
+- Hiring process speed: ${oc.speed || 'normal'} (chased/fast = strong hiring urgency = leverage)
+- Package extras: ${oc.extras || 'base only'}
+- Work arrangement: ${oc.worktype || 'not specified'}${oc.worktype === 'on_site' ? ' (on-site = smaller local talent pool = added leverage)' : oc.worktype === 'remote' ? ' (remote = national talent pool = lean on other leverage)' : ''}
+- Employment status: ${oc.employment || 'not specified'}${oc.employment === 'employed_stable' ? ' (CAN WALK AWAY \u2014 the strongest position; counters carry near-zero real risk, but never phrase it as a threat)' : oc.employment === 'between_jobs' ? ' (weaker fallback \u2014 keep the counter warm and low-friction, NEVER let urgency or desperation show in any script)' : oc.employment === 'first_job' ? ' (first real offer \u2014 simple asks, extra reassurance about how normal countering is)' : oc.employment === 'employed_leaving' ? ' (employed but motivated to move \u2014 solid fallback, do not reveal the push factor)' : ''}
+- Industry: ${oc.industry || 'not specified'}${/gov|public|school|universit|educat|health|hospital|medic|nurs/i.test(oc.industry || '') ? ' (rigid pay bands are common in this sector \u2014 lead the levers with review timeline, vacation, and title rather than base stretch)' : /tech|software|startup|saas|fintech/i.test(oc.industry || '') ? ' (equity and signing bonuses are normal asks \u2014 bands flex more here)' : ' (use industry norms qualitatively only \u2014 never invent figures)'}
+- Company size: ${oc.company_size || 'not specified'}${oc.company_size === 'small' ? ' (small \u2014 equity and title flex more than base)' : oc.company_size === 'growing' ? ' (growth-stage \u2014 signing bonuses are common)' : oc.company_size === 'enterprise' ? ' (enterprise \u2014 rigid bands, the non-salary levers carry more of the negotiation)' : oc.company_size === 'mid' ? ' (established bands with real room inside them)' : ''}
+- Salary anchor: ${oc.anchor === 'no_anchor' ? 'Candidate never shared a number — counter sets the first anchor' : oc.anchor === 'matched' ? 'Candidate shared a number and the offer matched it — counter needs new justification (market data, scope, competing signal) to go above their own anchor' : oc.anchor === 'below' ? 'Offer came in below what candidate stated — natural standing to re-ask for original number' : oc.anchor === 'above' ? 'Offer is above what candidate stated — company\'s internal band is higher than candidate\'s expectation, likely more room' : 'not specified'}
+- City: ${oc.city || 'not provided'} (use ONLY for qualitative talent-pool and cost-of-living reasoning \u2014 NEVER state or imply specific market salary figures for this city)
+- Candidate's natural voice: ${oc.tone || 'warm'} \u2014 write meeting_email, accept_email, and opening_script in this voice: ${oc.tone === 'direct' ? 'short sentences, no filler, gets to the number fast' : oc.tone === 'formal' ? 'polished, professional register, complete sentences, measured warmth' : 'friendly, personable, genuinely enthusiastic but professional'}
+${oc.researched_max ? '- Candidate researched market max: ' + fm(oc.researched_max) + ' (use this as the market anchor — their counter can reference it without attribution)' : '- No market research provided \u2014 anchor on offer mechanics, never invent market data'}
+${oc.jd_text ? '\nJOB DESCRIPTION (provided by candidate \u2014 use it to personalize: reference the actual scope, responsibilities, or requirements in the counter email, ask stack reasoning, and openers. Do not quote it back verbatim at length):\n' + oc.jd_text + '\n' : ''}
+
+COMPUTED NUMBERS (deterministic, computed from offer mechanics \u2014 use EXACTLY these figures, never invent market rates or any other dollar amounts):
+- Negotiation room: ${fm(oc.room_low)}\u2013${fm(oc.room_high)}
+- Counter number (the base ask): ${fm(oc.counter)}
+- SAFE counter: ${fm(oc.counter_safe)} | MODERATE counter: ${fm(oc.counter_moderate)} | AMBITIOUS counter: ${fm(oc.counter_ambitious)}
+- Walk-away power: employment=${oc.employment||'not specified'}, competing offer=${oc.competing||'not specified'}
+- Risk tolerance (stated intent): ${oc.risk || 'balanced'} (conservative = protect the offer and close cleanly, balanced = real gain without unnecessary friction, ambitious = maximum number on the table)
+  NOTE: Walk-away power and risk tolerance are independent. Someone employed+competing but playing safe has real leverage and a conservative intent. Honour both.
+- Years of experience: ${{ under2:'Under 2 years', '2_5':'2–5 years', '5_10':'5–10 years', over10:'10+ years' }[oc.experience] || oc.experience || 'not specified'} (affects talent market scarcity and counter anchor strength)
+- Signing bonus ask (the trade-down lever): ${fm(signingAsk)}`;
+
+  if (part === 'hooks' || part === 'teasers') {
+    return {
+      system: `You are a senior job-offer negotiation coach. The candidate has an offer in hand and is deciding whether to counter before signing. Generate ONE hook sentence per section.
+
+${ctxBlock}
+
+WHAT A HOOK MUST DO:
+- Reveal something the candidate didn't already know \u2014 a hidden risk, counterintuitive dynamic, or non-obvious move
+- Be specific to THEIR offer \u2014 not generic advice
+- Make them think "I need to read more"
+- NEVER restate their input back to them
+
+POSITION HOOKS \u2014 the candidate's 4 negotiation dimensions:
+- walkaway = WALK-AWAY POWER: objective leverage — employment status (what happens if they say no?) + competing offers (hard alternatives).
+- risk_tol = RISK TOLERANCE: their stated intent — how bold they want to play. Independent from walk-away power.
+- urgency = THEIR URGENCY: how badly the company needs this closed (process speed + deadline pressure).
+- talent = TALENT MARKET: how replaceable the candidate is and at what price (work arrangement pool size + years of experience + market research + local market).
+- offer = OFFER STRUCTURE: where the money sits and which levers exist (base + extras + company size band rigidity).
+
+Diagnostic \u2014 name the hidden risk or opportunity in that dimension of THEIR situation.
+Examples:
+- risk_pos (employed + competing offer): "You can afford a no \u2014 which means the only thing that can weaken your counter is sounding like you can't."
+- risk_pos (between jobs, wants it badly): "Your safest play isn't avoiding the counter \u2014 it's making one so warm and reasonable that a no costs them more goodwill than a yes costs budget."
+- urgency (they chased, tight deadline): "A company that moved this fast has already spent political capital on you \u2014 their deadline is pressure theater that cuts in your favour."
+- talent (10+ years, on-site): "A senior profile in a local-only search is exactly the hire that takes them six more months to replace \u2014 that math is your leverage."
+- offer (base only, enterprise): "A base-only offer at a big company means every lever is still unused \u2014 and the signing bonus is the easiest yes in their budget."
+
+STRATEGY HOOKS — make each locked section feel like the thing they cannot afford to skip:
+Rules for strategy hooks:
+- Name the EXACT mistake most people in their position make — specific, not general
+- Reference their specific context (their role, their leverage signals, their deadline) — never generic
+- End on an incomplete thought that makes them want to read the full section
+- The hook must be DIFFERENT from what they'd get from ChatGPT — it uses their computed numbers, their leverage signals, their deadline
+
+Examples (write better than these, calibrated to THEIR specific situation):
+- decision: "You have ${fm(oc.counter_safe)}–${fm(oc.counter_ambitious)} sitting on this table — the question isn't whether to ask for it, it's whether your framing will hold when they push back."
+- leverage_risk: "The rescind fear is real but statistically near-zero for professional counters — what actually kills offers is the candidate who sounds uncertain, not the one who asks for more."
+- emphasize: "Most candidates in your position lead with the wrong ask — the order of the stack determines whether you get a yes on what matters or a no on everything."
+- levers: "If they say the base is fixed, nine other levers activate — and the first pivot takes 10 seconds."
+- avoid: "There's one phrase that tanks more offer negotiations than any pushback — and most people say it instinctively in the first 30 seconds."
+- opening_script: "The recruiter's first impression of how you negotiate is formed in the first sentence — the four openers in this kit each send a different signal."
+- pushback: "Every recruiter response to a counter is either a real constraint or a closing tactic — the response is completely different depending on which one it is."
+- fallback: "If base is blocked, you have exactly one window to pivot before the conversation closes — this is what you say in that window."
+- meeting_email: "The email that gets a yes has one sentence most people leave out — and it's not the number."
+- accept_email: "How you accept is the last piece of leverage you have — most people waste it."
+- raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
+
+Respond ONLY with valid JSON, one sentence per key, no markdown:
+{"walkaway":"...","risk_tol":"...","urgency":"...","talent":"...","offer":"...","decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","accept_email":"...","fallback":"...","raise_case":"..."}`,
+// Respond with all 16 keys.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate 14 hook sentences \u2014 one per key.`,
+      maxTokens: 800,
+    };
+  }
+
+  if (part === 'full_kit' || part === 'strategy' || part === 'strategy_plan') {
+    return {
+      system: `You are a senior job-offer negotiation coach writing a complete, personalized Counter Kit for a candidate with an offer in hand.
+
+${ctxBlock}
+
+WRITING RULES:
+- Write for THIS candidate. Reference their actual offer, deadline, leverage signals.
+- Use EXACTLY the computed numbers above wherever a figure appears. NEVER invent market rates, percentages of "typical" raises, or any other dollar amounts.
+- Every counter must signal enthusiasm to sign \u2014 never an ultimatum.
+- Use **bold** for the single most important phrase per section only.
+- Plain text with \\n line breaks. No headers inside sections.
+- Tone: a coach who has closed 1,000 offer negotiations \u2014 direct, warm, zero filler.
+
+SECTIONS:
+
+decision:
+  This is OUR READ \u2014 a direct, expert recommendation in 3-4 sentences.
+  Answer three things explicitly:
+  1. SHOULD THEY NEGOTIATE? Yes/proceed carefully/no (almost always yes \u2014 only 'proceed carefully' if they have near-zero walk-away AND a tight deadline).
+  2. POSITION = leverage quality. Synthesize walkaway + urgency + talent market into one honest sentence about how strong their position actually is.
+  3. RISK LEVEL = how carefully should they counter? This is separate from their risk CHOICE. It is the expert read based on their leverage. Strong walkaway + urgency = push hard. Weak walkaway + tight deadline = carefully. Mismatch between their risk choice and their leverage \u2014 flag it: 'You chose ambitious, but your walk-away position is weak \u2014 your framing needs to be perfect.'
+  End with one sentence: the single most important thing they must get right in this negotiation.
+
+leverage_risk:
+  The non-obvious read of their specific leverage given the signals above. How to deploy it without putting the offer at risk. What rescind risk actually looks like (extremely rare for professional counters) and what genuinely triggers it. 4-5 sentences.
+
+counter_options:
+  Their three computed counters with when-to-choose guidance. Format exactly:
+  **SAFE \u2014 ${fm(oc.counter_safe)}.** [Who should send this and what it trades away. 1-2 sentences.]
+  **MODERATE \u2014 ${fm(oc.counter_moderate)}.** [The standard play \u2014 inside the zone that gets negotiated, not rejected. 1-2 sentences.]
+  **AMBITIOUS \u2014 ${fm(oc.counter_ambitious)}.** [What leverage justifies it and the extra friction it creates. 1-2 sentences.]
+  End with one sentence recommending ONE tier for THIS candidate based on their stated risk tolerance (${oc.risk || 'balanced'}) and leverage signals \u2014 and say it plainly: "For you: send the [tier] counter."
+
+levers:
+  One sentence: when base is blocked, the negotiation isn't over \u2014 it moves to the levers below.
+  Then EXACTLY these 10 levers, each ONE line, **bold name** \u2014 when to use it for THIS candidate:
+  **Signing bonus** / **Vacation days** / **Remote or hybrid days** / **Title** / **Start date** / **Annual review timeline (in writing)** / **Performance bonus** / **Relocation support** / **Education budget** / **Equity or options**.
+  Order them by relevance to this candidate's situation (their extras, work arrangement, and role). End with one sentence on the trading rule: concede on levers, never on base, and never give two levers for nothing.
+
+emphasize:
+  This is the ASK STACK \u2014 what to ask for and in what order. Format exactly:
+  **ASK 1 \u2014 Base: ${fm(oc.counter)}.** [Why base leads \u2014 it compounds every year and anchors every future job. 1-2 sentences tied to their situation.]
+  **ASK 2 \u2014 Signing bonus: ${fm(signingAsk)}.** [Why this is the trade-down when base is blocked \u2014 one-time budget, doesn't touch their band. 1-2 sentences.]
+  **FALLBACK \u2014 A written 6-month compensation review.** [When to deploy it and why it must be in writing. 1-2 sentences.]
+
+avoid:
+  The most common way candidates in their position sabotage a counter.
+  Then 4 numbered points \u2014 each ONE sentence naming the exact phrase or behavior to avoid AND why:
+  1. [phrase/behavior] \u2014 [why it backfires]
+  2. [phrase/behavior] \u2014 [why it backfires]
+  3. [phrase/behavior] \u2014 [why it backfires]
+  4. [phrase/behavior] \u2014 [why it backfires]
+  Draw from: giving a range instead of one number, apologizing for countering, bluffing a competing offer, answering "what were you making before", accepting "best and final" at face value, negotiating multiple items simultaneously.
+
+opening_script:
+  This is the PHONE OPENER \u2014 why the first 30 seconds of the call sets the recruiter's posture.
+  Then 4 complete openers, each a different angle, in first person, using their counter number where natural:
+  **Option 1 \u2014 Enthusiasm first:** [2-3 sentences]
+  **Option 2 \u2014 Anchored to scope:** [2-3 sentences]
+  **Option 3 \u2014 Sign-this-week:** [2-3 sentences]
+  **Option 4 \u2014 Direct:** [2-3 sentences]
+
+pushback:
+  The key insight: every recruiter pushback is either a real constraint or a closing tactic \u2014 and the response differs.
+  Then EXACTLY these 8 recruiter moves with responses, formatted as:
+  **"[recruiter line]"**
+  \u2192 [response, 1-2 sentences, non-defensive, using their computed numbers where natural]
+  Cover exactly: "This is our best and final offer." / "We need your answer by tomorrow." / "What's your current salary?" / "The band for this role is fixed." / "We can revisit compensation at your first review." / [silence after the counter] / "Why do you need more?" / "The offer expires today" (exploding deadline).
+
+meeting_email:
+  This is the COUNTER EMAIL. One sentence on why countering in writing first beats improvising on a call.
+  Then the complete email:
+  Subject: [short, references their offer]
+  
+  [Full email body, 90-130 words, first person, warm. Must include EXACTLY the counter number ${fm(oc.counter)}, one sentence of reasoning anchored to role scope, and must end with the closing signal: if we can get there, ready to sign this week. Only placeholder allowed: [Name] for the recruiter.]
+
+accept_email:
+  This is the FINAL ACCEPT EMAIL \u2014 sent after terms are agreed, to close professionally and lock the revised number in writing. One sentence on why accepting in writing matters (verbal agreements evaporate).
+  Then the complete email:
+  Subject: [short, signals acceptance]
+  
+  [Full email body, 50-90 words, first person, warm and decisive. Must: confirm acceptance at the agreed revised terms, ask for the updated offer letter reflecting them, and close with genuine enthusiasm about starting. Only placeholder allowed: [Name].]
+
+fallback:
+  This is the FALLBACK PLAYBOOK \u2014 what to do if base is rejected. Three concrete moves in order:
+  1. The signing bonus pivot: the exact script to use when they say base is fixed. One sentence in quotes, first person. Must include ${fm(signingAsk)} as the ask. Why this works (one-time budget, doesn't touch the band).
+  2. The 6-month review ask: how to get a compensation review committed in writing, not verbally. One sentence in quotes. Must specify 'in writing' and name a date.
+  3. The title upgrade: how a title change now creates comp leverage in the next role. One sentence on when to deploy it.
+  End with: 'The fallback sequence is: base \u2192 signing \u2192 review \u2192 title. Never give two levers for nothing.'
+
+raise_case:
+  This is the SEQUENCING PLAN \u2014 their 72-hour playbook. Numbered steps:
+  1. [Send the counter email first \u2014 when, and why writing leads]
+  2. [The waiting window \u2014 how long, what silence means]
+  3. [The call \u2014 take it practiced, openers ready]
+  4. [Getting the final number in writing before signing]
+  5. [If the deadline is too tight \u2014 the exact extension script, one sentence in quotes]
+
+Return ONLY these 10 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
+{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","avoid":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
+// 12 keys total.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 11 Counter Kit sections.`,
+      maxTokens: 3400,
+    };
+  }
+
+  if (part === 'strategy_position') {
+    return {
+      system: `You are a senior job-offer negotiation coach. Write 2-3 sentences of deep tactical insight for each of the candidate's 4 negotiation dimensions.
+
+${ctxBlock}
+
+DIMENSIONS:
+- walkaway = WALK-AWAY POWER \u2014 objective leverage. Synthesize employment status (what happens if they say no?) and competing offers. A competing offer in hand is a BATNA, not a bluff \u2014 the insight must say how strong or weak this alternative actually is.
+- risk_tol = RISK TOLERANCE \u2014 their stated intent. Note the interaction with walkaway: strong walkaway + safe risk = real power, conservative use; weak walkaway + ambitious risk = bold play that must be executed perfectly. The insight must call out this dynamic explicitly.
+- urgency = THEIR URGENCY \u2014 how badly the company needs this closed. Synthesize process speed and deadline. Tight deadline + fast process = they want it done, which is leverage. Slow process + no deadline = urgency is unclear, counter needs to create its own momentum (the sign-this-week line).
+- talent = TALENT MARKET \u2014 how replaceable they are and at what price. Synthesize work arrangement (remote = national pool, on-site = local scarcity), years of experience (seniority = scarcity), market research, and city. The read: how long and how expensive would replacing them be?
+- offer = OFFER STRUCTURE \u2014 where the money sits and what can move. Synthesize base vs extras (which levers are unused) and company size (band rigidity, signing-bonus likelihood).
+
+For each, calibrate by the dimension's score:
+- Strong (\u226565): the hidden risk of assuming it's enough, OR exactly how to deploy it without burning it. 2-3 sentences.
+- Medium (42-64): the dynamic plus one specific move to strengthen it before the call. 2-3 sentences.
+- Weak (<42): the honest consequence AND the play that works anyway \u2014 never leave them hopeless, weak dims have counters too. 2-3 sentences.
+
+Use EXACTLY the computed numbers above where figures appear. Use **bold** for the single key tactic only. No generic advice \u2014 every sentence must be impossible to write without THEIR specific answers.
+
+Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
+{"walkaway":"...","risk_tol":"...","urgency":"...","talent":"...","offer":"..."}`,
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 5 position insights.`,
+      maxTokens: 800,
+    };
+  }
+  return null;
+}
+
 async function handleDiscInsights(body, res) {
   const { blocker, answers, dims, levers, weaks, part, tailor } = body;
+  const storeFor = body._store_for; // access token to store results for paid user
+  const isOffer = body.product === 'offer';
+  const oc = body.offer_ctx || {};
 
   if (!answers || typeof answers !== 'object') {
     return res.status(400).json({ error: 'answers required' });
   }
 
   const dimDescriptions = {
+    // raise product dims
     evidence: { label: 'Evidence & Leverage' },
     timing:   { label: 'Timing & Window'     },
     manager:  { label: 'Manager'              },
     company:  { label: 'Company & Environment'},
     market:   { label: 'Market & Positioning' },
+    // offer product dims
+    walkaway: { label: 'Walk-Away Power (employment + competing offer)' },
+    risk_tol: { label: 'Risk Tolerance (how bold they want to play)' },
+    urgency:  { label: 'Their Urgency' },
+    talent:   { label: 'Talent Market' },
+    offer:    { label: 'Offer Structure' },
   };
 
   const answeredDims = Object.entries(dimDescriptions)
@@ -763,11 +1018,17 @@ async function handleDiscInsights(body, res) {
 
   let system, userMessage, maxTokens;
 
+  // ── OFFER product — Counter Kit prompts ───────────────────────────────────
+  if (isOffer) {
+    const op = buildOfferDiscPrompts(part, oc, answeredDims);
+    if (!op) return res.status(400).json({ error: `Unknown part: ${part}` });
+    system = op.system; userMessage = op.userMessage; maxTokens = op.maxTokens;
+
   // ── HOOKS — merged position + teasers (one call at paywall) ────────────────
   // Generates one sharp hook sentence per section (all 12 blocks).
   // Position hooks: diagnostic insight the user didn't know.
   // Strategy hooks: counterintuitive setup that makes them want the full section.
-  if (part === 'hooks' || part === 'teasers') {
+  } else if (part === 'hooks' || part === 'teasers') {
 
     system = `You are a senior salary negotiation coach. Generate ONE hook sentence per section.
 
@@ -875,7 +1136,7 @@ meeting_email:
   Then the complete email:
   Subject: [specific subject line]
   
-  [Full email body, 120-160 words. First person. Confident but not aggressive. Ends with a clear ask for 20-30 minutes.]
+  [Full email body, 120-160 words. First person. Confident but not ambitious. Ends with a clear ask for 20-30 minutes.]
 
 raise_case:
   Why most one-paragraph raise cases fail to land.
@@ -912,6 +1173,22 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
 
   } else {
     return res.status(400).json({ error: `Unknown part: ${part}` });
+  }
+
+  // If _store_for present, generate and store for paid user (webhook path)
+  if (storeFor && redis) {
+    try {
+      const fullResp = await client.messages.create({
+        model: 'claude-sonnet-4-6', max_tokens: maxTokens,
+        system, messages: [{ role: 'user', content: userMessage }],
+      });
+      const kitText = (fullResp.content[0]?.text || '').trim();
+      await redis.set(`offer:kit:${storeFor}`, kitText, { ex: 86400 * 30 });
+      return res.status(200).json({ stored: true });
+    } catch(e) {
+      console.error('[raise-coach] store kit error:', e.message);
+      return res.status(500).json({ error: 'store failed' });
+    }
   }
 
   try {
@@ -973,7 +1250,7 @@ Respond ONLY with valid JSON, no preamble:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1032,7 +1309,7 @@ Respond ONLY with valid JSON, no preamble:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 600,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1085,7 +1362,7 @@ JSON only, no preamble:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1124,7 +1401,7 @@ JSON only:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1154,7 +1431,7 @@ JSON only:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 150,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1201,7 +1478,7 @@ JSON only:
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 500,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = response.content[0]?.text || '';
     const parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
@@ -1254,7 +1531,7 @@ Be direct, encouraging, and specific. No filler. No generic advice. Reference th
     const response = await client.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 250,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const text = response.content[0]?.text || '';
     return res.status(200).json({ reflection: text, mode: 'coach_reflection' });
@@ -1333,7 +1610,7 @@ CRITICAL: Analyze the strategic direction only.${gistInstruction}`;
     const response = await client.messages.create({
       model: NUDGE_MODEL_ID,
       max_tokens: 350,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: offerize(prompt, body.product === 'offer') }],
     });
     const raw = (response.content[0]?.text || '').trim();
     // Try to parse as JSON for new gist+full format
@@ -1378,7 +1655,7 @@ async function handleCoachingChat(body, res) {
     content: m.content,
   }));
 
-  const systemPrompt = `You are a salary negotiation coach having a conversation with someone who is practicing their raise negotiation.
+  const systemPrompt = offerize(`You are a salary negotiation coach having a conversation with someone who is practicing their raise negotiation.
 
 THEIR SITUATION:
 - Main concern: "${blockerLabel}"
@@ -1394,7 +1671,7 @@ COACHING GUIDELINES:
 - If they ask about something they haven't practiced yet, encourage them to try it in practice mode.
 - Keep responses to 2-4 sentences. Don't lecture.
 - Never use markdown formatting, bullets, or headers. Plain conversational text only.
-- You're a supportive coach, not a textbook. Talk like a trusted mentor.`;
+- You're a supportive coach, not a textbook. Talk like a trusted mentor.`, body.product === 'offer');
 
   try {
     const messages = [
@@ -1495,7 +1772,7 @@ async function handleCasePolish(body, res) {
 
 Rules:
 - Write in first person ("I" not "they")
-- Be direct and confident, not aggressive or entitled
+- Be direct and confident, not ambitious or entitled
 - Use specific numbers and facts from the input — never fabricate
 - Keep it concise: 2-4 sentences per section maximum
 - Match the tone of a senior professional writing to their manager
