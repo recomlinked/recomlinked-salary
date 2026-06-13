@@ -5229,13 +5229,7 @@ async function generateDiscInsights() {
 
   // Log and show paywall
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
-  logSession('offer_paywall', {
-    product: 'offer',
-    paywall_seen: 'Yes',
-    role: SIM_STATE.context.role || '',
-    blocker_code: SIM_STATE.blocker || '',
-  });
-  showDiscPaywall();
+  showDiscPaywall(); // paywall log is inside showDiscPaywall
 
   // Smooth scroll reveal: user answer → canvas → intro → paywall
   setTimeout(function() {
@@ -5501,6 +5495,12 @@ function showDiscPaywall() {
 
   state.paywall_shown = true;
   saveState();
+  // Log paywall hit — only once per session
+  if (!state._paywallLogged) {
+    state._paywallLogged = true;
+    logSession('offer_paywall', { product:'offer', paywall_seen:'Yes',
+      role: (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role) || '' });
+  }
   var chatArea = $('disc-chat');
   if (!chatArea) return;
   if (chatArea.querySelector('.paywall-bubble')) {
