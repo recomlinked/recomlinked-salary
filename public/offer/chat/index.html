@@ -1056,7 +1056,7 @@ function logSession(stage, extra) {
   const payload = {
     timestamp: new Date().toISOString(),
     event: 'RAISE_SESSION',
-    product: window.location.pathname.indexOf('/offer/') >= 0 ? 'offer' : 'raise',
+    product: 'offer',
     session_id: profileHash(),
     user_id: USER_ID,
     stage,
@@ -3861,7 +3861,12 @@ function appendStandardPaywall(container, opts) {
 
 
 function initDiscoveryMode(container) {
-  logSession('disc_start', { stage: 'disc_start' });
+  // Set stable session ID for entire offer intake
+  if (!state.sim_session_id) {
+    state.sim_session_id = 'offer_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    saveState();
+  }
+  logSession('disc_start', { stage: 'disc_start', product: 'offer' });
   container.innerHTML = '';
 
   // Restore discovery state from localStorage if available
@@ -4929,21 +4934,24 @@ async function generateDiscInsights() {
   // ── Show radar + canvas now that intake is done ──
   insertDiscRadar(); // discStep >= 14 so canvas div IS created
 
-  // Log offer_complete milestone — maps to Raise Sessions columns
+  // Log offer_complete — full context for funnel analysis
   logSession('offer_complete', {
+    product: 'offer',
     role: SIM_STATE.context.role || '',
+    seniority: SIM_STATE.context.experience || '',
     blocker_code: SIM_STATE.blocker || '',
     blocker_label: [
-      SIM_STATE.context.employment,
-      SIM_STATE.context.competing,
-      SIM_STATE.context.risk,
-      SIM_STATE.context.worktype,
-      SIM_STATE.context.experience,
-      SIM_STATE.context.anchor,
-      SIM_STATE.context.base ? ('base:' + SIM_STATE.context.base) : '',
-      SIM_STATE.context.city && SIM_STATE.context.city !== 'skipped' ? ('city:' + SIM_STATE.context.city) : '',
+      SIM_STATE.context.employment || '',
+      SIM_STATE.context.competing || '',
+      SIM_STATE.context.risk || '',
+      SIM_STATE.context.worktype || '',
+      SIM_STATE.context.anchor || '',
+      SIM_STATE.context.base ? ('$' + SIM_STATE.context.base) : '',
+      SIM_STATE.context.city && SIM_STATE.context.city !== 'skipped' ? SIM_STATE.context.city : '',
     ].filter(Boolean).join(' | '),
     mode: 'offer',
+    template: SIM_STATE.context.company_size || '',
+    landing_ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || ''; }catch(e){ return ''; } })(),
   });
 
   // Auto-scroll to the Counter Kit reveal
