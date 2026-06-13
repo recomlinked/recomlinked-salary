@@ -2949,7 +2949,7 @@ var OFFER_Q_ORDER = [
   'industry', 'jd'
 ];
 
-var DISC_FREE_QUESTIONS = 15; // verdict after this many (city auto-skipped for remote = still 15)
+var DISC_FREE_QUESTIONS = 16; // verdict after this many — 16 questions, city always shown
 
 function buildDiscQuestions(blockerCode) {
   return OFFER_Q_ORDER.map(function(qId) {
@@ -3606,7 +3606,7 @@ function renderCanvasHTML() {
       { key: 'industry',     label: 'Industry',     val: ctx.industry && ctx.industry !== 'skipped' ? ctx.industry : null },
       { key: 'company_size', label: 'Company',      val: { small:'Small (<50)', growing:'Growing (50–500)', mid:'Mid-size (500–5K)', enterprise:'Enterprise (5K+)' }[ctx.company_size] },
       { key: 'worktype',     label: 'Work setup',   val: { on_site:'On-site', hybrid:'Hybrid', remote:'Remote' }[ctx.worktype] },
-      { key: 'city',         label: 'City',         val: ctx.city && ctx.city !== 'skipped' ? ctx.city : null },
+      { key: 'city',         label: 'City',         val: ctx.city || null },
       { key: 'anchor',       label: 'Anchor',       val: { no_anchor:'No number shared', matched:'Offer matched my number', below:'Offer below my number', above:'Offer above my number' }[ctx.anchor] },
     ];
     var filled = fields.filter(function(f){ return f.val; });
@@ -3979,7 +3979,7 @@ function initDiscoveryMode(container) {
         var _bc2 = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'other';
         var _ans2 = {};
         if (discOrderedQuestions && discOrderedQuestions.length > 0) {
-          discOrderedQuestions.slice(0, 15).forEach(function(q) { if (q.dimTag) _ans2[q.dimTag] = SIM_STATE.context[q.id] || ''; });
+          discOrderedQuestions.slice(0, 16).forEach(function(q) { if (q.dimTag) _ans2[q.dimTag] = SIM_STATE.context[q.id] || ''; });
         }
         var _base = { mode: 'disc_insights', product: 'offer', offer_ctx: buildOfferCtx(), blocker: _bc2, answers: _ans2, dims: discDims, levers: discLevers, weaks: discWeaks };
         var _posKeys = ['evidence','timing','manager','company','market'];
@@ -4421,11 +4421,6 @@ function pickDiscInput(qIdx, q, value, skipped) {
   }, 200);
 
   discStep++;
-  // Skip city if remote — talent pool is national, city irrelevant
-  if (discOrderedQuestions[discStep] && discOrderedQuestions[discStep].id === 'city' && SIM_STATE.context.worktype === 'remote') {
-    SIM_STATE.context.city = 'skipped';
-    discStep++;
-  }
   _inputReactionDone.then(function() {
     setTimeout(function() {
       renderDiscQuestion(discStep);
@@ -4783,11 +4778,6 @@ function pickDiscAnswer(qIdx, opt, pill) {
   }, 200);
   
   discStep++;
-  // Skip city if remote — talent pool is national, city irrelevant
-  if (discOrderedQuestions[discStep] && discOrderedQuestions[discStep].id === 'city' && SIM_STATE.context.worktype === 'remote') {
-    SIM_STATE.context.city = 'skipped';
-    discStep++;
-  }
   _reactionDone.then(function() {
     setTimeout(function() {
       renderDiscQuestion(discStep);
@@ -4989,7 +4979,7 @@ async function generateDiscInsights() {
       SIM_STATE.context.worktype || '',
       SIM_STATE.context.anchor || '',
       SIM_STATE.context.base ? ('$' + SIM_STATE.context.base) : '',
-      SIM_STATE.context.city && SIM_STATE.context.city !== 'skipped' ? SIM_STATE.context.city : '',
+      SIM_STATE.context.city || '',
     ].filter(Boolean).join(' | '),
     mode: 'offer',
     template: SIM_STATE.context.company_size || '',
@@ -5015,7 +5005,7 @@ async function generateDiscInsights() {
     blocker: SIM_STATE.blocker || 'other',
     answers: (function() {
       var ans = {};
-      discOrderedQuestions.slice(0, 15).forEach(function(q) {
+      discOrderedQuestions.slice(0, 16).forEach(function(q) {
         if (q.dimTag) ans[q.dimTag] = SIM_STATE.context[q.id] || '';
       });
       return ans;
@@ -5122,7 +5112,7 @@ async function generateDiscInsights() {
   // Free users fire hooks only
   var blockerCode = SIM_STATE.context.blocker_code || 'other';
   var answers = {};
-  discOrderedQuestions.slice(0, 15).forEach(function(q) {
+  discOrderedQuestions.slice(0, 16).forEach(function(q) {
     if (q.dimTag) answers[q.dimTag] = SIM_STATE.context[q.id] || '';
   });
 
@@ -7189,7 +7179,7 @@ async function startCheckout(selectedPrice) {
   ctx.blocker = SIM_STATE.blocker || 'other';
   ctx.answers = (function() {
     var ans = {};
-    discOrderedQuestions.slice(0, 15).forEach(function(q) {
+    discOrderedQuestions.slice(0, 16).forEach(function(q) {
       if (q.dimTag) ans[q.dimTag] = SIM_STATE.context[q.id] || '';
     });
     return ans;
@@ -7252,7 +7242,7 @@ async function startCheckout(selectedPrice) {
     {
       var blockerCode = SIM_STATE.context && SIM_STATE.context.blocker_code || 'other';
       var answers = {};
-      discOrderedQuestions.slice(0, 15).forEach(function(q) {
+      discOrderedQuestions.slice(0, 16).forEach(function(q) {
         if (q.dimTag) answers[q.dimTag] = SIM_STATE.context[q.id] || '';
       });
       var enrichedBody = {
