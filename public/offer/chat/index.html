@@ -4664,6 +4664,8 @@ function pickDiscAnswer(qIdx, opt, pill) {
       var waLbl=[{employed_stable:'Can walk away',employed_leaving:'Employed, motivated to move',between_jobs:'Between jobs',first_job:'First offer'}[emp],
                  comp==='yes'?'competing offer in hand':comp==='expecting'?'offer incoming':comp==='interviewing'?'still interviewing':''].filter(Boolean);
       discCanvasBlocks.walkaway.note = '';
+      // Milestone: walk-away assessed (Q1-Q3 done)
+      logSession('offer_q3', { product:'offer', role:ctx.role||'', employment:ctx.employment||'', competing:ctx.competing||'', risk:ctx.risk||'' });
     }
 
     // ── urgency: speed + deadline (average) ──
@@ -4679,6 +4681,11 @@ function pickDiscAnswer(qIdx, opt, pill) {
       discCanvasBlocks.urgency.note = '';
     }
 
+    // ── offer: base salary entered (+10 to offer dim) ──
+    if (ctx.base && !discActive._baseLogged) {
+      discActive._baseLogged = true;
+      logSession('offer_base', { product:'offer', role:ctx.role||'', blocker_code:SIM_STATE.blocker||'' });
+    }
     // ── offer: anchor + extras + company_size (average, base adds +10 via input path) ──
     var anch=ctx.anchor||'', ext=ctx.extras||'', csz=ctx.company_size||'';
     var anchB=anch==='no_anchor'?75:anch==='matched'?35:anch==='below'?60:anch==='above'?70:0;
@@ -5197,11 +5204,11 @@ async function generateDiscInsights() {
   // Log and show paywall
   logEntry('disc_paywall_shown', { levers: discLevers.length, weaks: discWeaks.length });
   logSession('paywall', {
+    product: 'offer',
     paywall_seen: true,
     role: SIM_STATE.context.role || '',
-    blocker: SIM_STATE.blocker || '',
+    blocker_code: SIM_STATE.blocker || '',
     score: calculateNegotiationScore ? calculateNegotiationScore() : 0,
-    dims: JSON.stringify(discDims),
   });
   showDiscPaywall();
 
