@@ -799,22 +799,24 @@ POSITION HOOKS \u2014 the candidate's 4 negotiation dimensions:
 - offer = OFFER STRUCTURE: where the money sits and which levers exist (base + extras + company size band rigidity).
 
 Diagnostic \u2014 name the hidden risk or opportunity in that dimension of THEIR situation.
+NEVER mention specific dollar amounts or salary figures in diagnostic hooks.
 Examples:
 - risk_pos (employed + competing offer): "You can afford a no \u2014 which means the only thing that can weaken your counter is sounding like you can't."
 - risk_pos (between jobs, wants it badly): "Your safest play isn't avoiding the counter \u2014 it's making one so warm and reasonable that a no costs them more goodwill than a yes costs budget."
 - urgency (they chased, tight deadline): "A company that moved this fast has already spent political capital on you \u2014 their deadline is pressure theater that cuts in your favour."
 - talent (10+ years, on-site): "A senior profile in a local-only search is exactly the hire that takes them six more months to replace \u2014 that math is your leverage."
-- offer (base only, enterprise): "A base-only offer at a big company means every lever is still unused \u2014 and the signing bonus is the easiest yes in their budget."
+- offer (base only, enterprise): "A base-only offer at a big company means every lever is still unused \u2014 and there are options beyond base that most candidates never think to ask for."
 
 STRATEGY HOOKS — make each locked section feel like the thing they cannot afford to skip:
 Rules for strategy hooks:
+- NEVER mention specific dollar amounts, salary figures, or computed numbers — those are locked behind the paywall
 - Name the EXACT mistake most people in their position make — specific, not general
 - Reference their specific context (their role, their leverage signals, their deadline) — never generic
 - End on an incomplete thought that makes them want to read the full section
-- The hook must be DIFFERENT from what they'd get from ChatGPT — it uses their computed numbers, their leverage signals, their deadline
+- The hook must be DIFFERENT from what they'd get from ChatGPT — it references their leverage signals, deadline, and position
 
 Examples (write better than these, calibrated to THEIR specific situation):
-- decision: "You have ${fm(oc.counter_safe)}–${fm(oc.counter_ambitious)} sitting on this table — the question isn't whether to ask for it, it's whether your framing will hold when they push back."
+- decision: "Your leverage signals say counter — the question isn't whether to ask, it's whether your framing will hold when they push back."
 - leverage_risk: "The rescind fear is real but statistically near-zero for professional counters — what actually kills offers is the candidate who sounds uncertain, not the one who asks for more."
 - emphasize: "Most candidates in your position lead with the wrong ask — the order of the stack determines whether you get a yes on what matters or a no on everything."
 - levers: "If they say the base is fixed, nine other levers activate — and the first pivot takes 10 seconds."
