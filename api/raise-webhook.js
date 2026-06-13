@@ -98,7 +98,7 @@ module.exports = async function handler(req, res) {
       ]);
 
       const allowed = product === 'offer'
-        ? OFFER_ALLOW.has(stage)
+        ? (OFFER_ALLOW.has(stage) || stage.startsWith('offer_q_') || stage === 'offer_paywall')
         : RAISE_ALLOW.has(stage);
 
       if (allowed) {
