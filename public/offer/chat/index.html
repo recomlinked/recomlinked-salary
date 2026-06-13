@@ -2885,10 +2885,10 @@ var DISC_Q_ALL = {
   role: { id: 'role', label: 'What role is the offer for?', dimTag: null, input: 'text', placeholder: 'e.g. Product Manager', options: [] },
   base: { id: 'base', label: 'What base salary did they offer? (annual)', dimTag: 'offer', input: 'money', placeholder: '85,000', options: [] },
   anchor: { id: 'anchor', label: 'Did you share a salary expectation during the process?', dimTag: 'offer', options: [
-    { val: 'no_anchor', text: 'No \u2014 I never shared a number', scores: {offer:10}, note: 'Clean position. Your counter can set the first real salary anchor instead of correcting an earlier one.', type: 'lever' },
-    { val: 'matched', text: 'Yes \u2014 and the offer matched what I said', scores: {offer:-5}, note: 'They met your anchor. To go higher, the counter needs fresh support: role scope, market data, or new leverage.', type: 'neutral' },
-    { val: 'below', text: 'Yes \u2014 but the offer came in below', scores: {offer:5}, note: 'Useful signal. Your counter can point back to the number you already gave, instead of sounding like a new demand.', type: 'lever' },
-    { val: 'above', text: 'Yes \u2014 but the offer is above what I said', scores: {offer:8}, note: 'Interesting signal. They had room to beat your expectation, which may mean the package has more flexibility.', type: 'lever' },
+    { val: 'no_anchor', text: 'No \u2014 I never shared a number', scores: {offer:75}, note: 'Clean position. Your counter can set the first real salary anchor instead of correcting an earlier one.', type: 'lever' },
+    { val: 'matched', text: 'Yes \u2014 and the offer matched what I said', scores: {offer:35}, note: 'They met your anchor. To go higher, the counter needs fresh support: role scope, market data, or new leverage.', type: 'neutral' },
+    { val: 'below', text: 'Yes \u2014 but the offer came in below', scores: {offer:60}, note: 'Useful signal. Your counter can point back to the number you already gave, instead of sounding like a new demand.', type: 'lever' },
+    { val: 'above', text: 'Yes \u2014 but the offer is above what I said', scores: {offer:70}, note: 'Interesting signal. They had room to beat your expectation, which may mean the package has more flexibility.', type: 'lever' },
   ] },
   extras: { id: 'extras', label: 'What else is in the offer?', dimTag: 'offer', options: [
     { val: 'signing', text: 'A signing bonus', scores: {offer:70}, note: 'Good signal. The package already has more than one compensation lever, which gives the kit more to work with.', type: 'lever' },
@@ -4671,6 +4671,35 @@ function pickDiscAnswer(qIdx, opt, pill) {
       var waLbl=[{employed_stable:'Can walk away',employed_leaving:'Employed, motivated to move',between_jobs:'Between jobs',first_job:'First offer'}[emp],
                  comp==='yes'?'competing offer in hand':comp==='expecting'?'offer incoming':comp==='interviewing'?'still interviewing':''].filter(Boolean);
       discCanvasBlocks.walkaway.note = '';
+    }
+
+    // ── urgency: speed + deadline (average) ──
+    var spd=ctx.speed||'', dl=ctx.deadline||'';
+    var spdB=spd==='chased'?90:spd==='fast'?70:spd==='normal'?50:spd==='slow'?35:0;
+    var dlB=dl==='24_72h'?65:dl==='this_week'?55:dl==='1_2wk'?45:dl==='none'?35:0;
+    var urPts=[spdB,dlB].filter(Boolean);
+    if (urPts.length) {
+      var urScore=Math.round(urPts.reduce(function(a,b){return a+b;},0)/urPts.length);
+      discDims.urgency=urScore; discActive.urgency=true;
+      discCanvasBlocks.urgency.filled=true;
+      discCanvasBlocks.urgency.strength=urScore>=60?'strong':urScore>=40?'neutral':'weak';
+      discCanvasBlocks.urgency.note = '';
+    }
+
+    // ── offer: anchor + extras + company_size (average, base adds +10 via input path) ──
+    var anch=ctx.anchor||'', ext=ctx.extras||'', csz=ctx.company_size||'';
+    var anchB=anch==='no_anchor'?75:anch==='matched'?35:anch==='below'?60:anch==='above'?70:0;
+    var extB=ext==='signing'?70:ext==='equity'?65:ext==='signing_equity'?80:ext==='base_only'?45:0;
+    var cszB=csz==='small'?60:csz==='growing'?65:csz==='mid'?55:csz==='enterprise'?45:0;
+    var ofPts=[anchB,extB,cszB].filter(Boolean);
+    if (ofPts.length) {
+      var ofScore=Math.round(ofPts.reduce(function(a,b){return a+b;},0)/ofPts.length);
+      // Base salary adds +10 if entered
+      if (ctx.base) ofScore = Math.min(95, ofScore + 10);
+      discDims.offer=ofScore; discActive.offer=true;
+      discCanvasBlocks.offer.filled=true;
+      discCanvasBlocks.offer.strength=ofScore>=60?'strong':ofScore>=40?'neutral':'weak';
+      discCanvasBlocks.offer.note = '';
     }
   })();
 
