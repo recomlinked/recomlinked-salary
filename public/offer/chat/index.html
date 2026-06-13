@@ -3868,6 +3868,33 @@ function initDiscoveryMode(container) {
     saveState();
   }
   logSession('disc_start', { stage: 'disc_start', product: 'offer' });
+
+  // Track drop-offs — fires when user leaves before completing intake
+  window._offerDropHandler = function() {
+    var step = (typeof discStep !== 'undefined') ? discStep : 0;
+    var total = (typeof DISC_FREE_QUESTIONS !== 'undefined') ? DISC_FREE_QUESTIONS : 15;
+    if (step > 0 && step < total) {
+      var lastQ = discOrderedQuestions && discOrderedQuestions[step - 1] ? discOrderedQuestions[step - 1].id : '';
+      var role = (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role) ? SIM_STATE.context.role : '';
+      navigator.sendBeacon(API_LOG, JSON.stringify({
+        event: 'RAISE_SESSION',
+        product: 'offer',
+        session_id: profileHash(),
+        user_id: USER_ID,
+        stage: 'offer_dropped',
+        last_question: lastQ,
+        questions_answered: step,
+        role: role,
+        blocker_code: (SIM_STATE && SIM_STATE.blocker) ? SIM_STATE.blocker : '',
+        duration_s: Math.round((Date.now() - SESSION_START_TIME) / 1000),
+        source: window.location.href,
+        timestamp: new Date().toISOString(),
+      }));
+    }
+  };
+  // Remove any previous listener before adding new one
+  window.removeEventListener('beforeunload', window._offerDropHandler);
+  window.addEventListener('beforeunload', window._offerDropHandler);
   container.innerHTML = '';
 
   // Restore discovery state from localStorage if available
@@ -4940,6 +4967,11 @@ async function generateDiscInsights() {
   }
 
   // ── Show radar + canvas now that intake is done ──
+  // Remove drop listener — user completed intake
+  if (window._offerDropHandler) {
+    window.removeEventListener('beforeunload', window._offerDropHandler);
+    window._offerDropHandler = null;
+  }
   insertDiscRadar(); // discStep >= 14 so canvas div IS created
 
   // Log offer_complete — full context for funnel analysis
