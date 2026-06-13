@@ -60,17 +60,43 @@ module.exports = async function handler(req, res) {
   try {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
-      // For offer product: skip noisy per-question disc_* stages
       const stage = peek.stage || '';
-      const isOffer = peek.product === 'offer';
-      const skipStage = isOffer && stage.startsWith('disc_') && !['disc_start','disc_complete'].includes(stage);
-      if (!skipStage) {
+
+      // ── Funnel allow-list — only meaningful milestones hit the sheet ──
+      // RAISE: sim_start, chips_seen, paywall, checkout, pdf_download,
+      //        case_template_selected, case_paywall_shown,
+      //        sim_opening_picked, sim_reply_tapped
+      // OFFER: disc_start, offer_verdict, offer_complete, paywall, checkout,
+      //        pdf_download, sim_opening_picked, sim_reply_tapped
+      // BOTH:  context_added with key=role (job title capture)
+      const ALLOW_STAGES = [
+        // Raise funnel
+        'sim_start', 'chips_seen', 'paywall', 'checkout', 'pdf_download',
+        'case_template_selected', 'case_resumed', 'case_paywall_shown',
+        'sim_opening_picked', 'sim_reply_tapped',
+        // Offer funnel
+        'disc_start', 'offer_verdict', 'offer_complete',
+      ];
+
+      // Special case: context_added only when key=role (job title)
+      const isRoleCapture = stage === 'context_added' && peek.key === 'role';
+
+      const shouldLog = ALLOW_STAGES.includes(stage) || isRoleCapture;
+
+      if (shouldLog) {
+        // For role capture: remap to role field so Apps Script maps it correctly
+        let body = rawBody.toString();
+        if (isRoleCapture) {
+          const payload = JSON.parse(body);
+          payload.role = payload.value || '';
+          body = JSON.stringify(payload);
+        }
         const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
         if (webhookUrl) {
           await fetch(webhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: rawBody.toString(),
+            body,
           });
         }
       }
