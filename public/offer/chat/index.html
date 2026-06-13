@@ -1044,7 +1044,43 @@ function getUserId() {
 }
 const USER_ID = getUserId();
 
-function logSession(stage, extra) { /* logging disabled for offer product */ }
+function logSession(stage, extra) {
+  var videoWatched = '';
+  var videoCompleted = '';
+  try { videoWatched = localStorage.getItem('rl_video_watched') || ''; videoCompleted = localStorage.getItem('rl_video_completed') || ''; } catch(e) {}
+  var _currentMode = 'plan';
+  try { _currentMode = SIM_STATE.currentMode || 'discovery'; } catch(e) {}
+  if (_currentMode === 'discovery') _currentMode = 'plan';
+  if (_currentMode === 'sim') _currentMode = 'practice';
+  if (_currentMode === 'coach') _currentMode = 'coaching';
+  const payload = {
+    timestamp: new Date().toISOString(),
+    event: 'RAISE_SESSION',
+    product: window.location.pathname.indexOf('/offer/') >= 0 ? 'offer' : 'raise',
+    session_id: profileHash(),
+    user_id: USER_ID,
+    stage,
+    duration_s: Math.round((Date.now() - SESSION_START_TIME) / 1000),
+    source: document.referrer || window.location.href,
+    url: window.location.href,
+    ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })(),
+    utm_term: _UTM.utm_term,
+    gclid: _UTM.gclid,
+    video_watched: videoWatched,
+    video_completed: videoCompleted,
+    mode: _currentMode,
+    template: '',
+    role: (function(){ try{ return SIM_STATE.context.role||''; }catch(e){ return ''; } })(),
+    blocker: (function(){ try{ return SIM_STATE.blocker||''; }catch(e){ return ''; } })(),
+    ...(extra || {}),
+  };
+  fetch(API_LOG, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  }).catch(err => { console.warn('[logSession] FAILED:', stage, err.message); });
+}
 
 // Freshness — if saved state is older than this, start from scratch.
 // (Per TODO: staleness check. User typically finishes in 3-5 min,
@@ -3825,6 +3861,7 @@ function appendStandardPaywall(container, opts) {
 
 
 function initDiscoveryMode(container) {
+  logSession('disc_start', { stage: 'disc_start' });
   container.innerHTML = '';
 
   // Restore discovery state from localStorage if available
