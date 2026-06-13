@@ -60,13 +60,18 @@ module.exports = async function handler(req, res) {
   try {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
-      const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
-      if (webhookUrl) {
-        await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: rawBody.toString(),
-        });
+      // Skip noisy per-question disc_* stages — only log milestones
+      const stage = peek.stage || '';
+      const skipStage = stage.startsWith('disc_') && !['disc_start','disc_complete'].includes(stage);
+      if (!skipStage) {
+        const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
+        if (webhookUrl) {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: rawBody.toString(),
+          });
+        }
       }
       return res.status(200).json({ ok: true });
     }
