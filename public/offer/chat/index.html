@@ -4977,20 +4977,22 @@ async function generateDiscInsights() {
     });
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
-      var hooks = (teaserData.content || []).map(function(b){ return b.text||''; }).join('');
-      try {
-        var hookJson = JSON.parse(hooks);
-        // Apply hook sentences as teaser insights to each canvas block
+      // API returns { insights: {...} } — not Anthropic streaming format
+      var hookJson = teaserData.insights || {};
+      if (Object.keys(hookJson).length > 0) {
         Object.keys(hookJson).forEach(function(k) {
           if (discCanvasBlocks[k] !== undefined) {
             discCanvasBlocks[k].insight = hookJson[k];
             discCanvasBlocks[k].filled = true;
-            discCanvasBlocks[k].teaser = true; // mark as teaser so planBlock shows the hook
+            discCanvasBlocks[k].teaser = true;
           }
         });
         discPlanLoading = false;
         var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-      } catch(e) {}
+      } else {
+        discPlanLoading = false;
+        var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+      }
     }
   } catch(e) { discPlanLoading = false; var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc); }
 
