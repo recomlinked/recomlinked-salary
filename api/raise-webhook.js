@@ -56,61 +56,44 @@ module.exports = async function handler(req, res) {
 
   const rawBody = await getRawBody(req);
 
-  // ── Session logging — route RAISE_SESSION to Google Sheets ──
+// ── Session logging — forward RAISE_SESSION events to Google Sheets ──
   try {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
       const stage = peek.stage || '';
       const product = peek.product || 'raise';
 
-      // ── Funnel milestones — what matters for conversion tracking ──
-      //
-      // RAISE FUNNEL:
-      //   sim_start         → user entered chat, picked blocker
-      //   chips_seen        → reached depth (saw the blocker question)
-      //   context_added     → answered a profile question (role/title captured)
-      //   paywall           → hit the paywall
-      //   checkout          → started checkout (paywall_action=checkout_started)
-      //   pdf_download      → downloaded PDF (paid user)
-      //   case_template_selected → entered case mode
-      //   case_paywall_shown     → hit case paywall
-      //   sim_opening_picked     → started simulation (depth signal)
-      //   sim_reply_tapped       → active in simulation (depth signal)
-      //
-      // OFFER FUNNEL:
-      //   disc_start        → user entered offer chat
-      //   offer_complete    → completed all intake questions (role, dims, etc.)
-      //   offer_verdict     → numbers computed (depth signal)
-      //   paywall           → hit the paywall
-      //   checkout          → started checkout
-      //   pdf_download      → downloaded PDF
-
+      // Simple allow-lists — one place, no logic elsewhere
       const RAISE_ALLOW = new Set([
-        'sim_start', 'chips_seen', 'context_added', 'paywall', 'checkout',
-        'pdf_download', 'case_template_selected', 'case_resumed',
-        'case_paywall_shown', 'sim_opening_picked', 'sim_reply_tapped',
-      ]);
-
-      const OFFER_ALLOW = new Set([
-        'disc_start', 'offer_q3', 'offer_base', 'offer_dropped', 'offer_complete', 'offer_verdict',
+        'sim_start', 'chips_seen', 'context_added',
         'paywall', 'checkout', 'pdf_download',
+        'case_template_selected', 'case_resumed', 'case_paywall_shown',
         'sim_opening_picked', 'sim_reply_tapped',
       ]);
 
-      const allowed = product === 'offer'
-        ? (OFFER_ALLOW.has(stage) || stage.startsWith('offer_q_') || stage === 'offer_paywall')
-        : RAISE_ALLOW.has(stage);
+      const isOffer = product === 'offer';
+      const isOfferAllowed = isOffer && (
+        stage === 'disc_start' ||
+        stage === 'offer_complete' ||
+        stage === 'offer_verdict' ||
+        stage === 'offer_paywall' ||
+        stage === 'offer_dropped' ||
+        stage === 'checkout' ||
+        stage === 'pdf_download' ||
+        stage === 'sim_opening_picked' ||
+        stage === 'sim_reply_tapped' ||
+        stage.startsWith('offer_q_')
+      );
+      const isRaiseAllowed = !isOffer && RAISE_ALLOW.has(stage);
 
-      if (allowed) {
+      if (isOfferAllowed || isRaiseAllowed) {
         let body = rawBody.toString();
-
-        // For raise context_added: remap value→role so Apps Script maps it
-        if (product !== 'offer' && stage === 'context_added' && peek.key === 'role') {
+        // Raise context_added: remap value→role for GAS column mapping
+        if (isRaiseAllowed && stage === 'context_added' && peek.key === 'role') {
           const p = JSON.parse(body);
           p.role = p.value || '';
           body = JSON.stringify(p);
         }
-
         const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
         if (webhookUrl) {
           await fetch(webhookUrl, {
@@ -122,7 +105,8 @@ module.exports = async function handler(req, res) {
       }
       return res.status(200).json({ ok: true });
     }
-  } catch (e) { /* not JSON or not a session event — continue to Stripe */ }
+  } catch (e) { /* not JSON — continue to Stripe */ }
+
 
   // ── Stripe webhook handling ─────────────────────────────
   const stripe  = new Stripe(process.env.STRIPE_SECRET_KEY);
