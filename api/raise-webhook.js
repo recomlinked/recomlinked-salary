@@ -47,6 +47,7 @@ function mintToken() {
 
 
 module.exports = async function handler(req, res) {
+  // VERSION: 2026-06-13-v4 (with console.log diagnostics)
   // CORS for browser session-logging requests
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -63,7 +64,8 @@ module.exports = async function handler(req, res) {
       const stage = peek.stage || '';
       const product = peek.product || 'raise';
 
-      // Simple allow-lists — one place, no logic elsewhere
+      console.log('[session-log] received:', product, stage);
+
       const RAISE_ALLOW = new Set([
         'sim_start', 'chips_seen', 'context_added',
         'paywall', 'checkout', 'pdf_download',
@@ -86,26 +88,34 @@ module.exports = async function handler(req, res) {
       );
       const isRaiseAllowed = !isOffer && RAISE_ALLOW.has(stage);
 
+      console.log('[session-log] allowed:', isOfferAllowed || isRaiseAllowed);
+
       if (isOfferAllowed || isRaiseAllowed) {
         let body = rawBody.toString();
-        // Raise context_added: remap value→role for GAS column mapping
         if (isRaiseAllowed && stage === 'context_added' && peek.key === 'role') {
           const p = JSON.parse(body);
           p.role = p.value || '';
           body = JSON.stringify(p);
         }
         const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
-        if (webhookUrl) {
-          await fetch(webhookUrl, {
+        if (!webhookUrl) {
+          console.error('[session-log] CAREER_SHEET_WEBHOOK not set!');
+        } else {
+          console.log('[session-log] forwarding to GAS...');
+          const gasResp = await fetch(webhookUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body,
           });
+          console.log('[session-log] GAS response:', gasResp.status);
         }
       }
       return res.status(200).json({ ok: true });
     }
-  } catch (e) { /* not JSON — continue to Stripe */ }
+  } catch (e) {
+    console.error('[session-log] error:', e.message);
+    /* not JSON — continue to Stripe */
+  }
 
 
   // ── Stripe webhook handling ─────────────────────────────
