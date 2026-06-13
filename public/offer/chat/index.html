@@ -4929,18 +4929,21 @@ async function generateDiscInsights() {
   // ── Show radar + canvas now that intake is done ──
   insertDiscRadar(); // discStep >= 14 so canvas div IS created
 
-  // Log offer_complete milestone with full context
+  // Log offer_complete milestone — maps to Raise Sessions columns
   logSession('offer_complete', {
     role: SIM_STATE.context.role || '',
-    blocker: SIM_STATE.blocker || '',
-    employment: SIM_STATE.context.employment || '',
-    competing: SIM_STATE.context.competing || '',
-    risk: SIM_STATE.context.risk || '',
-    worktype: SIM_STATE.context.worktype || '',
-    experience: SIM_STATE.context.experience || '',
-    company_size: SIM_STATE.context.company_size || '',
-    anchor: SIM_STATE.context.anchor || '',
-    dims: JSON.stringify(discDims),
+    blocker_code: SIM_STATE.blocker || '',
+    blocker_label: [
+      SIM_STATE.context.employment,
+      SIM_STATE.context.competing,
+      SIM_STATE.context.risk,
+      SIM_STATE.context.worktype,
+      SIM_STATE.context.experience,
+      SIM_STATE.context.anchor,
+      SIM_STATE.context.base ? ('base:' + SIM_STATE.context.base) : '',
+      SIM_STATE.context.city && SIM_STATE.context.city !== 'skipped' ? ('city:' + SIM_STATE.context.city) : '',
+    ].filter(Boolean).join(' | '),
+    mode: 'offer',
   });
 
   // Auto-scroll to the Counter Kit reveal
