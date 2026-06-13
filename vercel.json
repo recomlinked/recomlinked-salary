@@ -20,6 +20,11 @@
     { "src": "/raise/coach",          "status": 301, "headers": { "Location": "/raise/coach/" }     },
     { "src": "/raise/coach/",         "dest": "/raise/coach/index.html"     },
 
+    { "src": "/offer",                 "status": 301, "headers": { "Location": "/offer/" }           },
+    { "src": "/offer/",                "dest": "/offer/index.html"           },
+    { "src": "/offer/chat",            "status": 301, "headers": { "Location": "/offer/chat/" }      },
+    { "src": "/offer/chat/",           "dest": "/offer/chat/index.html"      },
+
     { "src": "/raise-case",           "status": 301, "headers": { "Location": "/raise-case/" }      },
     { "src": "/raise-case/",          "dest": "/raise-case/index.html"      },
 
