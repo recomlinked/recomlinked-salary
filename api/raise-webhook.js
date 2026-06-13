@@ -61,36 +61,56 @@ module.exports = async function handler(req, res) {
     const peek = JSON.parse(rawBody.toString());
     if (peek && peek.event === 'RAISE_SESSION') {
       const stage = peek.stage || '';
+      const product = peek.product || 'raise';
 
-      // ── Funnel allow-list — only meaningful milestones hit the sheet ──
-      // RAISE: sim_start, chips_seen, paywall, checkout, pdf_download,
-      //        case_template_selected, case_paywall_shown,
-      //        sim_opening_picked, sim_reply_tapped
-      // OFFER: disc_start, offer_verdict, offer_complete, paywall, checkout,
-      //        pdf_download, sim_opening_picked, sim_reply_tapped
-      // BOTH:  context_added with key=role (job title capture)
-      const ALLOW_STAGES = [
-        // Raise funnel
-        'sim_start', 'chips_seen', 'paywall', 'checkout', 'pdf_download',
-        'case_template_selected', 'case_resumed', 'case_paywall_shown',
+      // ── Funnel milestones — what matters for conversion tracking ──
+      //
+      // RAISE FUNNEL:
+      //   sim_start         → user entered chat, picked blocker
+      //   chips_seen        → reached depth (saw the blocker question)
+      //   context_added     → answered a profile question (role/title captured)
+      //   paywall           → hit the paywall
+      //   checkout          → started checkout (paywall_action=checkout_started)
+      //   pdf_download      → downloaded PDF (paid user)
+      //   case_template_selected → entered case mode
+      //   case_paywall_shown     → hit case paywall
+      //   sim_opening_picked     → started simulation (depth signal)
+      //   sim_reply_tapped       → active in simulation (depth signal)
+      //
+      // OFFER FUNNEL:
+      //   disc_start        → user entered offer chat
+      //   offer_complete    → completed all intake questions (role, dims, etc.)
+      //   offer_verdict     → numbers computed (depth signal)
+      //   paywall           → hit the paywall
+      //   checkout          → started checkout
+      //   pdf_download      → downloaded PDF
+
+      const RAISE_ALLOW = new Set([
+        'sim_start', 'chips_seen', 'context_added', 'paywall', 'checkout',
+        'pdf_download', 'case_template_selected', 'case_resumed',
+        'case_paywall_shown', 'sim_opening_picked', 'sim_reply_tapped',
+      ]);
+
+      const OFFER_ALLOW = new Set([
+        'disc_start', 'offer_complete', 'offer_verdict',
+        'paywall', 'checkout', 'pdf_download',
         'sim_opening_picked', 'sim_reply_tapped',
-        // Offer funnel
-        'disc_start', 'offer_verdict', 'offer_complete',
-      ];
+      ]);
 
-      // Special case: context_added only when key=role (job title)
-      const isRoleCapture = stage === 'context_added' && peek.key === 'role';
+      const allowed = product === 'offer'
+        ? OFFER_ALLOW.has(stage)
+        : RAISE_ALLOW.has(stage);
 
-      const shouldLog = ALLOW_STAGES.includes(stage) || isRoleCapture;
-
-      if (shouldLog) {
-        // For role capture: remap to role field so Apps Script maps it correctly
+      if (allowed) {
         let body = rawBody.toString();
-        if (isRoleCapture) {
-          const payload = JSON.parse(body);
-          payload.role = payload.value || '';
-          body = JSON.stringify(payload);
+
+        // For raise context_added: remap value→role so Apps Script maps it
+        if (product !== 'offer' && stage === 'context_added' && peek.key === 'role') {
+          const p = JSON.parse(body);
+          p.role = p.value || '';
+          body = JSON.stringify(p);
         }
+
         const webhookUrl = process.env.CAREER_SHEET_WEBHOOK;
         if (webhookUrl) {
           await fetch(webhookUrl, {
