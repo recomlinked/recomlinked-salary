@@ -3647,9 +3647,9 @@ function renderCanvasHTML() {
   _dimChips.forEach(function(d) {
     var blk = discCanvasBlocks[d.key] || {};
     var str = blk.strength || '';
-    var col = str==='strong'?'#00875a':str==='neutral'?'#b07d00':'#888';
-    var bg  = str==='strong'?'rgba(0,196,160,0.1)':str==='neutral'?'rgba(245,207,86,0.1)':'rgba(0,0,0,0.05)';
-    var bor = str==='strong'?'rgba(0,196,160,0.25)':str==='neutral'?'rgba(245,207,86,0.3)':'rgba(0,0,0,0.1)';
+    var col = str==='strong'?'#1a9e6c':str==='neutral'?'#c9a84c':'#E05555';
+    var bg  = str==='strong'?'rgba(26,158,108,0.08)':str==='neutral'?'rgba(201,168,76,0.1)':'rgba(224,85,85,0.08)';
+    var bor = str==='strong'?'rgba(26,158,108,0.3)':str==='neutral'?'rgba(201,168,76,0.35)':'rgba(224,85,85,0.25)';
     var label = str ? (str==='strong'?'Strong':str==='neutral'?'Medium':'Weak') : '—';
     html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:' + bg + ';border:1px solid ' + bor + ';">' +
       '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
