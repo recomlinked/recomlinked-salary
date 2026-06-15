@@ -4113,15 +4113,21 @@ function initDiscoveryMode(container) {
     rescind:        'What if they rescind the offer?',
     counter_number: 'I don\u2019t know what number to counter with',
     deadline:       'The deadline is in a few days',
-    anchored:       'I already told them my salary expectations',
     fixed_band:     'The recruiter said the band is fixed',
-    competing:      'I have another offer \u2014 how do I use it?',
-    first_offer:    'It\u2019s my first real offer \u2014 I don\u2019t want to mess it up',
-    avoid:          'I hate negotiating \u2014 I just want to accept',
+    first_offer:    'It\u2019s my first offer \u2014 I don\u2019t want to risk it',
+    greedy:         'I don\u2019t want to seem greedy',
   };
   var profileReason = state.sim_reason || (state.profile && state.profile.reason) || '';
-  if (profileReason && REASON_LABELS[profileReason]) {
-    introText = 'You said \u201c' + REASON_LABELS[profileReason] + '\u201d. Almost every offer has room \u2014 a few quick questions and I\u2019ll show you yours in dollars.';
+  var OPENER_MAP = {
+    'rescind': 'Rescinding an offer over a professional counter is extremely rare. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
+    'counter_number': 'The number isn’t a guess — it comes from how your offer was built. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
+    'deadline': 'A deadline makes the counter more urgent, not less possible. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
+    'fixed_band': '“The band is fixed” is often the opening position, not the final one. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
+    'first_offer': 'Your first offer is the one that anchors every salary for years. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
+    'greedy': 'Countering isn’t greedy — 73% of employers expect it. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.'
+  };
+  if (profileReason && OPENER_MAP[profileReason]) {
+    introText = OPENER_MAP[profileReason];
   }
   var textEl = introWrap.querySelector('.typed-text');
   var cursorEl = introWrap.querySelector('.cursor');
