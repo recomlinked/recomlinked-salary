@@ -3171,15 +3171,15 @@ function _generatePDFPrintFallback() {
   html += '<div class="section-title">YOUR STRATEGY</div>';
   html += renderBlock({key:'decision',label:'Our Read'}, 'strategy');
   html += renderBlock({key:'leverage_risk',label:'Leverage & Risk'}, 'strategy');
-  html += '<div class="row">' + renderBlock({key:'emphasize',label:'Ask Stack'}, 'strategy') + renderBlock({key:'avoid',label:'What Not to Say'}, 'strategy') + '</div>';
+  html += renderBlock({key:'emphasize',label:'Ask Stack'}, 'strategy');
 
   // YOUR COUNTER KIT — all full-width, no if_yes
   html += '<div class="section-title">YOUR COUNTER KIT</div>';
+  html += renderBlock({key:'meeting_email',label:'Counter Email'}, 'plan');
   html += renderBlock({key:'opening_script',label:'Phone Opener'}, 'plan');
   html += renderBlock({key:'levers',label:'Non-Salary Levers'}, 'plan');
   html += renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan');
   html += renderBlock({key:'fallback',label:'Fallback Responses'}, 'plan');
-  html += renderBlock({key:'meeting_email',label:'Counter Email'}, 'plan');
   html += renderBlock({key:'accept_email',label:'Final Accept Email'}, 'plan');
   html += renderBlock({key:'raise_case',label:'Sequencing Plan'}, 'plan');
 
@@ -3634,13 +3634,28 @@ function renderCanvasHTML() {
   var intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
 
   // YOUR POSITION
+  // Position dims as compact chips
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
-  html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
-  html += block('walkaway', 'Walk-Away Power', 'Your next question');
-  html += block('risk_tol', 'Risk Tolerance', 'Your next question');
-  html += block('urgency', 'Their Urgency', 'Your next question');
-  html += block('talent', 'Talent Market', 'Your next question');
-  html += block('offer', 'Offer Structure', 'Your next question');
+  html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+  var _dimChips = [
+    { key:'walkaway', label:'Walk-Away' },
+    { key:'risk_tol', label:'Risk' },
+    { key:'urgency',  label:'Urgency' },
+    { key:'talent',   label:'Talent' },
+    { key:'offer',    label:'Offer' },
+  ];
+  _dimChips.forEach(function(d) {
+    var blk = discCanvasBlocks[d.key] || {};
+    var str = blk.strength || '';
+    var col = str==='strong'?'#00875a':str==='neutral'?'#b07d00':'#888';
+    var bg  = str==='strong'?'rgba(0,196,160,0.1)':str==='neutral'?'rgba(245,207,86,0.1)':'rgba(0,0,0,0.05)';
+    var bor = str==='strong'?'rgba(0,196,160,0.25)':str==='neutral'?'rgba(245,207,86,0.3)':'rgba(0,0,0,0.1)';
+    var label = str ? (str==='strong'?'Strong':str==='neutral'?'Medium':'Weak') : '—';
+    html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:' + bg + ';border:1px solid ' + bor + ';">' +
+      '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
+      '<span style="font-size:9px;font-weight:700;color:' + col + ';">' + label + '</span>' +
+      '</div>';
+  });
   html += '</div>';
 
   // SHOULD YOU NEGOTIATE? card
@@ -3662,9 +3677,6 @@ function renderCanvasHTML() {
   }
 
   if (intakeDone) {
-  // PRO TIP
-  html += '<div style="font-size:10px;color:var(--text3);padding:6px 4px 2px;line-height:1.5;">'
-         + '<span style="color:var(--gold);font-weight:700;">Pro tip:</span> After unlocking, paste your job description and your counter email will reference the actual role scope.</div>';
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
@@ -3673,16 +3685,15 @@ function renderCanvasHTML() {
   html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
   html += planBlock('emphasize', 'Ask Stack', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('levers', 'Non-Salary Levers', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-  html += planBlock('avoid', 'What Not to Say', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += '</div>';
 
   // YOUR COUNTER KIT
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your plan</div>';
+  html += planBlock('meeting_email', 'Counter Email', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('opening_script', 'Phone Opener', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('pushback', 'Pushback Playbook', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('fallback', 'Fallback Responses', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-  html += planBlock('meeting_email', 'Counter Email', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('accept_email', 'Final Accept Email', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('raise_case', 'Sequencing Plan', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
 
@@ -4475,18 +4486,28 @@ function offerVerdictCardHtml(compact, showNumbers) {
 
     if (!showNumbers) {
       // Pre-intake: dashes everywhere
-      inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
+      inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+        '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">Your negotiation room</div>' +
+        '<span onclick="triggerPlanPaywall()" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(245,207,86,0.85);">' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+          'Unlock →</span>' +
+        '</div>' +
         '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' +
         '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:12px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
 
     } else if (!isPaid) {
       // Post-intake, free: show "meaningful room detected", tier structure with locks, no numbers
-      inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
+      inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+        '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">Your negotiation room</div>' +
+        '<span onclick="triggerPlanPaywall()" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(245,207,86,0.85);">' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+          'Unlock →</span>' +
+        '</div>' +
         '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;margin-bottom:6px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
         '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.55);margin-top:10px;display:flex;align-items:center;gap:5px;"><a href="#" onclick="event.preventDefault();triggerPlanPaywall()" style="color:rgba(245,207,86,0.75);font-weight:600;text-decoration:underline;text-underline-offset:2px;">Unlock exact numbers \u2192</a></div>' +
+
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:6px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
 
     } else {
@@ -5042,11 +5063,27 @@ async function generateDiscInsights() {
     discNumbersReady = true;
     discPlanLoading = false;
     var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+    // Auto-show paywall 3 seconds after kit reveals (free users only)
+    if (!state.paid) {
+      setTimeout(function() {
+        if (!state.paid && typeof showDiscPaywall === 'function') {
+          showDiscPaywall();
+        }
+      }, 3000);
+    }
   } catch(e) {
     console.warn('[teaser] fetch error:', e.message);
     discNumbersReady = true;
     discPlanLoading = false;
     var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+    // Auto-show paywall on error too
+    if (!state.paid) {
+      setTimeout(function() {
+        if (!state.paid && typeof showDiscPaywall === 'function') {
+          showDiscPaywall();
+        }
+      }, 3000);
+    }
   }
 
   // ── PHASE 2: Full kit (runs on payment, triggered by webhook) ─
