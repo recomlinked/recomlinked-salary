@@ -1193,7 +1193,6 @@ function logSession(stage, extra) {
     user_agent: navigator.userAgent.slice(0, 200),
     screen: window.innerWidth + 'x' + window.innerHeight,
     ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })(),
-    ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })(),
     utm_term: _UTM.utm_term,
     gclid: _UTM.gclid,
     video_watched: videoWatched,
@@ -5231,16 +5230,83 @@ function appendStandardPaywall(container, opts) {
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = PAYWALL_COPY[mode] || PAYWALL_COPY.discovery;
 
-  var selectedPrice = 9.5;
+  var selectedPrice = 29;
+  var plans = { 19: 'Raise Plan', 29: 'Plan + Simulation', 49: 'Full Coaching' };
   var uid = Date.now();
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
-    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my raise plan \u00b7 $9.50 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:18px;">' + copy.subtitle + '</p>' +
+    '<div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">' +
+      '<div id="pw-opt-19-' + uid + '" style="border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);">' +
+        '<div style="padding-right:12px;">' +
+          '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Raise Plan</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5;">Opening script, pushback playbook, meeting email &amp; raise case brief</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,0.8);">$19</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.4);">one time</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="pw-opt-29-' + uid + '" style="border:2px solid #F5CF56;border-radius:10px;padding:14px 16px;cursor:pointer;background:rgba(245,207,86,0.1);position:relative;">' +
+        '<div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#F5CF56;color:#1a1520;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap;letter-spacing:0.04em;text-transform:uppercase;">Most popular</div>' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+          '<div style="padding-right:12px;">' +
+            '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Plan + Simulation</div>' +
+            '<div style="font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;">Everything in Raise Plan + unlimited conversation scenarios</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;">' +
+            '<div style="font-size:18px;font-weight:800;color:#F5CF56;">$29</div>' +
+            '<div style="font-size:10px;color:rgba(245,207,86,0.6);">one time</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="pw-opt-49-' + uid + '" style="border:1.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);">' +
+        '<div style="padding-right:12px;">' +
+          '<div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">Full Coaching</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.5;">Plan + Simulation + AI coaching \u00b7 30 days access</div>' +
+        '</div>' +
+        '<div style="text-align:right;flex-shrink:0;">' +
+          '<div style="font-size:18px;font-weight:800;color:rgba(255,255,255,0.8);">$49</div>' +
+          '<div style="font-size:10px;color:rgba(255,255,255,0.4);">one time</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<button class="btn-pay" id="pw-cta-' + uid + '">Plan + Simulation \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
+
+  function applyState(price, hovered) {
+    [19, 29, 49].forEach(function(p) {
+      var optEl = wrap.querySelector('#pw-opt-' + p + '-' + uid);
+      if (!optEl) return;
+      var isSel = p === selectedPrice;
+      if (isSel) {
+        optEl.style.border = '2px solid #F5CF56';
+        optEl.style.background = 'rgba(245,207,86,0.1)';
+      } else if (hovered === p) {
+        optEl.style.border = '1.5px solid rgba(255,255,255,0.5)';
+        optEl.style.background = 'rgba(255,255,255,0.08)';
+      } else {
+        optEl.style.border = '1.5px solid rgba(255,255,255,0.2)';
+        optEl.style.background = 'rgba(255,255,255,0.04)';
+      }
+    });
+  }
+
+  [19, 29, 49].forEach(function(p) {
+    var optEl = wrap.querySelector('#pw-opt-' + p + '-' + uid);
+    var ctaBtn = wrap.querySelector('#pw-cta-' + uid);
+    if (!optEl) return;
+    optEl.addEventListener('click', function() {
+      selectedPrice = p;
+      applyState(p, null);
+      if (ctaBtn) ctaBtn.innerHTML = plans[p] + ' \u00b7 $' + p + ' <span class="btn-pay-arrow">\u2192</span>';
+    });
+    optEl.addEventListener('mouseenter', function() { applyState(selectedPrice, p); });
+    optEl.addEventListener('mouseleave', function() { applyState(selectedPrice, null); });
+  });
 
   var ctaBtn = wrap.querySelector('#pw-cta-' + uid);
   if (ctaBtn) ctaBtn.onclick = function() {
