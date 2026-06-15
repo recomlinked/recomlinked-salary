@@ -4106,7 +4106,7 @@ function initDiscoveryMode(container) {
   introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
   chatArea.appendChild(introWrap);
 
-  var introText = 'Most job offers sit below the band the company already approved. A few quick questions, then I\u2019ll show you how much negotiation room you\u2019re holding.';
+  var introText = 'Most job offers sit below the band the company already approved. A few quick questions, and I\u2019ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter to send.';
 
   // Personalize opening if user came from a specific blocker chip
   var REASON_LABELS = {
@@ -4137,8 +4137,8 @@ function initDiscoveryMode(container) {
     if (cursorEl) cursorEl.remove();
     // Set final text with bold on the key phrase
     textEl.innerHTML = introText.replace(
-      /I’ll show you how much negotiation room you’re holding\./,
-      '<b>I’ll show you how much negotiation room you’re holding.</b>'
+      /your negotiation room in dollars/,
+      '<b>your negotiation room in dollars</b>'
     );
 
     // Show first question directly — radar appears after first answer
