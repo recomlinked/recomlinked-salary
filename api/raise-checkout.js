@@ -76,8 +76,8 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
-  // Resolve selected price — default to $9.50 if not sent or invalid
-  const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 9.5;
+  // Resolve selected price — default to $29 if not sent or invalid
+  const selectedPrice = VALID_PRICES.includes(Number(price)) ? Number(price) : 29;
   const productCode = product === 'offer' ? 'offer' : 'raise';
   const priceId = PRICE_ID_MAP[selectedPrice];
 
