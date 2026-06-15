@@ -3075,7 +3075,7 @@ function _generatePDFPrintFallback() {
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var stratPlanKeys = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+    var stratPlanKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
     var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
 
     if (b && b.filled) {
@@ -3094,8 +3094,8 @@ function _generatePDFPrintFallback() {
         } else if (item.key === 'leverage_risk') {
           var m = clean.match(/^[^.!?]*[.!?]/);
           teaserText = m ? m[0] : clean.slice(0, 100);
-        } else if (item.key === 'emphasize' || item.key === 'avoid') {
-          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '3 key points';
+        } else if (item.key === 'emphasize') {
+          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '5 points';
         } else if (item.key === 'opening_script') {
           teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
         } else if (item.key === 'levers') {
@@ -3303,7 +3303,7 @@ function togglePosBlock(el, key) {
   // Show only first sentence as teaser (locked)
   var firstSentence = fullText.split(/(?<=[.!?])\s+/)[0] || '';
   var teaser = firstSentence.length > 100 ? firstSentence.slice(0, 100) + '\u2026' : firstSentence;
-  var lockIcon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+  var lockIcon = '';
   var chevronDown = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   var chevronUp   = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="' + tc + '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5;margin-left:4px;transform:rotate(180deg);flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   var headerRow = '<div style="display:flex;align-items:center;gap:5px;">' +
@@ -3327,7 +3327,7 @@ function togglePosBlock(el, key) {
   } else {
     el.setAttribute('data-expanded', '0');
     el.style.padding = '10px 14px';
-    var trailer = state.paid ? chevronDown : lockIcon + chevronDown;
+    var trailer = chevronDown;
     el.innerHTML = headerRow + trailer + '</div>';
   }
 }
@@ -3345,7 +3345,7 @@ function togglePlanBlock(el, key) {
       '<span style="color:var(--navy);flex-shrink:0;">' + ic + '</span>' +
       '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + lbl + '</span>' +
       (badge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;white-space:nowrap;">' + badge + '</span>' : '') +
-      '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
+      '' +
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   } else {
     // Expand — show teaser
@@ -3467,7 +3467,7 @@ function renderCanvasHTML() {
       var bt = b.strength === 'weak' ? 'Weak' : b.strength === 'neutral' ? 'Medium' : 'Strong';
       // Collapse position blocks once strategy is done — header + tag only, tappable to expand
       if (discStrategyDone) {
-        var lockSvg = state.paid ? '' : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;flex-shrink:0;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>';
+        var lockSvg = '';
         return '<div data-expanded="0" onclick="togglePosBlock(this,\'' + key + '\')" style="background:' + bg + ';border:1px solid ' + bc + '33;border-radius:8px;padding:10px 14px;cursor:pointer;">' +
           '<div style="display:flex;align-items:center;gap:5px;">' +
           '<span style="color:' + tc + ';">' + ic + '</span>' +
@@ -3547,7 +3547,7 @@ function renderCanvasHTML() {
         '<span style="color:var(--navy);flex-shrink:0;">' + ic + '</span>' +
         '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">' + label + '</span>' +
         (collapsedBadge ? '<span style="font-size:9px;font-weight:600;color:var(--navy);background:rgba(30,61,114,0.1);padding:2px 8px;border-radius:4px;white-space:nowrap;">' + collapsedBadge + '</span>' : '') +
-        '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
+        '' +
         '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
         '</div>';
     }
@@ -3963,7 +3963,7 @@ function initDiscoveryMode(container) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
-      var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+      var stratPlanKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
       stratPlanKeys.forEach(function(key) {
         if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
           discCanvasBlocks[key].teaser = false;
@@ -5043,7 +5043,7 @@ async function generateDiscInsights() {
       body: JSON.stringify(teaserBody)
     });
     console.log('[teaser] response status:', teaserResp.status);
-    var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+    var KIT_KEYS = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
       var hookJson = teaserData.insights || {};
@@ -5169,7 +5169,7 @@ async function generateDiscInsights() {
   console.log('[disc_insights] Sending', state.paid ? 'strategy (parallel)' : 'hooks', JSON.stringify({ blocker: blockerCode }));
 
   function applyInsights(insights, isPlanSection) {
-    var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+    var stratPlanKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
     var positionKeys  = ['walkaway','risk_tol','urgency','talent','offer'];
     Object.keys(insights).forEach(function(dim) {
       if (discCanvasBlocks[dim] !== undefined) {
@@ -7317,7 +7317,7 @@ async function startCheckout(selectedPrice) {
           body: JSON.stringify(body),
         }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
-          var stratPlanKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+          var stratPlanKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
             if (discCanvasBlocks[dim] !== undefined) {
               discCanvasBlocks[dim].insight = data.insights[dim];
