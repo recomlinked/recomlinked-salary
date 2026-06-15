@@ -762,7 +762,7 @@ function buildOfferDiscPrompts(part, oc, answeredDims) {
 - Work arrangement: ${oc.worktype || 'not specified'}${oc.worktype === 'on_site' ? ' (on-site = smaller local talent pool = added leverage)' : oc.worktype === 'remote' ? ' (remote = national talent pool = lean on other leverage)' : ''}
 - Employment status: ${oc.employment || 'not specified'}${oc.employment === 'employed_stable' ? ' (CAN WALK AWAY \u2014 the strongest position; counters carry near-zero real risk, but never phrase it as a threat)' : oc.employment === 'between_jobs' ? ' (weaker fallback \u2014 keep the counter warm and low-friction, NEVER let urgency or desperation show in any script)' : oc.employment === 'first_job' ? ' (first real offer \u2014 simple asks, extra reassurance about how normal countering is)' : oc.employment === 'employed_leaving' ? ' (employed but motivated to move \u2014 solid fallback, do not reveal the push factor)' : ''}
 - Industry: ${oc.industry || 'not specified'}${/gov|public|school|universit|educat|health|hospital|medic|nurs/i.test(oc.industry || '') ? ' (rigid pay bands are common in this sector \u2014 lead the levers with review timeline, vacation, and title rather than base stretch)' : /tech|software|startup|saas|fintech/i.test(oc.industry || '') ? ' (equity and signing bonuses are normal asks \u2014 bands flex more here)' : ' (use industry norms qualitatively only \u2014 never invent figures)'}
-- Company size: ${oc.company_size || 'not specified'}${oc.company_size === 'small' ? ' (small \u2014 equity and title flex more than base)' : oc.company_size === 'growing' ? ' (growth-stage \u2014 signing bonuses are common)' : oc.company_size === 'enterprise' ? ' (enterprise \u2014 rigid bands, the non-salary levers carry more of the negotiation)' : oc.company_size === 'mid' ? ' (established bands with real room inside them)' : ''}
+- Company size: ${oc.company_size || 'not specified'}${{'cs_1_50':' (1\u201350 \u2014 leadership decides comp directly, more flexibility)','cs_51_200':' (51\u2013200 \u2014 some structure, package is negotiable)','cs_201_1k':' (201\u20131,000 \u2014 salary bands exist with real room inside)','cs_1k_5k':' (1,001\u20135,000 \u2014 HR involved, package levers matter)','cs_5k_plus':' (5,000+ \u2014 rigid base bands, focus on signing bonus and title)'}[oc.company_size] || ''}
 - Salary anchor: ${oc.anchor === 'no_anchor' ? 'Candidate never shared a number — counter sets the first anchor' : oc.anchor === 'matched' ? 'Candidate shared a number and the offer matched it — counter needs new justification (market data, scope, competing signal) to go above their own anchor' : oc.anchor === 'below' ? 'Offer came in below what candidate stated — natural standing to re-ask for original number' : oc.anchor === 'above' ? 'Offer is above what candidate stated — company\'s internal band is higher than candidate\'s expectation, likely more room' : 'not specified'}
 - City: ${oc.city || 'not provided'} (use ONLY for qualitative talent-pool and cost-of-living reasoning \u2014 NEVER state or imply specific market salary figures for this city)
 - Candidate's natural voice: ${oc.tone || 'warm'} \u2014 write meeting_email, accept_email, and opening_script in this voice: ${oc.tone === 'direct' ? 'short sentences, no filler, gets to the number fast' : oc.tone === 'formal' ? 'polished, professional register, complete sentences, measured warmth' : 'friendly, personable, genuinely enthusiastic but professional'}
@@ -834,11 +834,11 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - accept_email: "How you accept is the last piece of leverage you have — most people waste it."
 - raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
 
-Respond ONLY with valid JSON, one sentence per key, no markdown:
-{"walkaway":"...","risk_tol":"...","urgency":"...","talent":"...","offer":"...","decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","avoid":"...","opening_script":"...","pushback":"...","meeting_email":"...","accept_email":"...","fallback":"...","raise_case":"..."}`,
+Respond ONLY with valid JSON — exactly these 10 keys, one hook sentence each, no markdown:
+{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
 // Respond with all 16 keys.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate 14 hook sentences \u2014 one per key.`,
-      maxTokens: 800,
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 10 hook sentences — one per key. Every key required.`,
+      maxTokens: 1200,
     };
   }
 
@@ -869,13 +869,6 @@ decision:
 leverage_risk:
   The non-obvious read of their specific leverage given the signals above. How to deploy it without putting the offer at risk. What rescind risk actually looks like (extremely rare for professional counters) and what genuinely triggers it. 4-5 sentences.
 
-counter_options:
-  Their three computed counters with when-to-choose guidance. Format exactly:
-  **SAFE \u2014 ${fm(oc.counter_safe)}.** [Who should send this and what it trades away. 1-2 sentences.]
-  **MODERATE \u2014 ${fm(oc.counter_moderate)}.** [The standard play \u2014 inside the zone that gets negotiated, not rejected. 1-2 sentences.]
-  **AMBITIOUS \u2014 ${fm(oc.counter_ambitious)}.** [What leverage justifies it and the extra friction it creates. 1-2 sentences.]
-  End with one sentence recommending ONE tier for THIS candidate based on their stated risk tolerance (${oc.risk || 'balanced'}) and leverage signals \u2014 and say it plainly: "For you: send the [tier] counter."
-
 levers:
   One sentence: when base is blocked, the negotiation isn't over \u2014 it moves to the levers below.
   Then EXACTLY these 10 levers, each ONE line, **bold name** \u2014 when to use it for THIS candidate:
@@ -887,15 +880,6 @@ emphasize:
   **ASK 1 \u2014 Base: ${fm(oc.counter)}.** [Why base leads \u2014 it compounds every year and anchors every future job. 1-2 sentences tied to their situation.]
   **ASK 2 \u2014 Signing bonus: ${fm(signingAsk)}.** [Why this is the trade-down when base is blocked \u2014 one-time budget, doesn't touch their band. 1-2 sentences.]
   **FALLBACK \u2014 A written 6-month compensation review.** [When to deploy it and why it must be in writing. 1-2 sentences.]
-
-avoid:
-  The most common way candidates in their position sabotage a counter.
-  Then 4 numbered points \u2014 each ONE sentence naming the exact phrase or behavior to avoid AND why:
-  1. [phrase/behavior] \u2014 [why it backfires]
-  2. [phrase/behavior] \u2014 [why it backfires]
-  3. [phrase/behavior] \u2014 [why it backfires]
-  4. [phrase/behavior] \u2014 [why it backfires]
-  Draw from: giving a range instead of one number, apologizing for countering, bluffing a competing offer, answering "what were you making before", accepting "best and final" at face value, negotiating multiple items simultaneously.
 
 opening_script:
   This is the PHONE OPENER \u2014 why the first 30 seconds of the call sets the recruiter's posture.
@@ -942,8 +926,8 @@ raise_case:
   5. [If the deadline is too tight \u2014 the exact extension script, one sentence in quotes]
 
 Return ONLY these 10 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
-{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","avoid":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
-// 12 keys total.
+{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
+// 10 keys total.
       userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 11 Counter Kit sections.`,
       maxTokens: 3400,
     };
