@@ -2918,10 +2918,11 @@ var DISC_Q_ALL = {
   industry: { id: 'industry', label: 'What industry is the company in? (Optional)', dimTag: null, input: 'text', placeholder: 'e.g. Healthcare, fintech, retail\u2026', skipText: 'Skip', options: [] },
   city: { id: 'city', label: 'What city is the role based in? (Optional \u2014 helps read the local talent pool)', dimTag: null, input: 'text', placeholder: 'e.g. Calgary', skipText: 'Skip', options: [] },
   company_size: { id: 'company_size', label: 'How big is the company?', dimTag: 'offer', options: [
-    { val: 'small', text: 'Small (under 50 people)', scores: {offer:60}, note: 'Small company. Flexibility may show up outside base salary, especially in title, equity, or timing.', type: 'neutral' },
-    { val: 'growing', text: 'Growing (50\u2013500)', scores: {offer:65}, note: 'Growth-stage company. There may be room if the ask is structured clearly and tied to closing.', type: 'neutral' },
-    { val: 'mid', text: 'Mid-size (500\u20135,000)', scores: {offer:55}, note: 'Mid-size company. Bands may exist, but there can still be room inside the package.', type: 'neutral' },
-    { val: 'enterprise', text: 'Enterprise (5,000+)', scores: {offer:45}, note: 'Enterprise company. Base may be more structured, so package levers and wording matter more.', type: 'neutral' },
+    { val: 'cs_1_50',    text: '1\u201350 employees',        scores: {offer:65}, note: 'Smaller team. Comp decisions often involve leadership directly, which can mean more flexibility.', type: 'neutral' },
+    { val: 'cs_51_200',  text: '51\u2013200 employees',      scores: {offer:60}, note: 'Some structure is forming but there\u2019s usually room to negotiate, especially on package.', type: 'neutral' },
+    { val: 'cs_201_1k',  text: '201\u20131,000 employees',   scores: {offer:55}, note: 'Established company. Salary bands exist but there\u2019s usually room inside them.', type: 'neutral' },
+    { val: 'cs_1k_5k',   text: '1,001\u20135,000 employees', scores: {offer:50}, note: 'HR is involved and bands are real, but the package has more levers to work with.', type: 'neutral' },
+    { val: 'cs_5k_plus', text: '5,000+ employees',            scores: {offer:45}, note: 'Base bands are more rigid here. The strongest asks focus on signing bonus, equity, and title.', type: 'neutral' },
   ]},
   experience: { id: 'experience', label: 'How many years of experience do you have in this type of role?', dimTag: 'talent', options: [
     { val: 'under2', text: 'Under 2 years', scores: {talent:35}, note: 'Early-career position. The counter should stay grounded, respectful, and easy to justify.', type: 'neutral' },
@@ -2955,10 +2956,10 @@ var OFFER_Q_ORDER = [
   // Group 4 — Offer Structure
   'extras', 'company_size',
   // Group 5 — Role Context
-  'industry', 'jd'
+  'industry'
 ];
 
-var DISC_FREE_QUESTIONS = 16; // verdict after this many — 16 questions, city always shown
+var DISC_FREE_QUESTIONS = 15; // verdict after this many — 15 questions (jd removed for V1)
 
 function buildDiscQuestions(blockerCode) {
   return OFFER_Q_ORDER.map(function(qId) {
@@ -3401,7 +3402,7 @@ var OFFER_TILE_DEFS = {
   industry:    { label: 'Industry',         val: function(a){ return a === 'skipped' ? 'Skipped' : String(a).slice(0, 24); } },
   city:        { label: 'Market',           val: function(a){ return a === 'skipped' ? 'Skipped' : String(a).slice(0, 22); } },
   worktype:    { label: 'Work setup',       val: function(a){ return { on_site:'On-site \u2014 leverage', hybrid:'Hybrid', remote:'Remote' }[a] || a; } },
-  company_size:{ label: 'Company',          val: function(a){ return { small:'Small (<50)', growing:'Growing (50\u2013500)', mid:'Mid (500\u20135K)', enterprise:'Enterprise (5K+)' }[a] || a; } },
+  company_size:{ label: 'Company',          val: function(a){ return { cs_1_50:'1\u201350', cs_51_200:'51\u2013200', cs_201_1k:'201\u20131K', cs_1k_5k:'1K\u20135K', cs_5k_plus:'5K+' }[a] || a; } },
   research:    { label: 'Research',         val: function(a){ return a === 'skipped' ? 'Skipped' : '$' + Number(String(a).replace(/[^\d]/g,'')||0).toLocaleString('en-US') + ' found'; } },
   jd:          { label: 'Job description',  val: function(a){ return a === 'skipped' ? 'Skipped' : 'Added \u2713'; } },
 };
@@ -3613,7 +3614,7 @@ function renderCanvasHTML() {
       { key: 'role',         label: 'Role',         val: ctx.role },
       { key: 'base',         label: 'Base salary',  val: ctx.base ? '$' + Number(String(ctx.base).replace(/[^\d]/g,'')).toLocaleString('en-US') : null },
       { key: 'industry',     label: 'Industry',     val: ctx.industry && ctx.industry !== 'skipped' ? ctx.industry : null },
-      { key: 'company_size', label: 'Company',      val: { small:'Small (<50)', growing:'Growing (50–500)', mid:'Mid-size (500–5K)', enterprise:'Enterprise (5K+)' }[ctx.company_size] },
+      { key: 'company_size', label: 'Company',      val: { cs_1_50:'1–50', cs_51_200:'51–200', cs_201_1k:'201–1K', cs_1k_5k:'1K–5K', cs_5k_plus:'5K+' }[ctx.company_size] },
       { key: 'worktype',     label: 'Work setup',   val: { on_site:'On-site', hybrid:'Hybrid', remote:'Remote' }[ctx.worktype] },
       { key: 'city',         label: 'City',         val: ctx.city || null },
       { key: 'anchor',       label: 'Anchor',       val: { no_anchor:'No number shared', matched:'Offer matched my number', below:'Offer below my number', above:'Offer above my number' }[ctx.anchor] },
@@ -3661,6 +3662,9 @@ function renderCanvasHTML() {
   }
 
   if (intakeDone) {
+  // PRO TIP
+  html += '<div style="font-size:10px;color:var(--text3);padding:6px 4px 2px;line-height:1.5;">'
+         + '<span style="color:var(--gold);font-weight:700;">Pro tip:</span> After unlocking, paste your job description and your counter email will reference the actual role scope.</div>';
   // YOUR STRATEGY
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
@@ -4402,7 +4406,7 @@ function pickDiscInput(qIdx, q, value, skipped) {
 
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag || '', answer: skipped ? 'skipped' : storeVal });
   // Log live progress with question ID (not index — city skip makes index unreliable)
-  if (!skipped) logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, questions_answered: discStep });
+  if (!skipped) logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, answer: storeVal, questions_answered: discStep });
 
   if (typeof _radarAnimFrame !== 'undefined' && _radarAnimFrame) { cancelAnimationFrame(_radarAnimFrame); _radarAnimFrame = null; }
   insertDiscRadar();
@@ -4416,7 +4420,6 @@ function pickDiscInput(qIdx, q, value, skipped) {
       'city': 'Added to your analysis. Location helps read the local talent pool and salary context.',
       'industry': 'Added to your analysis. Industry context helps calibrate tone, package expectations, and negotiation flexibility.',
       'research': 'Good. Market data gives your counter a stronger foundation and makes the ask feel less arbitrary.',
-      'jd': 'Great. The counter email can reference the actual role scope, not just the job title.'
     };
     var ir = inputReactions[q.id];
     if (ir && chatArea) _inputReactionDone = new Promise(function(res) { setTimeout(function() { typeReaction(ir, chatArea).then(res); }, 500); });
@@ -4672,7 +4675,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
 
   logEntry('disc_answer', { question: q.id, dimension: q.dimTag, answer: opt.val, note: opt.note, type: opt.type });
   // Log live progress with question ID (not index — city skip makes index unreliable)
-  logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, questions_answered: discStep });
+  logSession('offer_q_' + q.id, { product:'offer', last_question: q.id, answer: opt.val, questions_answered: discStep });
 
   // Recompute composite dims after every answer
   (function() {
@@ -4716,7 +4719,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
     var anch=ctx.anchor||'', ext=ctx.extras||'', csz=ctx.company_size||'';
     var anchB=anch==='no_anchor'?75:anch==='matched'?35:anch==='below'?60:anch==='above'?70:0;
     var extB=ext==='signing'?70:ext==='equity'?65:ext==='signing_equity'?80:ext==='base_only'?45:0;
-    var cszB=csz==='small'?60:csz==='growing'?65:csz==='mid'?55:csz==='enterprise'?45:0;
+    var cszB=csz==='cs_1_50'?65:csz==='cs_51_200'?60:csz==='cs_201_1k'?55:csz==='cs_1k_5k'?50:csz==='cs_5k_plus'?45:0;
     var ofPts=[anchB,extB,cszB].filter(Boolean);
     if (ofPts.length) {
       var ofScore=Math.round(ofPts.reduce(function(a,b){return a+b;},0)/ofPts.length);
@@ -4810,7 +4813,7 @@ function computeOfferVerdict() {
   var _ind = String(ctx.industry || '').toLowerCase();
   if (/gov|public|school|universit|educat|health|hospital|medic|nurs/.test(_ind)) { hi = Math.max(0.06, hi - 0.01); }
   else if (/tech|software|startup|saas|fintech|ai\b/.test(_ind)) { hi += 0.005; }
-  if (ctx.company_size === 'enterprise') { hi = Math.max(0.06, hi - 0.005); }
+  if (ctx.company_size === 'cs_5k_plus' || ctx.company_size === 'cs_1k_5k') { hi = Math.max(0.06, hi - 0.005); }
   if (ctx.experience === 'over10') { hi += 0.005; }
   else if (ctx.experience === '5_10') { hi += 0.0025; }
   var roomLow = base * lo, roomHigh = base * hi;
@@ -4971,21 +4974,18 @@ async function generateDiscInsights() {
   // Log offer_complete — full context for funnel analysis
   logSession('offer_complete', {
     product: 'offer',
-    role: SIM_STATE.context.role || '',
-    seniority: SIM_STATE.context.experience || '',
-    blocker_code: SIM_STATE.blocker || '',
-    blocker_label: [
-      SIM_STATE.context.employment || '',
-      SIM_STATE.context.competing || '',
-      SIM_STATE.context.risk || '',
-      SIM_STATE.context.worktype || '',
-      SIM_STATE.context.anchor || '',
-      SIM_STATE.context.base ? ('$' + SIM_STATE.context.base) : '',
-      SIM_STATE.context.city || '',
-    ].filter(Boolean).join(' | '),
     mode: 'offer',
-    template: SIM_STATE.context.company_size || '',
-    landing_ref: (function(){ try{ return new URLSearchParams(window.location.search).get('ref') || ''; }catch(e){ return ''; } })(),
+    role:         SIM_STATE.context.role         || '',
+    base:         SIM_STATE.context.base         || '',
+    city:         SIM_STATE.context.city         || '',
+    employment:   SIM_STATE.context.employment   || '',
+    competing:    SIM_STATE.context.competing    || '',
+    risk:         SIM_STATE.context.risk         || '',
+    worktype:     SIM_STATE.context.worktype     || '',
+    experience:   SIM_STATE.context.experience   || '',
+    anchor:       SIM_STATE.context.anchor       || '',
+    company_size: SIM_STATE.context.company_size || '',
+    industry:     SIM_STATE.context.industry     || '',
   });
 
   // Auto-scroll to the Counter Kit reveal
@@ -5498,8 +5498,16 @@ function showDiscPaywall() {
   // Log paywall hit — only once per session
   if (!state._paywallLogged) {
     state._paywallLogged = true;
-    logSession('offer_paywall', { product:'offer', paywall_seen:'Yes',
-      role: (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role) || '' });
+    saveState();
+    logSession('offer_paywall', {
+      product: 'offer',
+      paywall_seen: 'Yes',
+      role: (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role) || '',
+      employment:   (SIM_STATE && SIM_STATE.context && SIM_STATE.context.employment)   || '',
+      competing:    (SIM_STATE && SIM_STATE.context && SIM_STATE.context.competing)    || '',
+      risk:         (SIM_STATE && SIM_STATE.context && SIM_STATE.context.risk)         || '',
+      questions_answered: (typeof discStep !== 'undefined') ? discStep : 0,
+    });
   }
   var chatArea = $('disc-chat');
   if (!chatArea) return;
