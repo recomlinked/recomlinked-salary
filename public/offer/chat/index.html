@@ -967,13 +967,13 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       try {
         if (!state.paid) {
-          ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
+          ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
             }
           });
           // Restore collapsed position state
-          var hasStrat = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].some(function(k) {
+          var hasStrat = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].some(function(k) {
             return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
           });
           if (hasStrat) discStrategyDone = true;
@@ -1260,7 +1260,7 @@ function rewriteKitWithRisk(newRisk) {
   SIM_STATE.context.risk = newRisk;
   state.offer_verdict = null;
   // Clear all strategy sections so they regenerate
-  ['decision','leverage_risk','emphasize','levers','avoid','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
+  ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
     if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].insight = ''; }
   });
   discPlanLoading = true;
@@ -3018,7 +3018,7 @@ function _generatePDFPrintFallback() {
       { key: 'manager', label: 'Urgency' }, { key: 'company', label: 'Package' }, { key: 'market', label: 'Research' }
     ]},
     { section: 'YOUR STRATEGY', items: [
-      { key: 'decision', label: 'Our Read' }, { key: 'leverage_risk', label: 'Leverage & Risk' }, { key: 'emphasize', label: 'Ask Stack' }, { key: 'levers', label: 'Non-Salary Levers' }, { key: 'avoid', label: 'What Not to Say' }
+      { key: 'decision', label: 'Our Read' }, { key: 'leverage_risk', label: 'Leverage & Risk' }, { key: 'emphasize', label: 'Ask Stack' }, { key: 'levers', label: 'Non-Salary Levers' }, 
     ]},
     { section: 'YOUR COUNTER KIT', items: [
       { key: 'opening_script', label: 'Phone Opener' }, { key: 'pushback', label: 'Pushback Playbook' }, { key: 'fallback', label: 'Fallback Responses' },
@@ -3363,7 +3363,7 @@ function togglePlanBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + (state.paid && discCanvasBlocks && discCanvasBlocks[key] && discCanvasBlocks[key].insight ? formatInsight(discCanvasBlocks[key].insight) : preview) + '</p>' +
-      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'decision':'Unlock our full analysis \u2192','leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','avoid':'Unlock the full list \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','accept_email':'Unlock your accept email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'decision':'Unlock our full analysis \u2192','leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','accept_email':'Unlock your accept email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
   }
 }
 
@@ -3514,7 +3514,6 @@ function renderCanvasHTML() {
 
     if (key === 'leverage_risk') return { preview: firstSentence(clean), badge: '' };
     if (key === 'emphasize')     return { preview: firstSentence(clean), badge: '5 points' };
-    if (key === 'avoid')         return { preview: firstSentence(clean), badge: '4 points' };
     if (key === 'opening_script') return { preview: firstSentence(clean), badge: '4 options' };
     if (key === 'pushback')       return { preview: firstSentence(clean), badge: '8 prepared' };
     if (key === 'meeting_email') {
@@ -3935,13 +3934,13 @@ function initDiscoveryMode(container) {
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
-        ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].forEach(function(k) {
+        ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
           if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
             discCanvasBlocks[k].teaser = true;
           }
         });
         // Restore collapsed state if strategy was previously generated
-        var hasStrategy = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'].some(function(k) {
+        var hasStrategy = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].some(function(k) {
           return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
         });
         if (hasStrategy) discStrategyDone = true;
@@ -3994,7 +3993,7 @@ function initDiscoveryMode(container) {
         discStrategyDone = true;
         discPlanLoading = true;
         // Mark strategy blocks as unfilled so they show loading state
-        var _stratKeys = ['leverage_risk','emphasize','avoid','opening_script','pushback','meeting_email','raise_case'];
+        var _stratKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
         _stratKeys.forEach(function(k) { if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; } });
         // Render canvas with loading state immediately
         var _lc = $('disc-canvas-live');
