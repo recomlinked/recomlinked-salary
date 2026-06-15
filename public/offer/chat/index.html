@@ -5121,7 +5121,7 @@ async function generateDiscInsights() {
         if (!state.paid && typeof showDiscPaywall === 'function') {
           showDiscPaywall();
         }
-      }, 3000);
+      }, 5000);
     }
   } catch(e) {
     console.warn('[teaser] fetch error:', e.message);
@@ -5134,7 +5134,7 @@ async function generateDiscInsights() {
         if (!state.paid && typeof showDiscPaywall === 'function') {
           showDiscPaywall();
         }
-      }, 3000);
+      }, 5000);
     }
   }
 
