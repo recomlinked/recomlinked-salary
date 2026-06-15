@@ -174,7 +174,6 @@ button { font-family: var(--sans); cursor: pointer; }
 }
 .cta-btn:hover { background: var(--gold-hover); transform: translateY(-1px); box-shadow: var(--shadow-gold-hover); text-decoration: none; }
 .cta-btn:active { transform: translateY(0); }
-.cta-btn .cta-arrow { font-size: 17px; margin-left: 10px; flex-shrink: 0; }
 
 @media (max-width: 420px) { .cta-btn { padding: 14px 28px; font-size: 14.5px; } .cta-stack { gap: 10px; margin-top: 20px; } }
 
@@ -433,19 +432,56 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     <h1>Your <span class="accent">job offer</span> has more room<br><span class="hero-h1-line2">than they showed you. <span class="accent">Find it.</span></span></h1>
     
 
-    <p class="hero-sub-new" style="font-size:15px;color:var(--text2);line-height:1.75;max-width:460px;margin:0 auto 28px;text-align:center;">Most offers sit 5–15% below the approved ceiling. Most&nbsp;people&nbsp;sign&nbsp;anyway.</p>
+    <p class="hero-sub-new" style="font-size:15px;color:var(--text2);line-height:1.75;max-width:460px;margin:0 auto 28px;text-align:center;"><em>Most offers sit below the approved ceiling.</em></p>
     <div class="cta-stack">
       <a href="/offer/chat/" class="cta-btn" id="cta-offer">
         <span>See my negotiation room</span>
-        <span class="cta-arrow">→</span>
+         →
       </a>
     </div>
   </section>
 
+  <section class="section">
+
+    <div class="fade-in reasons-section" id="blockers">
+      <h2 class="section-title">What's stopping you from countering your offer?</h2>
+      <div class="reasons-grid">
+        <a href="/offer/chat/" class="reason-chip">
+          <span>What if they rescind the offer?</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip">
+          <span>I don't know what number to counter with</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip">
+          <span>The deadline is in a few days</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip">
+          <span>The recruiter said the band is fixed</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip">
+          <span>It's my first offer — I don't want to risk it</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip">
+          <span>I don't want to seem greedy</span><span class="reason-arrow">→</span>
+        </a>
+        <a href="/offer/chat/" class="reason-chip reason-chip-cta">
+          <span>None of these? Let's find yours</span><span class="reason-arrow">→</span>
+        </a>
+      </div>
+  </section>
+
+  <div class="fade-in proof-bar" style="margin:0 0 8px;">
+    <div class="proof-stat">
+      People who negotiate earn <span class="proof-num">18.8% more</span> on average than those who accept the first offer.
+    </div>
+    <div class="proof-src"><a href="https://blog.theinterviewguys.com/we-reviewed-every-salary-negotiation-study/" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(44,36,56,0.2);">The Interview Guys</a></div>
+  </div>
+
+
 
   <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
   <section class="section hiw-section" id="how-it-works">
-    <h2 class="section-title"><span style="color:var(--purple);">In <span style="font-size:1.3em;">3</span> simple steps</span></h2>
+    <h2 class="section-title">How to negotiate a job offer: <span style="color:var(--purple);"><span style="font-size:1.3em;">3</span> steps</span></h2>
 
     <a href="/offer/chat/" class="hiw-card" aria-label="Step 1: enter your offer and see your negotiation room">
       <div class="hiw-num">1</div>
@@ -455,13 +491,13 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
         <div class="hiw-cta">Check my offer now <span class="hiw-cta-arrow">→</span></div>
       </div>
     </a>
-    <!-- Harvard proof bar -->
-    <div class="fade-in proof-bar" style="margin-top:32px;">
+    <div class="fade-in proof-bar" style="margin-top:24px;">
       <div class="proof-stat">
-        People who negotiate their starting salary earn <span class="proof-num">7.4% more</span> on average. Up to <span class="proof-num">$1M more</span> over a career.
+        <span class="proof-num">87%</span> of employers have never rescinded an offer because a candidate negotiated.
       </div>
-      <div class="proof-src">Glassdoor · Harvard Program on Negotiation</div>
+      <div class="proof-src"><a href="https://jedsi.yale.edu/resources/salary-negotiations" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(44,36,56,0.2);">Salary.com via Yale</a></div>
     </div>
+
 
 
     <div class="divider"></div>
@@ -475,82 +511,9 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     </a>
 
 <!-- Blockers section — each chip is one dimension of the full plan -->
-    <div class="fade-in reasons-section" id="blockers">
-      <h2 class="section-title">Common blockers to negotiating a job offer</h2>
-      <div class="reasons-grid">
-        <a href="/offer/chat/?fear=rescind" class="reason-chip">
-          <span>What if they rescind the offer?</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=counter_number" class="reason-chip">
-          <span>I don't know what number to counter with</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=deadline" class="reason-chip">
-          <span>The deadline is in a few days</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=anchored" class="reason-chip">
-          <span>I already told them my salary expectations</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=fixed_band" class="reason-chip">
-          <span>The recruiter said the band is fixed</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=competing" class="reason-chip">
-          <span>I have another offer — how do I use it?</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=first_offer" class="reason-chip">
-          <span>It's my first real offer — I don't want to mess it up</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/?fear=avoid" class="reason-chip">
-          <span>I hate negotiating — I just want to accept</span><span class="reason-arrow">→</span>
-        </a>
-        <a href="/offer/chat/" class="reason-chip reason-chip-cta">
-          <span>None of these? Let's find yours</span><span class="reason-arrow">→</span>
-        </a>
-      </div>
     </div>
 
-    <!-- Share card -->
-    <div class="share-card-wrap" style="background:var(--purple-light);border:1px solid rgba(139,111,165,0.12);border-radius:16px;padding:24px;margin:32px 0;display:flex;gap:24px;align-items:center;flex-wrap:wrap;position:relative;overflow:hidden;">
-      <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:rgba(139,111,165,0.05);border-radius:50%;"></div>
-      <!-- CTA side (left) -->
-      <div style="flex:1;min-width:180px;order:1;position:relative;z-index:1;">
-        <div style="font-size:18px;font-weight:700;color:var(--text);line-height:1.35;margin-bottom:6px;">Know someone with an offer in hand?</div>
-        <div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:16px;">Send them this before they sign. Seeing their negotiation room is free.</div>
-        <div style="font-size:13px;font-weight:600;color:var(--purple);letter-spacing:0.03em;">Be the reason they don't sign at the first number.</div>
-      </div>
-      <!-- Card (right) + button below -->
-      <div style="flex-shrink:0;width:200px;max-width:100%;order:2;display:flex;flex-direction:column;align-items:center;gap:12px;">
-        <div onclick="shareLink()" style="width:100%;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);cursor:pointer;transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
-          <svg width="100%" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="cardBg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#faf3e8"/>
-                <stop offset="40%" stop-color="#f5ece0"/>
-                <stop offset="100%" stop-color="#efe4da"/>
-              </linearGradient>
-              <linearGradient id="accentBar" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#9B7CFC"/>
-                <stop offset="100%" stop-color="#F5CF56"/>
-              </linearGradient>
-            </defs>
-            <rect width="400" height="400" fill="url(#cardBg)"/>
-            <circle cx="60" cy="50" r="20" fill="#f0e2d2" opacity="0.4"/>
-            <circle cx="360" cy="340" r="25" fill="#e8daf0" opacity="0.3"/>
-            <circle cx="340" cy="70" r="12" fill="#fce8c8" opacity="0.35"/>
-            <text x="200" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">Don't sign at</text>
-            <text x="200" y="172" text-anchor="middle" font-family="Georgia,serif" font-size="24" fill="#3a2e42">their first number</text>
-            <text x="200" y="210" text-anchor="middle" font-family="Georgia,serif" font-size="26" font-weight="700" fill="#3a2e42" font-style="italic">counter with confidence.</text>
-            <rect x="150" y="224" width="100" height="3" rx="1.5" fill="url(#accentBar)"/>
-            <path d="M200,278 C193,274 189,270 189,266 C189,264 191,262 193,262 C195,262 197,263 200,266 C204,263 205,262 207,262 C209,262 211,264 211,266 C211,270 207,274 200,278Z" fill="#9B7CFC"/>
-            <text x="200" y="300" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" fill="#8a7e72" font-style="italic">from a friend who wants you paid right</text>
-            <rect x="140" y="330" width="120" height="0.5" fill="#d8cab8" opacity="0.5"/>
-            <text x="200" y="355" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#a89888">salary.recomlinked.com</text>
-            <text x="200" y="372" text-anchor="middle" font-family="system-ui,sans-serif" font-size="9" fill="#b8a898">See your room. Then counter your offer.</text>
-          </svg>
-        </div>
-        <button onclick="shareLink()" style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--purple);color:#fff;padding:12px 16px;border-radius:var(--radius);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:var(--sans);box-shadow:0 2px 12px rgba(123,92,252,0.2);transition:all 0.15s;" onmouseover="this.style.background='var(--purple-hover)'" onmouseout="this.style.background='var(--purple)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Encourage them</button>
-        <div id="share-copied" style="display:none;font-size:12px;color:var(--purple);font-weight:500;">Link copied ✓</div>
-      </div>
-    </div>
+
 
     
     
@@ -576,36 +539,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       </div>
     </div>
 
-    <div class="divider"></div>
-    <!-- Pro tip: counter email -->
-    <div class="fade-in demo-section" id="counter-email-sample">
-      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,207,86,0.12);border:1px solid rgba(245,207,86,0.3);border-radius:6px;padding:4px 10px;font-size:10px;font-weight:700;color:#7a6428;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:14px;">★ Pro tip</div>
-      <h2 class="section-title">Why a written counter is <a href="/offer/chat/" style="color:var(--purple);text-decoration:none;">the best way to negotiate a job offer</a></h2>
-      <p style="font-size:14px;color:var(--text2);line-height:1.7;margin:0 0 28px;">Instead of improvising on a recruiter call, send a professional counter first. They read your number, your reasoning, and your signing intent — and respond with their real flexibility. <strong style="color:var(--text);">The hardest part happens in writing, on your terms, before anyone is put on the spot.</strong></p>
-
-      <div style="display:flex;flex-direction:column;align-items:center;margin:28px 0 0;max-width:100%;">
-        <div style="width:100%;max-width:420px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 20px rgba(0,0,0,0.08);overflow:hidden;text-align:left;">
-          <div style="padding:14px 20px;border-bottom:1px solid #eee9f2;background:#faf8fc;">
-            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Your counter email — written for you, ready to send</div>
-            <div style="font-size:13px;font-weight:700;color:var(--text);">Re: Offer — Product Manager</div>
-          </div>
-          <div style="padding:18px 20px;font-size:12.5px;color:#4a4356;line-height:1.75;">
-            Hi Sarah,<br/><br/>
-            Thank you again for the offer — I'm genuinely excited about the team and the roadmap we discussed.<br/><br/>
-            Before I sign, I'd like to align on compensation. Based on the scope of the role and the current market for this position, I was targeting a base of <strong style="color:#6a4a10;background:rgba(245,207,86,0.18);padding:0 4px;border-radius:3px;">$93,000</strong>. If we can get there, <strong style="color:var(--text);">I'm ready to sign this week.</strong><br/><br/>
-            Happy to jump on a quick call if that's easier.<br/><br/>
-            Best,<br/>Alex
-          </div>
-          <div style="padding:10px 20px;border-top:1px solid #eee9f2;display:flex;justify-content:space-between;font-size:10px;color:var(--text3);">
-            <span>Built from your numbers · salary.recomlinked.com</span>
-            <span>Copy-ready</span>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:36px;font-size:14px;color:var(--text);line-height:1.7;">Answer a few quick questions about your offer. We compute your negotiation room, build your ask stack — base first, signing bonus as the trade-down, fallback in writing — and write your counter email with your numbers, <a href="/offer/chat/" style="color:var(--purple);text-decoration:none;">ready to send before the deadline</a>.</div>
-      <div style="margin-top:24px;margin-bottom:8px;text-align:center;"><a href="/offer/chat/" class="cta-btn">Get my counter plan now <span class="cta-arrow">→</span></a></div>
-    </div>
+    
 
   </section>
 
@@ -686,7 +620,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     </p>
     <a href="/offer/chat/" class="cta-btn">
       <span>See my negotiation room</span>
-      <span class="cta-arrow">→</span>
+       →
     </a>
     <div class="mini-trust">
       <strong>Free</strong> · No email needed
@@ -769,7 +703,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px;">Your deadline isn't waiting. Neither should you.</div>
     <a href="/offer/chat/" class="cta-btn">
       <span>See my negotiation room</span>
-      <span class="cta-arrow">→</span>
+       →
     </a>
   </div>
 
