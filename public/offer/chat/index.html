@@ -4476,7 +4476,12 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var numColor = (locked || val === null) ? (isRec ? 'rgba(245,207,86,0.45)' : 'rgba(255,255,255,0.25)') : (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)');
       return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
         '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
-        '<div style="font-size:14px;font-weight:900;color:' + (locked ? (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') : numColor) + ';' + (locked ? 'filter:blur(7px);user-select:none;cursor:pointer;' : '') + '" ' + (locked ? 'onclick="triggerPlanPaywall()" title="Unlock to reveal"' : '') + '>' + (locked ? fm(val !== null && val > 0 ? val : 97500) : display) + '</div>' +
+        (locked
+          ? '<div style="display:flex;align-items:baseline;justify-content:center;gap:1px;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
+              '<span style="font-size:11px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';cursor:pointer;">$</span>' +
+              '<span style="font-size:14px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') + ';filter:blur(7px);user-select:none;cursor:pointer;">' + fm(val !== null && val > 0 ? val : 97500).replace('$','') + '</span>' +
+              '</div>'
+          : '<div style="font-size:14px;font-weight:900;color:' + numColor + ';">' + display + '</div>') +
         '</div>';
     }
     var wa2=discDims.walkaway||0, rt2=discDims.risk_tol||0;
@@ -4503,7 +4508,10 @@ function offerVerdictCardHtml(compact, showNumbers) {
           '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
           'Unlock →</span>' +
         '</div>' +
-        '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;margin-bottom:6px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
+        '<div style="display:flex;align-items:baseline;gap:2px;margin-bottom:6px;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
+        '<span style="font-size:' + (compact?'16px':'20px') + ';font-weight:900;color:#F5CF56;">$</span>' +
+        '<span style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;filter:blur(8px);user-select:none;">' + fm(v.room_low).replace('$','') + ' \u2013 ' + fm(v.room_high).replace('$','') + '</span>' +
+        '</div>' +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
         '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
 
