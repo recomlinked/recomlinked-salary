@@ -3183,6 +3183,14 @@ function _generatePDFPrintFallback() {
   html += renderBlock({key:'accept_email',label:'Final Accept Email'}, 'plan');
   html += renderBlock({key:'raise_case',label:'Sequencing Plan'}, 'plan');
 
+  // Disclaimer — paid users only
+  if (state.paid) {
+    html += '<div style="margin-top:16px;padding:10px 14px;background:rgba(0,0,0,0.03);border-radius:6px;border:1px solid rgba(0,0,0,0.06);">' +
+      '<p style="font-size:10px;color:#888;line-height:1.6;margin:0;">' +
+      'Your Counter Kit is built from the information you provided. The numbers are personalized estimates — a strong starting point, not a guarantee. Your judgment and context always lead.' +
+      '</p></div>';
+  }
+
   try {
   // ── YOUR NEGOTIATION ROOM ──
   y += 4;
@@ -3226,6 +3234,16 @@ function _generatePDFPrintFallback() {
     doc.text('\u2014', mx+5, y+18);
   }
   y += 38;
+
+  // ── Disclaimer ──
+  y += 6;
+  if (y + 16 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'italic');
+  doc.setTextColor(160, 150, 180);
+  var disclaimerLines = doc.splitTextToSize('Your Counter Kit is built from the information you provided. The numbers are personalized estimates — a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2 - 4);
+  doc.text(disclaimerLines, mx + 2, y + 4);
+  y += disclaimerLines.length * 4 + 4;
 
   // ── Footer ──
   drawFooter();
