@@ -4106,7 +4106,7 @@ function initDiscoveryMode(container) {
   introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
   chatArea.appendChild(introWrap);
 
-  var introText = 'Most job offers sit below the band the company already approved. A few quick questions, and I\u2019ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter to send.';
+  var introText = 'Most job offers leave room to negotiate. A few quick questions, and I\u2019ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.';
 
   // Personalize opening if user came from a specific blocker chip
   var REASON_LABELS = {
@@ -4140,6 +4140,15 @@ function initDiscoveryMode(container) {
       /your negotiation room in dollars/,
       '<b>your negotiation room in dollars</b>'
     );
+    // Trust line beneath the opener
+    var bub = introWrap.querySelector('.bubble');
+    if (bub && !bub.querySelector('.opener-trust')) {
+      var trust = document.createElement('div');
+      trust.className = 'opener-trust';
+      trust.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text3,#9a93a8);display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+      trust.innerHTML = '<span>No email needed</span><span style="opacity:0.5;">\u00b7</span><span>Takes about 2 minutes</span>';
+      bub.appendChild(trust);
+    }
 
     // Show first question directly — radar appears after first answer
     await sleep(400);
