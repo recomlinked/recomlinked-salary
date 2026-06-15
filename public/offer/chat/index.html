@@ -3159,7 +3159,7 @@ function _generatePDFPrintFallback() {
 
   // Should You Negotiate?
   var nScore = calculateNegotiationScore();
-  var nLabel = getNegotiationLabel(nScore);
+  var nLabel = getNegotiationLabel(nScore, (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced');
   html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:14px 16px;margin:8px 0;">';
   html += '<div style="font-size:10px;font-weight:700;color:' + nLabel.color + ';text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Should You Negotiate?</div>';
   html += '<div style="font-size:14px;font-weight:700;color:' + nLabel.color + ';margin-bottom:4px;">' + nLabel.label + '</div>';
@@ -3268,11 +3268,46 @@ function calculateNegotiationScore() {
   return Math.round(final);
 }
 
-function getNegotiationLabel(score) {
-  if (score >= 72) return { label: 'Strong position \u2014 counter with confidence', riskLevel: 'Low. Your leverage justifies a firm ask \u2014 one number, confident tone, sign-this-week close.', color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: 'Send the ambitious counter. Your leverage signals justify it \u2014 lead with base, use the signing bonus as your trade-down.', risk: 'Over-explaining your ask or showing urgency. One number, sign-this-week framing, then stop talking.' };
-  if (score >= 55) return { label: 'Solid position \u2014 counter is the right move', riskLevel: 'Moderate-low. A counter is reasonable \u2014 protect the offer with a warm tone, one clear ask, and a sign-this-week close.', color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: 'Send the moderate counter. Your position supports a professional ask \u2014 pair it with the sign-this-week signal.', risk: 'Accepting the first pushback as final. \u2018Best and final\u2019 on the first mention almost never is.' };
-  if (score >= 40) return { label: 'Viable \u2014 tone and framing matter most', riskLevel: 'Moderate. The counter needs warm framing and a single clean ask \u2014 no range, no apology, no extras until base is settled.', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: 'Send the safe counter. Keep it warm, one ask, sign-this-week close. The counter email does the heavy lifting.', risk: 'Giving a range instead of one number, or apologising for countering. Neither signals the confidence that gets yeses.' };
-  if (score >= 25) return { label: 'Lean position \u2014 every word counts', riskLevel: 'Moderate-high. Keep the counter tight and warm \u2014 one ask, sign-this-week signal, pivot to signing bonus immediately if base is blocked.', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: 'A tight, warm safe counter focused on role scope \u2014 not market data you don\u2019t have. Pivot fast to the signing bonus if base is blocked.', risk: 'Revealing urgency, asking for too much, or countering without a sign-this-week signal. The pushback playbook is your most important section.' };
+function getNegotiationLabel(score, riskChoice) {
+  // riskChoice: 'safe' | 'balanced' | 'ambitious' (the user's stated approach)
+  // The starred tier in the verdict card follows riskChoice exactly.
+  // This recommendation NAMES that same tier, then notes if leverage suggests adjusting.
+  var choice = riskChoice || 'balanced';
+  var chosenTier = choice === 'safe' ? 'safe' : choice === 'ambitious' ? 'ambitious' : 'moderate';
+  var tierName = chosenTier === 'safe' ? 'safe' : chosenTier === 'ambitious' ? 'ambitious' : 'moderate';
+
+  // Score buckets define how much leverage they actually have
+  var bucket = score >= 72 ? 4 : score >= 55 ? 3 : score >= 40 ? 2 : score >= 25 ? 1 : 0;
+  // Tier rank: safe=0, moderate=1, ambitious=2 — used to compare choice vs leverage
+  var choiceRank = chosenTier === 'safe' ? 0 : chosenTier === 'ambitious' ? 2 : 1;
+  // What leverage alone would suggest
+  var leverageRank = bucket >= 4 ? 2 : bucket >= 3 ? 1 : 0;
+
+  // Build the target line — confirms the chosen tier, adds an honest note
+  var target;
+  if (choiceRank < leverageRank) {
+    // Their leverage could support a bolder ask than they chose
+    target = 'Send the ' + tierName + ' counter you chose — it\u2019s well within your leverage. If you want, your position could support one tier bolder.';
+  } else if (chosenTier === 'ambitious' && bucket <= 1) {
+    // Ambitious on a weak (Lean/Difficult) position — honest stretch warning
+    target = 'You chose the ambitious counter — that\u2019s a stretch for this position. The ask needs to be tightened so it doesn\u2019t overplay your leverage.';
+  } else if (choiceRank > leverageRank) {
+    // They chose bolder than leverage comfortably supports — keep it clean, not scary
+    target = 'You chose the ' + tierName + ' counter — keep it clean and defensible: one number, warm tone, sign-this-week close.';
+  } else {
+    // Aligned
+    target = 'Send the ' + tierName + ' counter — it matches both your leverage and your approach. Pair it with the sign-this-week signal.';
+  }
+
+  // Loss-framing line — only on strong/solid tiers (bucket 3-4)
+  var lossLine = (bucket >= 3)
+    ? ' The real risk isn\u2019t a professional counter — it\u2019s accepting too quickly and leaving approved room on the table.'
+    : '';
+
+  if (bucket === 4) return { label: 'Strong position \u2014 counter with confidence', riskLevel: 'Low. Your leverage justifies a firm ask \u2014 one number, confident tone, sign-this-week close.' + lossLine, color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: target, risk: 'Over-explaining your ask or showing urgency. One number, sign-this-week framing, then stop talking.' };
+  if (bucket === 3) return { label: 'Solid position \u2014 counter is the right move', riskLevel: 'Moderate-low. A counter is reasonable \u2014 protect the offer with a warm tone, one clear ask, and a sign-this-week close.' + lossLine, color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: target, risk: 'Accepting the first pushback as final. \u2018Best and final\u2019 on the first mention almost never is.' };
+  if (bucket === 2) return { label: 'Viable \u2014 tone and framing matter most', riskLevel: 'Moderate. The counter needs warm framing and a single clean ask \u2014 no range, no apology, no extras until base is settled.', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: target, risk: 'Giving a range instead of one number, or apologising for countering. Neither signals the confidence that gets yeses.' };
+  if (bucket === 1) return { label: 'Lean position \u2014 every word counts', riskLevel: 'Moderate-high. Keep the counter tight and warm \u2014 one ask, sign-this-week signal, pivot to signing bonus immediately if base is blocked.', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: target, risk: 'Revealing urgency, asking for too much, or countering without a sign-this-week signal. The pushback playbook is your most important section.' };
   return { label: 'Difficult position \u2014 preparation is everything', riskLevel: 'High. A minimal, enthusiastic counter only \u2014 base, one ask, close fast. Every additional ask increases the risk of losing momentum.', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'A minimal, enthusiastic counter \u2014 base only, one ask, no extras. Getting the revised number in writing is the win.', risk: 'Over-reaching with a big counter or negotiating multiple items at once. Keep it simple and close fast.' };
 }
 
@@ -3663,7 +3698,7 @@ function renderCanvasHTML() {
   var coreComplete = intakeDone && baseEntered && discActive.walkaway && discActive.risk_tol;
   if (coreComplete) {
     var nScore = calculateNegotiationScore();
-    var nLabel = getNegotiationLabel(nScore);
+    var nLabel = getNegotiationLabel(nScore, (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced');
     html += '<div style="background:' + nLabel.bg + ';border:1px solid ' + nLabel.border + ';border-radius:8px;padding:12px 14px;margin-top:4px;">';
     html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + nLabel.color + '" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
@@ -4476,12 +4511,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var numColor = (locked || val === null) ? (isRec ? 'rgba(245,207,86,0.45)' : 'rgba(255,255,255,0.25)') : (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)');
       return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
         '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
-        (locked
-          ? '<div style="display:flex;align-items:baseline;justify-content:center;gap:1px;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
-              '<span style="font-size:11px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';cursor:pointer;">$</span>' +
-              '<span style="font-size:14px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') + ';filter:blur(7px);user-select:none;cursor:pointer;">' + fm(val !== null && val > 0 ? val : 97500).replace('$','') + '</span>' +
-              '</div>'
-          : '<div style="font-size:14px;font-weight:900;color:' + numColor + ';">' + display + '</div>') +
+        '<div style="font-size:14px;font-weight:900;color:' + (locked ? (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') : numColor) + ';' + (locked ? 'filter:blur(7px);user-select:none;cursor:pointer;' : '') + '" ' + (locked ? 'onclick="triggerPlanPaywall()" title="Unlock to reveal"' : '') + '>' + (locked ? fm(val !== null && val > 0 ? val : 97500) : display) + '</div>' +
         '</div>';
     }
     var wa2=discDims.walkaway||0, rt2=discDims.risk_tol||0;
@@ -4508,10 +4538,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
           '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
           'Unlock →</span>' +
         '</div>' +
-        '<div style="display:flex;align-items:baseline;gap:2px;margin-bottom:6px;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
-        '<span style="font-size:' + (compact?'16px':'20px') + ';font-weight:900;color:#F5CF56;">$</span>' +
-        '<span style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;filter:blur(8px);user-select:none;">' + fm(v.room_low).replace('$','') + ' \u2013 ' + fm(v.room_high).replace('$','') + '</span>' +
-        '</div>' +
+        '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;margin-bottom:6px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
         '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
 
