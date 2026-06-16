@@ -4568,8 +4568,8 @@ function offerVerdictCardHtml(compact, showNumbers) {
     var how = (wa2>=70&&rt2>=65)?'Push hard \u2014 leverage and intent align':(wa2>=60&&rt2>=40)?'Counter carefully \u2014 solid position, measured approach':(wa2<40&&rt2>=65)?'Bold play \u2014 execute it perfectly, no slack in the framing':(wa2>=60&&rt2<40)?'Play it safe \u2014 you have leverage but want low friction':'';
     var icon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,207,86,0.9)" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
 
-    if (!showNumbers) {
-      // Pre-intake: dashes everywhere
+    if (!showNumbers && !isPaid) {
+      // Free user pre-unlock: blurred numbers
       inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
         '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">Your negotiation room</div>' +
         '<span onclick="triggerPlanPaywall()" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(245,207,86,0.85);">' +
