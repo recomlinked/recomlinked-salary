@@ -139,16 +139,19 @@ module.exports = async function handler(req, res) {
   // ── Idempotency: reject duplicate Stripe events ──────────────────
   const eventKey = 'stripe_event:' + event.id;
   try {
-    const already = await kv.get(eventKey);
+    const already = await redis.get(eventKey);
     if (already) {
       console.log('[raise-webhook] duplicate event ignored:', event.id);
       return res.status(200).json({ received: true, duplicate: true });
     }
-    await kv.set(eventKey, '1', { ex: 86400 }); // expire after 24h
+    await redis.set(eventKey, '1', { ex: 86400 }); // expire after 24h
   } catch(e) {
     console.warn('[raise-webhook] idempotency check failed:', e.message);
     // Continue processing — better to risk a duplicate than miss a payment
   }
+
+  // ── Respond to Stripe immediately (prevents retries from timeout) ──
+  res.status(200).json({ received: true });
 
   const session = event.data.object;
   const meta    = session.metadata || {};
@@ -156,7 +159,7 @@ module.exports = async function handler(req, res) {
   // CRITICAL: only process raise/offer product events — ignore FA events silently
   const product = meta.product || 'raise';
   if (product !== 'raise' && product !== 'offer') {
-    return res.status(200).json({ received: true, ignored_product: product });
+    return; // already responded
   }
 
   const email        = normalizeEmail(session.customer_email || session.customer_details?.email);
@@ -166,11 +169,11 @@ module.exports = async function handler(req, res) {
 
   if (!email) {
     console.error('[raise-webhook] no email in session', session.id);
-    return res.status(200).json({ received: true, error: 'no_email' });
+    return; // already responded
   }
   if (!profileHash) {
     console.error('[raise-webhook] no profile_hash in metadata', session.id);
-    return res.status(200).json({ received: true, error: 'no_profile_hash' });
+    return; // already responded
   }
 
   // Plan is generated on-demand via disc_insights — not pre-computed
@@ -398,5 +401,5 @@ Co-founder, Recomlinked`;
     } catch(e) { console.error('[raise-webhook] kit gen error:', e.message); }
   }
 
-  return res.status(200).json({ received: true, processed: true });
+  // Response already sent above
 };
