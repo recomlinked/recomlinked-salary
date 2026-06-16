@@ -4050,12 +4050,22 @@ function initDiscoveryMode(container) {
       if (!_hasFullPlan) {
         discStrategyDone = true;
         discPlanLoading = true;
+        discNumbersReady = true; // Numbers are ready — verdict card computes from restored discDims
         // Mark strategy blocks as unfilled so they show loading state
         var _stratKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
         _stratKeys.forEach(function(k) { if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; } });
-        // Render canvas with loading state immediately
+        // Render canvas with loading state + numbers visible
         var _lc = $('disc-canvas-live');
         if (_lc) setCanvasHTML(_lc);
+        // Fix 2: Show patience message — full kit takes ~2 minutes
+        var _waitMsg = el('div', 'coach-msg', '');
+        _waitMsg.innerHTML = '<div class="bubble" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);">' +
+          '<p style="font-size:12.5px;color:var(--t2);line-height:1.6;margin:0;">' +
+          '<strong style="color:var(--gold);">Building your full Counter Kit…</strong><br>' +
+          'Your counter email, pushback playbook, phone opener, and sequencing plan are being written from your specific offer. ' +
+          'This takes up to 2 minutes — please stay on the page until it’s done.</p></div>';
+        var _chatArea = $('disc-chat');
+        if (_chatArea) _chatArea.appendChild(_waitMsg);
 
         var _bc2 = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'other';
         var _ans2 = {};
