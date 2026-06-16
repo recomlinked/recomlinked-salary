@@ -5045,6 +5045,22 @@ async function generateDiscInsights() {
         var kitData = await kitResp.json();
         if (kitData && kitData.kit) {
           try {
+            // Restore offer context from Redis so verdict card numbers compute correctly
+            if (kitData.offer_ctx) {
+              var rCtx = kitData.offer_ctx;
+              // Restore to SIM_STATE.context
+              ['role','base','city','employment','competing','risk','worktype','experience',
+               'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+                if (rCtx[k] !== undefined) SIM_STATE.context[k] = rCtx[k];
+              });
+              // Restore dims for verdict card scoring
+              if (rCtx.dims) discDims = Object.assign(discDims, rCtx.dims);
+              if (rCtx.levers) discLevers = rCtx.levers;
+              if (rCtx.weaks) discWeaks = rCtx.weaks;
+              // Save to state.discovery.answers for fallback
+              if (!state.discovery) state.discovery = {};
+              state.discovery.answers = rCtx.answers || rCtx;
+            }
             var kitJson = JSON.parse(kitData.kit);
             Object.keys(kitJson).forEach(function(k) {
               if (discCanvasBlocks[k] !== undefined) {
