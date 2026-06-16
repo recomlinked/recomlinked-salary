@@ -5406,12 +5406,11 @@ async function generateDiscInsights() {
           var _kitToStore = {};
           var _kitKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
           _kitKeys.forEach(function(k) { if (discCanvasBlocks[k] && discCanvasBlocks[k].insight) _kitToStore[k] = discCanvasBlocks[k].insight; });
-          fetch('/api/raise-coach', {
+          fetch('/api/offer-kit-save', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              mode: 'disc_insights', product: 'offer', part: 'store_kit',
-              _store_for: state.paid_token,
-              _kit_json: JSON.stringify(_kitToStore),
+              token: state.paid_token,
+              kit: JSON.stringify(_kitToStore),
               offer_ctx: buildOfferCtx(),
             }),
           }).catch(function() {}); // fire and forget
