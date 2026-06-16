@@ -5400,6 +5400,23 @@ async function generateDiscInsights() {
       }
       // Save after both calls complete with full content
       try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; state.discovery.insights = discInsights; saveState(); } catch(e) {}
+      // Store generated kit in Redis so future visits load instantly (no re-generation)
+      if (state.paid && state.paid_token) {
+        try {
+          var _kitToStore = {};
+          var _kitKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+          _kitKeys.forEach(function(k) { if (discCanvasBlocks[k] && discCanvasBlocks[k].insight) _kitToStore[k] = discCanvasBlocks[k].insight; });
+          fetch('/api/raise-coach', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mode: 'disc_insights', product: 'offer', part: 'store_kit',
+              _store_for: state.paid_token,
+              _kit_json: JSON.stringify(_kitToStore),
+              offer_ctx: buildOfferCtx(),
+            }),
+          }).catch(function() {}); // fire and forget
+        } catch(e) {}
+      }
       // Replace patience message with success message
       if (state.paid) {
         var _discChat = $('disc-chat');
