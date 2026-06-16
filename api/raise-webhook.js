@@ -88,7 +88,7 @@ module.exports = async function handler(req, res) {
       );
       const isRaiseAllowed = !isOffer && RAISE_ALLOW.has(stage);
 
-      console.log('[session-log] product=' + product + ' stage=' + stage + ' allowed=' + (isOfferAllowed || isRaiseAllowed));
+      console.log('[session-log] product=' + product + ' stage=' + stage + ' sid=' + (peek.session_id||'?') + ' allowed=' + (isOfferAllowed || isRaiseAllowed));
 
       if (isOfferAllowed || isRaiseAllowed) {
         let body = rawBody.toString();
@@ -107,7 +107,8 @@ module.exports = async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body,
           });
-          console.log('[session-log] GAS response:', gasResp.status);
+          const gasBody = await gasResp.text();
+          console.log('[session-log] GAS response:', gasResp.status, gasBody.slice(0,200));
         }
       }
       return res.status(200).json({ ok: true });
@@ -133,6 +134,20 @@ module.exports = async function handler(req, res) {
   // Acknowledge everything we don't care about
   if (event.type !== 'checkout.session.completed') {
     return res.status(200).json({ received: true, ignored_type: event.type });
+  }
+
+  // ── Idempotency: reject duplicate Stripe events ──────────────────
+  const eventKey = 'stripe_event:' + event.id;
+  try {
+    const already = await kv.get(eventKey);
+    if (already) {
+      console.log('[raise-webhook] duplicate event ignored:', event.id);
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+    await kv.set(eventKey, '1', { ex: 86400 }); // expire after 24h
+  } catch(e) {
+    console.warn('[raise-webhook] idempotency check failed:', e.message);
+    // Continue processing — better to risk a duplicate than miss a payment
   }
 
   const session = event.data.object;
