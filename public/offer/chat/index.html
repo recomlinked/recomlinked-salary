@@ -4044,6 +4044,8 @@ function initDiscoveryMode(container) {
 
   // Paid user with no saved discovery — fetch kit+context from Redis, skip re-intake
   if (state.paid && discStep === 0 && state.paid_token) {
+    stopThinkingAnimation();
+    showToolbar(); showModeToggle(); unlockModeToggle();
     var _paidNoDisc = el('div', 'coach-msg', '');
     _paidNoDisc.innerHTML = '<div class="bubble"><p>Loading your Counter Kit…</p></div>';
     chatArea.appendChild(_paidNoDisc);
@@ -4077,18 +4079,15 @@ function initDiscoveryMode(container) {
           discPlanLoading = false;
           _paidNoDisc.remove();
           insertDiscRadar();
-          var sc = el('div','coach-msg','');
-          sc.innerHTML = '<div class="bubble"><p>Your complete <strong>Counter Kit</strong> is ready. All sections are unlocked.</p></div>';
-          chatArea.appendChild(sc);
-          var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+          insertDiscRadar();
           showToolbar(); showModeToggle(); unlockModeToggle();
         } else {
-          // Kit not ready yet — ask user to re-complete intake
+          // Kit not in Redis yet — show patience message and re-ask intake (no charge)
           _paidNoDisc.remove();
           var msg = el('div','coach-msg','');
-          msg.innerHTML = '<div class="bubble"><p>Your kit is still being generated. Please answer the intake questions again — you won’t be charged again, and the full kit will unlock immediately.</p></div>';
+          msg.innerHTML = '<div class="bubble"><p>⚠️ Your kit link has expired or is being generated. To rebuild your Counter Kit, answer the questions again — you won’t be charged again and the full kit unlocks immediately at the end.</p></div>';
           chatArea.appendChild(msg);
-          renderDiscQuestion(0, chatArea);
+          setTimeout(function() { renderDiscQuestion(0, chatArea); }, 2000);
         }
       })
       .catch(function() { _paidNoDisc.remove(); renderDiscQuestion(0, chatArea); });
@@ -4117,17 +4116,32 @@ function initDiscoveryMode(container) {
     insertDiscRadar();
 
     if (state.paid) {
+      stopThinkingAnimation();
       // Numbers are always ready for paid users — verdict card computes from restored discDims
       discNumbersReady = true;
 
       // Paid user: show success message, no paywall
-      var successBubble = el('div', 'coach-msg', '');
-      successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Counter Kit</strong> is ready. All sections are unlocked \u2014 your ask stack, counter email, phone opener, pushback playbook, and sequencing plan. Download the full PDF anytime.</p></div>';
-      chatArea.appendChild(successBubble);
-
-      // Generate or restore full kit
       discNumbersReady = true;
+      // Mark all strategy blocks as loading (not filled) until strategy API responds
+      var _stratLoadKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+      _stratLoadKeys.forEach(function(k) {
+        if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; }
+      });
+      discPlanLoading = true;
+      var _lcPre = $('disc-canvas-live'); if (_lcPre) setCanvasHTML(_lcPre);
+      // Patience message — shown while strategy generates
+      var _genMsg = el('div', 'coach-msg kit-generating-msg', '');
+      _genMsg.innerHTML = '<div class="bubble" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);padding:12px 14px;">' +
+        '<p style="font-size:13px;color:var(--t2);line-height:1.65;margin:0;">' +
+        '<strong style="color:var(--gold);">Building your Counter Kit…</strong><br>' +
+        'Your counter email, pushback responses, phone opener, and sequencing plan are being written from your specific offer. ' +
+        'This takes about 60–90 seconds — please stay on the page.</p></div>';
+      var _gchat = $('disc-chat'); if (_gchat) _gchat.appendChild(_genMsg);
+      // Remove any stale loading indicator
+      var _staleLoad = $('disc-loading');
+      if (_staleLoad) { try{if(_staleLoad._arcStop)_staleLoad._arcStop();}catch(e){} _staleLoad.remove(); }
       generateDiscInsights();
+      // Note: generateDiscInsights shows patience message and updates canvas when done
     } else {
       showDiscPaywall();
     }
@@ -5363,6 +5377,19 @@ async function generateDiscInsights() {
       }
       // Save after both calls complete with full content
       try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; state.discovery.insights = discInsights; saveState(); } catch(e) {}
+      // Replace patience message with success message
+      if (state.paid) {
+        var _discChat = $('disc-chat');
+        if (_discChat) {
+          var _genMsgEl = _discChat.querySelector('.kit-generating-msg');
+          if (_genMsgEl) _genMsgEl.remove();
+          if (!_discChat.querySelector('.kit-ready-msg')) {
+            var _kitMsg = el('div', 'coach-msg kit-ready-msg', '');
+            _kitMsg.innerHTML = '<div class="bubble"><p>✅ Your <strong>Counter Kit</strong> is ready — all sections are unlocked.</p></div>';
+            _discChat.appendChild(_kitMsg);
+          }
+        }
+      }
 
     } else {
       // Free users: hooks only
@@ -5703,6 +5730,7 @@ function triggerPlanPaywall() {
 // ── Start simulation at the specific blocker moment ──
 async function startSimulationAtBlocker() {
   const blocker = SIM_STATE.blocker;
+  stopThinkingAnimation();
 
   // Show toolbar + mode toggle
   showToolbar();
