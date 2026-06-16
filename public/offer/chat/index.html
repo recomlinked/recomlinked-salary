@@ -1201,7 +1201,7 @@ function loadState() {
     const raw = localStorage.getItem(LS_STATE);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    console.log('[loadState] stage:', parsed.current_exchange, 'chat_log:', parsed.chat_log?.length, 'paywall_shown:', parsed.paywall_shown);
+    console.log('[loadState] stage:', parsed.current_exchange, 'chat_log:', parsed.chat_log?.length, 'paywall_shown:', parsed.paywall_shown, 'discovery.step:', parsed.discovery?.step, 'paid:', parsed.paid);
     return parsed;
   } catch (e) { return null; }
 }
@@ -6972,6 +6972,7 @@ async function init() {
       // which calls initDiscoveryMode(), restores the canvas, and fires
       // Phase 2 (full strategy API) because state.paid = true.
       var _savedDiscStep = (state.discovery && state.discovery.step) ? parseInt(state.discovery.step) : 0;
+      console.log('[init] paid=true, _savedDiscStep:', _savedDiscStep, 'discovery:', JSON.stringify(state.discovery || null).slice(0,80));
       if (_savedDiscStep > 0) {
         // Restore discovery canvas for paid user
         await beginSimulationFlow('other');
@@ -6995,14 +6996,18 @@ async function init() {
     }
 
     try { localStorage.removeItem(LS_STATE); } catch (e) {}
-    // Re-write paid status so it survives the state clear
-    if (state.paid) {
-      try {
-        var _ps = { paid: true };
-        if (state.paid_token) _ps.paid_token = state.paid_token;
-        localStorage.setItem(LS_STATE, JSON.stringify(_ps));
-      } catch(e) {}
-    }
+    // Re-write paid status AND discovery so both survive the state clear
+    try {
+      var _ps = {};
+      if (state.paid) { _ps.paid = true; if (state.paid_token) _ps.paid_token = state.paid_token; }
+      // Always preserve discovery — needed for paid restore on return from Stripe
+      var _discSaved = state.discovery || null;
+      if (!_discSaved) {
+        try { _discSaved = JSON.parse(localStorage.getItem('rl_offer_discovery_backup') || 'null'); } catch(e) {}
+      }
+      if (_discSaved && _discSaved.step > 0) _ps.discovery = _discSaved;
+      if (Object.keys(_ps).length) localStorage.setItem(LS_STATE, JSON.stringify(_ps));
+    } catch(e) {}
     if (forceReset) {
     }
     stopThinkingAnimation();
