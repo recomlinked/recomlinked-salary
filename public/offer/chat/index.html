@@ -4900,6 +4900,11 @@ function pickDiscAnswer(qIdx, opt, pill) {
 // ═══════════════════════════════════════════════════════════
 function computeOfferVerdict() {
   var ctx = SIM_STATE.context || {};
+  // Fallback: use saved discovery answers if SIM_STATE.context is empty (paid restore path)
+  if (!ctx.base && state && state.discovery && state.discovery.answers) {
+    var ans = state.discovery.answers;
+    Object.keys(ans).forEach(function(k) { if (!ctx[k]) ctx[k] = ans[k]; });
+  }
   var base = parseInt(String(ctx.base || '').replace(/[^\d]/g, ''), 10) || 0;
   if (!base || base < 1000) return null;
   var lo = 0.06, hi = 0.10;
