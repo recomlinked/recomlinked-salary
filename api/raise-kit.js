@@ -1,4 +1,3 @@
-// Fetch pre-generated Counter Kit for a paid user
 const { Redis } = require('@upstash/redis');
 const redis = new Redis({
   url: process.env.KV_REST_API_URL,
@@ -14,11 +13,22 @@ module.exports = async function handler(req, res) {
       redis.get(`offer:kit:${token}`),
       redis.get(`offer:ctx:${token}`),
     ]);
-    if (!kit) return res.status(404).json({ ready: false });
-    return res.status(200).json({
+
+    // No kit AND no ctx → old token, nothing in Redis
+    if (!kit && !ctx) return res.status(404).json({ ready: false });
+
+    // Kit ready → return both
+    if (kit) return res.status(200).json({
       ready: true,
       kit,
-      offer_ctx: ctx ? JSON.parse(ctx) : null,
+      offer_ctx: ctx ? (typeof ctx === 'string' ? JSON.parse(ctx) : ctx) : null,
+    });
+
+    // Ctx exists but kit still generating → return ctx so client can generate with correct data
+    return res.status(200).json({
+      ready: false,
+      kit: null,
+      offer_ctx: typeof ctx === 'string' ? JSON.parse(ctx) : ctx,
     });
   } catch(e) {
     return res.status(500).json({ error: e.message });
