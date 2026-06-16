@@ -366,6 +366,13 @@ Co-founder, Recomlinked`;
     console.error('[raise-webhook] email send error:', emailErr.message || emailErr);
   }
 
+  // ── Store offer context immediately so it's available on return (offer product only) ──
+  if (product === 'offer' && user && user.offer_context && accessToken) {
+    try {
+      await redis.set(`offer:ctx:${accessToken}`, JSON.stringify(user.offer_context), { ex: 86400 * 30 });
+    } catch(e) { console.warn('[raise-webhook] offer:ctx store failed:', e.message); }
+  }
+
   // ── Generate full Counter Kit on payment (offer product only) ──
   // Stores results in Redis so they're ready when user lands on paid page.
   // This avoids any loading spinner after payment.
