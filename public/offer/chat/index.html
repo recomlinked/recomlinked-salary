@@ -4553,7 +4553,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
   var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
   var RISK_LABELS = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
   var inner;
-  if (v && v.room_low && showNumbers) {
+  if (v && v.room_low && (showNumbers || isPaid)) {
     var rk = v.risk || 'balanced';
     var recTier = rk === 'safe' ? 'safe' : rk === 'ambitious' ? 'ambitious' : 'moderate';
     function tier(name, val, isRec, locked) {
