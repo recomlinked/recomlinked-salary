@@ -1163,12 +1163,9 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
     userMessage = `User's position:\n${answeredDims}\n\nGenerate the 5 position insights.`;
     maxTokens   = 800;
 
-  } else {
-    return res.status(400).json({ error: `Unknown part: ${part}` });
-  }
-
-  // Client-side kit storage: part=store_kit sends pre-generated kit JSON to Redis
-  if (part === 'store_kit' && storeFor && redis && body._kit_json) {
+  } else if (part === 'store_kit') {
+    // Client-side kit storage: pre-generated kit JSON → Redis (no Claude API call)
+    if (!storeFor || !body._kit_json) return res.status(400).json({ error: 'store_kit requires _store_for and _kit_json' });
     try {
       await Promise.all([
         redis.set(`offer:kit:${storeFor}`, body._kit_json, { ex: 86400 * 30 }),
@@ -1178,7 +1175,10 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
     } catch(e) {
       return res.status(500).json({ error: 'store failed' });
     }
+  } else {
+    return res.status(400).json({ error: `Unknown part: ${part}` });
   }
+
 
   // If _store_for present, generate and store for paid user (webhook path)
   if (storeFor && redis) {
