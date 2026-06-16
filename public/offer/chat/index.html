@@ -4077,8 +4077,8 @@ function initDiscoveryMode(container) {
           discStep = 15;
           discNumbersReady = true;
           discPlanLoading = false;
+          window._offerKitLoadedFromRedis = true;
           _paidNoDisc.remove();
-          insertDiscRadar();
           insertDiscRadar();
           showToolbar(); showModeToggle(); unlockModeToggle();
         } else {
@@ -4122,6 +4122,12 @@ function initDiscoveryMode(container) {
 
       // Paid user: show success message, no paywall
       discNumbersReady = true;
+      // If kit was already loaded from Redis (paid_no_disc path), skip re-generation
+      if (window._offerKitLoadedFromRedis) {
+        window._offerKitLoadedFromRedis = false;
+        var _lcSkip = $('disc-canvas-live'); if (_lcSkip) setCanvasHTML(_lcSkip);
+        return;
+      }
       // Mark all strategy blocks as loading (not filled) until strategy API responds
       var _stratLoadKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
       _stratLoadKeys.forEach(function(k) {
