@@ -5157,8 +5157,13 @@ async function generateDiscInsights() {
     if (kit) kit.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 300);
 
-  // ── PHASE 1: Teaser hooks (runs for everyone) ───────────
-  // Fast call — 1 sentence per section, creates desire to unlock
+  // ── PHASE 1: Teaser hooks (free users only — paid users skip straight to Phase 2) ──
+  if (state && state.paid) {
+    // Paid users: skip hooks, go straight to Phase 2 strategy
+    discPlanLoading = true;
+    var lc0p = $('disc-canvas-live'); if (lc0p) setCanvasHTML(lc0p);
+  } else {
+  // Free users: hooks teaser
   discPlanLoading = true;
   var lc0 = $('disc-canvas-live'); if (lc0) setCanvasHTML(lc0); // show loading state
   var isOfferProduct = true; // always offer in this flow
@@ -5227,6 +5232,8 @@ async function generateDiscInsights() {
       }, 5000);
     }
   }
+
+  } // end free-user Phase 1
 
   // ── PHASE 2: Full kit (runs on payment, triggered by webhook) ─
   // Free users stop here — the teaser hooks are their preview.
