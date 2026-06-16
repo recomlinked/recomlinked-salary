@@ -6906,6 +6906,11 @@ function goBack() {
 async function init() {
   // If Stripe redirect verification is in progress, halt — IIFE will redirect when done
   if (sessionStorage.getItem('rl_verifying_payment')) {
+    // Remove drop handler so navigation to clean URL doesn't log a false offer_dropped
+    if (window._offerDropHandler) {
+      window.removeEventListener('beforeunload', window._offerDropHandler);
+      window._offerDropHandler = null;
+    }
     var _vMsg = document.getElementById('messages') || document.getElementById('disc-chat');
     if (_vMsg) _vMsg.innerHTML = '<div class="coach-msg"><div class="bubble"><p>Confirming your payment… you’ll be redirected in a moment.</p></div></div>';
     return;
