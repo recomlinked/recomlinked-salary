@@ -4052,7 +4052,7 @@ function initDiscoveryMode(container) {
     fetch('/api/raise-kit?token=' + encodeURIComponent(state.paid_token))
       .then(function(r) { return r.json(); })
       .then(function(kitData) {
-        if (kitData && kitData.kit && kitData.offer_ctx) {
+        if (kitData && kitData.ready && kitData.kit) {
           // Restore context from Redis
           var rCtx = kitData.offer_ctx;
           ['role','base','city','employment','competing','risk','worktype','experience',
@@ -4081,13 +4081,32 @@ function initDiscoveryMode(container) {
           _paidNoDisc.remove();
           insertDiscRadar();
           showToolbar(); showModeToggle(); unlockModeToggle();
+        } else if (kitData && kitData.offer_ctx) {
+          // Kit still generating but context is available — restore context and fire Phase 2
+          var rCtx2 = kitData.offer_ctx;
+          ['role','base','city','employment','competing','risk','worktype','experience',
+           'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+            if (rCtx2[k] !== undefined) SIM_STATE.context[k] = rCtx2[k];
+          });
+          if (rCtx2.dims) { discDims = Object.assign(discDims, rCtx2.dims); discActive = Object.assign(discActive, rCtx2.dims); }
+          if (rCtx2.levers) discLevers = rCtx2.levers;
+          if (rCtx2.weaks) discWeaks = rCtx2.weaks;
+          if (!state.discovery) state.discovery = {};
+          state.discovery.answers = rCtx2.answers || rCtx2;
+          state.discovery.step = 15;
+          discStep = 15;
+          discNumbersReady = true;
+          _paidNoDisc.remove();
+          insertDiscRadar();
+          showToolbar(); showModeToggle(); unlockModeToggle();
+          generateDiscInsights(); // context restored, Phase 2 will fire
         } else {
-          // Kit not in Redis yet — show patience message and re-ask intake (no charge)
+          // Nothing in Redis (old token) — fresh intake, no charge
           _paidNoDisc.remove();
           var msg = el('div','coach-msg','');
-          msg.innerHTML = '<div class="bubble"><p>⚠️ Your kit link has expired or is being generated. To rebuild your Counter Kit, answer the questions again — you won’t be charged again and the full kit unlocks immediately at the end.</p></div>';
+          msg.innerHTML = '<div class="bubble"><p>Please answer the intake questions again — you won’t be charged again and the full kit will unlock immediately.</p></div>';
           chatArea.appendChild(msg);
-          setTimeout(function() { renderDiscQuestion(0, chatArea); }, 2000);
+          setTimeout(function() { renderDiscQuestion(0, chatArea); }, 1500);
         }
       })
       .catch(function() { _paidNoDisc.remove(); renderDiscQuestion(0, chatArea); });
@@ -5097,8 +5116,6 @@ async function generateDiscInsights() {
               if (!state.discovery) state.discovery = {};
               state.discovery.answers = rCtx.answers || rCtx;
             }
-            var kitJson = JSON.parse(kitData.kit);
-            // Quality check: full kit sections should be >200 chars each
             // If kit is ready and full quality — use it directly
             if (kitData.ready && kitData.kit) {
               var kitJson2 = JSON.parse(kitData.kit);
@@ -7047,13 +7064,10 @@ async function init() {
       var _discFromStorage = null;
       try { var _raw = localStorage.getItem('rl_raise_state'); if (_raw) { var _p = JSON.parse(_raw); _discFromStorage = _p.discovery || null; } } catch(e) {}
       var _savedDiscStep = (_discFromStorage && _discFromStorage.step) ? parseInt(_discFromStorage.step) : 0;
-      if (_savedDiscStep > 0) {
-        // Restore discovery into state now so initDiscoveryMode can use it
-        state.discovery = _discFromStorage;
-      }
       console.log('[init] paid=true, _savedDiscStep:', _savedDiscStep, 'discovery.step:', _discFromStorage && _discFromStorage.step);
       if (_savedDiscStep > 0) {
-        // Restore discovery canvas for paid user
+        // Restore discovery into state then resume canvas
+        state.discovery = _discFromStorage;
         await beginSimulationFlow('other');
         return;
       }
