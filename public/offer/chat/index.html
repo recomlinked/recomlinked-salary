@@ -4125,71 +4125,9 @@ function initDiscoveryMode(container) {
       successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Counter Kit</strong> is ready. All sections are unlocked \u2014 your ask stack, counter email, phone opener, pushback playbook, and sequencing plan. Download the full PDF anytime.</p></div>';
       chatArea.appendChild(successBubble);
 
-      // Check if we only have hooks (short content) — re-fire strategy immediately
-      var _hasFullPlan = discCanvasBlocks.opening_script && discCanvasBlocks.opening_script.filled &&
-                         (discCanvasBlocks.opening_script.insight || '').length > 200;
-      if (!_hasFullPlan) {
-        discStrategyDone = true;
-        discPlanLoading = true;
-        // Mark strategy blocks as unfilled so they show loading state
-        var _stratKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
-        _stratKeys.forEach(function(k) { if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; } });
-        // Render canvas with loading state + numbers visible
-        var _lc = $('disc-canvas-live');
-        if (_lc) setCanvasHTML(_lc);
-        // Fix 2: Show patience message — full kit takes ~2 minutes
-        var _waitMsg = el('div', 'coach-msg', '');
-        _waitMsg.innerHTML = '<div class="bubble" style="background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);">' +
-          '<p style="font-size:12.5px;color:var(--t2);line-height:1.6;margin:0;">' +
-          '<strong style="color:var(--gold);">Building your full Counter Kit…</strong><br>' +
-          'Your counter email, pushback playbook, phone opener, and sequencing plan are being written from your specific offer. ' +
-          'This takes up to 2 minutes — please stay on the page until it’s done.</p></div>';
-        var _chatArea = $('disc-chat');
-        if (_chatArea) _chatArea.appendChild(_waitMsg);
-
-        var _bc2 = SIM_STATE.context && SIM_STATE.context.blocker_code || (state.blocker && state.blocker.code) || 'other';
-        var _ans2 = {};
-        if (discOrderedQuestions && discOrderedQuestions.length > 0) {
-          discOrderedQuestions.slice(0, 16).forEach(function(q) { if (q.dimTag) _ans2[q.dimTag] = SIM_STATE.context[q.id] || ''; });
-        }
-        var _base = { mode: 'disc_insights', product: 'offer', offer_ctx: buildOfferCtx(), blocker: _bc2, answers: _ans2, dims: discDims, levers: discLevers, weaks: discWeaks };
-        var _posKeys = ['evidence','timing','manager','company','market'];
-        var _done = 0;
-
-        function _applyAndRender(data) {
-          if (!data || !data.insights) return;
-          Object.keys(data.insights).forEach(function(dim) {
-            if (discCanvasBlocks[dim] !== undefined) {
-              discCanvasBlocks[dim].insight = data.insights[dim];
-              discCanvasBlocks[dim].filled  = true;
-              discCanvasBlocks[dim].teaser  = false;
-              if (_posKeys.indexOf(dim) >= 0) {
-                var sc = discDims && discDims[dim] ? discDims[dim] : 50;
-                discCanvasBlocks[dim].strength = sc >= 60 ? 'strong' : sc < 40 ? 'weak' : 'neutral';
-              }
-            }
-          });
-          _done++;
-          // Only clear loading after BOTH calls complete
-          if (_done >= 2) discPlanLoading = false;
-          var lc2 = $('disc-canvas-live');
-          if (lc2) {
-            setCanvasHTML(lc2);
-            if (_done >= 2) {
-              lc2.querySelectorAll('[data-expanded="0"][onclick*="togglePosBlock"]').forEach(function(el) {
-                var m = el.getAttribute('onclick').match(/togglePosBlock\(this,'(\w+)'\)/);
-                if (m) togglePosBlock(el, m[1]);
-              });
-              try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; saveState(); } catch(e) {}
-            }
-          }
-        }
-
-        fetch('/api/raise-coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({}, _base, { part: 'strategy_position' })) })
-          .then(function(r) { return r.json(); }).then(_applyAndRender).catch(function() { _done++; });
-        fetch('/api/raise-coach', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.assign({}, _base, { part: 'strategy_plan' })) })
-          .then(function(r) { return r.json(); }).then(_applyAndRender).catch(function() { _done++; });
-      }
+      // Generate or restore full kit
+      discNumbersReady = true;
+      generateDiscInsights();
     } else {
       showDiscPaywall();
     }
@@ -5140,17 +5078,20 @@ async function generateDiscInsights() {
               state.discovery.answers = rCtx.answers || rCtx;
             }
             var kitJson = JSON.parse(kitData.kit);
+            // Quality check: full kit sections should be >200 chars each
+            var _isFullKit = kitJson.opening_script && (kitJson.opening_script || '').length > 200;
             Object.keys(kitJson).forEach(function(k) {
               if (discCanvasBlocks[k] !== undefined) {
                 discCanvasBlocks[k].insight = kitJson[k];
-                discCanvasBlocks[k].filled = true;
+                discCanvasBlocks[k].filled = _isFullKit;
                 discCanvasBlocks[k].teaser = false; // paid — always unlocked
               }
             });
             discNumbersReady = true; // Numbers ready — paid kit loaded from Redis
             discPlanLoading = false;
             var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-            return; // Kit loaded from storage — skip live generation
+            if (_isFullKit) return; // Full kit loaded — skip live generation
+            // Kit has hooks only — fall through to Phase 2 strategy generation
           } catch(e) {}
         }
       }
@@ -7036,8 +6977,15 @@ async function init() {
       // For the offer product, we route back through beginSimulationFlow
       // which calls initDiscoveryMode(), restores the canvas, and fires
       // Phase 2 (full strategy API) because state.paid = true.
-      var _savedDiscStep = (state.discovery && state.discovery.step) ? parseInt(state.discovery.step) : 0;
-      console.log('[init] paid=true, _savedDiscStep:', _savedDiscStep, 'discovery:', JSON.stringify(state.discovery || null).slice(0,80));
+      // Read discovery directly from localStorage — state.discovery not yet populated at this point in init()
+      var _discFromStorage = null;
+      try { var _raw = localStorage.getItem('rl_raise_state'); if (_raw) { var _p = JSON.parse(_raw); _discFromStorage = _p.discovery || null; } } catch(e) {}
+      var _savedDiscStep = (_discFromStorage && _discFromStorage.step) ? parseInt(_discFromStorage.step) : 0;
+      if (_savedDiscStep > 0) {
+        // Restore discovery into state now so initDiscoveryMode can use it
+        state.discovery = _discFromStorage;
+      }
+      console.log('[init] paid=true, _savedDiscStep:', _savedDiscStep, 'discovery.step:', _discFromStorage && _discFromStorage.step);
       if (_savedDiscStep > 0) {
         // Restore discovery canvas for paid user
         await beginSimulationFlow('other');
