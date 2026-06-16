@@ -4039,6 +4039,9 @@ function initDiscoveryMode(container) {
     insertDiscRadar();
 
     if (state.paid) {
+      // Numbers are always ready for paid users — verdict card computes from restored discDims
+      discNumbersReady = true;
+
       // Paid user: show success message, no paywall
       var successBubble = el('div', 'coach-msg', '');
       successBubble.innerHTML = '<div class="bubble"><p>Your complete <strong>Counter Kit</strong> is ready. All sections are unlocked \u2014 your ask stack, counter email, phone opener, pushback playbook, and sequencing plan. Download the full PDF anytime.</p></div>';
@@ -4050,7 +4053,6 @@ function initDiscoveryMode(container) {
       if (!_hasFullPlan) {
         discStrategyDone = true;
         discPlanLoading = true;
-        discNumbersReady = true; // Numbers are ready — verdict card computes from restored discDims
         // Mark strategy blocks as unfilled so they show loading state
         var _stratKeys = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
         _stratKeys.forEach(function(k) { if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; } });
@@ -5046,6 +5048,7 @@ async function generateDiscInsights() {
                 discCanvasBlocks[k].teaser = false; // paid — always unlocked
               }
             });
+            discNumbersReady = true; // Numbers ready — paid kit loaded from Redis
             discPlanLoading = false;
             var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
             return; // Kit loaded from storage — skip live generation
