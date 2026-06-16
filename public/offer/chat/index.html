@@ -820,19 +820,37 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
     var params = new URLSearchParams(location.search);
     var sid = params.get('session_id');
     if (!sid) return;
+    // CRITICAL: save discovery state NOW before init() clears localStorage
+    try {
+      var _existingState = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
+      if (_existingState.discovery) {
+        localStorage.setItem('rl_offer_discovery_backup', JSON.stringify(_existingState.discovery));
+      }
+    } catch(e) {}
+    // Signal to init() that we're in verification — don't clear state
+    sessionStorage.setItem('rl_verifying_payment', '1');
     fetch('/api/raise-verify?session_id=' + encodeURIComponent(sid))
       .then(function(r) { return r.json(); })
       .then(function(d) {
         if (d && d.access_token) {
           localStorage.setItem('rl_raise_access_token', d.access_token);
+          // Restore discovery state that init() may have cleared
+          var backup = null;
+          try { backup = JSON.parse(localStorage.getItem('rl_offer_discovery_backup') || 'null'); } catch(e) {}
           var s = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
           s.paid = true;
           s.paid_token = d.access_token;
+          if (backup && !s.discovery) s.discovery = backup;
           localStorage.setItem('rl_raise_state', JSON.stringify(s));
+          localStorage.removeItem('rl_offer_discovery_backup');
         }
+        sessionStorage.removeItem('rl_verifying_payment');
         location.replace('/offer/chat/');
       })
-      .catch(function() { location.replace('/offer/chat/'); });
+      .catch(function() {
+        sessionStorage.removeItem('rl_verifying_payment');
+        location.replace('/offer/chat/');
+      });
   } catch(e) {}
 })();
 </script>
@@ -6886,6 +6904,12 @@ function goBack() {
 // reachable after the paywall has been shown, even as the user scrolls.
 
 async function init() {
+  // If Stripe redirect verification is in progress, halt — IIFE will redirect when done
+  if (sessionStorage.getItem('rl_verifying_payment')) {
+    var _vMsg = document.getElementById('messages') || document.getElementById('disc-chat');
+    if (_vMsg) _vMsg.innerHTML = '<div class="coach-msg"><div class="bubble"><p>Confirming your payment… you’ll be redirected in a moment.</p></div></div>';
+    return;
+  }
   // ── Restore paid status immediately — before ANY state clearing ──────────
   try {
     const _early = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
