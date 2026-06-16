@@ -832,17 +832,24 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
     fetch('/api/raise-verify?session_id=' + encodeURIComponent(sid))
       .then(function(r) { return r.json(); })
       .then(function(d) {
-        if (d && d.access_token) {
-          localStorage.setItem('rl_raise_access_token', d.access_token);
-          // Restore discovery state that init() may have cleared
+        // raise-verify returns {valid, profile: {access_token, ...}, plan, days_left}
+        var accessToken = (d && d.profile && d.profile.access_token) ? d.profile.access_token
+                        : (d && d.access_token) ? d.access_token : null;
+        if (accessToken) {
+          localStorage.setItem('rl_raise_access_token', accessToken);
+          // Restore discovery — from backup or from existing state
           var backup = null;
           try { backup = JSON.parse(localStorage.getItem('rl_offer_discovery_backup') || 'null'); } catch(e) {}
           var s = JSON.parse(localStorage.getItem('rl_raise_state') || '{}');
           s.paid = true;
-          s.paid_token = d.access_token;
-          if (backup && !s.discovery) s.discovery = backup;
+          s.paid_token = accessToken;
+          if (backup && (!s.discovery || !s.discovery.step)) s.discovery = backup;
           localStorage.setItem('rl_raise_state', JSON.stringify(s));
           localStorage.removeItem('rl_offer_discovery_backup');
+          // Redirect with paid_token in URL — works regardless of localStorage state
+          sessionStorage.removeItem('rl_verifying_payment');
+          location.replace('/offer/chat/?paid_token=' + encodeURIComponent(accessToken));
+          return;
         }
         sessionStorage.removeItem('rl_verifying_payment');
         location.replace('/offer/chat/');
@@ -4034,6 +4041,59 @@ function initDiscoveryMode(container) {
   var chatArea = el('div', '', '');
   chatArea.id = 'disc-chat';
   container.appendChild(chatArea);
+
+  // Paid user with no saved discovery — fetch kit+context from Redis, skip re-intake
+  if (state.paid && discStep === 0 && state.paid_token) {
+    var _paidNoDisc = el('div', 'coach-msg', '');
+    _paidNoDisc.innerHTML = '<div class="bubble"><p>Loading your Counter Kit…</p></div>';
+    chatArea.appendChild(_paidNoDisc);
+    fetch('/api/raise-kit?token=' + encodeURIComponent(state.paid_token))
+      .then(function(r) { return r.json(); })
+      .then(function(kitData) {
+        if (kitData && kitData.kit && kitData.offer_ctx) {
+          // Restore context from Redis
+          var rCtx = kitData.offer_ctx;
+          ['role','base','city','employment','competing','risk','worktype','experience',
+           'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+            if (rCtx[k] !== undefined) SIM_STATE.context[k] = rCtx[k];
+          });
+          if (rCtx.dims) { discDims = Object.assign(discDims, rCtx.dims); }
+          if (rCtx.levers) discLevers = rCtx.levers;
+          if (rCtx.weaks) discWeaks = rCtx.weaks;
+          if (!state.discovery) state.discovery = {};
+          state.discovery.answers = rCtx.answers || rCtx;
+          state.discovery.step = 15;
+          // Apply kit
+          var kitJson = JSON.parse(kitData.kit);
+          var KK = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+          KK.forEach(function(k) {
+            if (kitJson[k]) { discCanvasBlocks[k] = { insight: kitJson[k], filled: true, teaser: false }; }
+          });
+          if (rCtx.dims) {
+            Object.keys(discActive).forEach(function(k) { if (rCtx.dims[k] !== undefined) { discActive[k] = true; } });
+          }
+          discStep = 15;
+          discNumbersReady = true;
+          discPlanLoading = false;
+          _paidNoDisc.remove();
+          insertDiscRadar();
+          var sc = el('div','coach-msg','');
+          sc.innerHTML = '<div class="bubble"><p>Your complete <strong>Counter Kit</strong> is ready. All sections are unlocked.</p></div>';
+          chatArea.appendChild(sc);
+          var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+          showToolbar(); showModeToggle(); unlockModeToggle();
+        } else {
+          // Kit not ready yet — ask user to re-complete intake
+          _paidNoDisc.remove();
+          var msg = el('div','coach-msg','');
+          msg.innerHTML = '<div class="bubble"><p>Your kit is still being generated. Please answer the intake questions again — you won’t be charged again, and the full kit will unlock immediately.</p></div>';
+          chatArea.appendChild(msg);
+          renderDiscQuestion(0, chatArea);
+        }
+      })
+      .catch(function() { _paidNoDisc.remove(); renderDiscQuestion(0, chatArea); });
+    return;
+  }
 
   // If assessment was completed, show final canvas + paywall (or full canvas if paid)
   if (discStep >= discOrderedQuestions.length || discStep >= DISC_FREE_QUESTIONS) {
