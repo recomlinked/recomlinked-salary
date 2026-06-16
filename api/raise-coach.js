@@ -1175,7 +1175,12 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
         system, messages: [{ role: 'user', content: userMessage }],
       });
       const kitText = (fullResp.content[0]?.text || '').trim();
-      await redis.set(`offer:kit:${storeFor}`, kitText, { ex: 86400 * 30 });
+      // Store kit + context together so returning users can restore their data
+      const offerCtxToStore = body.offer_ctx || null;
+      await Promise.all([
+        redis.set(`offer:kit:${storeFor}`, kitText, { ex: 86400 * 30 }),
+        offerCtxToStore ? redis.set(`offer:ctx:${storeFor}`, JSON.stringify(offerCtxToStore), { ex: 86400 * 30 }) : Promise.resolve(),
+      ]);
       return res.status(200).json({ stored: true });
     } catch(e) {
       console.error('[raise-coach] store kit error:', e.message);
