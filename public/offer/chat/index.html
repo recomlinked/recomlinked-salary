@@ -5080,7 +5080,7 @@ async function generateDiscInsights() {
       var kitResp = await fetch('/api/raise-kit?token=' + encodeURIComponent(state.paid_token));
       if (kitResp.ok) {
         var kitData = await kitResp.json();
-        if (kitData && kitData.kit) {
+        if (kitData && (kitData.kit || kitData.offer_ctx)) {
           try {
             // Restore offer context from Redis so verdict card numbers compute correctly
             if (kitData.offer_ctx) {
@@ -5100,19 +5100,28 @@ async function generateDiscInsights() {
             }
             var kitJson = JSON.parse(kitData.kit);
             // Quality check: full kit sections should be >200 chars each
-            var _isFullKit = kitJson.opening_script && (kitJson.opening_script || '').length > 200;
-            Object.keys(kitJson).forEach(function(k) {
-              if (discCanvasBlocks[k] !== undefined) {
-                discCanvasBlocks[k].insight = kitJson[k];
-                discCanvasBlocks[k].filled = _isFullKit;
-                discCanvasBlocks[k].teaser = false; // paid — always unlocked
+            // If kit is ready and full quality — use it directly
+            if (kitData.ready && kitData.kit) {
+              var kitJson2 = JSON.parse(kitData.kit);
+              var _isFullKit = kitJson2.opening_script && (kitJson2.opening_script || '').length > 200;
+              if (_isFullKit) {
+                Object.keys(kitJson2).forEach(function(k) {
+                  if (discCanvasBlocks[k] !== undefined) {
+                    discCanvasBlocks[k].insight = kitJson2[k];
+                    discCanvasBlocks[k].filled = true;
+                    discCanvasBlocks[k].teaser = false;
+                  }
+                });
+                discNumbersReady = true;
+                discPlanLoading = false;
+                window._offerKitLoadedFromRedis = true;
+                var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+                return; // Full kit loaded — skip live generation
               }
-            });
-            discNumbersReady = true; // Numbers ready — paid kit loaded from Redis
+            }
+            // Kit not ready or hooks only — context restored above, fall through to Phase 2
+            discNumbersReady = true;
             discPlanLoading = false;
-            var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-            if (_isFullKit) return; // Full kit loaded — skip live generation
-            // Kit has hooks only — fall through to Phase 2 strategy generation
           } catch(e) {}
         }
       }
