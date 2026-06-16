@@ -1167,6 +1167,19 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
     return res.status(400).json({ error: `Unknown part: ${part}` });
   }
 
+  // Client-side kit storage: part=store_kit sends pre-generated kit JSON to Redis
+  if (part === 'store_kit' && storeFor && redis && body._kit_json) {
+    try {
+      await Promise.all([
+        redis.set(`offer:kit:${storeFor}`, body._kit_json, { ex: 86400 * 30 }),
+        body.offer_ctx ? redis.set(`offer:ctx:${storeFor}`, JSON.stringify(body.offer_ctx), { ex: 86400 * 30 }) : Promise.resolve(),
+      ]);
+      return res.status(200).json({ stored: true });
+    } catch(e) {
+      return res.status(500).json({ error: 'store failed' });
+    }
+  }
+
   // If _store_for present, generate and store for paid user (webhook path)
   if (storeFor && redis) {
     try {
