@@ -3984,6 +3984,13 @@ function initDiscoveryMode(container) {
       discStep = saved.step || 0;
       discInsights = saved.insights || {};
       if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
+      // Restore SIM_STATE.context from saved answers so buildOfferCtx()
+      // has the user's role, base, city etc. when generating the full kit
+      if (saved.answers) {
+        Object.keys(saved.answers).forEach(function(k) {
+          SIM_STATE.context[k] = saved.answers[k];
+        });
+      }
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
@@ -4023,14 +4030,12 @@ function initDiscoveryMode(container) {
       });
     }
 
-    // Instant restore — no typing
-    var intro = el('div', 'coach-msg', '');
-    var _introMsg = 'Most people have more leverage in salary negotiations than they realize. Let’s find yours in just 5 questions.';
-    var _pr = state.sim_reason || (state.profile && state.profile.reason) || '';
-    var _rl = { no_script:'I don’t know how to start the conversation', underpaid:'I think I’m underpaid but I can’t prove it', quiet_performer:'I’m a strong performer but I don’t speak up', unknown_number:'I don’t know what number to ask for', fear_no:'What if they say no?', no_advocate:'My manager doesn’t advocate for me', already_asked:'I already asked and got nothing', unknown_timing:'I’m not sure if now is the right time' };
-    if (_pr && _rl[_pr]) { _introMsg = 'You said “' + _rl[_pr] + '”. Most people have more leverage than they realize. Let’s find yours in just 5 questions.'; }
-    intro.innerHTML = '<div class="bubble"><p>' + _introMsg + '</p></div>';
-    chatArea.appendChild(intro);
+   // Offer product restore — skip Raise-era intro for paid users
+    if (!state.paid) {
+      var intro = el('div', 'coach-msg', '');
+      intro.innerHTML = '<div class="bubble"><p>Most job offers leave room to negotiate. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.</p></div>';
+      chatArea.appendChild(intro);
+    }
     insertDiscRadar();
 
     if (state.paid) {
@@ -5028,6 +5033,7 @@ async function generateDiscInsights() {
               if (discCanvasBlocks[k] !== undefined) {
                 discCanvasBlocks[k].insight = kitJson[k];
                 discCanvasBlocks[k].filled = true;
+                discCanvasBlocks[k].teaser = false; // paid — always unlocked
               }
             });
             discPlanLoading = false;
@@ -5122,7 +5128,7 @@ async function generateDiscInsights() {
         if (discCanvasBlocks[k] !== undefined) {
           discCanvasBlocks[k].insight = hookJson[k];
           discCanvasBlocks[k].filled = true;
-          discCanvasBlocks[k].teaser = true;
+          discCanvasBlocks[k].teaser = !state.paid; // paid users see full hooks unblurred
         }
       });
     } else {
@@ -6902,7 +6908,18 @@ async function init() {
     // A paid user with no prior session (just paid) will fall through to
     // resumeFromState() which handles the empty-state case gracefully.
     if (state.paid && !forceReset) {
-      reason = null; // fall through to resume
+      // ── Offer discovery restore: paid user with completed intake ──
+      // resumeFromState() is for the Raise simulation product only.
+      // For the offer product, we route back through beginSimulationFlow
+      // which calls initDiscoveryMode(), restores the canvas, and fires
+      // Phase 2 (full strategy API) because state.paid = true.
+      var _savedDiscStep = (state.discovery && state.discovery.step) ? parseInt(state.discovery.step) : 0;
+      if (_savedDiscStep > 0) {
+        // Restore discovery canvas for paid user
+        await beginSimulationFlow('other');
+        return;
+      }
+      reason = null; // no discovery data — fall through to resumeFromState()
     }
   }
 
