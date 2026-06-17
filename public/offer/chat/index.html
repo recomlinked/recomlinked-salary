@@ -992,13 +992,13 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       try {
         if (!state.paid) {
-          ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
+          ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
             }
           });
           // Restore collapsed position state
-          var hasStrat = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].some(function(k) {
+          var hasStrat = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].some(function(k) {
             return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
           });
           if (hasStrat) discStrategyDone = true;
@@ -1285,7 +1285,7 @@ function rewriteKitWithRisk(newRisk) {
   SIM_STATE.context.risk = newRisk;
   state.offer_verdict = null;
   // Clear all strategy sections so they regenerate
-  ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
+  ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
     if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].insight = ''; }
   });
   discPlanLoading = true;
@@ -2912,10 +2912,10 @@ var DISC_Q_ALL = {
     { val: 'above', text: 'Yes \u2014 but the offer is above what I said', scores: {offer:70}, note: 'Interesting signal. They had room to beat your expectation, which may mean the package has more flexibility.', type: 'lever' },
   ] },
   extras: { id: 'extras', label: 'What else is in the offer?', dimTag: 'offer', options: [
+    { val: 'base_only', text: 'Just base salary', scores: {offer:45}, note: 'Base-only offer. That may leave other parts of the package open for negotiation.', type: 'neutral' },
     { val: 'signing', text: 'A signing bonus', scores: {offer:70}, note: 'Good signal. The package already has more than one compensation lever, which gives the kit more to work with.', type: 'lever' },
     { val: 'equity', text: 'Equity / stock', scores: {offer:65}, note: 'Equity noted. The counter can consider both immediate cash and long-term value.', type: 'lever' },
     { val: 'signing_equity', text: 'Both signing bonus and equity', scores: {offer:80}, note: 'Full package. The ask needs to prioritize what matters most instead of pushing every lever at once.', type: 'lever' },
-    { val: 'base_only', text: 'Just base salary', scores: {offer:45}, note: 'Base-only offer. That may leave other parts of the package open for negotiation.', type: 'neutral' },
   ]},
   deadline: { id: 'deadline', label: 'When do they want your answer?', dimTag: 'urgency', options: [
     { val: '24_72h', text: '24\u201372 hours', scores: {urgency:65}, note: 'Tight timeline. Your message needs to be clear, calm, and easy for them to act on quickly.', type: 'lever' },
@@ -3008,7 +3008,6 @@ var discCanvasBlocks = {
   pushback: { filled: false, insight: '' },
   meeting_email: { filled: false, insight: '' },
   raise_case: { filled: false, insight: '' },  levers: { filled: false, insight: '' },
-  accept_email: { filled: false, insight: '' },
 };
 var discStrategyLoading = false;
 var discStrategyDone = false;
@@ -3227,7 +3226,6 @@ function _generatePDFWithJsPDF() {
   drawFullWidth('levers', 'Non-Salary Levers', 'plan');
   drawFullWidth('pushback', 'Pushback Playbook', 'plan');
   drawFullWidth('fallback', 'Fallback Responses', 'plan');
-  drawFullWidth('accept_email', 'Final Accept Email', 'plan');
   drawFullWidth('raise_case', 'Sequencing Plan', 'plan');
 
   // ── Disclaimer ──
@@ -3257,7 +3255,7 @@ function _generatePDFPrintFallback() {
     ]},
     { section: 'YOUR COUNTER KIT', items: [
       { key: 'opening_script', label: 'Phone Opener' }, { key: 'pushback', label: 'Pushback Playbook' }, { key: 'fallback', label: 'Fallback Responses' },
-      { key: 'meeting_email', label: 'Counter Email' }, { key: 'accept_email', label: 'Final Accept Email' }, { key: 'raise_case', label: 'Sequencing Plan' }
+      { key: 'meeting_email', label: 'Counter Email' }, { key: 'raise_case', label: 'Sequencing Plan' }
     ]}
   ];
 
@@ -3309,7 +3307,7 @@ function _generatePDFPrintFallback() {
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
     var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
 
     if (b && b.filled) {
@@ -3332,8 +3330,6 @@ function _generatePDFPrintFallback() {
           teaserText = clean.slice(0, 50) + '...'; teaserBadge = 'Full script ready';
         } else if (item.key === 'levers') {
           teaserText = clean.slice(0, 45) + '...'; teaserBadge = '10 levers';
-        } else if (item.key === 'accept_email') {
-          teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'Ready to send';
         } else if (item.key === 'fallback') {
           teaserText = clean.slice(0, 45) + '...'; teaserBadge = 'If base is rejected';
         } else if (item.key === 'pushback') {
@@ -3411,7 +3407,6 @@ function _generatePDFPrintFallback() {
   html += renderBlock({key:'levers',label:'Non-Salary Levers'}, 'plan');
   html += renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan');
   html += renderBlock({key:'fallback',label:'Fallback Responses'}, 'plan');
-  html += renderBlock({key:'accept_email',label:'Final Accept Email'}, 'plan');
   html += renderBlock({key:'raise_case',label:'Sequencing Plan'}, 'plan');
 
   // Disclaimer — paid users only
@@ -3480,28 +3475,23 @@ function getNegotiationLabel(score, riskChoice) {
   var target;
   if (choiceRank < leverageRank) {
     // Their leverage could support a bolder ask than they chose
-    target = 'Send the ' + tierName + ' counter you chose — it\u2019s well within your leverage. If you want, your position could support one tier bolder.';
+    target = 'Your leverage could carry one tier bolder than the ' + tierName + ' counter you picked.';
   } else if (chosenTier === 'ambitious' && bucket <= 1) {
     // Ambitious on a weak (Lean/Difficult) position — honest stretch warning
-    target = 'You chose the ambitious counter — that\u2019s a stretch for this position. The ask needs to be tightened so it doesn\u2019t overplay your leverage.';
+    target = 'The ambitious counter you chose runs ahead of this position — it needs tightening so it doesn\u2019t overplay.';
   } else if (choiceRank > leverageRank) {
     // They chose bolder than leverage comfortably supports — keep it clean, not scary
-    target = 'You chose the ' + tierName + ' counter — keep it clean and defensible: one number, warm tone, sign-this-week close.';
+    target = 'The ' + tierName + ' counter you chose runs slightly ahead of your leverage — workable if it stays clean.';
   } else {
     // Aligned
-    target = 'Send the ' + tierName + ' counter — it matches both your leverage and your approach. Pair it with the sign-this-week signal.';
+    target = 'The ' + tierName + ' counter fits both your leverage and your approach.';
   }
 
-  // Loss-framing line — only on strong/solid tiers (bucket 3-4)
-  var lossLine = (bucket >= 3)
-    ? ' The real risk isn\u2019t a professional counter — it\u2019s accepting too quickly and leaving approved room on the table.'
-    : '';
-
-  if (bucket === 4) return { label: 'Strong position \u2014 counter with confidence', riskLevel: 'Low. Your leverage justifies a firm ask \u2014 one number, confident tone, sign-this-week close.' + lossLine, color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: target, risk: 'Over-explaining your ask or showing urgency. One number, sign-this-week framing, then stop talking.' };
-  if (bucket === 3) return { label: 'Solid position \u2014 counter is the right move', riskLevel: 'Moderate-low. A counter is reasonable \u2014 protect the offer with a warm tone, one clear ask, and a sign-this-week close.' + lossLine, color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: target, risk: 'Accepting the first pushback as final. \u2018Best and final\u2019 on the first mention almost never is.' };
-  if (bucket === 2) return { label: 'Viable \u2014 tone and framing matter most', riskLevel: 'Moderate. The counter needs warm framing and a single clean ask \u2014 no range, no apology, no extras until base is settled.', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: target, risk: 'Giving a range instead of one number, or apologising for countering. Neither signals the confidence that gets yeses.' };
-  if (bucket === 1) return { label: 'Lean position \u2014 every word counts', riskLevel: 'Moderate-high. Keep the counter tight and warm \u2014 one ask, sign-this-week signal, pivot to signing bonus immediately if base is blocked.', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: target, risk: 'Revealing urgency, asking for too much, or countering without a sign-this-week signal. The pushback playbook is your most important section.' };
-  return { label: 'Difficult position \u2014 preparation is everything', riskLevel: 'High. A minimal, enthusiastic counter only \u2014 base, one ask, close fast. Every additional ask increases the risk of losing momentum.', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'A minimal, enthusiastic counter \u2014 base only, one ask, no extras. Getting the revised number in writing is the win.', risk: 'Over-reaching with a big counter or negotiating multiple items at once. Keep it simple and close fast.' };
+  if (bucket === 4) return { label: 'Strong hand \u2014 but the room only counts if you claim it', riskLevel: 'Low on rescind, high on under-capturing \u2014 the money slips away from accepting too fast or over-explaining, not from countering. Your kit has the exact ask and when to stop talking.', color: '#0a5c3a', bg: '#E8F7F0', border: 'rgba(26,158,108,0.2)', target: target, risk: 'Over-explaining your ask or showing urgency. One number, sign-this-week framing, then stop talking.' };
+  if (bucket === 3) return { label: 'Solid position \u2014 there\u2019s room here worth protecting', riskLevel: 'Moderate-low. The danger isn\u2019t a pulled offer \u2014 it\u2019s a weak ask or folding on the first pushback. Your kit has the exact number, framing, and sign-this-week close.', color: '#3d6b1e', bg: '#EEF6E8', border: 'rgba(80,140,40,0.2)', target: target, risk: 'Accepting the first pushback as final. \u2018Best and final\u2019 on the first mention almost never is.' };
+  if (bucket === 2) return { label: 'Viable \u2014 tone and framing matter most', riskLevel: 'Moderate. One clean ask, warm framing, no range or apology \u2014 and hold the extras until base is settled. Your kit has the wording.', color: '#6a4a10', bg: '#FDF5E6', border: 'rgba(201,168,76,0.2)', target: target, risk: 'Giving a range instead of one number, or apologising for countering. Neither signals the confidence that gets yeses.' };
+  if (bucket === 1) return { label: 'Lean position \u2014 every word counts', riskLevel: 'Moderate-high. Keep it tight and warm \u2014 one ask, and pivot to a signing bonus the moment base is blocked. Your kit has that pivot scripted.', color: '#b45a00', bg: '#FFF4E6', border: 'rgba(200,120,20,0.2)', target: target, risk: 'Revealing urgency, asking for too much, or countering without a sign-this-week signal. The pushback playbook is your most important section.' };
+  return { label: 'Difficult position \u2014 preparation is everything', riskLevel: 'High. A minimal, enthusiastic counter only \u2014 base, one ask, close fast. Your kit keeps it simple and gets the number in writing.', color: '#7a2020', bg: '#FCEBEB', border: 'rgba(204,68,68,0.2)', target: 'A minimal, enthusiastic counter \u2014 base only, one ask, no extras.', risk: 'Over-reaching with a big counter or negotiating multiple items at once. Keep it simple and close fast.' };
 }
 
 function togglePosBlock(el, key) {
@@ -3591,7 +3581,7 @@ function togglePlanBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + (state.paid && discCanvasBlocks && discCanvasBlocks[key] && discCanvasBlocks[key].insight ? formatInsight(discCanvasBlocks[key].insight) : preview) + '</p>' +
-      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','accept_email':'Unlock your accept email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
   }
 }
 
@@ -3886,7 +3876,6 @@ function renderCanvasHTML() {
         avoid: 'Flagging what not to say',
         fallback: 'Mapping your fallback responses',
         levers: 'Mapping your non-salary levers',
-        accept_email: 'Drafting your accept email',
         opening_script: 'Writing your phone opener',
         pushback: 'Preparing recruiter pushback responses',
         if_yes: 'Planning your closing moves',
@@ -4010,7 +3999,6 @@ function renderCanvasHTML() {
   html += planBlock('opening_script', 'Phone Opener', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('pushback', 'Pushback Playbook', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('fallback', 'Fallback Responses', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-  html += planBlock('accept_email', 'Final Accept Email', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('raise_case', 'Sequencing Plan', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
 
   if (answeredCount >= 5) {
@@ -4177,7 +4165,7 @@ function appendStandardPaywall(container, opts) {
     if (mode === 'discovery' && _v && _v.room_low) {
       var _f = function(n) { return '$' + n.toLocaleString('en-US'); };
       copy.title = 'Your negotiation room is ready.';
-      copy.subtitle = 'The exact numbers, counter email, call script, fallback plan, and recruiter pushback responses are one step away \u2014 built from your offer, role, leverage, and risk style.';
+      copy.subtitle = 'The counter numbers, counter email, call script, fallback plan, and recruiter pushback responses are one step away, built from your leverage and risk style.';
     }
   } catch (e) {}
 
@@ -4258,13 +4246,13 @@ function initDiscoveryMode(container) {
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
-        ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].forEach(function(k) {
+        ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
           if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
             discCanvasBlocks[k].teaser = true;
           }
         });
         // Restore collapsed state if strategy was previously generated
-        var hasStrategy = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'].some(function(k) {
+        var hasStrategy = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].some(function(k) {
           return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
         });
         if (hasStrategy) discStrategyDone = true;
@@ -4306,7 +4294,7 @@ function initDiscoveryMode(container) {
           state.discovery.step = 15;
           // Apply kit
           var kitJson = JSON.parse(kitData.kit);
-          var KK = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+          var KK = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
           KK.forEach(function(k) {
             if (kitJson[k]) { discCanvasBlocks[k] = { insight: kitJson[k], filled: true, teaser: false }; }
           });
@@ -4357,7 +4345,7 @@ function initDiscoveryMode(container) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
-      var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
       stratPlanKeys.forEach(function(key) {
         if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
           discCanvasBlocks[key].teaser = false;
@@ -4387,7 +4375,7 @@ function initDiscoveryMode(container) {
         return;
       }
       // Mark all strategy blocks as loading (not filled) until strategy API responds
-      var _stratLoadKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+      var _stratLoadKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
       _stratLoadKeys.forEach(function(k) {
         if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; }
       });
@@ -5516,7 +5504,7 @@ async function generateDiscInsights() {
       body: JSON.stringify(teaserBody)
     });
     console.log('[teaser] response status:', teaserResp.status);
-    var KIT_KEYS = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+    var KIT_KEYS = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
       var hookJson = teaserData.insights || {};
@@ -5586,8 +5574,7 @@ async function generateDiscInsights() {
       if_yes: 'Get the revised number in writing before you sign. A one-line confirmation email the same day locks it in.',
       meeting_email: 'Subject: Re: Offer. "Hi [Name], thank you again for the offer — I\'m excited about the team. Before I sign, I\'d like to align on compensation. I was targeting [counter]. If we can get there, I\'m ready to sign this week."',
       fallback: 'If base is blocked: 1) Pivot to the signing bonus immediately. 2) Ask for a committed 6-month review in writing. 3) Negotiate title as a proxy for future comp.',
-      raise_case: 'Your 72-hour plan: counter in writing first, give them a day to respond, take the call ready for pushback, get the final number in writing.',      levers: 'Beyond base: signing bonus, vacation days, remote days, title, start date, annual review timeline, performance bonus, relocation support, education budget, equity. Trade down the list \u2014 never up.',
-      accept_email: 'Subject: Re: Offer \u2014 Accepted. "Hi [Name], delighted to confirm \u2014 I accept at the revised terms we agreed. Could you send the updated offer letter? Excited to get started."'
+      raise_case: 'Your 72-hour plan: counter in writing first, give them a day to respond, take the call ready for pushback, get the final number in writing.',      levers: 'Beyond base: signing bonus, vacation days, remote days, title, start date, annual review timeline, performance bonus, relocation support, education budget, equity. Trade down the list \u2014 never up.'
     };
     Object.keys(fallbacks).forEach(function(key) {
       if (discCanvasBlocks[key]) {
@@ -5643,7 +5630,7 @@ async function generateDiscInsights() {
   console.log('[disc_insights] Sending', state.paid ? 'strategy (parallel)' : 'hooks', JSON.stringify({ blocker: blockerCode }));
 
   function applyInsights(insights, isPlanSection) {
-    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
     var positionKeys  = ['walkaway','risk_tol','urgency','talent','offer'];
     Object.keys(insights).forEach(function(dim) {
       if (discCanvasBlocks[dim] !== undefined) {
@@ -5713,7 +5700,7 @@ async function generateDiscInsights() {
       if (state.paid && state.paid_token) {
         try {
           var _kitToStore = {};
-          var _kitKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+          var _kitKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
           _kitKeys.forEach(function(k) { if (discCanvasBlocks[k] && discCanvasBlocks[k].insight) _kitToStore[k] = discCanvasBlocks[k].insight; });
           fetch('/api/offer-kit-save', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -7852,7 +7839,7 @@ async function startCheckout(selectedPrice) {
           body: JSON.stringify(body),
         }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
-          var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
+          var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
           Object.keys(data.insights).forEach(function(dim) {
             if (discCanvasBlocks[dim] !== undefined) {
               discCanvasBlocks[dim].insight = data.insights[dim];
