@@ -833,7 +833,6 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - leverage_risk: "The rescind fear is real but statistically near-zero for professional counters — what actually kills offers is the candidate who sounds uncertain, not the one who asks for more."
 - emphasize: "Most candidates in your position lead with the wrong ask — the order of the stack determines whether you get a yes on what matters or a no on everything."
 - levers: "If they say the base is fixed, nine other levers activate — and the first pivot takes 10 seconds."
-- avoid: "There's one phrase that tanks more offer negotiations than any pushback — and most people say it instinctively in the first 30 seconds."
 - opening_script: "The recruiter's first impression of how you negotiate is formed in the first sentence — the four openers in this kit each send a different signal."
 - pushback: "Every recruiter response to a counter is either a real constraint or a closing tactic — the response is completely different depending on which one it is."
 - fallback: "If base is blocked, you have exactly one window to pivot before the conversation closes — this is what you say in that window."
