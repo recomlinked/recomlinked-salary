@@ -55,6 +55,97 @@ const NUDGE_RATE_LIMIT_TTL = 15 * 60;            // 15 minutes
 const NUDGE_MODEL_ID       = 'claude-haiku-4-5-20251001';
 const NUDGE_MAX_TOKENS_OUT = 80;                 // one short sentence, that's it
 
+// ── Robust JSON parser for Claude responses ─────────────────────────────
+// LLMs frequently wrap JSON in markdown fences, add a sentence of preamble,
+// or — most commonly for multi-line string values (emails, numbered lists) —
+// emit LITERAL newlines/tabs inside string values, which strict JSON.parse
+// rejects ("Bad control character in string literal"). This helper escalates
+// through fence-stripping, brace-extraction, control-char repair, and
+// trailing-comma removal so a well-formed-but-messy response still parses.
+// Returns the parsed object, or null if every strategy fails.
+function _stripFences(s) {
+  return String(s)
+    .replace(/^\uFEFF/, '')                 // strip BOM
+    .replace(/```[a-zA-Z0-9_-]*\s*/g, '')   // ```json / ```JSON / ```js / ```
+    .replace(/```/g, '')
+    .trim();
+}
+
+// Walk the string and escape raw control characters that appear *inside*
+// JSON string literals. Already-escaped sequences are left untouched.
+function _escapeControlCharsInStrings(s) {
+  let out = '';
+  let inStr = false;
+  let escaped = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (escaped) { out += ch; escaped = false; continue; }
+    if (ch === '\\') { out += ch; escaped = true; continue; }
+    if (ch === '"') { inStr = !inStr; out += ch; continue; }
+    if (inStr) {
+      if (ch === '\n') { out += '\\n'; continue; }
+      if (ch === '\r') { out += '\\r'; continue; }
+      if (ch === '\t') { out += '\\t'; continue; }
+      const code = ch.charCodeAt(0);
+      if (code < 0x20) { out += '\\u' + code.toString(16).padStart(4, '0'); continue; }
+    }
+    out += ch;
+  }
+  return out;
+}
+
+// Remove trailing commas (",}" or ",]") that appear outside string literals.
+function _stripTrailingCommas(s) {
+  let out = '';
+  let inStr = false;
+  let escaped = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (escaped) { out += ch; escaped = false; continue; }
+    if (ch === '\\') { out += ch; escaped = true; continue; }
+    if (ch === '"') { inStr = !inStr; out += ch; continue; }
+    if (!inStr && ch === ',') {
+      // look ahead past whitespace for a closing bracket
+      let j = i + 1;
+      while (j < s.length && /\s/.test(s[j])) j++;
+      if (s[j] === '}' || s[j] === ']') { continue; } // drop the comma
+    }
+    out += ch;
+  }
+  return out;
+}
+
+function parseClaudeJSON(raw) {
+  if (raw == null) return null;
+  let s = _stripFences(raw);
+  if (!s) return null;
+
+  // 1. Direct parse of the fence-stripped text.
+  try { return JSON.parse(s); } catch (e) { /* fall through */ }
+
+  // 2. Extract the outermost JSON object/array, dropping any prose around it.
+  const firstObj = s.indexOf('{');
+  const firstArr = s.indexOf('[');
+  let first = -1;
+  if (firstObj === -1) first = firstArr;
+  else if (firstArr === -1) first = firstObj;
+  else first = Math.min(firstObj, firstArr);
+  const last = Math.max(s.lastIndexOf('}'), s.lastIndexOf(']'));
+
+  if (first !== -1 && last !== -1 && last > first) {
+    const candidate = s.slice(first, last + 1);
+
+    // 2a. Plain.
+    try { return JSON.parse(candidate); } catch (e) { /* fall through */ }
+    // 2b. Repair literal control chars inside strings (the common defect).
+    try { return JSON.parse(_escapeControlCharsInStrings(candidate)); } catch (e) { /* fall through */ }
+    // 2c. Also strip trailing commas.
+    try { return JSON.parse(_stripTrailingCommas(_escapeControlCharsInStrings(candidate))); } catch (e) { /* fall through */ }
+  }
+
+  return null;
+}
+
 // Fallback nudges if the Haiku call fails or rate limit is hit. Indexed by
 // exchange + attempt number (0 = first time they've been nudged).
 const NUDGE_FALLBACKS = {
@@ -929,7 +1020,7 @@ Return ONLY these 10 keys as valid JSON. Values are plain text strings with \\n 
 {"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
 // 10 keys total.
       userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 11 Counter Kit sections.`,
-      maxTokens: 3400,
+      maxTokens: 5200,
     };
   }
 
@@ -1188,10 +1279,19 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
         system, messages: [{ role: 'user', content: userMessage }],
       });
       const kitText = (fullResp.content[0]?.text || '').trim();
+      // Normalize to clean JSON before storing so the paid page can always
+      // JSON.parse(kit) on return. If parsing fails we still store the raw
+      // text as a last resort (better than losing the generated kit), but the
+      // robust parser handles fences + literal newlines, so this is rare.
+      const parsedKit = parseClaudeJSON(kitText);
+      const kitToStore = parsedKit ? JSON.stringify(parsedKit) : kitText;
+      if (!parsedKit) {
+        console.error('[raise-coach] store kit: could not parse kit JSON, storing raw. head:', kitText.slice(0, 300));
+      }
       // Store kit + context together so returning users can restore their data
       const offerCtxToStore = body.offer_ctx || null;
       await Promise.all([
-        redis.set(`offer:kit:${storeFor}`, kitText, { ex: 86400 * 30 }),
+        redis.set(`offer:kit:${storeFor}`, kitToStore, { ex: 86400 * 30 }),
         offerCtxToStore ? redis.set(`offer:ctx:${storeFor}`, JSON.stringify(offerCtxToStore), { ex: 86400 * 30 }) : Promise.resolve(),
       ]);
       return res.status(200).json({ stored: true });
@@ -1210,12 +1310,9 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
     });
 
     const raw = (response.content[0]?.text || '').trim();
-    let insights = {};
-    try {
-      const cleaned = raw.replace(/```json|```/g, '').trim();
-      insights = JSON.parse(cleaned);
-    } catch (parseErr) {
-      console.error('[disc_insights] JSON parse error:', parseErr.message, 'raw:', raw.slice(0, 200));
+    let insights = parseClaudeJSON(raw);
+    if (!insights || typeof insights !== 'object') {
+      console.error('[disc_insights] JSON parse failed for part=' + (part || 'hooks') + ' raw:', raw.slice(0, 300));
       insights = {};
     }
 
