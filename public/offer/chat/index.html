@@ -3072,14 +3072,20 @@ function _generatePDFWithJsPDF() {
 
   function wrapText(text, maxWidth) {
     if (!text) return [];
-    var words = text.replace(/\*\*/g, '').split(' ');
-    var lines = [], line = '';
-    words.forEach(function(w) {
-      var test = line ? line + ' ' + w : w;
-      if (doc.getTextWidth(test) > maxWidth) { if (line) lines.push(line); line = w; }
-      else line = test;
+    var clean = text.replace(/\*\*/g, '');
+    var lines = [];
+    // Respect explicit newlines first (emails use \n\n between greeting/body)
+    clean.split('\n').forEach(function(para) {
+      if (para === '') { lines.push(''); return; } // preserve blank lines
+      var words = para.split(' ');
+      var line = '';
+      words.forEach(function(w) {
+        var test = line ? line + ' ' + w : w;
+        if (doc.getTextWidth(test) > maxWidth) { if (line) lines.push(line); line = w; }
+        else line = test;
+      });
+      if (line) lines.push(line);
     });
-    if (line) lines.push(line);
     return lines;
   }
 
@@ -3209,6 +3215,36 @@ function _generatePDFWithJsPDF() {
   drawRow(['walkaway', 'risk_tol'], ['Walk-Away Power', 'Risk Tolerance'], 'position');
   drawRow(['urgency', 'talent'], ['Their Urgency', 'Talent Market'], 'position');
   drawFullWidth('offer', 'Offer Structure', 'position');
+
+  // ── OVERALL POSITION SUMMARY ──
+  try {
+    if (typeof calculateNegotiationScore === 'function' && typeof getNegotiationLabel === 'function') {
+      var nScore = calculateNegotiationScore();
+      var nLabel = getNegotiationLabel(nScore, (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced');
+      if (nLabel) {
+        var sumW = W - mx * 2;
+        var padX = 5;
+        // Pre-measure to size the box
+        doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+        var tgtLines = nLabel.target ? wrapText('Your target: ' + nLabel.target, sumW - padX * 2) : [];
+        var rlLines  = nLabel.riskLevel ? wrapText('Risk level: ' + nLabel.riskLevel, sumW - padX * 2) : [];
+        var sumH = 13 + tgtLines.length * 4 + 2 + rlLines.length * 4 + 6;
+        if (y + sumH > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+        doc.setFillColor(244, 246, 250); doc.setDrawColor(30, 61, 114);
+        doc.roundedRect(mx, y, sumW, sumH, 2, 2, 'FD');
+        doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(30, 61, 114);
+        doc.text('OVERALL POSITION', mx + padX, y + 6.5);
+        doc.setFontSize(9.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(26, 53, 96);
+        doc.text((nLabel.label || '').replace(/\u2014/g, '-'), mx + padX, y + 12);
+        var ly = y + 17;
+        doc.setFontSize(8); doc.setFont('helvetica', 'normal'); doc.setTextColor(60, 70, 95);
+        tgtLines.forEach(function(ln) { doc.text(ln, mx + padX, ly); ly += 4; });
+        if (tgtLines.length) ly += 1.5;
+        rlLines.forEach(function(ln) { doc.text(ln, mx + padX, ly); ly += 4; });
+        y += sumH + 2;
+      }
+    }
+  } catch (e) {}
 
   y += 2; doc.setDrawColor(220, 225, 235); doc.line(mx, y, W - mx, y); y += 5;
 
