@@ -3020,7 +3020,7 @@ function generateCanvasPDF() {
   logEntry('pdf_download', { filled: filledCount, paid: !!state.paid });
   logSession('pdf_download', { filled: filledCount, download_pdf: true });
 
-  if (window.jspdf) {
+  if (window.jspdf && window.jspdf.jsPDF) {
     return _generatePDFWithJsPDF();
   }
   // Load jsPDF dynamically
@@ -3216,12 +3216,163 @@ function _generatePDFPrintFallback() {
       '</p></div>';
   }
 
+
+  html += '<div class="footer"><span>salary.recomlinked.com/offer</span><span class="gold">' + (isPaid ? 'Full version' : 'Free preview') + '</span></div>';
+  html += '</body></html>';
+
+  var w = window.open('', '_blank');
+  if (!w) { alert('Please allow pop-ups for this site to download your Counter Kit as a PDF.'); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(function() { try { w.print(); } catch (e) {} }, 500);
+}
+
+function _generatePDFWithJsPDF() {
+  var jsPDF = window.jspdf && window.jspdf.jsPDF;
+  if (!jsPDF) { return _generatePDFPrintFallback(); }
   try {
+  var doc = new jsPDF('p', 'mm', 'a4');
+  var W = 210, H = 297;
+  var mx = 16, y = 0;
+  var navy = [30, 61, 114];
+  var gold = [201, 168, 76];
+  var isPaid = state.paid;
+  var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
+
+  // ── Header bar ──
+  doc.setFillColor(navy[0], navy[1], navy[2]);
+  doc.rect(0, 0, W, 28, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(16);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Offer Counter Kit', mx, 13);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(200, 200, 220);
+  doc.text('salary.recomlinked.com/offer', mx, 20);
+  var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  doc.text(dateStr, W - mx, 20, { align: 'right' });
+  y = 36;
+
+  // ── Helpers ──
+  function drawFooter() {
+    doc.setFillColor(navy[0], navy[1], navy[2]);
+    doc.rect(0, H - 12, W, 12, 'F');
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(200, 200, 220);
+    doc.text('salary.recomlinked.com/offer', mx, H - 5);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text(isPaid ? 'Full version' : 'Free preview \u2014 unlock at salary.recomlinked.com/offer', W - mx, H - 5, { align: 'right' });
+  }
+
+  function drawSectionTitle(title) {
+    if (y + 10 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(navy[0], navy[1], navy[2]);
+    doc.text(title.toUpperCase(), mx, y);
+    y += 6;
+  }
+
+  function getBlockColors(strength) {
+    if (strength === 'strong') return { bg: [232, 247, 240], border: [26, 158, 108], text: [10, 92, 58], badge: 'Strong' };
+    if (strength === 'weak') return { bg: [252, 235, 235], border: [204, 68, 68], text: [122, 32, 32], badge: 'Weak' };
+    if (strength === 'neutral') return { bg: [253, 245, 230], border: [201, 168, 76], text: [106, 74, 16], badge: 'Medium' };
+    return { bg: [232, 239, 248], border: [30, 61, 114], text: [26, 53, 96], badge: '' };
+  }
+
+  function wrapText(text, maxWidth) {
+    if (!text) return [];
+    var tokens = String(text).replace(/\*\*/g, '').replace(/\n/g, ' \u0001 ').split(' ');
+    var lines = [];
+    var line = '';
+    tokens.forEach(function(wd) {
+      if (wd === '\u0001') { lines.push(line); line = ''; return; }
+      if (!wd) return;
+      var test = line ? line + ' ' + wd : wd;
+      if (doc.getTextWidth(test) > maxWidth) {
+        if (line) lines.push(line);
+        line = wd;
+      } else {
+        line = test;
+      }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawBlock(key, label, section) {
+    var b = discCanvasBlocks[key];
+    var filled = b && b.filled;
+    var insight = filled ? (b.insight || b.note || '') : '';
+    var fullW = W - mx * 2;
+    var padX = 5;
+    var c = getBlockColors(b && b.strength);
+
+    // Locked position block for free users — header + badge only, no body
+    if (filled && section === 'position' && !state.paid) {
+      if (y + 13 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+      doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+      doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
+      doc.roundedRect(mx, y, fullW, 11, 2, 2, 'FD');
+      doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+      doc.text(label.toUpperCase(), mx + padX, y + 7);
+      if (c.badge) { doc.setFontSize(6); doc.text(c.badge, W - mx - padX, y + 7, { align: 'right' }); }
+      y += 13;
+      return;
+    }
+
+    if (!filled) {
+      if (y + 16 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+      doc.setFillColor(240, 241, 245);
+      doc.setDrawColor(200, 205, 215);
+      doc.roundedRect(mx, y, fullW, 14, 2, 2, 'FD');
+      doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(160, 165, 180);
+      doc.text(label.toUpperCase(), mx + padX, y + 6);
+      doc.setFontSize(6.5); doc.setFont('helvetica', 'italic');
+      doc.setTextColor(180, 185, 195);
+      doc.text(section === 'position' ? 'Not yet answered' : 'Completing your intake\u2026', mx + padX, y + 11);
+      y += 16;
+      return;
+    }
+
+    // Filled block (paid, or any non-position section)
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+    var lines = wrapText(insight, fullW - padX * 2 - 2);
+    var blockH = 11 + lines.length * 4.2 + 4;
+    if (y + blockH > H - 20) {
+      drawFooter(); doc.addPage(); y = 16;
+      // Recompute against fresh page (a single block may still overflow; jsPDF clips gracefully)
+    }
+    doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+    doc.setDrawColor(c.border[0], c.border[1], c.border[2]);
+    doc.roundedRect(mx, y, fullW, blockH, 2, 2, 'FD');
+    doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+    doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+    doc.text(label.toUpperCase(), mx + padX, y + 6.5);
+    if (c.badge && section === 'position') { doc.setFontSize(6); doc.text(c.badge, W - mx - padX, y + 6.5, { align: 'right' }); }
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(c.text[0], c.text[1], c.text[2]);
+    lines.forEach(function(ln, i) { doc.text(ln, mx + padX, y + 11 + i * 4.2); });
+    y += blockH + 2;
+  }
+
+  // ── YOUR POSITION ──
+  drawSectionTitle('Your position');
+  drawBlock('walkaway', 'Walk-Away Power', 'position');
+  drawBlock('risk_tol', 'Risk Tolerance', 'position');
+  drawBlock('urgency', 'Their Urgency', 'position');
+  drawBlock('talent', 'Talent Market', 'position');
+  drawBlock('offer', 'Offer Structure', 'position');
+
   // ── YOUR NEGOTIATION ROOM ──
   y += 4;
   if (y + 36 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
   var v = state && state.offer_verdict;
-  var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
   doc.setFillColor(44, 32, 80);
   doc.setDrawColor(201, 168, 76);
   doc.roundedRect(mx, y, W - mx * 2, 34, 3, 3, 'FD');
@@ -3260,15 +3411,47 @@ function _generatePDFPrintFallback() {
   }
   y += 38;
 
+  // ── YOUR STRATEGY ──
+  drawSectionTitle('Your strategy');
+  drawBlock('decision', 'Our Read', 'strategy');
+  drawBlock('leverage_risk', 'Leverage & Risk', 'strategy');
+  drawBlock('emphasize', 'Ask Stack', 'strategy');
+  drawBlock('levers', 'Non-Salary Levers', 'strategy');
+
+  // ── YOUR COUNTER KIT ──
+  drawSectionTitle('Your counter kit');
+  drawBlock('opening_script', 'Phone Opener', 'plan');
+  drawBlock('pushback', 'Pushback Playbook', 'plan');
+  drawBlock('fallback', 'Fallback Playbook', 'plan');
+  drawBlock('meeting_email', 'Counter Email', 'plan');
+  drawBlock('accept_email', 'Final Accept Email', 'plan');
+  drawBlock('raise_case', 'Sequencing Plan', 'plan');
+
   // ── Disclaimer ──
-  y += 6;
+  y += 4;
   if (y + 16 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
   doc.setFontSize(6);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(160, 150, 180);
-  var disclaimerLines = doc.splitTextToSize('Your Counter Kit is built from the information you provided. The numbers are personalized estimates — a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2 - 4);
+  var disclaimerLines = doc.splitTextToSize('Your Counter Kit is built from the information you provided. The numbers are personalized estimates \u2014 a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2 - 4);
   doc.text(disclaimerLines, mx + 2, y + 4);
   y += disclaimerLines.length * 4 + 4;
+
+  // ── CTA for free users ──
+  if (!isPaid) {
+    if (y + 24 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    doc.setFillColor(248, 246, 240);
+    doc.setDrawColor(201, 168, 76);
+    doc.roundedRect(mx, y, W - mx * 2, 20, 3, 3, 'FD');
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(74, 80, 104);
+    doc.text('Your position is mapped and your strategy preview is ready. Unlock the full', mx + 6, y + 7);
+    doc.text('ask stack, every pushback response, and your counter + accept emails.', mx + 6, y + 12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text('Unlock your full kit at salary.recomlinked.com/offer', mx + 6, y + 17.5);
+    y += 24;
+  }
 
   // ── Footer ──
   drawFooter();
@@ -4054,7 +4237,7 @@ function initDiscoveryMode(container) {
       .then(function(kitData) {
         if (kitData && kitData.ready && kitData.kit) {
           // Restore context from Redis
-          var rCtx = kitData.offer_ctx;
+          var rCtx = kitData.offer_ctx || {};
           ['role','base','city','employment','competing','risk','worktype','experience',
            'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
             if (rCtx[k] !== undefined) SIM_STATE.context[k] = rCtx[k];
@@ -4065,12 +4248,36 @@ function initDiscoveryMode(container) {
           if (!state.discovery) state.discovery = {};
           state.discovery.answers = rCtx.answers || rCtx;
           state.discovery.step = 15;
-          // Apply kit
-          var kitJson = JSON.parse(kitData.kit);
+          // Apply kit — robust parse so a malformed stored kit never forces
+          // the paid user back through intake. If parsing yields nothing usable
+          // but we have their context, regenerate the kit live instead.
+          var kitJson = null;
+          try { kitJson = JSON.parse(kitData.kit); }
+          catch (e1) {
+            try { kitJson = JSON.parse(String(kitData.kit).replace(/```json|```/gi, '').trim()); }
+            catch (e2) { kitJson = null; }
+          }
           var KK = ['decision','leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','accept_email','raise_case'];
-          KK.forEach(function(k) {
-            if (kitJson[k]) { discCanvasBlocks[k] = { insight: kitJson[k], filled: true, teaser: false }; }
-          });
+          var _appliedCount = 0;
+          if (kitJson && typeof kitJson === 'object') {
+            KK.forEach(function(k) {
+              if (kitJson[k]) { discCanvasBlocks[k] = { insight: kitJson[k], filled: true, teaser: false }; _appliedCount++; }
+            });
+          }
+          if (_appliedCount === 0) {
+            // Stored kit was empty/unparseable — fall back to live regeneration
+            // using the restored context (paid, no re-charge, no re-intake).
+            if (rCtx.dims) { discDims = Object.assign(discDims, rCtx.dims); discActive = Object.assign(discActive, rCtx.dims); }
+            if (rCtx.levers) discLevers = rCtx.levers;
+            if (rCtx.weaks) discWeaks = rCtx.weaks;
+            discStep = 15;
+            discNumbersReady = true;
+            _paidNoDisc.remove();
+            insertDiscRadar();
+            showToolbar(); showModeToggle(); unlockModeToggle();
+            generateDiscInsights();
+            return;
+          }
           if (rCtx.dims) {
             Object.keys(discActive).forEach(function(k) { if (rCtx.dims[k] !== undefined) { discActive[k] = true; } });
           }
