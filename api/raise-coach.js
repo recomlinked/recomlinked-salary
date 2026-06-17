@@ -765,7 +765,7 @@ function buildOfferDiscPrompts(part, oc, answeredDims) {
 - Company size: ${oc.company_size || 'not specified'}${{'cs_1_50':' (1\u201350 \u2014 leadership decides comp directly, more flexibility)','cs_51_200':' (51\u2013200 \u2014 some structure, package is negotiable)','cs_201_1k':' (201\u20131,000 \u2014 salary bands exist with real room inside)','cs_1k_5k':' (1,001\u20135,000 \u2014 HR involved, package levers matter)','cs_5k_plus':' (5,000+ \u2014 rigid base bands, focus on signing bonus and title)'}[oc.company_size] || ''}
 - Salary anchor: ${oc.anchor === 'no_anchor' ? 'Candidate never shared a number — counter sets the first anchor' : oc.anchor === 'matched' ? 'Candidate shared a number and the offer matched it — counter needs new justification (market data, scope, competing signal) to go above their own anchor' : oc.anchor === 'below' ? 'Offer came in below what candidate stated — natural standing to re-ask for original number' : oc.anchor === 'above' ? 'Offer is above what candidate stated — company\'s internal band is higher than candidate\'s expectation, likely more room' : 'not specified'}
 - City: ${oc.city || 'not provided'} (use ONLY for qualitative talent-pool and cost-of-living reasoning \u2014 NEVER state or imply specific market salary figures for this city)
-- Candidate's natural voice: ${oc.tone || 'warm'} \u2014 write meeting_email, accept_email, and opening_script in this voice: ${oc.tone === 'direct' ? 'short sentences, no filler, gets to the number fast' : oc.tone === 'formal' ? 'polished, professional register, complete sentences, measured warmth' : 'friendly, personable, genuinely enthusiastic but professional'}
+- Candidate's natural voice: ${oc.tone || 'warm'} \u2014 write meeting_email and opening_script in this voice: ${oc.tone === 'direct' ? 'short sentences, no filler, gets to the number fast' : oc.tone === 'formal' ? 'polished, professional register, complete sentences, measured warmth' : 'friendly, personable, genuinely enthusiastic but professional'}
 ${oc.researched_max ? '- Candidate researched market max: ' + fm(oc.researched_max) + ' (use this as the market anchor — their counter can reference it without attribution)' : '- No market research provided \u2014 anchor on offer mechanics, never invent market data'}
 ${oc.jd_text ? '\nJOB DESCRIPTION (provided by candidate \u2014 use it to personalize: reference the actual scope, responsibilities, or requirements in the counter email, ask stack reasoning, and openers. Do not quote it back verbatim at length):\n' + oc.jd_text + '\n' : ''}
 
@@ -838,13 +838,12 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - pushback: "Every recruiter response to a counter is either a real constraint or a closing tactic — the response is completely different depending on which one it is."
 - fallback: "If base is blocked, you have exactly one window to pivot before the conversation closes — this is what you say in that window."
 - meeting_email: "Subject: Re: Senior Accountant offer — a quick note before I sign\\n\\nHi Sarah,\\n\\nThank you again for the offer — I'm genuinely excited about the team and the work ahead. Before I sign, I'd like to align on compensation so we can wrap this up cleanly. Based on the scope we discussed and the market for this role, I was hoping we could revisit the..."
-- accept_email: "How you accept is the last piece of leverage you have — most people waste it."
 - raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
 
 Respond ONLY with valid JSON — exactly these 9 keys, one hook sentence each, no markdown:
-{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
-// Respond with all 9 keys.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 9 hook sentences — one per key. Every key required.`,
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","raise_case":"..."}`,
+// Respond with all 8 keys.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 8 hook sentences — one per key. Every key required.`,
       maxTokens: 1200,
     };
   }
@@ -902,13 +901,6 @@ meeting_email:
   
   [Full email body, 90-130 words, first person, warm. Must include EXACTLY the counter number ${fm(oc.counter)}, one sentence of reasoning anchored to role scope, and must end with the closing signal: if we can get there, ready to sign this week. Only placeholder allowed: [Name] for the recruiter.]
 
-accept_email:
-  This is the FINAL ACCEPT EMAIL \u2014 sent after terms are agreed, to close professionally and lock the revised number in writing. One sentence on why accepting in writing matters (verbal agreements evaporate).
-  Then the complete email:
-  Subject: [short, signals acceptance]
-  
-  [Full email body, 50-90 words, first person, warm and decisive. Must: confirm acceptance at the agreed revised terms, ask for the updated offer letter reflecting them, and close with genuine enthusiasm about starting. Only placeholder allowed: [Name].]
-
 fallback:
   This is the FALLBACK PLAYBOOK \u2014 what to do if base is rejected. Three concrete moves in order:
   1. The signing bonus pivot: the exact script to use when they say base is fixed. One sentence in quotes, first person. Must include ${fm(signingAsk)} as the ask. Why this works (one-time budget, doesn't touch the band).
@@ -924,10 +916,10 @@ raise_case:
   4. [Getting the final number in writing before signing]
   5. [If the deadline is too tight \u2014 the exact extension script, one sentence in quotes]
 
-Return ONLY these 9 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
-{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
-// 9 keys total.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 9 Counter Kit sections.`,
+Return ONLY these 8 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","raise_case":"..."}`,
+// 8 keys total.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 8 Counter Kit sections.`,
       maxTokens: 4096,
     };
   }
