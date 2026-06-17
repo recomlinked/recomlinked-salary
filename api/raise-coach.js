@@ -822,7 +822,6 @@ Rules for strategy hooks:
 - The hook must be DIFFERENT from what they'd get from ChatGPT — it references their leverage signals, deadline, and position
 
 Examples (write better than these, calibrated to THEIR specific situation):
-- decision: "Your leverage signals say counter — the question isn't whether to ask, it's whether your framing will hold when they push back."
 - leverage_risk: "The rescind fear is real but statistically near-zero for professional counters — what actually kills offers is the candidate who sounds uncertain, not the one who asks for more."
 - emphasize: "Most candidates in your position lead with the wrong ask — the order of the stack determines whether you get a yes on what matters or a no on everything."
 - levers: "If they say the base is fixed, nine other levers activate — and the first pivot takes 10 seconds."
@@ -834,10 +833,10 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - accept_email: "How you accept is the last piece of leverage you have — most people waste it."
 - raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
 
-Respond ONLY with valid JSON — exactly these 10 keys, one hook sentence each, no markdown:
-{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
-// Respond with all 16 keys.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 10 hook sentences — one per key. Every key required.`,
+Respond ONLY with valid JSON — exactly these 9 keys, one hook sentence each, no markdown:
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
+// Respond with all 9 keys.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 9 hook sentences — one per key. Every key required.`,
       maxTokens: 1200,
     };
   }
@@ -857,14 +856,6 @@ WRITING RULES:
 - Tone: a coach who has closed 1,000 offer negotiations \u2014 direct, warm, zero filler.
 
 SECTIONS:
-
-decision:
-  This is OUR READ \u2014 a direct, expert recommendation in 3-4 sentences.
-  Answer three things explicitly:
-  1. SHOULD THEY NEGOTIATE? Yes/proceed carefully/no (almost always yes \u2014 only 'proceed carefully' if they have near-zero walk-away AND a tight deadline).
-  2. POSITION = leverage quality. Synthesize walkaway + urgency + talent market into one honest sentence about how strong their position actually is.
-  3. RISK LEVEL = how carefully should they counter? This is separate from their risk CHOICE. It is the expert read based on their leverage. Strong walkaway + urgency = push hard. Weak walkaway + tight deadline = carefully. Mismatch between their risk choice and their leverage \u2014 flag it: 'You chose ambitious, but your walk-away position is weak \u2014 your framing needs to be perfect.'
-  End with one sentence: the single most important thing they must get right in this negotiation.
 
 leverage_risk:
   The non-obvious read of their specific leverage given the signals above. How to deploy it without putting the offer at risk. What rescind risk actually looks like (extremely rare for professional counters) and what genuinely triggers it. 4-5 sentences.
@@ -925,10 +916,10 @@ raise_case:
   4. [Getting the final number in writing before signing]
   5. [If the deadline is too tight \u2014 the exact extension script, one sentence in quotes]
 
-Return ONLY these 10 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
-{"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
-// 10 keys total.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 11 Counter Kit sections.`,
+Return ONLY these 9 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
+// 9 keys total.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 9 Counter Kit sections.`,
       maxTokens: 4096,
     };
   }
