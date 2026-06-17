@@ -3019,20 +3019,7 @@ function generateCanvasPDF() {
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
   logEntry('pdf_download', { filled: filledCount, paid: !!state.paid });
   logSession('pdf_download', { filled: filledCount, download_pdf: true });
-
-  if (window.jspdf) {
-    return _generatePDFWithJsPDF();
-  }
-  // Load jsPDF dynamically
-  var s = document.createElement('script');
-  s.crossOrigin = 'anonymous';
-  s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
-  s.onload = function() { _generatePDFWithJsPDF(); };
-  s.onerror = function() {
-    // Fallback: print-friendly page
-    _generatePDFPrintFallback();
-  };
-  document.head.appendChild(s);
+  _generatePDFPrintFallback();
 }
 
 function _generatePDFPrintFallback() {
@@ -3216,71 +3203,15 @@ function _generatePDFPrintFallback() {
       '</p></div>';
   }
 
-  try {
-  // ── YOUR NEGOTIATION ROOM ──
-  y += 4;
-  if (y + 36 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
-  var v = state && state.offer_verdict;
-  var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
-  doc.setFillColor(44, 32, 80);
-  doc.setDrawColor(201, 168, 76);
-  doc.roundedRect(mx, y, W - mx * 2, 34, 3, 3, 'FD');
-  doc.setFontSize(7.5);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(245, 207, 86);
-  doc.text('YOUR NEGOTIATION ROOM', mx + 5, y + 6);
-  if (v && v.room_low) {
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(245, 207, 86);
-    doc.text(fm(v.room_low) + ' \u2013 ' + fm(v.room_high), mx + 5, y + 15);
-    var rk = v.risk || 'balanced';
-    var tiers = [{l:'SAFE',v:v.counter_safe},{l:'MODERATE',v:v.counter_moderate},{l:'AMBITIOUS',v:v.counter_ambitious}];
-    var recIdx = rk==='safe'?0:rk==='ambitious'?2:1;
-    var tw = (W - mx*2 - 10) / 3;
-    tiers.forEach(function(t,i) {
-      var tx = mx + 5 + i*(tw+2);
-      var isRec = i===recIdx;
-      if(isRec){doc.setFillColor(201,168,76);doc.setDrawColor(201,168,76);}else{doc.setFillColor(80,70,120);doc.setDrawColor(100,90,140);}
-      doc.roundedRect(tx, y+18, tw, 10, 1.5, 1.5, 'FD');
-      doc.setFontSize(6); doc.setFont('helvetica','bold');
-      doc.setTextColor(isRec?44:200, isRec?32:190, isRec?80:230);
-      doc.text(t.l + (isRec?' \u2605':''), tx+tw/2, y+22.5, {align:'center'});
-      doc.setFontSize(8); doc.setFont('helvetica','bold');
-      doc.setTextColor(isRec?44:240, isRec?32:235, isRec?80:255);
-      doc.text(fm(t.v), tx+tw/2, y+27, {align:'center'});
-    });
-    doc.setFontSize(6.5); doc.setFont('helvetica','normal');
-    doc.setTextColor(200,190,230);
-    doc.text('Plan calibrated to your risk choice: ' + (rk.charAt(0).toUpperCase()+rk.slice(1)), mx+5, y+32);
-  } else {
-    doc.setFontSize(11); doc.setFont('helvetica','bold');
-    doc.setTextColor(180,160,200);
-    doc.text('\u2014', mx+5, y+18);
-  }
-  y += 38;
-
-  // ── Disclaimer ──
-  y += 6;
-  if (y + 16 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'italic');
-  doc.setTextColor(160, 150, 180);
-  var disclaimerLines = doc.splitTextToSize('Your Counter Kit is built from the information you provided. The numbers are personalized estimates — a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2 - 4);
-  doc.text(disclaimerLines, mx + 2, y + 4);
-  y += disclaimerLines.length * 4 + 4;
-
-  // ── Footer ──
-  drawFooter();
-
-  // ── Save ──
-  doc.save('offer-counter-kit.pdf');
-  } catch (e) {
-    console.error('PDF generation error:', e);
-    // Fallback to print version
-    _generatePDFPrintFallback();
-  }
+  html += '</body></html>';
+  var win = window.open('', '_blank', 'width=800,height=900');
+  if (!win) { alert('Please allow pop-ups to download your Counter Kit PDF.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); }, 600);
 }
+
 
 function calculateNegotiationScore() {
   var wa = discDims.walkaway || 0;
