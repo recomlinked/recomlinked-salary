@@ -821,6 +821,14 @@ Rules for strategy hooks:
 - End on an incomplete thought that makes them want to read the full section
 - The hook must be DIFFERENT from what they'd get from ChatGPT — it references their leverage signals, deadline, and position
 
+SPECIAL FORMAT FOR meeting_email — this one is NOT a teaser sentence:
+- meeting_email must be the ACTUAL OPENING of the real counter email — the literal text the candidate would send, not a description of it.
+- Start with "Subject: " then a real subject line, then "\\n\\n", then the first 2-3 sentences of the email body (greeting + warm opening + the lead-in to the ask).
+- Write it in their natural voice (see tone above). Reference their actual role.
+- STOP right before any number or specific figure would appear — the body must end mid-thought, leading into the ask, with NO dollar amounts, percentages, or salary figures anywhere.
+- Do NOT explain or describe the email. Do NOT use phrases like "the email that..." or "this email...". Output only the email text itself.
+- Example shape (write better, in their voice): "Subject: Re: [Role] offer — a quick note before I sign\\n\\nHi [Name],\\n\\nThank you again for the offer — I'm genuinely excited about the team and the scope of this role. Before I sign, I'd like to align on the compensation so we can close this cleanly. Based on the scope we discussed and where comparable roles are landing, I was hoping we could revisit the..."
+
 Examples (write better than these, calibrated to THEIR specific situation):
 - leverage_risk: "The rescind fear is real but statistically near-zero for professional counters — what actually kills offers is the candidate who sounds uncertain, not the one who asks for more."
 - emphasize: "Most candidates in your position lead with the wrong ask — the order of the stack determines whether you get a yes on what matters or a no on everything."
@@ -829,7 +837,7 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - opening_script: "The recruiter's first impression of how you negotiate is formed in the first sentence — the four openers in this kit each send a different signal."
 - pushback: "Every recruiter response to a counter is either a real constraint or a closing tactic — the response is completely different depending on which one it is."
 - fallback: "If base is blocked, you have exactly one window to pivot before the conversation closes — this is what you say in that window."
-- meeting_email: "The email that gets a yes has one sentence most people leave out — and it's not the number."
+- meeting_email: "Subject: Re: Senior Accountant offer — a quick note before I sign\\n\\nHi Sarah,\\n\\nThank you again for the offer — I'm genuinely excited about the team and the work ahead. Before I sign, I'd like to align on compensation so we can wrap this up cleanly. Based on the scope we discussed and the market for this role, I was hoping we could revisit the..."
 - accept_email: "How you accept is the last piece of leverage you have — most people waste it."
 - raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
 
