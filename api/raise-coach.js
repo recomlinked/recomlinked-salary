@@ -929,7 +929,7 @@ Return ONLY these 10 keys as valid JSON. Values are plain text strings with \\n 
 {"decision":"...","leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","accept_email":"...","raise_case":"..."}`,
 // 10 keys total.
       userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 11 Counter Kit sections.`,
-      maxTokens: 3400,
+      maxTokens: 4096,
     };
   }
 
@@ -1212,10 +1212,18 @@ Return ONLY these 5 keys as valid JSON. No markdown fences. No preamble.
     const raw = (response.content[0]?.text || '').trim();
     let insights = {};
     try {
-      const cleaned = raw.replace(/```json|```/g, '').trim();
+      // Strip markdown fences, then extract the first {...} JSON object
+      let cleaned = raw.replace(/```json|```/g, '').trim();
+      // If Claude added preamble text, extract the JSON object
+      const jsonMatch = cleaned.match(/\{[\s\S]+\}/);
+      if (jsonMatch) cleaned = jsonMatch[0];
       insights = JSON.parse(cleaned);
+      if (typeof insights !== 'object' || Array.isArray(insights)) insights = {};
+      if (Object.keys(insights).length === 0) {
+        console.error('[disc_insights] empty insights, raw:', raw.slice(0, 300));
+      }
     } catch (parseErr) {
-      console.error('[disc_insights] JSON parse error:', parseErr.message, 'raw:', raw.slice(0, 200));
+      console.error('[disc_insights] JSON parse error:', parseErr.message, 'raw:', raw.slice(0, 300));
       insights = {};
     }
 
