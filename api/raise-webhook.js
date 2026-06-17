@@ -369,17 +369,26 @@ Co-founder, Recomlinked`;
     console.error('[raise-webhook] email send error:', emailErr.message || emailErr);
   }
 
-  // ── Store offer context immediately so it's available on return (offer product only) ──
-  if (product === 'offer' && user && user.offer_context && accessToken) {
+  // ── Read checkout stash to get offer_context (only stored there, not in Stripe metadata) ──
+  let offerCtx = null;
+  if (product === 'offer' && accessToken) {
     try {
-      await redis.set(`offer:ctx:${accessToken}`, JSON.stringify(user.offer_context), { ex: 86400 * 30 });
+      const stashRaw = await redis.get(`raise:checkout:${session.id}`);
+      const stash = stashRaw ? (typeof stashRaw === 'string' ? JSON.parse(stashRaw) : stashRaw) : null;
+      if (stash && stash.offer_context) offerCtx = stash.offer_context;
+    } catch(e) { console.warn('[raise-webhook] stash read failed:', e.message); }
+  }
+
+  // ── Store offer context immediately so email link works on any device ──
+  if (product === 'offer' && offerCtx && accessToken) {
+    try {
+      await redis.set(`offer:ctx:${accessToken}`, JSON.stringify(offerCtx), { ex: 86400 * 30 });
+      console.log('[raise-webhook] offer:ctx stored for', accessToken.slice(0,8));
     } catch(e) { console.warn('[raise-webhook] offer:ctx store failed:', e.message); }
   }
 
   // ── Generate full Counter Kit on payment (offer product only) ──
-  // Stores results in Redis so they're ready when user lands on paid page.
-  // This avoids any loading spinner after payment.
-  if (product === 'offer' && user && user.offer_context) {
+  if (product === 'offer' && offerCtx) {
     try {
       const BASE_URL2 = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || 'https://salary.recomlinked.com';
       fetch(BASE_URL2 + '/api/raise-coach', {
@@ -389,12 +398,12 @@ Co-founder, Recomlinked`;
           mode: 'disc_insights',
           product: 'offer',
           part: 'full_kit',
-          offer_ctx: user.offer_context,
-          blocker: user.offer_context.blocker || 'other',
-          answers: user.offer_context.answers || {},
-          dims: user.offer_context.dims || {},
-          levers: user.offer_context.levers || [],
-          weaks: user.offer_context.weaks || [],
+          offer_ctx: offerCtx,
+          blocker: offerCtx.blocker || 'other',
+          answers: offerCtx.answers || {},
+          dims: offerCtx.dims || {},
+          levers: offerCtx.levers || [],
+          weaks: offerCtx.weaks || [],
           _store_for: accessToken,
         })
       }).catch(function(e) { console.error('[raise-webhook] kit gen error:', e.message); });
