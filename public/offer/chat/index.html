@@ -2887,6 +2887,7 @@ var discActive = {walkaway:false,risk_tol:false,urgency:false,talent:false,offer
 var discLevers = [];
 var discWeaks = [];
 var discStep = 0;
+var _discAnswerHistory = []; // snapshot stack for back button
 var discInsights = {}; // AI-generated insights per dimension
 var discOrderedQuestions = []; // Questions reordered per blocker
 
@@ -2941,7 +2942,7 @@ var DISC_Q_ALL = {
     { val: 'first_job', text: 'Student / this is my first real job', scores: {walkaway:35}, note: 'First offers can still be negotiated. The safest move is a respectful ask that sounds prepared, not overplayed.', type: 'neutral' },
   ]},
   industry: { id: 'industry', label: 'What industry is the company in? (Optional)', dimTag: null, input: 'text', placeholder: 'e.g. Healthcare, fintech, retail\u2026', skipText: 'Skip', options: [] },
-  city: { id: 'city', label: 'What city is the role based in? (Optional \u2014 helps read the local talent pool)', dimTag: null, input: 'text', placeholder: 'e.g. Calgary', skipText: 'Skip', options: [] },
+  city: { id: 'city', label: 'What city is the role based in? (Optional \u2014 helps read the local talent pool)', dimTag: null, input: 'text', placeholder: 'e.g. New York', skipText: 'Skip', options: [] },
   company_size: { id: 'company_size', label: 'How big is the company?', dimTag: 'offer', options: [
     { val: 'cs_1_50',    text: '1\u201350 employees',        scores: {offer:65}, note: 'Smaller team. Comp decisions often involve leadership directly, which can mean more flexibility.', type: 'neutral' },
     { val: 'cs_51_200',  text: '51\u2013200 employees',      scores: {offer:60}, note: 'Some structure is forming but there\u2019s usually room to negotiate, especially on package.', type: 'neutral' },
@@ -3019,7 +3020,231 @@ function generateCanvasPDF() {
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
   logEntry('pdf_download', { filled: filledCount, paid: !!state.paid });
   logSession('pdf_download', { filled: filledCount, download_pdf: true });
-  _generatePDFPrintFallback();
+  if (window.jspdf && window.jspdf.jsPDF) {
+    return _generatePDFWithJsPDF();
+  }
+  var s = document.createElement('script');
+  s.crossOrigin = 'anonymous';
+  s.src = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+  s.onload = function() { _generatePDFWithJsPDF(); };
+  s.onerror = function() { _generatePDFPrintFallback(); };
+  document.head.appendChild(s);
+}
+
+
+function _generatePDFWithJsPDF() {
+  var jsPDF = window.jspdf.jsPDF;
+  try {
+  var doc = new jsPDF('p', 'mm', 'a4');
+  var W = 210, H = 297;
+  var mx = 16, y = 0;
+  var navy = [30, 61, 114];
+  var purple = [44, 32, 80];
+  var gold = [201, 168, 76];
+  var isPaid = state.paid;
+  var v = (state && state.offer_verdict) || {};
+  var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
+
+  // ── Header ──
+  doc.setFillColor(purple[0], purple[1], purple[2]);
+  doc.rect(0, 0, W, 28, 'F');
+  doc.setFontSize(16); doc.setFont('helvetica', 'bold');
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text('Counter Offer Kit', mx, 13);
+  doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+  doc.setTextColor(200, 190, 230);
+  doc.text('salary.recomlinked.com/offer', mx, 20);
+  var dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  doc.text(dateStr, W - mx, 20, { align: 'right' });
+  y = 36;
+
+  function drawSectionTitle(title) {
+    doc.setFontSize(9); doc.setFont('helvetica', 'bold');
+    doc.setTextColor(navy[0], navy[1], navy[2]);
+    doc.text(title.toUpperCase(), mx, y);
+    y += 6;
+  }
+
+  function getBlockColors(strength) {
+    if (strength === 'strong') return { bg:[232,247,240], border:[26,158,108], text:[10,92,58], badge:'Strong' };
+    if (strength === 'weak')   return { bg:[252,235,235], border:[204,68,68],  text:[122,32,32], badge:'Weak' };
+    if (strength === 'neutral')return { bg:[253,245,230], border:[201,168,76], text:[106,74,16], badge:'Medium' };
+    return { bg:[232,239,248], border:[30,61,114], text:[26,53,96], badge:'' };
+  }
+
+  function wrapText(text, maxWidth) {
+    if (!text) return [];
+    var words = text.replace(/\*\*/g, '').split(' ');
+    var lines = [], line = '';
+    words.forEach(function(w) {
+      var test = line ? line + ' ' + w : w;
+      if (doc.getTextWidth(test) > maxWidth) { if (line) lines.push(line); line = w; }
+      else line = test;
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  function drawBlock(block, label, x, blockW, forceH, section) {
+    var b = discCanvasBlocks[block];
+    var filled = b && b.filled;
+    var insight = filled ? (b.insight || '') : '';
+    var padX = 5, padY = 6;
+    var emptyText = discPlanLoading ? 'Generating\u2026' : 'Complete intake to fill';
+    if (filled) {
+      var col = getBlockColors(b.strength);
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      var textLines = wrapText(insight, blockW - padX * 2 - 2);
+      var blockH = forceH || (12 + textLines.length * 4.2 + padY);
+      doc.setFillColor(col.bg[0], col.bg[1], col.bg[2]);
+      doc.setDrawColor(col.border[0], col.border[1], col.border[2]);
+      doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
+      doc.setFontSize(7); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(col.text[0], col.text[1], col.text[2]);
+      doc.text(label.toUpperCase(), x + padX, y + 6.5);
+      if (col.badge) {
+        var bw = doc.getTextWidth(col.badge) + 4;
+        doc.setFillColor(col.border[0], col.border[1], col.border[2]);
+        doc.roundedRect(x + blockW - 4 - bw - 1, y + 2.5, bw + 2, 5, 1, 1, 'F');
+        doc.setFontSize(6); doc.setTextColor(255, 255, 255);
+        doc.text(col.badge, x + blockW - 4 - bw / 2, y + 5.8, { align: 'center' });
+      }
+      doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(col.text[0], col.text[1], col.text[2]);
+      textLines.forEach(function(line, i) { doc.text(line, x + padX, y + 12 + i * 4.2); });
+      return blockH + 2;
+    } else {
+      var blockH = forceH || 14;
+      doc.setFillColor(240, 241, 245); doc.setDrawColor(200, 205, 215);
+      doc.roundedRect(x, y, blockW, blockH, 2, 2, 'FD');
+      doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(160, 165, 180);
+      doc.text(label.toUpperCase(), x + padX, y + 6.5);
+      doc.setFontSize(6.5); doc.setFont('helvetica', 'italic'); doc.setTextColor(180, 185, 195);
+      doc.text(emptyText, x + padX, y + 12);
+      return blockH + 2;
+    }
+  }
+
+  function calcRowH(blocks, colW) {
+    var maxH = 14;
+    blocks.forEach(function(block) {
+      var b = discCanvasBlocks[block];
+      if (b && b.filled) {
+        doc.setFontSize(7.5);
+        var lines = wrapText(b.insight || '', colW - 10);
+        var h = 12 + lines.length * 4.2 + 6;
+        if (h > maxH) maxH = h;
+      }
+    });
+    return maxH;
+  }
+
+  function drawRow(blocks, labels, section) {
+    var colW = (W - mx * 2 - (blocks.length - 1) * 3) / blocks.length;
+    var rowH = calcRowH(blocks, colW);
+    if (y + rowH > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    var savedY = y;
+    blocks.forEach(function(block, i) {
+      y = savedY;
+      drawBlock(block, labels[i], mx + i * (colW + 3), colW, rowH, section);
+    });
+    y = savedY + rowH + 2;
+  }
+
+  function drawFullWidth(block, label, section) {
+    var fullW = W - mx * 2;
+    var b = discCanvasBlocks[block];
+    var estH = 14;
+    if (b && b.filled) {
+      doc.setFontSize(7.5);
+      var lines = wrapText(b.insight || '', fullW - 10);
+      estH = 12 + lines.length * 4.2 + 6;
+    }
+    if (y + estH > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    y += drawBlock(block, label, mx, fullW, null, section);
+  }
+
+  function drawFooter() {
+    doc.setFillColor(purple[0], purple[1], purple[2]);
+    doc.rect(0, H - 12, W, 12, 'F');
+    doc.setFontSize(7); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(200, 190, 230);
+    doc.text('salary.recomlinked.com/offer', mx, H - 5);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text(isPaid ? 'Full Counter Kit' : 'Free preview \u2014 unlock at salary.recomlinked.com/offer', W - mx, H - 5, { align: 'right' });
+  }
+
+  // ── YOUR NEGOTIATION ROOM ──
+  if (v && v.room_low) {
+    if (y + 38 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+    doc.setFillColor(44, 32, 80); doc.setDrawColor(gold[0], gold[1], gold[2]);
+    doc.roundedRect(mx, y, W - mx * 2, 36, 3, 3, 'FD');
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text('YOUR NEGOTIATION ROOM', mx + 5, y + 6);
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text(fm(v.room_low) + ' \u2013 ' + fm(v.room_high), mx + 5, y + 14);
+    var rk = v.risk || 'balanced';
+    var tiers = [{l:'SAFE',v:v.counter_safe},{l:'MODERATE',v:v.counter_moderate},{l:'AMBITIOUS',v:v.counter_ambitious}];
+    var recIdx = rk==='safe'?0:rk==='ambitious'?2:1;
+    var tw = (W - mx * 2 - 12) / 3;
+    tiers.forEach(function(t, i) {
+      var tx = mx + 5 + i * (tw + 1);
+      var isRec = i === recIdx;
+      if (isRec) { doc.setFillColor(gold[0],gold[1],gold[2]); doc.setDrawColor(gold[0],gold[1],gold[2]); }
+      else        { doc.setFillColor(70,55,110); doc.setDrawColor(90,75,130); }
+      doc.roundedRect(tx, y + 18, tw, 11, 1.5, 1.5, 'FD');
+      doc.setFontSize(6); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(isRec ? 44 : 200, isRec ? 32 : 185, isRec ? 80 : 230);
+      doc.text(t.l + (isRec ? ' \u2605' : ''), tx + tw / 2, y + 22.5, { align: 'center' });
+      doc.setFontSize(8); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(isRec ? 44 : 240, isRec ? 32 : 235, isRec ? 80 : 255);
+      doc.text(fm(t.v), tx + tw / 2, y + 27.5, { align: 'center' });
+    });
+    doc.setFontSize(6); doc.setFont('helvetica', 'normal'); doc.setTextColor(190, 180, 220);
+    doc.text('Risk choice: ' + rk.charAt(0).toUpperCase() + rk.slice(1), mx + 5, y + 33.5);
+    y += 40;
+  }
+
+  // ── YOUR POSITION ──
+  doc.setDrawColor(220, 225, 235); doc.line(mx, y, W - mx, y); y += 5;
+  drawSectionTitle('Your Position');
+  drawRow(['walkaway', 'risk_tol'], ['Walk-Away Power', 'Risk Tolerance'], 'position');
+  drawRow(['urgency', 'talent'], ['Their Urgency', 'Talent Market'], 'position');
+  drawFullWidth('offer', 'Offer Structure', 'position');
+
+  y += 2; doc.setDrawColor(220, 225, 235); doc.line(mx, y, W - mx, y); y += 5;
+
+  // ── YOUR STRATEGY ──
+  drawSectionTitle('Your Strategy');
+  drawFullWidth('decision', 'Our Read', 'strategy');
+  drawFullWidth('leverage_risk', 'Leverage & Risk', 'strategy');
+  drawFullWidth('emphasize', 'Ask Stack', 'strategy');
+
+  y += 2; doc.setDrawColor(220, 225, 235); doc.line(mx, y, W - mx, y); y += 5;
+
+  // ── YOUR COUNTER KIT ──
+  drawSectionTitle('Your Counter Kit');
+  drawFullWidth('meeting_email', 'Counter Email', 'plan');
+  drawFullWidth('opening_script', 'Phone Opener', 'plan');
+  drawFullWidth('levers', 'Non-Salary Levers', 'plan');
+  drawFullWidth('pushback', 'Pushback Playbook', 'plan');
+  drawFullWidth('fallback', 'Fallback Responses', 'plan');
+  drawFullWidth('accept_email', 'Final Accept Email', 'plan');
+  drawFullWidth('raise_case', 'Sequencing Plan', 'plan');
+
+  // ── Disclaimer ──
+  y += 4;
+  if (y + 14 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
+  doc.setFontSize(6); doc.setFont('helvetica', 'italic'); doc.setTextColor(160, 150, 180);
+  var disc = doc.splitTextToSize('Your Counter Kit is built from the information you provided. Numbers are personalized estimates \u2014 a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2);
+  doc.text(disc, mx, y); y += disc.length * 3.5 + 4;
+
+  drawFooter();
+  doc.save('offer-counter-kit.pdf');
+  } catch(e) {
+    console.error('PDF error:', e);
+    _generatePDFPrintFallback();
+  }
 }
 
 function _generatePDFPrintFallback() {
@@ -3873,13 +4098,13 @@ function appendStandardPaywall(container, opts) {
     }
   } catch (e) {}
 
-  var selectedPrice = 39;
+  var selectedPrice = 19;
   var uid = Date.now();
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my Counter Kit \u00b7 $39 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my Counter Kit \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
@@ -4629,6 +4854,20 @@ function renderDiscQuestion(idx) {
     chatArea.appendChild(ghDiv);
   }
 
+  // Invisible marker — used by back button to find where this step starts
+  var _stepMarker = el('div', '', '');
+  _stepMarker.dataset.discStepStart = idx;
+  _stepMarker.style.display = 'none';
+  chatArea.appendChild(_stepMarker);
+
+  // Back button — only shown from Q2 onward
+  if (idx > 0) {
+    var _backRow = el('div', '', '');
+    _backRow.style.cssText = 'padding:0 2px 4px;';
+    _backRow.innerHTML = '<button onclick="goBackDiscQuestion()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--t3);padding:2px 0;display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Edit my last answer</button>';
+    chatArea.appendChild(_backRow);
+  }
+
   var coachBubble = el('div', 'coach-msg', '');
   var catLabel = q.dimTag ? (DIM_LABELS[q.dimTag] || q.dimTag) : (Q_CATEGORY_LABELS[q.id] || '');
   var labelHtml = catLabel ? '<span class="disc-dim-tag">' + catLabel + '</span> ' : '';
@@ -4718,6 +4957,16 @@ function pickDiscAnswer(qIdx, opt, pill) {
   var userBubble = el('div', 'user-msg', '');
   userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(opt.text) + '</div>';
   chatArea.appendChild(userBubble);
+
+  // Snapshot current state for back button
+  _discAnswerHistory.push({
+    step: qIdx,
+    dims: JSON.parse(JSON.stringify(discDims)),
+    active: JSON.parse(JSON.stringify(discActive)),
+    levers: discLevers.slice(),
+    weaks: discWeaks.slice(),
+    context: JSON.parse(JSON.stringify(SIM_STATE.context || {})),
+  });
 
   // Update scores
   var q = discOrderedQuestions[qIdx];
@@ -4879,6 +5128,37 @@ function pickDiscAnswer(qIdx, opt, pill) {
       renderDiscQuestion(discStep);
     }, 400);
   });
+}
+
+function goBackDiscQuestion() {
+  if (!_discAnswerHistory.length) return;
+  var snap = _discAnswerHistory.pop();
+  // Restore state to before this answer
+  discDims    = snap.dims;
+  discActive  = snap.active;
+  discLevers  = snap.levers;
+  discWeaks   = snap.weaks;
+  SIM_STATE.context = snap.context;
+  discStep    = snap.step;
+  // Restore canvas blocks for this question's dimension
+  var q = discOrderedQuestions[snap.step];
+  if (q && q.dimTag && discCanvasBlocks[q.dimTag]) {
+    discCanvasBlocks[q.dimTag].filled = false;
+    discCanvasBlocks[q.dimTag].insight = '';
+  }
+  // Remove all DOM elements from this step onward
+  var chatArea = $('disc-chat');
+  if (chatArea) {
+    var marker = chatArea.querySelector('[data-disc-step-start="' + snap.step + '"]');
+    if (marker) {
+      var toRemove = [];
+      var node = marker;
+      while (node) { toRemove.push(node); node = node.nextSibling; }
+      toRemove.forEach(function(n) { if (n.parentNode) n.parentNode.removeChild(n); });
+    }
+  }
+  // Re-render the question
+  renderDiscQuestion(snap.step);
 }
 
 // ═══════════════════════════════════════════════════════════
