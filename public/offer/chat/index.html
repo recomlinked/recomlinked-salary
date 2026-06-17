@@ -3072,7 +3072,14 @@ function _generatePDFWithJsPDF() {
 
   function wrapText(text, maxWidth) {
     if (!text) return [];
-    var clean = text.replace(/\*\*/g, '');
+    var clean = text.replace(/\*\*/g, '')
+      // jsPDF's built-in Helvetica can't render these — replace with safe ASCII
+      .replace(/\u2192/g, '->')        // → arrow (used in pushback separators)
+      .replace(/[\u2018\u2019]/g, "'")  // curly single quotes
+      .replace(/[\u201C\u201D]/g, '"')  // curly double quotes
+      .replace(/\u2022/g, '-')          // bullet
+      .replace(/\u2026/g, '...')        // ellipsis
+      .replace(/[\u2013\u2014]/g, '-'); // en/em dash
     var lines = [];
     // Respect explicit newlines first (emails use \n\n between greeting/body)
     clean.split('\n').forEach(function(para) {
@@ -3175,7 +3182,7 @@ function _generatePDFWithJsPDF() {
     doc.setTextColor(200, 190, 230);
     doc.text('salary.recomlinked.com/offer', mx, H - 5);
     doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.text(isPaid ? 'Full Counter Kit' : 'Free preview \u2014 unlock at salary.recomlinked.com/offer', W - mx, H - 5, { align: 'right' });
+    doc.text(isPaid ? 'Full Counter Kit' : 'Free preview - unlock at salary.recomlinked.com/offer', W - mx, H - 5, { align: 'right' });
   }
 
   // ── YOUR NEGOTIATION ROOM ──
@@ -3186,7 +3193,7 @@ function _generatePDFWithJsPDF() {
     doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(gold[0], gold[1], gold[2]);
     doc.text('YOUR NEGOTIATION ROOM', mx + 5, y + 6);
     doc.setFontSize(14); doc.setFont('helvetica', 'bold'); doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.text(fm(v.room_low) + ' \u2013 ' + fm(v.room_high), mx + 5, y + 14);
+    doc.text(fm(v.room_low) + ' - ' + fm(v.room_high), mx + 5, y + 14);
     var rk = v.risk || 'balanced';
     var tiers = [{l:'SAFE',v:v.counter_safe},{l:'MODERATE',v:v.counter_moderate},{l:'AMBITIOUS',v:v.counter_ambitious}];
     var recIdx = rk==='safe'?0:rk==='ambitious'?2:1;
@@ -3199,7 +3206,7 @@ function _generatePDFWithJsPDF() {
       doc.roundedRect(tx, y + 18, tw, 11, 1.5, 1.5, 'FD');
       doc.setFontSize(6); doc.setFont('helvetica', 'bold');
       doc.setTextColor(isRec ? 44 : 200, isRec ? 32 : 185, isRec ? 80 : 230);
-      doc.text(t.l + (isRec ? ' \u2605' : ''), tx + tw / 2, y + 22.5, { align: 'center' });
+      doc.text(t.l + (isRec ? ' (PICK)' : ''), tx + tw / 2, y + 22.5, { align: 'center' });
       doc.setFontSize(8); doc.setFont('helvetica', 'bold');
       doc.setTextColor(isRec ? 44 : 240, isRec ? 32 : 235, isRec ? 80 : 255);
       doc.text(fm(t.v), tx + tw / 2, y + 27.5, { align: 'center' });
@@ -3268,7 +3275,7 @@ function _generatePDFWithJsPDF() {
   y += 4;
   if (y + 14 > H - 20) { drawFooter(); doc.addPage(); y = 16; }
   doc.setFontSize(6); doc.setFont('helvetica', 'italic'); doc.setTextColor(160, 150, 180);
-  var disc = doc.splitTextToSize('Your Counter Kit is built from the information you provided. Numbers are personalized estimates \u2014 a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2);
+  var disc = doc.splitTextToSize('Your Counter Kit is built from the information you provided. Numbers are personalized estimates - a strong starting point, not a guarantee. Your judgment and context always lead.', W - mx * 2);
   doc.text(disc, mx, y); y += disc.length * 3.5 + 4;
 
   drawFooter();
