@@ -191,22 +191,6 @@ module.exports = async function handler(req, res) {
   const now         = new Date().toISOString();
   const expiresAt   = new Date(Date.now() + TTL_30_DAYS * 1000).toISOString();
 
-  // The checkout endpoint stashes the full payload (including offer_context)
-  // in Redis under raise:checkout:{session.id}. Stripe metadata can't hold the
-  // nested offer_context object, so we read it back here. Without this, the
-  // offer Counter Kit never pre-generates and offer:ctx is never stored, which
-  // breaks the email link on a new device.
-  let offerContext = null;
-  try {
-    const stashRaw = await redis.get(`raise:checkout:${session.id}`);
-    if (stashRaw) {
-      const stash = typeof stashRaw === 'string' ? JSON.parse(stashRaw) : stashRaw;
-      offerContext = stash && stash.offer_context ? stash.offer_context : null;
-    }
-  } catch (e) {
-    console.warn('[raise-webhook] checkout stash read failed:', e.message);
-  }
-
   const userRecord = {
     email,
     first_name:    firstName,
@@ -227,8 +211,6 @@ module.exports = async function handler(req, res) {
     },
     // Round 2 — persist obstacle so coach + paid dashboard can reference it
     obstacle: obstacleFromMeta,
-    // Persist offer_context (offer product) so it survives in the user record too
-    offer_context: offerContext,
     access_token: accessToken,
     product: product,
   };
@@ -388,16 +370,16 @@ Co-founder, Recomlinked`;
   }
 
   // ── Store offer context immediately so it's available on return (offer product only) ──
-  if (product === 'offer' && offerContext && accessToken) {
+  if (product === 'offer' && user && user.offer_context && accessToken) {
     try {
-      await redis.set(`offer:ctx:${accessToken}`, JSON.stringify(offerContext), { ex: 86400 * 30 });
+      await redis.set(`offer:ctx:${accessToken}`, JSON.stringify(user.offer_context), { ex: 86400 * 30 });
     } catch(e) { console.warn('[raise-webhook] offer:ctx store failed:', e.message); }
   }
 
   // ── Generate full Counter Kit on payment (offer product only) ──
   // Stores results in Redis so they're ready when user lands on paid page.
   // This avoids any loading spinner after payment.
-  if (product === 'offer' && offerContext) {
+  if (product === 'offer' && user && user.offer_context) {
     try {
       const BASE_URL2 = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL || 'https://salary.recomlinked.com';
       fetch(BASE_URL2 + '/api/raise-coach', {
@@ -407,12 +389,12 @@ Co-founder, Recomlinked`;
           mode: 'disc_insights',
           product: 'offer',
           part: 'full_kit',
-          offer_ctx: offerContext,
-          blocker: offerContext.blocker || 'other',
-          answers: offerContext.answers || {},
-          dims: offerContext.dims || {},
-          levers: offerContext.levers || [],
-          weaks: offerContext.weaks || [],
+          offer_ctx: user.offer_context,
+          blocker: user.offer_context.blocker || 'other',
+          answers: user.offer_context.answers || {},
+          dims: user.offer_context.dims || {},
+          levers: user.offer_context.levers || [],
+          weaks: user.offer_context.weaks || [],
           _store_for: accessToken,
         })
       }).catch(function(e) { console.error('[raise-webhook] kit gen error:', e.message); });
