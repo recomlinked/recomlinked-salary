@@ -2734,29 +2734,6 @@ function unlockModeToggle() {
   updateModeToggleUI();
 }
 
-// ── Markdown rendering for coach output ──
-// The coach API returns Markdown ( **bold**, *italic*, ## headers,
-// paragraph breaks). We render a safe subset. Without this, raw asterisks
-// and hashes appear in the chat — which is what made the coaching message
-// look like a wall of text in earlier screenshots.
-function renderMarkdownToHtml(md) {
-  if (!md) return '';
-  // Escape HTML first so user/model output can't inject tags
-  let s = md.replace(/[&<>"']/g, c => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[c]);
-
-  // Headers (## or ###) become <h3>
-  s = s.replace(/^#{2,3}\s+(.+)$/gm, '<h3>$1</h3>');
-  // Bold **text** → <strong> (process before italic so *bold* doesn't conflict)
-  s = s.replace(/\*\*([^*]+?)\*\*/g, '<strong>$1</strong>');
-  // Italic *text* → <em>
-  s = s.replace(/(^|[^*])\*([^*\n]+?)\*(?!\*)/g, '$1<em>$2</em>');
-  // Paragraph breaks: split on blank lines, wrap each block in <p>
-  // (skip wrapping if the block is already an <h3>)
-  const blocks = s.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
-  return blocks.map(b => /^<h3>/.test(b) ? b : `<p>${b.replace(/\n/g, ' ')}</p>`).join('');
-}
 
 
 // Map landing page reason params to blocker codes + labels + scene-setting
@@ -3642,64 +3619,10 @@ function togglePlanBlock(el, key) {
   }
 }
 
-function autoExpandPlanCards() {
-  ['opening_script', 'pushback'].forEach(function(k) {
-    var el = document.querySelector('[data-block-key="' + k + '"]');
-    if (el && el.getAttribute('data-expanded') === '0') togglePlanBlock(el, k);
-  });
-  // Show paywall 3s after plan fully builds (strategy done, not paid, not yet shown)
-  if (discStrategyDone && !state.paid && !window.feShown) {
-    window.feShown = true;
-    var chatArea = $('disc-chat');
-    setTimeout(function() {
-      if (!state.paid && !chatArea.querySelector('.paywall-bubble')) {
-        appendStandardPaywall(chatArea);
-        lockFreeModes();
-      }
-    }, 3000);
-  }
-}
 function setCanvasHTML(el) {
   if (!el) return;
   el.innerHTML = renderCanvasHTML();
   // Cards start collapsed — user expands on demand
-}
-
-var OFFER_TILE_DEFS = {
-  base:        { label: 'Offer logged',     val: function(a){ return '$' + Number(String(a).replace(/[^\d]/g,'')||0).toLocaleString('en-US'); } },
-  extras:      { label: 'Package',          val: function(a){ return { signing:'Signing bonus in play', equity:'Equity in play', signing_equity:'Bonus + equity', base_only:'Base only \u2014 levers open' }[a] || a; } },
-  deadline:    { label: 'Clock',            val: function(a){ return { under_24h:'Under 24h', '24_72h':'24\u201372h', this_week:'This week', '1_2wk':'1\u20132 weeks', none:'No deadline' }[a] || a; } },
-  employment:  { label: 'Fallback',         val: function(a){ return { employed_stable:'Can walk away', employed_leaving:'Employed, moving', between_jobs:'Between jobs', first_job:'First offer' }[a] || a; } },
-  competing:   { label: 'Leverage card',    val: function(a){ return { yes:'Competing offer \u2713', expecting:'Offer incoming', interviewing:'Still interviewing', no:'Single offer' }[a] || a; } },
-  speed:       { label: 'Their urgency',    val: function(a){ return { chased:'They chased you', fast:'Fast process', normal:'Normal pace', slow:'Slow process' }[a] || a; } },
-  risk:        { label: 'Plan calibration', val: function(a){ return { safe:'Conservative', balanced:'Balanced', ambitious:'Ambitious' }[a] || a; }, gold: true },
-  role:        { label: 'Role',             val: function(a){ return String(a).slice(0, 26); } },
-  industry:    { label: 'Industry',         val: function(a){ return a === 'skipped' ? 'Skipped' : String(a).slice(0, 24); } },
-  city:        { label: 'Market',           val: function(a){ return a === 'skipped' ? 'Skipped' : String(a).slice(0, 22); } },
-  worktype:    { label: 'Work setup',       val: function(a){ return { on_site:'On-site \u2014 leverage', hybrid:'Hybrid', remote:'Remote' }[a] || a; } },
-  company_size:{ label: 'Company',          val: function(a){ return { cs_1_50:'1\u201350', cs_51_200:'51\u2013200', cs_201_1k:'201\u20131K', cs_1k_5k:'1K\u20135K', cs_5k_plus:'5K+' }[a] || a; } },
-  research:    { label: 'Research',         val: function(a){ return a === 'skipped' ? 'Skipped' : '$' + Number(String(a).replace(/[^\d]/g,'')||0).toLocaleString('en-US') + ' found'; } },
-  jd:          { label: 'Job description',  val: function(a){ return a === 'skipped' ? 'Skipped' : 'Added \u2713'; } },
-};
-
-function buildOfferMapTilesHtml() {
-  var ans = (state && state.discovery && state.discovery.answers) || {};
-  var html = '';
-  var count = 0;
-  OFFER_Q_ORDER.forEach(function(qId) {
-    if (!(qId in ans)) return;
-    var def = OFFER_TILE_DEFS[qId];
-    if (!def) return;
-    count++;
-    var v = def.val(ans[qId]);
-    var gold = def.gold;
-    html += '<div style="animation:canvasBlockIn 0.4s ease;border-radius:7px;padding:7px 9px;' + (gold ? 'background:rgba(245,207,86,0.14);border:1px solid rgba(201,168,76,0.5);' : 'background:var(--muted);border:1px solid var(--divider);') + '">' +
-      '<div style="font-size:8px;font-weight:700;color:' + (gold ? '#6a4a10' : 'var(--t3)') + ';letter-spacing:0.06em;text-transform:uppercase;">' + def.label + '</div>' +
-      '<div style="font-size:10.5px;font-weight:700;color:' + (gold ? '#6a4a10' : 'var(--t1)') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escapeHtml(String(v)) + '</div>' +
-      '</div>';
-  });
-  if (!count) return '';
-  return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:4px;margin-bottom:2px;">' + html + '</div>';
 }
 
 function renderCanvasHTML() {
@@ -5470,53 +5393,16 @@ function buildOfferCtx() {
   };
 }
 
-function renderOfferVerdict(v) {
-  var chatArea = $('disc-chat');
-  if (!chatArea || !v) return;
-  var ctx = SIM_STATE.context || {};
-  var fm = function(n) { return '$' + n.toLocaleString('en-US'); };
-  var DEADLINE_LABELS = { under_24h: 'answer due in under 24 hours', '24_72h': 'answer due in 24\u201372 hours', this_week: 'answer due this week', '1_2wk': '1\u20132 weeks to respond', none: 'no deadline given' };
-
-  var lead = el('div', 'coach-msg', '');
-  lead.innerHTML = '<div class="bubble"><p>That\u2019s everything I need. Here\u2019s your verdict.</p></div>';
-  chatArea.appendChild(lead);
-
-  var wrap = el('div', 'coach-msg', '');
-  var snapBits = [];
-  if (ctx.role) snapBits.push(escapeHtml(ctx.role));
-  snapBits.push(fm(v.base) + ' base');
-  if (DEADLINE_LABELS[ctx.deadline]) snapBits.push(DEADLINE_LABELS[ctx.deadline]);
-  wrap.innerHTML =
-    '<div style="max-width:420px;">' +
-      '<div style="font-size:11.5px;color:var(--t3);margin:0 0 8px 2px;">' + snapBits.join(' \u00b7 ') + '</div>' +
-      '<div style="background:linear-gradient(160deg,#2c2050 0%,#3a2d6e 100%);border:1px solid rgba(245,207,86,0.3);border-radius:14px;padding:20px 18px;">' +
-        '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.55);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:7px;">Your negotiation room</div>' +
-        '<div style="font-size:30px;font-weight:800;color:#F5CF56;letter-spacing:-0.5px;line-height:1;margin-bottom:7px;">' + fm(v.roomLow) + ' \u2013 ' + fm(v.roomHigh) + '</div>' +
-        '<div style="font-size:12px;color:rgba(255,255,255,0.72);line-height:1.6;">Computed from your offer\u2019s structure and your leverage signals \u2014 not invented market data.</div>' +
-        '<div style="height:1px;background:rgba(255,255,255,0.12);margin:14px 0;"></div>' +
-        '<div style="display:flex;gap:6px;margin-bottom:12px;">' +
-          (function(){ var rk = (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced'; var rec = rk === 'safe' ? 0 : rk === 'ambitious' ? 2 : 1;
-            return [['SAFE', v.counterSafe], ['MODERATE', v.counterModerate], ['AMBITIOUS', v.counterAmbitious]].map(function(t, i){
-              var isRec = i === rec;
-              return '<div style="flex:1;text-align:center;padding:8px 4px;border-radius:8px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
-                '<div style="font-size:8.5px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';">' + t[0] + (isRec ? ' \u2605' : '') + '</div>' +
-                '<div style="font-size:13px;font-weight:800;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') + ';">' + fm(t[1]) + '</div></div>';
-            }).join(''); })() +
-        '</div>' +
-        '<div style="font-size:11px;color:rgba(255,255,255,0.65);margin-bottom:12px;">\u2713 Plan calibrated to your risk choice \u2014 the \u2605 counter is yours.</div>' +
-        '<div style="font-size:12px;color:rgba(255,255,255,0.85);line-height:1.6;"><strong style="color:#fff;">Your strongest leverage:</strong> ' + v.leverage + '</div>' +
-        '<div style="font-size:11.5px;color:rgba(255,255,255,0.55);line-height:1.6;margin-top:10px;">Rescinding an offer over a professional, respectful counter is extremely rare \u2014 employers expect candidates to negotiate.</div>' +
-      '</div>' +
-    '</div>';
-  chatArea.appendChild(wrap);
-
-  try { logSession('offer_verdict', { room_low: v.roomLow, room_high: v.roomHigh, counter: v.counter, base: v.base }); } catch (e) {}
-  try { state.offer_verdict = { room_low: v.roomLow, room_high: v.roomHigh, counter: v.counter, counter_safe: v.counterSafe, counter_moderate: v.counterModerate, counter_ambitious: v.counterAmbitious, risk: v.risk, base: v.base, leverage: v.leverage }; saveState(); } catch (e) {}
-
-  setTimeout(function() {
-    var chatWrap = $('chat-wrap');
-    if (chatWrap) chatWrap.scrollTop = chatWrap.scrollHeight;
-  }, 250);
+function retryKitGeneration() {
+  var rm = document.querySelector('.kit-retry-msg');
+  if (rm) rm.remove();
+  // Reset generation flags so generateDiscInsights runs fresh
+  discStrategyLoading = false;
+  discStrategyDone = false;
+  discPlanLoading = true;
+  showKitBuildingBanner();
+  var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
+  try { generateDiscInsights(); } catch (e) { hideKitBanner(); }
 }
 
 function showKitBuildingBanner() {
@@ -5871,7 +5757,12 @@ async function generateDiscInsights() {
         var lc2 = $('disc-canvas-live');
         if (lc2) setCanvasHTML(lc2);
       }
-      // Save after both calls complete with full content
+      // Did the plan actually produce content? Check the 8 plan sections.
+      var _planKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+      var _planFilled = _planKeys.filter(function(k){ return discCanvasBlocks[k] && discCanvasBlocks[k].insight; }).length;
+      var _planOK = _planFilled >= 4; // need a real kit, not a couple of stragglers
+      // Save after both calls complete with full content — only if the plan is real
+      if (_planOK) {
       try { state.discovery = state.discovery || {}; state.discovery.canvasBlocks = discCanvasBlocks; state.discovery.insights = discInsights; saveState(); } catch(e) {}
       // Store generated kit in Redis so future visits load instantly (no re-generation)
       if (state.paid && state.paid_token) {
@@ -5889,8 +5780,25 @@ async function generateDiscInsights() {
           }).catch(function() {}); // fire and forget
         } catch(e) {}
       }
+      }
+      // Plan came back empty — don't show a false "ready". Offer an honest retry.
+      if (!_planOK) {
+        hideKitBanner();
+        var _ec = $('disc-chat');
+        if (_ec) {
+          var _genMsgEl2 = _ec.querySelector('.kit-generating-msg');
+          if (_genMsgEl2) _genMsgEl2.remove();
+          if (!_ec.querySelector('.kit-retry-msg')) {
+            var _retry = el('div', 'coach-msg kit-retry-msg', '');
+            _retry.innerHTML = '<div class="bubble" style="background:rgba(226,75,74,0.06);border:1px solid rgba(226,75,74,0.25);">' +
+              '<p style="margin:0 0 8px;">A few sections didn\u2019t finish generating. Your access is saved \u2014 tap below to finish building your kit.</p>' +
+              '<button onclick="retryKitGeneration()" style="background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);">Finish building my kit</button></div>';
+            _ec.appendChild(_retry);
+          }
+        }
+      }
       // Replace patience message with success message
-      if (state.paid) {
+      if (state.paid && _planOK) {
         var _discChat = $('disc-chat');
         if (_discChat) {
           var _genMsgEl = _discChat.querySelector('.kit-generating-msg');
