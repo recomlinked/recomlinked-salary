@@ -4207,8 +4207,8 @@ function appendStandardPaywall(container, opts) {
     var _v = state.offer_verdict;
     if (mode === 'discovery' && _v && _v.room_low) {
       var _f = function(n) { return '$' + n.toLocaleString('en-US'); };
-      copy.title = 'Your negotiation room is ready.';
-      copy.subtitle = 'The counter numbers, counter email, call script, fallback plan, and recruiter pushback responses are one step away, built from your leverage and risk style.';
+      copy.title = 'You get one counter. Make it the right one.';
+      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. There’s no version of this math where $19 isn’t worth it.';
     }
   } catch (e) {}
 
@@ -4218,7 +4218,7 @@ function appendStandardPaywall(container, opts) {
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" id="pw-cta-' + uid + '">Unlock my numbers and kit \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my counter \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
