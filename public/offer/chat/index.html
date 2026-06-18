@@ -4443,8 +4443,12 @@ function initDiscoveryMode(container) {
       if (_staleLoad) { try{if(_staleLoad._arcStop)_staleLoad._arcStop();}catch(e){} _staleLoad.remove(); }
       generateDiscInsights();
       // Note: generateDiscInsights shows patience message and updates canvas when done
-    } else {
+    } else if (discStep >= DISC_FREE_QUESTIONS) {
+      // Free user, completed intake → verdict + paywall (history already replayed above)
       showDiscPaywall();
+    } else {
+      // Free user, mid-intake resume → continue from the next unanswered question
+      renderDiscQuestion(discStep);
     }
     return;
   }
@@ -4716,16 +4720,17 @@ function buildDiscInputUI(idx, q) {
       input.focus();
       return;
     }
-    // Base salary sanity: even after magnitude correction (×1000), reject values
-    // that can't be a real annual salary (e.g. "8" -> 8,000 is below any full-time floor).
-    if (isMoney && q.id === 'base') {
+    // Salary sanity: even after magnitude correction (×1000), reject values that
+    // can't be a real annual salary (e.g. "8" -> 8,000 is below any full-time floor).
+    // Applies to all money fields (base, posted range top, researched max).
+    if (isMoney) {
       var _bn = parseInt(v.replace(/[^\d]/g, ''), 10) || 0;
       if (_bn > 0 && _bn < 1000) _bn = _bn * 1000; // mirror the magnitude fix for validation
       if (_bn < 10000) {
         inputWrap.style.borderColor = '#E24B4A';
         inputWrap.style.boxShadow = '0 0 0 2px rgba(226,75,74,0.2)';
         input.value = '';
-        input.placeholder = 'Enter the full annual salary, e.g. 85,000';
+        input.placeholder = 'Enter the full annual amount, e.g. 90,000';
         btn.style.background = '#E24B4A';
         setTimeout(function(){ btn.style.background = 'var(--navy)'; }, 1200);
         input.focus();
@@ -4771,9 +4776,9 @@ function pickDiscInput(qIdx, q, value, skipped) {
   var chatArea = $('disc-chat');
   var isMoney = (q.input === 'money' || q.input === 'money_optional');
   var isTextarea = (q.input === 'textarea_optional');
-  // Magnitude fix: for the annual base field, "85" means "85,000". Only correct when the
+  // Magnitude fix: for any annual salary field, "90" means "90,000". Only correct when the
   // result lands in a plausible annual range (>=10k); genuinely invalid values are blocked at submit.
-  if (isMoney && !skipped && q.id === 'base') {
+  if (isMoney && !skipped) {
     var _n = parseInt(value.replace(/[^\d]/g, ''), 10) || 0;
     if (_n >= 10 && _n < 1000) { value = String(_n * 1000); }
   }
@@ -5378,12 +5383,14 @@ function computeOfferVerdict() {
   var roomLow = base * lo, roomHigh = base * hi;
   // Posted salary band — the employer's own stated ceiling for this role. Strongest anchor.
   var postedMax = parseInt(String(ctx.posted_max || '').replace(/[^\d]/g, ''), 10) || 0;
+  if (postedMax >= 10 && postedMax < 1000) postedMax = postedMax * 1000; // "90" -> 90,000
   if (postedMax > base) {
     var pgap = postedMax - base;
     var pcap = Math.min(pgap, base * 0.25);   // posted band can push room up to 25% of base
     roomHigh = Math.max(roomHigh, Math.min(pcap, pgap * 0.85));
   }
   var researchedMax = parseInt(String(ctx.researched_max || '').replace(/[^\d]/g, ''), 10) || 0;
+  if (researchedMax >= 10 && researchedMax < 1000) researchedMax = researchedMax * 1000; // "90" -> 90,000
   if (researchedMax > base) {
     var cap = Math.min(researchedMax - base, base * 0.18);
     roomHigh = Math.max(roomHigh, Math.min(cap, roomHigh * 1.4));
@@ -7484,10 +7491,13 @@ async function init() {
       var _freeDisc = null;
       try { var _fraw = localStorage.getItem(LS_STATE); if (_fraw) { var _fp = JSON.parse(_fraw); _freeDisc = _fp.discovery || null; var _fPaywall = !!_fp.paywall_shown; } } catch(e) {}
       var _freeStep = (_freeDisc && _freeDisc.step) ? parseInt(_freeDisc.step) : 0;
-      // Resume only if intake was completed (numbers/verdict generated) or paywall was already shown
-      if (_freeStep >= DISC_FREE_QUESTIONS || (typeof _fPaywall !== 'undefined' && _fPaywall && _freeStep > 0)) {
+      // Resume if they made meaningful progress (>=3 answers) or the paywall was already shown.
+      // <3 answers = near-bounce, not worth resuming — falls through to a fresh start.
+      if (_freeStep >= 3 || (typeof _fPaywall !== 'undefined' && _fPaywall && _freeStep > 0)) {
         state.discovery = _freeDisc;
-        state.paywall_shown = true; // ensure paywall re-renders on resume
+        // Only treat the paywall as shown if intake was actually completed or it was already shown.
+        // Mid-intake resumes (3..15 answers) have NOT reached the paywall yet.
+        if (_freeStep >= DISC_FREE_QUESTIONS || _fPaywall) { state.paywall_shown = true; }
         await beginSimulationFlow('other');
         return;
       }
