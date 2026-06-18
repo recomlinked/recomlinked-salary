@@ -2897,7 +2897,7 @@ var Q_CATEGORY_LABELS = {
   risk: 'Risk Tolerance', employment: 'Walk-Away Power', competing: 'Walk-Away Power',
   speed: 'Their Urgency', deadline: 'Their Urgency',
   worktype: 'Talent Market', city: 'Talent Market', experience: 'Talent Market', research: 'Talent Market',
-  base: 'Offer Structure', extras: 'Offer Structure', company_size: 'Offer Structure',
+  base: 'Offer Structure', extras: 'Offer Structure', company_size: 'Offer Structure', posted_max: 'Offer Structure',
   role: 'Role context', industry: 'Role context', jd: 'Role context',
 };
 
@@ -2967,6 +2967,7 @@ var DISC_Q_ALL = {
     { val: 'remote', text: 'Fully remote', scores: {talent:40}, note: 'Wider talent pool. Your strongest leverage will likely come from role fit, urgency, and offer structure.', type: 'neutral' },
   ]},
   research: { id: 'research', label: 'Did you research the market range? If so, what\u2019s the top of the range you found?', dimTag: 'talent', input: 'money_optional', placeholder: '95,000', skipText: 'I haven\u2019t researched it', options: [] },
+  posted_max: { id: 'posted_max', label: 'Was a salary range posted for this role? If so, what\u2019s the top of it?', dimTag: 'offer', input: 'money_optional', placeholder: '120,000', skipText: 'No range was posted', options: [] },
   jd: { id: 'jd', label: 'Last one \u2014 want a sharper kit? Paste the job description and your counter email will reference the actual role. (Optional)', dimTag: null, input: 'textarea_optional', placeholder: 'Paste the job post text here\u2026', skipText: 'Skip this', options: [] },
 };
 
@@ -2978,14 +2979,14 @@ var OFFER_Q_ORDER = [
   // Group 2 — Their Urgency
   'speed', 'deadline',
   // Group 3 — Talent Market
-  'worktype', 'city', 'experience', 'research',
+  'worktype', 'city', 'experience', 'research', 'posted_max',
   // Group 4 — Offer Structure
   'extras', 'company_size',
   // Group 5 — Role Context
   'industry'
 ];
 
-var DISC_FREE_QUESTIONS = 15; // verdict after this many — 15 questions (jd removed for V1)
+var DISC_FREE_QUESTIONS = 16; // verdict after this many — 16 questions (added posted_max)
 
 function buildDiscQuestions(blockerCode) {
   return OFFER_Q_ORDER.map(function(qId) {
@@ -3966,6 +3967,7 @@ function renderCanvasHTML() {
       { key: 'company_size', label: 'Company',      val: { cs_1_50:'1–50', cs_51_200:'51–200', cs_201_1k:'201–1K', cs_1k_5k:'1K–5K', cs_5k_plus:'5K+' }[ctx.company_size] },
       { key: 'worktype',     label: 'Work setup',   val: { on_site:'On-site', hybrid:'Hybrid', remote:'Remote' }[ctx.worktype] },
       { key: 'city',         label: 'City',         val: ctx.city || null },
+      { key: 'posted_max',   label: 'Posted range top', val: ctx.posted_max ? '$' + Number(String(ctx.posted_max).replace(/[^\d]/g,'')).toLocaleString('en-US') : null },
       { key: 'anchor',       label: 'Anchor',       val: { no_anchor:'No number shared', matched:'Offer matched my number', below:'Offer below my number', above:'Offer above my number' }[ctx.anchor] },
     ];
     var filled = fields.filter(function(f){ return f.val; });
@@ -4243,7 +4245,7 @@ function initDiscoveryMode(container) {
   // Track drop-offs — fires when user leaves before completing intake
   window._offerDropHandler = function() {
     var step = (typeof discStep !== 'undefined') ? discStep : 0;
-    var total = (typeof DISC_FREE_QUESTIONS !== 'undefined') ? DISC_FREE_QUESTIONS : 15;
+    var total = (typeof DISC_FREE_QUESTIONS !== 'undefined') ? DISC_FREE_QUESTIONS : 16;
     if (step > 0 && step < total) {
       var lastQ = discOrderedQuestions && discOrderedQuestions[step - 1] ? discOrderedQuestions[step - 1].id : '';
       var role = (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role) ? SIM_STATE.context.role : '';
@@ -4326,7 +4328,7 @@ function initDiscoveryMode(container) {
           // Restore context from Redis
           var rCtx = kitData.offer_ctx;
           ['role','base','city','employment','competing','risk','worktype','experience',
-           'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+           'anchor','company_size','industry','speed','deadline','extras','posted_max','researched_max'].forEach(function(k) {
             if (rCtx[k] !== undefined) SIM_STATE.context[k] = rCtx[k];
           });
           if (rCtx.dims) { discDims = Object.assign(discDims, rCtx.dims); }
@@ -4334,7 +4336,7 @@ function initDiscoveryMode(container) {
           if (rCtx.weaks) discWeaks = rCtx.weaks;
           if (!state.discovery) state.discovery = {};
           state.discovery.answers = rCtx.answers || rCtx;
-          state.discovery.step = 15;
+          state.discovery.step = DISC_FREE_QUESTIONS;
           // Apply kit
           var kitJson = JSON.parse(kitData.kit);
           var KK = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
@@ -4344,7 +4346,7 @@ function initDiscoveryMode(container) {
           if (rCtx.dims) {
             Object.keys(discActive).forEach(function(k) { if (rCtx.dims[k] !== undefined) { discActive[k] = true; } });
           }
-          discStep = 15;
+          discStep = DISC_FREE_QUESTIONS;
           discNumbersReady = true;
           discPlanLoading = false;
           window._offerKitLoadedFromRedis = true;
@@ -4355,7 +4357,7 @@ function initDiscoveryMode(container) {
           // Kit still generating but context is available — restore context and fire Phase 2
           var rCtx2 = kitData.offer_ctx;
           ['role','base','city','employment','competing','risk','worktype','experience',
-           'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+           'anchor','company_size','industry','speed','deadline','extras','posted_max','researched_max'].forEach(function(k) {
             if (rCtx2[k] !== undefined) SIM_STATE.context[k] = rCtx2[k];
           });
           if (rCtx2.dims) { discDims = Object.assign(discDims, rCtx2.dims); discActive = Object.assign(discActive, rCtx2.dims); }
@@ -4363,8 +4365,8 @@ function initDiscoveryMode(container) {
           if (rCtx2.weaks) discWeaks = rCtx2.weaks;
           if (!state.discovery) state.discovery = {};
           state.discovery.answers = rCtx2.answers || rCtx2;
-          state.discovery.step = 15;
-          discStep = 15;
+          state.discovery.step = DISC_FREE_QUESTIONS;
+          discStep = DISC_FREE_QUESTIONS;
           discNumbersReady = true;
           _paidNoDisc.remove();
           insertDiscRadar();
@@ -4402,7 +4404,11 @@ function initDiscoveryMode(container) {
       intro.innerHTML = '<div class="bubble"><p>Most job offers leave room to negotiate. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.</p></div>';
       chatArea.appendChild(intro);
     }
+    // Replay previously answered questions as instant Q&A bubbles FIRST, so a resumed
+    // session reads top-to-bottom: opening -> your answers -> the radar/verdict/paywall.
+    if (!state.paid) { try { replayDiscHistory(chatArea); } catch (e) {} }
     insertDiscRadar();
+
 
     if (state.paid) {
       stopThinkingAnimation();
@@ -4451,14 +4457,6 @@ function initDiscoveryMode(container) {
   var introText = 'Most job offers leave room to negotiate. A few quick questions, and I\u2019ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.';
 
   // Personalize opening if user came from a specific blocker chip
-  var REASON_LABELS = {
-    rescind:        'What if they rescind the offer?',
-    counter_number: 'I don\u2019t know what number to counter with',
-    deadline:       'The deadline is in a few days',
-    fixed_band:     'The recruiter said the band is fixed',
-    first_offer:    'It\u2019s my first offer \u2014 I don\u2019t want to risk it',
-    greedy:         'I don\u2019t want to seem greedy',
-  };
   var profileReason = state.sim_reason || (state.profile && state.profile.reason) || '';
   var OPENER_MAP = {
     'rescind': 'Rescinding an offer over a professional counter is extremely rare. A few quick questions, and I’ll show you three things: how risky a counter would be, your negotiation room in dollars, and which type of counter fits your situation.',
@@ -4862,8 +4860,24 @@ function pickDiscInput(qIdx, q, value, skipped) {
       'city': 'Added to your analysis. Location helps read the local talent pool and salary context.',
       'industry': 'Added to your analysis. Industry context helps calibrate tone, package expectations, and negotiation flexibility.',
       'research': 'Good. Market data gives your counter a stronger foundation and makes the ask feel less arbitrary.',
+      'posted_max': 'That\u2019s a strong anchor \u2014 a posted range is the company\u2019s own stated ceiling.',
     };
     var ir = inputReactions[q.id];
+    // posted_max: three situations depending on how the posted top compares to base
+    if (q.id === 'posted_max') {
+      var _pBase = parseInt(String(SIM_STATE.context.base || '').replace(/[^\d]/g, ''), 10) || 0;
+      var _pMax = parseInt(String(storeVal || '').replace(/[^\d]/g, ''), 10) || 0;
+      if (_pBase && _pMax) {
+        if (_pMax > _pBase) {
+          var _gap = (_pMax - _pBase).toLocaleString('en-US');
+          ir = 'Strong anchor. They\u2019ve stated they\u2019ll pay up to $' + _pMax.toLocaleString('en-US') + ' \u2014 your offer is $' + _gap + ' below their ceiling. That\u2019s real room to work with, and we build the case to help you claim part of it.';
+        } else if (_pMax === _pBase) {
+          ir = 'Useful to know. Your offer is already at the top of the posted range, so your counter will lean on other leverage \u2014 scope, competing interest, and timing \u2014 rather than the band.';
+        } else {
+          ir = 'Interesting \u2014 your offer is already above the posted range, a good sign they value you. Your counter builds on that with scope and competing signals, not the band.';
+        }
+      }
+    }
     if (ir && chatArea) _inputReactionDone = new Promise(function(res) { setTimeout(function() { typeReaction(ir, chatArea).then(res); }, 500); });
   }
 
@@ -4881,8 +4895,6 @@ function pickDiscInput(qIdx, q, value, skipped) {
     }, 400);
   });
 }
-
-var DISC_GROUP_HEADERS = {};
 
 function offerVerdictCardHtml(compact, showNumbers) {
   // Always recompute from current context — canvas updates live as answers arrive
@@ -4974,21 +4986,54 @@ function offerVerdictCardHtml(compact, showNumbers) {
   return '<div style="background:linear-gradient(160deg,#2c2050 0%,#3a2d6e 100%);border:1px solid rgba(245,207,86,0.3);border-radius:10px;padding:18px 20px;margin-bottom:6px;">' + inner + '</div>';
 }
 
+function replayDiscHistory(chatArea) {
+  if (!chatArea) chatArea = $('disc-chat');
+  if (!chatArea) return;
+  var answers = (state.discovery && state.discovery.answers) ? state.discovery.answers : {};
+  var upto = Math.min(discStep, discOrderedQuestions.length);
+  for (var i = 0; i < upto; i++) {
+    var q = discOrderedQuestions[i];
+    if (!q) continue;
+    var stored = answers[q.id];
+    if (stored === undefined || stored === null) continue; // no recorded answer — skip
+
+    // Question bubble (coach) — same markup as renderDiscQuestion
+    var catLabel = q.dimTag ? (DIM_LABELS[q.dimTag] || q.dimTag) : (Q_CATEGORY_LABELS[q.id] || '');
+    var labelHtml = catLabel ? '<span class="disc-dim-tag">' + catLabel + '</span> ' : '';
+    var coachBubble = el('div', 'coach-msg', '');
+    coachBubble.innerHTML = '<div class="bubble"><p>' + labelHtml + q.label + '</p></div>';
+    chatArea.appendChild(coachBubble);
+
+    // Reconstruct the user's answer display text
+    var displayText;
+    var isMoney = (q.input === 'money' || q.input === 'money_optional');
+    var isTextarea = (q.input === 'textarea_optional');
+    if (stored === 'skipped' || stored === '') {
+      displayText = q.skipText || 'Skipped';
+    } else if (q.options && q.options.length) {
+      // Multiple-choice: map stored value back to its display text
+      var opt = null;
+      for (var j = 0; j < q.options.length; j++) { if (q.options[j].val === stored) { opt = q.options[j]; break; } }
+      displayText = opt ? opt.text : String(stored);
+    } else if (isMoney) {
+      displayText = '$' + (Number(String(stored).replace(/[^\d]/g, '')) || 0).toLocaleString('en-US');
+    } else if (isTextarea) {
+      displayText = 'Job description added \u2713';
+    } else {
+      displayText = String(stored);
+    }
+
+    var userBubble = el('div', 'user-msg', '');
+    userBubble.innerHTML = '<div class="user-bubble">' + escapeHtml(displayText) + '</div>';
+    chatArea.appendChild(userBubble);
+  }
+}
+
 function renderDiscQuestion(idx) {
   if (idx >= discOrderedQuestions.length || idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
   var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
-
-  var gh = DISC_GROUP_HEADERS[idx];
-  if (gh) {
-    var ghDiv = el('div', 'coach-msg', '');
-    ghDiv.innerHTML = '<div style="margin:14px 0 4px;padding:8px 12px;border-left:3px solid var(--gold);background:var(--muted);border-radius:0 8px 8px 0;">' +
-      '<div style="font-size:9px;font-weight:700;color:var(--t3);letter-spacing:0.08em;text-transform:uppercase;">' + gh.num + '</div>' +
-      '<div style="font-size:13px;font-weight:800;color:var(--t1);">' + gh.title + ' <span style="font-weight:500;color:var(--t3);font-size:11px;">\u2014 ' + gh.sub + '</span></div>' +
-      '</div>';
-    chatArea.appendChild(ghDiv);
-  }
 
   // Invisible marker — used by back button to find where this step starts
   var _stepMarker = el('div', '', '');
@@ -5331,6 +5376,13 @@ function computeOfferVerdict() {
   if (ctx.experience === 'over10') { hi += 0.005; }
   else if (ctx.experience === '5_10') { hi += 0.0025; }
   var roomLow = base * lo, roomHigh = base * hi;
+  // Posted salary band — the employer's own stated ceiling for this role. Strongest anchor.
+  var postedMax = parseInt(String(ctx.posted_max || '').replace(/[^\d]/g, ''), 10) || 0;
+  if (postedMax > base) {
+    var pgap = postedMax - base;
+    var pcap = Math.min(pgap, base * 0.25);   // posted band can push room up to 25% of base
+    roomHigh = Math.max(roomHigh, Math.min(pcap, pgap * 0.85));
+  }
   var researchedMax = parseInt(String(ctx.researched_max || '').replace(/[^\d]/g, ''), 10) || 0;
   if (researchedMax > base) {
     var cap = Math.min(researchedMax - base, base * 0.18);
@@ -5350,6 +5402,7 @@ function computeOfferVerdict() {
   var recommended = riskPref === 'safe' ? counterSafe : riskPref === 'ambitious' ? counterAmbitious : counterModerate;
   var lev = 'The offer structure itself \u2014 first numbers sit below the approved band';
   if (ctx.competing === 'yes') lev = 'Your competing offer \u2014 the strongest card in any negotiation';
+  else if (postedMax > base) lev = 'The posted salary range \u2014 they\u2019ve stated they\u2019ll pay up to $' + postedMax.toLocaleString('en-US') + ', and your offer sits below it';
   else if (ctx.employment === 'employed_stable') lev = 'You don\u2019t need this job \u2014 the strongest position any negotiator can hold';
   else if (ctx.speed === 'chased') lev = 'Their speed \u2014 they chased you, and hiring urgency is leverage';
   else if (ctx.speed === 'fast') lev = 'Their fast process \u2014 urgency on their side is leverage on yours';
@@ -5370,6 +5423,7 @@ function buildOfferCtx() {
     speed: ctx.speed || '',
     extras: ctx.extras || '',
     researched_max: ctx.researched_max || '',
+    posted_max: ctx.posted_max || '',
     worktype: ctx.worktype || '',
     employment: ctx.employment || '',
     industry: ctx.industry || '',
@@ -5454,7 +5508,7 @@ async function generateDiscInsights() {
               var rCtx = kitData.offer_ctx;
               // Restore to SIM_STATE.context
               ['role','base','city','employment','competing','risk','worktype','experience',
-               'anchor','company_size','industry','speed','deadline','extras'].forEach(function(k) {
+               'anchor','company_size','industry','speed','deadline','extras','posted_max','researched_max'].forEach(function(k) {
                 if (rCtx[k] !== undefined) SIM_STATE.context[k] = rCtx[k];
               });
               // Restore dims for verdict card scoring
@@ -7422,7 +7476,7 @@ async function init() {
     }
 
     // ── Offer discovery restore: FREE user with completed intake ──
-    // Without this, a free user who finishes the 15-question intake and then
+    // Without this, a free user who finishes the 16-question intake and then
     // refreshes or navigates back loses everything and must re-answer. We
     // restore their saved discovery (verdict + paywall) instead. initDiscoveryMode()
     // already forces teasers and re-shows the paywall for non-paid users.
@@ -7431,7 +7485,7 @@ async function init() {
       try { var _fraw = localStorage.getItem(LS_STATE); if (_fraw) { var _fp = JSON.parse(_fraw); _freeDisc = _fp.discovery || null; var _fPaywall = !!_fp.paywall_shown; } } catch(e) {}
       var _freeStep = (_freeDisc && _freeDisc.step) ? parseInt(_freeDisc.step) : 0;
       // Resume only if intake was completed (numbers/verdict generated) or paywall was already shown
-      if (_freeStep >= 15 || (typeof _fPaywall !== 'undefined' && _fPaywall && _freeStep > 0)) {
+      if (_freeStep >= DISC_FREE_QUESTIONS || (typeof _fPaywall !== 'undefined' && _fPaywall && _freeStep > 0)) {
         state.discovery = _freeDisc;
         state.paywall_shown = true; // ensure paywall re-renders on resume
         await beginSimulationFlow('other');
