@@ -919,7 +919,7 @@ Return ONLY these 8 keys as valid JSON. Values are plain text strings with \\n f
 {"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","raise_case":"..."}`,
 // 8 keys total.
       userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 8 Counter Kit sections.`,
-      maxTokens: 4096,
+      maxTokens: 12000,
     };
   }
 
