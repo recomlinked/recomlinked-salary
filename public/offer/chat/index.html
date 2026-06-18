@@ -2887,6 +2887,7 @@ var discActive = {walkaway:false,risk_tol:false,urgency:false,talent:false,offer
 var discLevers = [];
 var discWeaks = [];
 var discStep = 0;
+var _discResumeLanding = false; // true only for the first question shown after a resume — suppresses the dead back button
 var _discAnswerHistory = []; // snapshot stack for back button
 var discInsights = {}; // AI-generated insights per dimension
 var discOrderedQuestions = []; // Questions reordered per blocker
@@ -4386,7 +4387,7 @@ function initDiscoveryMode(container) {
   }
 
   // If assessment was completed, show final canvas + paywall (or full canvas if paid)
-  if (discStep >= discOrderedQuestions.length || discStep >= DISC_FREE_QUESTIONS) {
+  if (discStep >= discOrderedQuestions.length || discStep >= DISC_FREE_QUESTIONS || (!state.paid && discStep >= 3 && discStep < DISC_FREE_QUESTIONS)) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
@@ -4448,6 +4449,7 @@ function initDiscoveryMode(container) {
       showDiscPaywall();
     } else {
       // Free user, mid-intake resume → continue from the next unanswered question
+      _discResumeLanding = true;
       renderDiscQuestion(discStep);
     }
     return;
@@ -5046,13 +5048,15 @@ function renderDiscQuestion(idx) {
   _stepMarker.style.display = 'none';
   chatArea.appendChild(_stepMarker);
 
-  // Back button — only shown from Q2 onward
-  if (idx > 0) {
+  // Back button — only shown from Q2 onward, but NOT on the first question after a resume
+  // (the undo stack is empty on resume, so the button would do nothing).
+  if (idx > 0 && !_discResumeLanding) {
     var _backRow = el('div', '', '');
     _backRow.style.cssText = 'padding:0 2px 4px;';
     _backRow.innerHTML = '<button onclick="goBackDiscQuestion()" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--t3);padding:2px 0;display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>Edit my last answer</button>';
     chatArea.appendChild(_backRow);
   }
+  _discResumeLanding = false; // only suppress for the resume-landing question
 
   var coachBubble = el('div', 'coach-msg', '');
   var catLabel = q.dimTag ? (DIM_LABELS[q.dimTag] || q.dimTag) : (Q_CATEGORY_LABELS[q.id] || '');
