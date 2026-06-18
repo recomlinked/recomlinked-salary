@@ -4718,6 +4718,22 @@ function buildDiscInputUI(idx, q) {
       input.focus();
       return;
     }
+    // Base salary sanity: even after magnitude correction (×1000), reject values
+    // that can't be a real annual salary (e.g. "8" -> 8,000 is below any full-time floor).
+    if (isMoney && q.id === 'base') {
+      var _bn = parseInt(v.replace(/[^\d]/g, ''), 10) || 0;
+      if (_bn > 0 && _bn < 1000) _bn = _bn * 1000; // mirror the magnitude fix for validation
+      if (_bn < 10000) {
+        inputWrap.style.borderColor = '#E24B4A';
+        inputWrap.style.boxShadow = '0 0 0 2px rgba(226,75,74,0.2)';
+        input.value = '';
+        input.placeholder = 'Enter the full annual salary, e.g. 85,000';
+        btn.style.background = '#E24B4A';
+        setTimeout(function(){ btn.style.background = 'var(--navy)'; }, 1200);
+        input.focus();
+        return;
+      }
+    }
     inputWrap.style.borderColor = 'var(--divider)';
     inputWrap.style.boxShadow = 'none';
     pickDiscInput(idx, q, v, false);
@@ -4757,7 +4773,13 @@ function pickDiscInput(qIdx, q, value, skipped) {
   var chatArea = $('disc-chat');
   var isMoney = (q.input === 'money' || q.input === 'money_optional');
   var isTextarea = (q.input === 'textarea_optional');
-  var displayText = skipped ? (q.skipText || 'Skipped') : (isMoney ? ('$' + value) : (isTextarea ? 'Job description added \u2713' : value));
+  // Magnitude fix: for the annual base field, "85" means "85,000". Only correct when the
+  // result lands in a plausible annual range (>=10k); genuinely invalid values are blocked at submit.
+  if (isMoney && !skipped && q.id === 'base') {
+    var _n = parseInt(value.replace(/[^\d]/g, ''), 10) || 0;
+    if (_n >= 10 && _n < 1000) { value = String(_n * 1000); }
+  }
+  var displayText = skipped ? (q.skipText || 'Skipped') : (isMoney ? ('$' + Number(String(value).replace(/[^\d]/g,'')||0).toLocaleString('en-US')) : (isTextarea ? 'Job description added \u2713' : value));
   var storeVal = skipped ? '' : (isMoney ? value.replace(/,/g, '') : (isTextarea ? value.slice(0, 1500) : value));
 
   var userBubble = el('div', 'user-msg', '');
@@ -5286,7 +5308,9 @@ function computeOfferVerdict() {
     Object.keys(ans).forEach(function(k) { if (!ctx[k]) ctx[k] = ans[k]; });
   }
   var base = parseInt(String(ctx.base || '').replace(/[^\d]/g, ''), 10) || 0;
-  if (!base || base < 1000) return null;
+  // Magnitude normalization safety net: "85" -> 85,000. Only correct when plausible (>=10).
+  if (base >= 10 && base < 1000) { base = base * 1000; ctx.base = String(base); }
+  if (!base || base < 10000) return null;
   var lo = 0.06, hi = 0.10;
   if (ctx.competing === 'yes') { lo += 0.02; hi += 0.04; }
   else if (ctx.competing === 'expecting') { lo += 0.01; hi += 0.02; }
@@ -7395,6 +7419,24 @@ async function init() {
         return;
       }
       reason = null; // no discovery data — fall through to resumeFromState()
+    }
+
+    // ── Offer discovery restore: FREE user with completed intake ──
+    // Without this, a free user who finishes the 15-question intake and then
+    // refreshes or navigates back loses everything and must re-answer. We
+    // restore their saved discovery (verdict + paywall) instead. initDiscoveryMode()
+    // already forces teasers and re-shows the paywall for non-paid users.
+    if (!state.paid && !forceReset) {
+      var _freeDisc = null;
+      try { var _fraw = localStorage.getItem(LS_STATE); if (_fraw) { var _fp = JSON.parse(_fraw); _freeDisc = _fp.discovery || null; var _fPaywall = !!_fp.paywall_shown; } } catch(e) {}
+      var _freeStep = (_freeDisc && _freeDisc.step) ? parseInt(_freeDisc.step) : 0;
+      // Resume only if intake was completed (numbers/verdict generated) or paywall was already shown
+      if (_freeStep >= 15 || (typeof _fPaywall !== 'undefined' && _fPaywall && _freeStep > 0)) {
+        state.discovery = _freeDisc;
+        state.paywall_shown = true; // ensure paywall re-renders on resume
+        await beginSimulationFlow('other');
+        return;
+      }
     }
   }
 
