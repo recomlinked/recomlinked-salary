@@ -295,6 +295,8 @@ button { font-family: var(--sans); cursor: pointer; }
   .goal-amb .gp-num{ color: var(--gold-text); font-weight: 800; }
 }
 
+
+.step-num { color: var(--purple); font-weight: 800; }
 .reasons-section { padding: 24px 0; }
 .reasons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 @media (max-width: 480px) { .reasons-grid { grid-template-columns: 1fr; } }
@@ -517,7 +519,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
   <section class="section">
 
     <div class="fade-in reasons-section" id="blockers">
-      <h2 class="section-title">What's stopping you from countering your offer?</h2>
+      <h2 class="section-title"><span class="step-num">Step 1:</span> What's stopping you from countering your offer?</h2>
       <div class="reasons-grid">
         <a href="/offer/chat/?fear=rescind" class="reason-chip">
           <span>What if they rescind the offer?</span><span class="reason-arrow">→</span>
@@ -550,6 +552,7 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 
 
   <section class="section" id="preview">
+    <h2 class="section-title" style="margin-bottom:24px;"><span class="step-num">Step 2:</span> Define your leverage and negotiation room</h2>
     <a href="/offer/chat/" class="preview-cards-link" style="display:block;text-decoration:none;color:inherit;max-width:520px;margin:0 auto;cursor:pointer;">
 
       <div style="background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;box-shadow:0 24px 60px rgba(50,30,80,0.13);position:relative;z-index:1;">
@@ -600,42 +603,14 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 
 
 
-  <!-- How it works (3 vertical cards) — moved up, sits right after hero ── -->
+  <!-- Step 3: closing section — replaces old "3 steps" card grid ── -->
   <div class="divider"></div>
-  <section class="section hiw-section" id="how-it-works">
-    <h2 class="section-title">How to negotiate a job offer: <span style="color:var(--purple);"><span style="font-size:1.3em;">3</span> steps</span></h2>
+  <section class="section" id="step-3">
+    <h2 class="section-title"><span class="step-num">Step 3:</span> Send your counter offer with confidence</h2>
 
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;">
-
-      <a href="/offer/chat/" class="hiw-card" style="flex-direction:column;align-items:flex-start;padding:24px 20px;gap:16px;" aria-label="Step 1: see your negotiation room">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="hiw-num">1</div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </div>
-        <div class="hiw-title" style="margin:0;font-size:15px;line-height:1.35;">Check your offer and leverage</div>
-      </a>
-
-      <a href="/offer/chat/" class="hiw-card" style="flex-direction:column;align-items:flex-start;padding:24px 20px;gap:16px;" aria-label="Step 2: get your counter kit">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="hiw-num">2</div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        </div>
-        <div class="hiw-title" style="margin:0;font-size:15px;line-height:1.35;">Get your number and the email to send</div>
-      </a>
-
-      <a href="/offer/chat/" class="hiw-card" style="flex-direction:column;align-items:flex-start;padding:24px 20px;gap:16px;" aria-label="Step 3: done">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div class="hiw-num">3</div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </div>
-        <div class="hiw-title" style="margin:0;font-size:15px;line-height:1.35;">Send it</div>
-      </a>
-
+    <div style="max-width:640px;margin:24px auto 0;">
+      <p style="font-size:15px;color:var(--text2);line-height:1.75;">Most people negotiate a job offer once or twice in their career. Recruiters and HR teams do it every week — so they are more prepared and more practiced than you are. This tool closes that gap. Answer a few questions about your offer — base salary, deadline, competing offers, how fast they moved — and you'll see your negotiation room in dollars, how risky a counter would be, and which counter to actually send. Your counter email is generated and ready. Your pushback responses are prepared. The whole thing takes about two minutes, and you go into the conversation knowing exactly what you're asking for and why.</p>
     </div>
-
-  <div style="max-width:640px;margin:28px auto 0;">
-    <p style="font-size:15px;color:var(--text2);line-height:1.75;">Most people negotiate a job offer once or twice in their career. Recruiters and HR teams do it every week — so they are more prepared and more practiced than you are. This tool closes that gap. Answer a few questions about your offer — base salary, deadline, competing offers, how fast they moved — and you'll see your negotiation room in dollars, how risky a counter would be, and which counter to actually send. Your counter email is generated and ready. Your pushback responses are prepared. The whole thing takes about two minutes, and you go into the conversation knowing exactly what you're asking for and why.</p>
-  </div>
 
     <div class="fade-in proof-bar" style="margin-top:24px;">
       <div class="proof-stat">
@@ -644,8 +619,8 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
       <div class="proof-src"><span style="font-size:11px;color:var(--text3);">Salary.com via Yale</span></div>
     </div>
 
-    <div style="text-align:center;margin-top:24px;">
-      <a href="/offer/chat/" class="demo-text-cta">Get my counter number <span class="demo-text-cta-arrow">→</span></a>
+    <div class="cta-stack" style="margin-top:24px;">
+      <a href="/offer/chat/" class="cta-btn"><span>Get my counter number</span>&nbsp;→</a>
     </div>
 
   </section>
