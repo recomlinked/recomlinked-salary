@@ -129,7 +129,9 @@ button { font-family: var(--sans); cursor: pointer; }
 
 /* ── 5. HERO ──────────────────────────────── */
 .hero {
-  background: linear-gradient(160deg, #f5e6d8 0%, #eddce8 40%, #d8c4e8 70%, #c4aade 100%);
+  background:
+    linear-gradient(to bottom, rgba(248,246,250,0) 70%, var(--bg) 100%),
+    linear-gradient(160deg, #f5e6d8 0%, #eddce8 40%, #d8c4e8 70%, #c4aade 100%);
   text-align: center;
   padding: 100px 24px 56px;
   width: 100vw;
