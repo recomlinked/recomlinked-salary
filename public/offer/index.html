@@ -534,7 +534,8 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     .wins-sep{color:rgba(123,92,252,0.35);}
     .wins-counter{font-size:14px;font-weight:800;color:#1A9E6C;}
     .wins-ticker:hover .wins-track{animation-play-state:paused;}
-    .wins-item{display:inline-flex;align-items:center;gap:10px;padding:0 22px;border-right:1px solid rgba(123,92,252,0.12);}
+    .wins-item{display:inline-flex;align-items:center;gap:6px;padding:0 20px;border-right:1px solid rgba(123,92,252,0.12);}
+    .wins-mid{color:rgba(123,92,252,0.4);font-weight:700;}
     .wins-badge{width:7px;height:7px;border-radius:50%;background:#1A9E6C;flex-shrink:0;}
     .wins-role{font-size:14px;font-weight:500;color:var(--text);}
     .wins-amt{font-size:14px;font-weight:800;color:#1A9E6C;}
@@ -600,13 +601,15 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
         return wins.map(function(w){
           return '<div class="wins-item">'+
             '<span class="wins-role">'+w.role+'</span>'+
+            '<span class="wins-mid">\u00b7</span>'+
             '<span class="wins-risk wins-risk-'+w.rc+'">Risk: '+w.risk+'</span>'+
+            '<span class="wins-mid">\u00b7</span>'+
             '<span class="wins-amt">'+w.offer+' offer <span class="wins-sep">/</span> counter <span class="wins-counter">'+w.counter+'</span></span>'+
             '</div>';
         }).join('');
       }
       track.innerHTML = build()+build(); // duplicated for a seamless loop
-      requestAnimationFrame(function(){ var half=track.scrollWidth/2; if(half>0){ track.style.animationDuration=Math.round(half/38)+"s"; } });
+      requestAnimationFrame(function(){ var half=track.scrollWidth/2; if(half>0){ track.style.animationDuration=Math.round(half/100)+"s"; } });
     })();
   </script>
 
