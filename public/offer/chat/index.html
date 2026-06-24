@@ -5499,17 +5499,7 @@ async function generateDiscInsights() {
     } catch(e) {}
   }
 
-  // Free users: show JD teaser in chat
-  if (!(state && state.paid) && !SIM_STATE.context.jd_text) {
-    var teaserDiv = document.createElement('div');
-    teaserDiv.className = 'coach-msg';
-    teaserDiv.innerHTML = '<div class="bubble" style="background:var(--muted);border:1.5px dashed var(--divider);padding:10px 13px;font-size:12px;color:var(--t2);line-height:1.6;">' +
-      'Your kit is being built. With your kit unlocked, also paste your job description and offer letter — your counter email will reference the actual role scope and your specific terms. ' +
-      '<a href="#" onclick="event.preventDefault();triggerPlanPaywall()" style="font-weight:700;color:var(--gold);text-decoration:none;">Unlock →</a>' +
-      '</div>';
-    var chatArea = $('disc-chat');
-    if (chatArea) chatArea.appendChild(teaserDiv);
-  }
+  // (JD teaser removed)
 
   // ── Show radar + canvas now that intake is done ──
   // Remove drop listener — user completed intake
