@@ -826,6 +826,39 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   } catch(e) {}
 })();
 
+// Report a completed purchase to GA4/Ads exactly once (deduped by Stripe session id).
+(function() {
+  try {
+    var raw = localStorage.getItem('rl_pending_purchase');
+    if (!raw) return;
+    var p = {};
+    try { p = JSON.parse(raw); } catch(e) { localStorage.removeItem('rl_pending_purchase'); return; }
+    var key = 'rl_purchase_reported_' + (p.sid || '');
+    if (localStorage.getItem(key)) { localStorage.removeItem('rl_pending_purchase'); return; }
+    var tries = 0;
+    function tryFire() {
+      if (typeof window.gtag !== 'function') return false;
+      try {
+        window.gtag('event', 'purchase', {
+          product: 'offer',
+          value: p.value || 19,
+          currency: 'USD',
+          transaction_id: p.sid || '',
+          transport_type: 'beacon',
+        });
+      } catch(e) {}
+      try { if (typeof window.clarity === 'function') window.clarity('event', 'purchase'); } catch(e) {}
+      try { localStorage.setItem(key, '1'); localStorage.removeItem('rl_pending_purchase'); } catch(e) {}
+      return true;
+    }
+    if (tryFire()) return;
+    var iv = setInterval(function() {
+      tries++;
+      if (tryFire() || tries > 40) clearInterval(iv); // give up after ~6s; retries on next load
+    }, 150);
+  } catch(e) {}
+})();
+
 // Post-Stripe return: ?session_id= → verify, store token, re-init as paid.
 (function() {
   try {
@@ -858,6 +891,10 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
           if (backup && (!s.discovery || !s.discovery.step)) s.discovery = backup;
           localStorage.setItem('rl_raise_state', JSON.stringify(s));
           localStorage.removeItem('rl_offer_discovery_backup');
+          // Mark a completed purchase so it's reported to GA4/Ads once (after redirect, when gtag is ready)
+          try {
+            localStorage.setItem('rl_pending_purchase', JSON.stringify({ sid: sid, value: (parseInt(localStorage.getItem('rl_offer_price'), 10) || 19) }));
+          } catch(e) {}
           // Redirect with paid_token in URL — works regardless of localStorage state
           sessionStorage.removeItem('rl_verifying_payment');
           location.replace('/offer/chat/?paid_token=' + encodeURIComponent(accessToken));
@@ -3622,6 +3659,16 @@ function togglePlanBlock(el, key) {
 function setCanvasHTML(el) {
   if (!el) return;
   el.innerHTML = renderCanvasHTML();
+  // Wire the in-kit paywall button (canvas re-renders, so wire each time)
+  var _pwBtn = el.querySelector('.btn-pay[data-pw-go]');
+  if (_pwBtn) {
+    _pwBtn.onclick = function() {
+      var _p = parseInt(_pwBtn.getAttribute('data-pw-price'), 10) || 19;
+      if (typeof startCheckout === 'function') startCheckout(_p);
+      else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
+    };
+    if (!(state && state.paid)) logPaywallSeenOnce();
+  }
   // Cards start collapsed — user expands on demand
 }
 
@@ -3893,6 +3940,11 @@ function renderCanvasHTML() {
   var _intakeDone2 = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
   html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
+  // Free users: the (exact) paywall sits directly under the locked verdict card
+  if (_intakeDone2 && !(state && state.paid)) {
+    html += '<div style="margin:8px 0 4px;">' + buildPaywallBubbleHTML({ mode: 'discovery' }).html + '</div>';
+  }
+
   var intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
 
   // YOUR POSITION
@@ -4127,6 +4179,35 @@ var PAYWALL_COPY = {
 // appendStandardPaywall(container, opts)
 // opts.mode  — 'discovery' | 'sim' | 'coach'  (defaults to SIM_STATE.currentMode)
 // opts.logTag — string passed to logSession for analytics
+// Shared builder so the chat paywall and the in-kit paywall are byte-identical copy
+function buildPaywallBubbleHTML(opts) {
+  opts = opts || {};
+  var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
+  var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
+  var selectedPrice = 19;
+  try {
+    var _base = parseInt(String(
+      (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
+      (state && state.profile && state.profile.base) || ''
+    ).replace(/[^\d]/g, ''), 10) || 0;
+    if (_base >= 100000) selectedPrice = 49;
+  } catch (e) {}
+  try {
+    var _v = state.offer_verdict;
+    if (mode === 'discovery' && _v && _v.room_low) {
+      copy.title = 'You get one counter. Make it the right one.';
+      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
+    }
+  } catch (e) {}
+  var html = '<div class="bubble paywall-bubble">' +
+    '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
+    '<button class="btn-pay" data-pw-go="1" data-pw-price="' + selectedPrice + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
+  '</div>';
+  return { html: html, price: selectedPrice };
+}
+
 function appendStandardPaywall(container, opts) {
   opts = opts || {};
   // Log paywall view for affiliate tracking — fire and forget
@@ -4141,42 +4222,15 @@ function appendStandardPaywall(container, opts) {
     }
   } catch(e) {}
 
-  var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
-  var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
-
-  // Two-tier pricing by base salary: under $100k => $19, $100k+ => $49
-  var selectedPrice = 19;
-  try {
-    var _base = parseInt(String(
-      (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
-      (state && state.profile && state.profile.base) || ''
-    ).replace(/[^\d]/g, ''), 10) || 0;
-    if (_base >= 100000) selectedPrice = 49;
-  } catch (e) {}
-
-  // Discovery paywall: anchor to the verdict dollars when available
-  try {
-    var _v = state.offer_verdict;
-    if (mode === 'discovery' && _v && _v.room_low) {
-      var _f = function(n) { return '$' + n.toLocaleString('en-US'); };
-      copy.title = 'You get one counter. Make it the right one.';
-      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. <strong>There’s no version of this math where $' + selectedPrice + ' isn’t worth it.</strong>';
-    }
-  } catch (e) {}
-  var uid = Date.now();
+  var built = buildPaywallBubbleHTML(opts);
   var wrap = el('div', 'coach-msg', '');
-  wrap.innerHTML = '<div class="bubble paywall-bubble">' +
-    '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
-    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
-    '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
-  '</div>';
+  wrap.innerHTML = built.html;
   container.appendChild(wrap);
 
-  var ctaBtn = wrap.querySelector('#pw-cta-' + uid);
+  var ctaBtn = wrap.querySelector('.btn-pay');
   if (ctaBtn) ctaBtn.onclick = function() {
-    if (typeof startCheckout === 'function') startCheckout(selectedPrice);
-    else if (typeof initiateCheckout === 'function') initiateCheckout(selectedPrice);
+    if (typeof startCheckout === 'function') startCheckout(built.price);
+    else if (typeof initiateCheckout === 'function') initiateCheckout(built.price);
   };
 
 }
@@ -6110,6 +6164,38 @@ function showTailorQuestion(chatArea, idx) {
 }
 
 
+function logPaywallSeenOnce() {
+  if (state && state.paid) return;
+  if (state && state._paywallLogged) return;
+  state._paywallLogged = true;
+  state.paywall_shown = true;
+  saveState();
+  logSession('offer_paywall', {
+    product: 'offer',
+    paywall_seen: 'Yes',
+    role:       (SIM_STATE && SIM_STATE.context && SIM_STATE.context.role)       || '',
+    employment: (SIM_STATE && SIM_STATE.context && SIM_STATE.context.employment) || '',
+    competing:  (SIM_STATE && SIM_STATE.context && SIM_STATE.context.competing)  || '',
+    risk:       (SIM_STATE && SIM_STATE.context && SIM_STATE.context.risk)       || '',
+    questions_answered: (typeof discStep !== 'undefined') ? discStep : 0,
+  });
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'reached_paywall', { product: 'offer', currency: 'USD', transport_type: 'beacon' });
+    }
+  } catch(e) {}
+  try {
+    var _ref = localStorage.getItem('rl_ref');
+    if (_ref) {
+      fetch('/api/raise-affiliate-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'paywall_view', ref: _ref }),
+      }).catch(function() {});
+    }
+  } catch(e) {}
+}
+
 function showDiscPaywall() {
   // Paid users: strategy already ran in the main flow — just skip the paywall
   if (state.paid) return;
@@ -7871,6 +7957,7 @@ async function startCheckout(selectedPrice) {
   ctx.dims = discDims; ctx.levers = discLevers; ctx.weaks = discWeaks;
   try { localStorage.setItem('rl_offer_ctx', JSON.stringify(ctx)); } catch(e) {}
   var checkoutPrice = selectedPrice || PRICE_USD;
+  try { localStorage.setItem('rl_offer_price', String(checkoutPrice)); } catch(e) {}
   try {
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'checkout_started', {
