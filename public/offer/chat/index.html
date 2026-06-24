@@ -4453,7 +4453,10 @@ function initDiscoveryMode(container) {
       generateDiscInsights();
       // Note: generateDiscInsights shows patience message and updates canvas when done
     } else if (discStep >= DISC_FREE_QUESTIONS) {
-      // Free user, completed intake → verdict + paywall (history already replayed above)
+      // Free user, completed intake → numbers recompute locally from restored answers;
+      // mark ready + re-render so the verdict shows the blurred-locked numbers, not the loading skeleton
+      discNumbersReady = true;
+      var _lcFree = $('disc-canvas-live'); if (_lcFree) setCanvasHTML(_lcFree);
       showDiscPaywall();
     } else {
       // Free user, mid-intake resume → continue from the next unanswered question
@@ -6225,7 +6228,9 @@ function showDiscPaywall() {
   var chatArea = $('disc-chat');
   if (!chatArea) return;
   if (chatArea.querySelector('.paywall-bubble')) {
-    chatArea.querySelector('.paywall-bubble').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    lockFreeModes();
+    var _existPw = chatArea.querySelector('.paywall-bubble');
+    setTimeout(function() { _existPw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200);
     return;
   }
   appendStandardPaywall(chatArea, { mode: 'discovery' });
