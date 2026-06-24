@@ -8029,7 +8029,7 @@ async function startCheckout(selectedPrice) {
 // (profile, range, obstacle, timing). Conversational style — uses regular
 // coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
-// Simple $19 pricing — no promo, no discount.
+// Two-tier pricing ($19 under $100k / $49 at $100k+) — no promo, no discount.
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   state.paywall_shown = true;
