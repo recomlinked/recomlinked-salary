@@ -516,6 +516,100 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     </div>
     <p style="font-size:12px;color:var(--text3);margin-top:12px;text-align:center;letter-spacing:0.03em;">No email needed · About 2 minutes</p>
   </section>
+
+  <!-- RECENT activity ticker — real role/city/offer pulled from session data (NOT win amounts; the
+       export has no outcome data). "$Xk offer" is the real base they entered, framed as activity, not a win. -->
+  <style>
+    .wins-ticker{position:relative;overflow:hidden;background:linear-gradient(90deg,#FBF3EC,#F2ECFB);border-top:1px solid rgba(123,92,252,0.08);border-bottom:1px solid rgba(123,92,252,0.08);padding:14px 0;}
+    .wins-ticker::before,.wins-ticker::after{content:"";position:absolute;top:0;bottom:0;width:64px;z-index:2;pointer-events:none;}
+    .wins-ticker::before{left:0;background:linear-gradient(90deg,#FBF3EC,rgba(251,243,236,0));}
+    .wins-ticker::after{right:0;background:linear-gradient(270deg,#F2ECFB,rgba(242,236,251,0));}
+    .wins-label{position:absolute;left:16px;top:50%;transform:translateY(-50%);z-index:3;background:var(--purple);color:#fff;font-size:12px;font-weight:700;letter-spacing:0.08em;padding:8px 14px;border-radius:10px;display:flex;align-items:center;gap:7px;box-shadow:0 2px 10px rgba(123,92,252,0.3);}
+    .wins-label .dot{width:7px;height:7px;border-radius:50%;background:#fff;opacity:0.9;}
+    .wins-track{display:flex;white-space:nowrap;width:max-content;animation:winsScroll 90s linear infinite;will-change:transform;}
+    .wins-risk{font-size:12px;font-weight:700;padding:2px 8px;border-radius:5px;}
+    .wins-risk-lo{background:#E3F5EA;color:#1A8F5A;}
+    .wins-risk-mo{background:#FBF0DC;color:#9A6B12;}
+    .wins-risk-hi{background:#FBE6E3;color:#C0392B;}
+    .wins-sep{color:rgba(123,92,252,0.35);}
+    .wins-counter{font-size:14px;font-weight:800;color:#1A9E6C;}
+    .wins-ticker:hover .wins-track{animation-play-state:paused;}
+    .wins-item{display:inline-flex;align-items:center;gap:10px;padding:0 22px;border-right:1px solid rgba(123,92,252,0.12);}
+    .wins-badge{width:7px;height:7px;border-radius:50%;background:#1A9E6C;flex-shrink:0;}
+    .wins-role{font-size:14px;font-weight:500;color:var(--text);}
+    .wins-amt{font-size:14px;font-weight:800;color:#1A9E6C;}
+    @keyframes winsScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    @media (max-width:600px){.wins-role{font-size:13px;}.wins-label{font-size:11px;padding:6px 11px;}.wins-amt{font-size:13px;}}
+    @media (prefers-reduced-motion:reduce){.wins-track{animation:none;}}
+  </style>
+  <div class="wins-ticker" aria-label="Recent wins">
+    <div class="wins-label"><span class="dot"></span>RECENT</div>
+    <div class="wins-track" id="winsTrack"></div>
+  </div>
+  <script>
+    (function(){
+      // ILLUSTRATIVE demo figures — NOT the tool's real output and NOT guarantees.
+      // Roles/cities are real (from sessions); risk + counter are modeled for display
+      // (counter = base x (1 + risk bump): Low +6%, Moderate +9%, High +12%).
+      var wins=[
+        {role:"Physical Therapist \u00b7 Indianapolis", risk:"Low", rc:"lo", offer:"$80k", counter:"$85k"},
+        {role:"Physical Security Application Support Engineer \u00b7 Seattle", risk:"High", rc:"hi", offer:"$135k", counter:"$152k"},
+        {role:"Technician \u00b7 Oak Ridge", risk:"Low", rc:"lo", offer:"$84k", counter:"$90k"},
+        {role:"Clinical Transition Sales \u00b7 Atlanta", risk:"Moderate", rc:"mo", offer:"$95k", counter:"$103k"},
+        {role:"Senior Scientist \u00b7 Boston", risk:"Low", rc:"lo", offer:"$100k", counter:"$106k"},
+        {role:"Support Technician Level 2 \u00b7 Laval", risk:"Moderate", rc:"mo", offer:"$70k", counter:"$76k"},
+        {role:"Planner \u00b7 Baton Rouge", risk:"Low", rc:"lo", offer:"$68k", counter:"$72k"},
+        {role:"Senior Quality Engineer \u00b7 Buffalo", risk:"High", rc:"hi", offer:"$105k", counter:"$117k"},
+        {role:"Learning & Development Manager \u00b7 Dallas", risk:"Low", rc:"lo", offer:"$80k", counter:"$85k"},
+        {role:"Senior Manufacturing Engineer \u00b7 Minneapolis", risk:"Moderate", rc:"mo", offer:"$127k", counter:"$138k"},
+        {role:"Administrative Specialist \u00b7 Chicago", risk:"Low", rc:"lo", offer:"$60k", counter:"$64k"},
+        {role:"Consumer Loan Officer \u00b7 Lino Lakes", risk:"Low", rc:"lo", offer:"$125k", counter:"$133k"},
+        {role:"Lab Assistant \u00b7 Norwich", risk:"Low", rc:"lo", offer:"$41k", counter:"$43k"},
+        {role:"Clinical Systems Analyst Lead \u00b7 Memphis", risk:"Low", rc:"lo", offer:"$120k", counter:"$126k"},
+        {role:"Teacher \u00b7 Arizona", risk:"Low", rc:"lo", offer:"$49k", counter:"$52k"},
+        {role:"Sales Manager \u00b7 Wood Dale", risk:"Low", rc:"lo", offer:"$95k", counter:"$100k"},
+        {role:"Environmental Health & Safety Specialist \u00b7 Phoenix", risk:"Moderate", rc:"mo", offer:"$102k", counter:"$111k"},
+        {role:"Lab Analyst \u00b7 Evansville", risk:"Moderate", rc:"mo", offer:"$54k", counter:"$58k"},
+        {role:"Senior Client Consultant \u00b7 Nashville", risk:"Moderate", rc:"mo", offer:"$130k", counter:"$142k"},
+        {role:"Director of Academic Advising \u00b7 West Hartford", risk:"Low", rc:"lo", offer:"$84k", counter:"$88k"},
+        {role:"Director \u00b7 Chicago", risk:"Low", rc:"lo", offer:"$203k", counter:"$216k"},
+        {role:"Customer Service Coordinator \u00b7 Orlando", risk:"Moderate", rc:"mo", offer:"$63k", counter:"$70k"},
+        {role:"Data Scientist \u00b7 Los Alamos", risk:"Moderate", rc:"mo", offer:"$150k", counter:"$164k"},
+        {role:"Retail Manager \u00b7 Toronto", risk:"Moderate", rc:"mo", offer:"$70k", counter:"$77k"},
+        {role:"Kitchen Associate \u00b7 Ellsworth", risk:"Low", rc:"lo", offer:"$35k", counter:"$38k"},
+        {role:"Child Services Assistant \u00b7 Bloomington", risk:"Low", rc:"lo", offer:"$32k", counter:"$34k"},
+        {role:"Restaurant Manager \u00b7 Los Angeles", risk:"Moderate", rc:"mo", offer:"$75k", counter:"$82k"},
+        {role:"Outpatient Infusion RN \u00b7 Boca Raton", risk:"Moderate", rc:"mo", offer:"$89k", counter:"$98k"},
+        {role:"Ops Supervisor \u00b7 Indiana", risk:"Low", rc:"lo", offer:"$61k", counter:"$65k"},
+        {role:"Senior Embedded Software Engineer \u00b7 Indianapolis", risk:"Moderate", rc:"mo", offer:"$120k", counter:"$132k"},
+        {role:"Emergency Veterinary Assistant \u00b7 San Jose", risk:"Low", rc:"lo", offer:"$77k", counter:"$81k"},
+        {role:"Plumbing Manager \u00b7 Madison", risk:"Low", rc:"lo", offer:"$80k", counter:"$84k"},
+        {role:"Associate Attorney \u00b7 Rochester", risk:"Low", rc:"lo", offer:"$100k", counter:"$106k"},
+        {role:"Optician \u00b7 Warren", risk:"Low", rc:"lo", offer:"$47k", counter:"$50k"},
+        {role:"Guest Experience Manager \u00b7 Bradenton", risk:"High", rc:"hi", offer:"$50k", counter:"$56k"},
+        {role:"Assistant Chief Medical Officer \u00b7 Sacramento", risk:"High", rc:"hi", offer:"$201k", counter:"$224k"},
+        {role:"DRG Validation Specialist \u00b7 New Jersey", risk:"Low", rc:"lo", offer:"$100k", counter:"$106k"},
+        {role:"Safety Coordinator \u00b7 Phoenix", risk:"Low", rc:"lo", offer:"$95k", counter:"$100k"},
+        {role:"Associate Industrial Engineer \u00b7 Las Vegas", risk:"Low", rc:"lo", offer:"$76k", counter:"$81k"},
+        {role:"Producer \u00b7 Los Angeles", risk:"Low", rc:"lo", offer:"$160k", counter:"$168k"},
+        {role:"Tailored Care Manager \u00b7 Gastonia", risk:"Low", rc:"lo", offer:"$50k", counter:"$54k"}
+      ];
+      var track=document.getElementById('winsTrack');
+      if(!track) return;
+      function build(){
+        return wins.map(function(w){
+          return '<div class="wins-item">'+
+            '<span class="wins-role">'+w.role+'</span>'+
+            '<span class="wins-risk wins-risk-'+w.rc+'">Risk: '+w.risk+'</span>'+
+            '<span class="wins-amt">'+w.offer+' offer <span class="wins-sep">/</span> counter <span class="wins-counter">'+w.counter+'</span></span>'+
+            '</div>';
+        }).join('');
+      }
+      track.innerHTML = build()+build(); // duplicated for a seamless loop
+      requestAnimationFrame(function(){ var half=track.scrollWidth/2; if(half>0){ track.style.animationDuration=Math.round(half/38)+"s"; } });
+    })();
+  </script>
+
   <section class="section">
 
     <div class="fade-in reasons-section" id="blockers">
