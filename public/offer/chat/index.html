@@ -4143,23 +4143,31 @@ function appendStandardPaywall(container, opts) {
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
 
+  // Two-tier pricing by base salary: under $100k => $19, $100k+ => $49
+  var selectedPrice = 19;
+  try {
+    var _base = parseInt(String(
+      (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
+      (state && state.profile && state.profile.base) || ''
+    ).replace(/[^\d]/g, ''), 10) || 0;
+    if (_base >= 100000) selectedPrice = 49;
+  } catch (e) {}
+
   // Discovery paywall: anchor to the verdict dollars when available
   try {
     var _v = state.offer_verdict;
     if (mode === 'discovery' && _v && _v.room_low) {
       var _f = function(n) { return '$' + n.toLocaleString('en-US'); };
       copy.title = 'You get one counter. Make it the right one.';
-      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. There’s no version of this math where $19 isn’t worth it.';
+      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. There’s no version of this math where $' + selectedPrice + ' isn’t worth it.';
     }
   } catch (e) {}
-
-  var selectedPrice = 19;
   var uid = Date.now();
   var wrap = el('div', 'coach-msg', '');
   wrap.innerHTML = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my counter \u00b7 $19 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<button class="btn-pay" id="pw-cta-' + uid + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust"><span>No subscription</span><span class="dot">\u00b7</span><span>Stripe secure</span></div>' +
   '</div>';
   container.appendChild(wrap);
@@ -5982,7 +5990,14 @@ function showTailorQuestion(chatArea, idx) {
 
     // 4. Update paywall CTA
     var btn = chatArea.querySelector('.btn-pay');
-    if (btn) btn.innerHTML = 'Unlock exact numbers + your full Counter Kit \u00b7 $' + PRICE_USD + ' <span class="btn-pay-arrow">\u2192</span>';
+    if (btn) {
+      var _b2 = parseInt(String(
+        (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
+        (state && state.profile && state.profile.base) || ''
+      ).replace(/[^\d]/g, ''), 10) || 0;
+      var _pr2 = _b2 >= 100000 ? 49 : 19;
+      btn.innerHTML = 'Unlock exact numbers + your full Counter Kit \u00b7 $' + _pr2 + ' <span class="btn-pay-arrow">\u2192</span>';
+    }
 
     // 5. Done bubble
     var doneWrap = el('div', 'coach-msg', '');
