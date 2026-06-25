@@ -4190,7 +4190,7 @@ function buildPaywallBubbleHTML(opts) {
       (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
       (state && state.profile && state.profile.base) || ''
     ).replace(/[^\d]/g, ''), 10) || 0;
-    if (_base >= 100000) selectedPrice = 49;
+    if (_base >= 100000) selectedPrice = 19; // flat $19 — $49 tier disabled for now
   } catch (e) {}
   try {
     var _v = state.offer_verdict;
@@ -6051,7 +6051,7 @@ function showTailorQuestion(chatArea, idx) {
         (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
         (state && state.profile && state.profile.base) || ''
       ).replace(/[^\d]/g, ''), 10) || 0;
-      var _pr2 = _b2 >= 100000 ? 49 : 19;
+      var _pr2 = 19; // flat $19 — $49 tier disabled for now
       btn.innerHTML = 'Unlock exact numbers + your full Counter Kit \u00b7 $' + _pr2 + ' <span class="btn-pay-arrow">\u2192</span>';
     }
 
@@ -8120,7 +8120,7 @@ async function startCheckout(selectedPrice) {
 // (profile, range, obstacle, timing). Conversational style — uses regular
 // coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
-// Two-tier pricing ($19 under $100k / $49 at $100k+) — no promo, no discount.
+// Pricing: flat $19 (the $49 high-base tier is disabled for now) — no promo, no discount.
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   state.paywall_shown = true;
