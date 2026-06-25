@@ -4196,7 +4196,7 @@ function buildPaywallBubbleHTML(opts) {
     var _v = state.offer_verdict;
     if (mode === 'discovery' && _v && _v.room_low) {
       copy.title = 'You get one counter. Make it the right one.';
-      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, your script, and your pushback responses are ready. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
+      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>, and that higher base lifts every raise and bonus after it. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
     }
   } catch (e) {}
   var html = '<div class="bubble paywall-bubble">' +
@@ -4930,7 +4930,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
   var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
   var RISK_LABELS = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
   var _obase = parseInt(String((SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) || (state && state.profile && state.profile.base) || '').replace(/[^\d]/g, ''), 10) || 0;
-  var baseLine = _obase ? '<div style="font-size:10px;color:rgba(255,255,255,0.5);margin:-2px 0 10px;">on your $' + _obase.toLocaleString('en-US') + ' offer</div>' : '';
+  var baseLine = _obase ? '<div style="font-size:10px;color:#fff;margin:-2px 0 18px;">on top of your $' + _obase.toLocaleString('en-US') + ' offer</div>' : '';
   var inner;
   if (v && v.room_low && (showNumbers || isPaid)) {
     var rk = v.risk || 'balanced';
@@ -4939,8 +4939,14 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var display = (locked || val === null) ? '\u2014' : fm(val);
       var numColor = (locked || val === null) ? (isRec ? 'rgba(245,207,86,0.45)' : 'rgba(255,255,255,0.25)') : (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)');
       return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
-        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.5)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
-        '<div style="font-size:14px;font-weight:900;color:' + (locked ? (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') : numColor) + ';' + (locked ? 'filter:blur(7px);user-select:none;cursor:pointer;' : '') + '" ' + (locked ? 'onclick="triggerPlanPaywall()" title="Unlock to reveal"' : '') + '>' + (locked ? fm(val !== null && val > 0 ? val : 97500) : display) + '</div>' +
+        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.9)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
+        (locked
+          ? '<div style="display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
+              '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.6)') + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
+              '<span style="font-size:14px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') + ';filter:blur(7px);user-select:none;">' + fm(val !== null && val > 0 ? val : 97500) + '</span>' +
+            '</div>'
+          : '<div style="font-size:14px;font-weight:900;color:' + numColor + ';">' + display + '</div>'
+        ) +
         '</div>';
     }
     var wa2=discDims.walkaway||0, rt2=discDims.risk_tol||0;
@@ -4950,36 +4956,39 @@ function offerVerdictCardHtml(compact, showNumbers) {
     if (!showNumbers && !isPaid) {
       // Free user pre-unlock: blurred numbers
       inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
-        '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">Your negotiation room</div>' +
+        '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">You have room to earn more</div>' +
         '<span onclick="triggerPlanPaywall()" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(245,207,86,0.85);">' +
           '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
           'Unlock →</span>' +
         '</div>' +
         '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
-        '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:12px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
+        '<div style="display:flex;gap:5px;padding-bottom:14px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
+        '';
 
     } else if (!isPaid) {
       // Post-intake, free: show "meaningful room detected", tier structure with locks, no numbers
       inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
-        '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">Your negotiation room</div>' +
+        '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;">You have room to earn more</div>' +
         '<span onclick="triggerPlanPaywall()" style="cursor:pointer;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(245,207,86,0.85);">' +
           '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
           'Unlock →</span>' +
         '</div>' +
-        '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;margin-bottom:6px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' + baseLine +
+        '<div style="display:flex;align-items:center;gap:8px;padding:10px 0 12px;margin-bottom:6px;">' +
+          '<svg width="' + (compact?'20':'24') + '" height="' + (compact?'20':'24') + '" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
+          '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
+        '</div>' + baseLine +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
-        '<div style="display:flex;gap:5px;">' + tier('SAFE',null,recTier==='safe',true) + tier('MODERATE',null,recTier==='moderate',true) + tier('AMBITIOUS',null,recTier==='ambitious',true) + '</div>' +
+        '<div style="display:flex;gap:5px;padding-bottom:14px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
 
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:6px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
+        '';
 
     } else {
       // Paid: full numbers
-      inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
+      inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
         '<div style="font-size:' + (compact?'17px':'20px') + ';font-weight:800;color:#F5CF56;letter-spacing:-0.3px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' + baseLine +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '') +
-        '<div style="display:flex;gap:5px;">' + tier('SAFE',v.counter_safe,recTier==='safe',false) + tier('MODERATE',v.counter_moderate,recTier==='moderate',false) + tier('AMBITIOUS',v.counter_ambitious,recTier==='ambitious',false) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.65);margin-top:12px;display:flex;align-items:center;gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Plan calibrated to your approach: <b style="color:#fff;">' + (RISK_LABELS[rk]||'Balanced') + '</b></div>';
+        '<div style="display:flex;gap:5px;padding-bottom:14px;">' + tier('Safe ask',v.counter_safe,recTier==='safe',false) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',v.counter_ambitious,recTier==='ambitious',false) + '</div>' +
+        '';
     }
   } else {
     // Locked state — same structure as filled, ??? placeholders
@@ -4989,19 +4998,17 @@ function offerVerdictCardHtml(compact, showNumbers) {
     function tierLocked(name, idx0) {
       var isRec = idx0 === recTier0;
       return '<div style="flex:1;min-width:0;text-align:center;padding:6px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.12);border:1px solid rgba(245,207,86,0.4);' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);') + '">' +
-        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? 'rgba(245,207,86,0.7)' : 'rgba(255,255,255,0.3)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
+        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? 'rgba(245,207,86,0.7)' : 'rgba(255,255,255,0.9)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
         '<span class="' + (isRec ? 'verdict-shimmer' : 'verdict-shimmer-sm') + '" style="height:14px;width:58px;margin:2px auto;display:block;"></span>' +
         '</div>';
     }
-    inner = '<div style="font-size:13px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">Your negotiation room</div>' +
+    inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
       '<div style="margin-bottom:8px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
       '<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:8px;"></div>' +
-      '<div style="display:flex;gap:5px;">' +
-        tierLocked('SAFE', 0) + tierLocked('MODERATE', 1) + tierLocked('AMBITIOUS', 2) +
+      '<div style="display:flex;gap:5px;padding-bottom:14px;">' +
+        tierLocked('Safe ask', 0) + tierLocked('Strong ask', 1) + tierLocked('Bold ask', 2) +
       '</div>' +
-      '<div style="font-size:9.5px;color:rgba(255,255,255,0.35);margin-top:7px;display:flex;align-items:center;gap:5px;">' +
-        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="rgba(245,207,86,0.4)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-        'Plan calibrated to your approach: <b style="color:rgba(255,255,255,0.5);">' + (RISK_LABELS0[rk0] || 'Balanced') + '</b></div>';
+      '';
   }
   return '<div style="background:linear-gradient(160deg,#2c2050 0%,#3a2d6e 100%);border:1px solid rgba(245,207,86,0.3);border-radius:10px;padding:18px 20px;margin-bottom:6px;">' + inner + '</div>';
 }
