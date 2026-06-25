@@ -3941,7 +3941,7 @@ function renderCanvasHTML() {
   html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
   // Free users: the (exact) paywall sits directly under the locked verdict card
-  if (_intakeDone2 && !(state && state.paid)) {
+  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
     html += '<div style="margin:8px 0 4px;">' + buildPaywallBubbleHTML({ mode: 'discovery' }).html + '</div>';
   }
 
