@@ -539,8 +539,9 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
   <script>
     (function(){
       // ILLUSTRATIVE demo figures — NOT the tool's real output and NOT guarantees.
-      // Roles/cities are real (from sessions); risk + counter are modeled for display
-      // (counter = base x (1 + risk bump): Low +6%, Moderate +9%, High +12%).
+      // Roles/cities are real (from sessions); the gain shown is modeled for display,
+      // computed as offer x risk premium (Low +8%, Moderate +12%, High +16%) so it can't drift.
+      // The hardcoded `counter` field below is unused now (gain is computed at render).
       var wins=[
         {role:"Physical Therapist \u00b7 Indianapolis", risk:"Low", rc:"lo", offer:"$80k", counter:"$85k"},
         {role:"Physical Security Application Support Engineer \u00b7 Seattle", risk:"High", rc:"hi", offer:"$135k", counter:"$152k"},
@@ -584,16 +585,20 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
         {role:"Producer \u00b7 Los Angeles", risk:"Low", rc:"lo", offer:"$160k", counter:"$168k"},
         {role:"Tailored Care Manager \u00b7 Gastonia", risk:"Low", rc:"lo", offer:"$50k", counter:"$54k"}
       ];
+      wins = wins.filter(function(w){ return (parseInt(String(w.offer).replace(/[^\d]/g,''),10)||0) >= 50; });
       var track=document.getElementById('winsTrack');
       if(!track) return;
       function build(){
+        var PREM={lo:0.08, mo:0.12, hi:0.16};
         return wins.map(function(w){
+          var ofNum=parseInt(String(w.offer).replace(/[^\d]/g,''),10)||0;
+          var gain=Math.max(1, Math.round(ofNum*(PREM[w.rc]||0.10))); // in $k
           return '<div class="wins-item">'+
             '<span class="wins-role">'+w.role+'</span>'+
             '<span class="wins-mid">\u00b7</span>'+
             '<span class="wins-risk wins-risk-'+w.rc+'">Risk: '+w.risk+'</span>'+
             '<span class="wins-mid">\u00b7</span>'+
-            '<span class="wins-amt">'+w.offer+' offer <span class="wins-sep">/</span> counter <span class="wins-counter">'+w.counter+'</span></span>'+
+            '<span class="wins-amt">'+w.offer+' offer <span class="wins-sep">\u2192</span> <span class="wins-counter">+$'+gain+'k</span></span>'+
             '</div>';
         }).join('');
       }
