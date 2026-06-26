@@ -3527,6 +3527,91 @@ function calculateNegotiationScore() {
   return Math.round(final);
 }
 
+// ── Company/market-side acceptance model (offer-structure analysis) ──
+// Acceptance = likelihood THE COMPANY says yes. Driven ONLY by company/market signals
+// (urgency, offer room, talent scarcity). Deliberately EXCLUDES walkaway & risk_tol (user-side).
+function computeCompanyScore() {
+  var u = discDims.urgency || 0;   // deadline + how the process felt (their eagerness)
+  var o = discDims.offer   || 0;   // room above offer: anchor, extras, company size, posted range
+  var t = discDims.talent  || 0;   // scarcity/market: experience, worktype, market research
+  // weighted: offer room matters most, then their urgency, then scarcity
+  var cs = (o * 0.40) + (u * 0.34) + (t * 0.26);
+  return Math.max(0, Math.min(100, cs));
+}
+// Per-tier acceptance %, stepping down as the ask gets bolder. Company-side only.
+function tierAcceptance() {
+  var cs = computeCompanyScore();
+  var safe = Math.round(Math.max(60, Math.min(96, 62 + cs * 0.34)));
+  var strong = Math.round(Math.max(38, safe - (10 + (100 - cs) * 0.10)));
+  var bold = Math.round(Math.max(28, strong - (12 + (100 - cs) * 0.12)));
+  return { safe: safe, moderate: strong, ambitious: bold };
+}
+// Confidence in the read — based on how many real company-side signals we actually have.
+function estimateConfidence() {
+  var ctx = (typeof SIM_STATE !== 'undefined' && SIM_STATE.context) ? SIM_STATE.context : {};
+  var signals = 0;
+  if (ctx.deadline && ctx.deadline !== 'none') signals++;
+  if (ctx.speed) signals++;
+  if (ctx.anchor && ctx.anchor !== 'no_anchor') signals++;
+  if (ctx.extras && ctx.extras !== 'base_only') signals++;
+  if (ctx.company_size) signals++;
+  if (ctx.experience) signals++;
+  if (ctx.worktype) signals++;
+  var hasPosted = ctx.posted_max && String(ctx.posted_max).replace(/[^\d]/g,'') !== '';
+  var hasResearch = ctx.research && String(ctx.research).replace(/[^\d]/g,'') !== '';
+  if (hasPosted) signals += 2;      // explicit public range is a strong signal
+  if (hasResearch) signals += 1;
+  if (signals >= 8) return { level: 'High', note: 'strong company-side signals' };
+  if (signals >= 5) return { level: 'Moderate', note: 'partial company-side signals' };
+  return { level: 'Limited', note: 'few company-side signals \u2014 add the posted range for a sharper read' };
+}
+
+// ── #1 Visible "offer-structure analysis" panel — names the REAL company-side
+// factors the verdict weighed, with their actual reads. CSS-animated reveal (no JS timing).
+function buildAnalysisPanelHTML() {
+  var ctx = (typeof SIM_STATE !== 'undefined' && SIM_STATE.context) ? SIM_STATE.context : {};
+  function read(score){ return score >= 65 ? {l:'Strong', c:'#15835a'} : score >= 45 ? {l:'Moderate', c:'#a07d1e'} : {l:'Limited', c:'#9a8db8'}; }
+  var u = read(discDims.urgency || 0);
+  var o = read(discDims.offer || 0);
+  var t = read(discDims.talent || 0);
+  var urgBasis = ctx.speed === 'chased' ? 'they reached out to you first'
+              : ctx.speed === 'fast' ? 'they moved fast through the process'
+              : (ctx.deadline === '24_72h' ? 'a tight 24\u201372h decision window' : 'their stated timeline');
+  var roomBasis = ctx.anchor === 'below' ? 'offer came in below your stated number'
+              : ctx.anchor === 'no_anchor' ? 'no anchor set \u2014 room to set the first number'
+              : (ctx.extras === 'signing_equity' || ctx.extras === 'signing') ? 'multiple comp levers in the package'
+              : 'how the offer sits against the range';
+  var scarceBasis = ctx.experience === 'over10' ? '10+ yrs \u2014 high replacement cost'
+              : ctx.worktype === 'on_site' ? 'on-site role, narrower local pool'
+              : 'your profile vs. the talent pool';
+  var conf = estimateConfidence();
+  function row(label, basis, r, i){
+    return '<div class="ofa-row" style="animation-delay:' + (0.1 + i*0.14) + 's;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--divider);">' +
+      '<div style="min-width:0;"><div style="font-size:11px;font-weight:700;color:var(--navy);">' + label + '</div>' +
+      '<div style="font-size:9.5px;color:#8a8295;line-height:1.3;">' + basis + '</div></div>' +
+      '<div style="flex-shrink:0;font-size:10px;font-weight:800;color:' + r.c + ';">' + r.l + '</div></div>';
+  }
+  if (!document.getElementById('ofa-style')) {
+    var st = document.createElement('style'); st.id = 'ofa-style';
+    st.textContent = '@keyframes ofaIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}.ofa-row{opacity:0;animation:ofaIn .45s ease forwards}.ofa-head{opacity:0;animation:ofaIn .4s ease forwards}';
+    document.head.appendChild(st);
+  }
+  return '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;">' +
+    '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;">' +
+      '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--navy);flex:1;">Offer-structure analysis</span>' +
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="opacity:0.6;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
+    '</summary>' +
+    '<div style="margin-top:8px;">' +
+      '<div style="font-size:9.5px;color:#8a8295;margin-bottom:6px;line-height:1.4;">How likely the company is to say yes \u2014 read from their side.</div>' +
+      row('Their urgency', urgBasis, u, 0) +
+      row('Room above the offer', roomBasis, o, 1) +
+      row('Market scarcity', scarceBasis, t, 2) +
+      '<div style="font-size:9.5px;color:#8a8295;margin-top:7px;">Confidence in this read: <strong style="color:var(--navy);">' + conf.level + '</strong> \u2014 ' + conf.note + '</div>' +
+    '</div>' +
+  '</details>';
+}
+
 function getNegotiationLabel(score, riskChoice) {
   // riskChoice: 'safe' | 'balanced' | 'ambitious' (the user's stated approach)
   // The starred tier in the verdict card follows riskChoice exactly.
@@ -3948,7 +4033,6 @@ function renderCanvasHTML() {
   var intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
 
   // YOUR POSITION
-  // Position dims as compact chips
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
   var _dimChips = [
@@ -3971,6 +4055,11 @@ function renderCanvasHTML() {
       '</div>';
   });
   html += '</div>';
+
+  // #1 Offer-structure analysis — supportive credibility block (company-side read)
+  if (intakeDone && discNumbersReady) {
+    try { html += buildAnalysisPanelHTML(); } catch (e) {}
+  }
 
   // SHOULD YOU NEGOTIATE? card
   var answeredCount = Object.values(discActive).filter(Boolean).length;
@@ -4965,6 +5054,12 @@ function offerVerdictCardHtml(compact, showNumbers) {
     var recTier = rk === 'safe' ? 'safe' : rk === 'ambitious' ? 'ambitious' : 'moderate';
     function tier(name, val, isRec, locked) {
       var display = (locked || val === null) ? '\u2014' : fm(val);
+      // Acceptance % (company/market-side only) — shown unblurred for free + paid
+      var _accAll = tierAcceptance();
+      var _accKey = name.indexOf('Safe') >= 0 ? 'safe' : name.indexOf('Strong') >= 0 ? 'moderate' : 'ambitious';
+      var _accPct = _accAll[_accKey];
+      var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8C97A' : 'rgba(255,255,255,0.6)';
+      var _accLine = '<div style="font-size:8.5px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accPct + '% likely accepted</div>';
       var numColor = (locked || val === null) ? (isRec ? 'rgba(245,207,86,0.45)' : 'rgba(255,255,255,0.25)') : (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)');
       return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
         '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.9)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
@@ -4975,6 +5070,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
             '</div>'
           : '<div style="font-size:14px;font-weight:900;color:' + numColor + ';">' + display + '</div>'
         ) +
+        _accLine +
         '</div>';
     }
     var wa2=discDims.walkaway||0, rt2=discDims.risk_tol||0;
@@ -4991,7 +5087,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '</div>' +
         '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Estimated by weighing multiple signals from your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
         '';
 
     } else if (!isPaid) {
@@ -5008,7 +5104,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '</div>' + baseLine +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Estimated by weighing multiple signals from your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
 
         '';
 
@@ -5018,7 +5114,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '<div style="font-size:' + (compact?'17px':'20px') + ';font-weight:800;color:#F5CF56;letter-spacing:-0.3px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' + baseLine +
         (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '') +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',v.counter_safe,recTier==='safe',false) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',v.counter_ambitious,recTier==='ambitious',false) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Estimated by weighing multiple signals from your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
         '';
     }
   } else {
@@ -5037,7 +5133,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       '<div style="margin-bottom:8px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
       '<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:8px;"></div>' +
       '<div style="display:flex;gap:5px;padding-bottom:6px;">' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Estimated by weighing multiple signals from your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
         tierLocked('Safe ask', 0) + tierLocked('Strong ask', 1) + tierLocked('Bold ask', 2) +
       '</div>' +
       '';
