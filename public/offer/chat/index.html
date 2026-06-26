@@ -3570,10 +3570,18 @@ function estimateConfidence() {
 // factors the verdict weighed, with their actual reads. CSS-animated reveal (no JS timing).
 function buildAnalysisPanelHTML() {
   var ctx = (typeof SIM_STATE !== 'undefined' && SIM_STATE.context) ? SIM_STATE.context : {};
-  function read(score){ return score >= 65 ? {l:'Strong', c:'#15835a'} : score >= 45 ? {l:'Moderate', c:'#a07d1e'} : {l:'Limited', c:'#9a8db8'}; }
-  var u = read(discDims.urgency || 0);
-  var o = read(discDims.offer || 0);
-  var t = read(discDims.talent || 0);
+  // Read the SAME strength value the "Your position" pills use, so labels can never contradict.
+  function read(key){
+    var blk = (typeof discCanvasBlocks !== 'undefined' && discCanvasBlocks[key]) ? discCanvasBlocks[key] : {};
+    var str = blk.strength || '';
+    if (str === 'strong')  return { l:'Strong',   c:'#15835a' };
+    if (str === 'neutral') return { l:'Medium',   c:'#a07d1e' };
+    if (str === 'weak')    return { l:'Weak',     c:'#b5546a' };
+    return { l:'\u2014', c:'#9a8db8' };
+  }
+  var u = read('urgency');
+  var o = read('offer');
+  var t = read('talent');
   var urgBasis = ctx.speed === 'chased' ? 'they reached out to you first'
               : ctx.speed === 'fast' ? 'they moved fast through the process'
               : (ctx.deadline === '24_72h' ? 'a tight 24\u201372h decision window' : 'their stated timeline');
@@ -3585,16 +3593,11 @@ function buildAnalysisPanelHTML() {
               : ctx.worktype === 'on_site' ? 'on-site role, narrower local pool'
               : 'your profile vs. the talent pool';
   var conf = estimateConfidence();
-  function row(label, basis, r, i){
-    return '<div class="ofa-row" style="animation-delay:' + (0.1 + i*0.14) + 's;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid var(--divider);">' +
-      '<div style="min-width:0;"><div style="font-size:11px;font-weight:700;color:var(--navy);">' + label + '</div>' +
+  function row(label, basis, r){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--divider);">' +
+      '<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:var(--navy);">' + label + '</div>' +
       '<div style="font-size:9.5px;color:#8a8295;line-height:1.3;">' + basis + '</div></div>' +
-      '<div style="flex-shrink:0;font-size:10px;font-weight:800;color:' + r.c + ';">' + r.l + '</div></div>';
-  }
-  if (!document.getElementById('ofa-style')) {
-    var st = document.createElement('style'); st.id = 'ofa-style';
-    st.textContent = '@keyframes ofaIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}.ofa-row{opacity:0;animation:ofaIn .45s ease forwards}.ofa-head{opacity:0;animation:ofaIn .4s ease forwards}';
-    document.head.appendChild(st);
+      '<div style="flex-shrink:0;width:64px;text-align:right;font-size:10px;font-weight:800;color:' + r.c + ';">' + r.l + '</div></div>';
   }
   return '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;">' +
     '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;">' +
@@ -3604,9 +3607,9 @@ function buildAnalysisPanelHTML() {
     '</summary>' +
     '<div style="margin-top:8px;">' +
       '<div style="font-size:9.5px;color:#8a8295;margin-bottom:6px;line-height:1.4;">How likely the company is to say yes \u2014 read from their side.</div>' +
-      row('Their urgency', urgBasis, u, 0) +
-      row('Room above the offer', roomBasis, o, 1) +
-      row('Market scarcity', scarceBasis, t, 2) +
+      row('Their urgency', urgBasis, u) +
+      row('Room above the offer', roomBasis, o) +
+      row('Market scarcity', scarceBasis, t) +
       '<div style="font-size:9.5px;color:#8a8295;margin-top:7px;">Confidence in this read: <strong style="color:var(--navy);">' + conf.level + '</strong> \u2014 ' + conf.note + '</div>' +
     '</div>' +
   '</details>';
