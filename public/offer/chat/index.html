@@ -3611,7 +3611,7 @@ function togglePosBlock(el, key) {
       // Free: show teaser + lock + unlock CTA
       el.innerHTML = headerRow + lockIcon + chevronUp + '</div>' +
         '<p style="font-size:11px;color:' + tc + ';line-height:1.75;margin:8px 0 6px;">' + teaser + '</p>' +
-        '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis →</a>';
+        '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">Unlock to see full analysis →</a>';
     }
   } else {
     el.setAttribute('data-expanded', '0');
@@ -3652,7 +3652,7 @@ function togglePlanBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + (state.paid && discCanvasBlocks && discCanvasBlocks[key] && discCanvasBlocks[key].insight ? formatInsight(discCanvasBlocks[key].insight) : preview) + '</p>' +
-      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();triggerPlanPaywall()" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
   }
 }
 
@@ -3832,7 +3832,7 @@ function renderCanvasHTML() {
         '</div>' +
         '<div style="padding:0 14px 14px;display:flex;align-items:center;gap:8px;">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="' + navy + '" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>' +
-          '<a href="#" onclick="event.preventDefault();triggerPlanPaywall()" style="font-size:12px;font-weight:700;color:var(--gold);text-decoration:none;flex:1;">Unlock your full counter email \u2192</a>' +
+          '<a href="#" onclick="event.preventDefault();kitUnlock(this)" style="font-size:12px;font-weight:700;color:var(--gold);text-decoration:none;flex:1;">Unlock your full counter email \u2192</a>' +
         '</div>' +
       '</div>';
     }
@@ -4007,7 +4007,7 @@ function renderCanvasHTML() {
     if (_rlock) {
       html += '<span style="font-size:10px;font-weight:600;color:var(--gold);">Unlock your risk score \u2192</span>';
     } else {
-      html += '<span style="font-size:12px;font-weight:800;color:' + _risk.c + ';">' + _riskNum + '/100 \u00b7 ' + _risk.l + '</span>';
+      html += '<span style="font-size:12px;font-weight:800;color:' + _risk.c + ';">' + _risk.l + '</span>';
     }
     html += '</div>';
     html += '<div style="position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,#1A9E6C 0%,#C9A84C 55%,#cc4444 100%);">';
@@ -7992,6 +7992,18 @@ async function resumeFromState() {
 /* ───────────────────────────────────────────────────────── */
 /* ── PAYWALL (main) — dynamic, coach-voice                ── */
 /* ───────────────────────────────────────────────────────── */
+
+function kitUnlock(el){
+  try{
+    if(el){
+      if(!document.getElementById('rl-spin-style')){var s=document.createElement('style');s.id='rl-spin-style';s.textContent='@keyframes rl-spin{to{transform:rotate(360deg)}}';document.head.appendChild(s);}
+      el.insertAdjacentHTML('beforeend',' <svg class="rl-cta-spinner" width="12" height="12" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:4px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>');
+      el.style.pointerEvents='none';
+    }
+  }catch(e){}
+  if(typeof startCheckout==='function'){ startCheckout(19); }
+  else if(typeof triggerPlanPaywall==='function'){ triggerPlanPaywall(); }
+}
 
 async function startCheckout(selectedPrice) {
   // Save offer context so webhook can generate full kit on payment
