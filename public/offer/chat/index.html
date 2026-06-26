@@ -4028,11 +4028,11 @@ function renderCanvasHTML() {
   html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:4px 4px 2px;">Your position</div>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
   var _dimChips = [
-    { key:'walkaway', label:'Walk-Away' },
-    { key:'risk_tol', label:'Risk' },
-    { key:'urgency',  label:'Urgency' },
-    { key:'talent',   label:'Talent' },
-    { key:'offer',    label:'Offer' },
+    { key:'walkaway', label:'Your walk-away power' },
+    { key:'risk_tol', label:'Your risk tolerance' },
+    { key:'urgency',  label:'Their urgency' },
+    { key:'talent',   label:'Talent market' },
+    { key:'offer',    label:'Offer room' },
   ];
   _dimChips.forEach(function(d) {
     var blk = discCanvasBlocks[d.key] || {};
