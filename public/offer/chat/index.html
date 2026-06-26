@@ -3582,21 +3582,10 @@ function buildAnalysisPanelHTML() {
   var u = read('urgency');
   var o = read('offer');
   var t = read('talent');
-  var urgBasis = ctx.speed === 'chased' ? 'they reached out to you first'
-              : ctx.speed === 'fast' ? 'they moved fast through the process'
-              : (ctx.deadline === '24_72h' ? 'a tight 24\u201372h decision window' : 'their stated timeline');
-  var roomBasis = ctx.anchor === 'below' ? 'offer came in below your stated number'
-              : ctx.anchor === 'no_anchor' ? 'no anchor set \u2014 room to set the first number'
-              : (ctx.extras === 'signing_equity' || ctx.extras === 'signing') ? 'multiple comp levers in the package'
-              : 'how the offer sits against the range';
-  var scarceBasis = ctx.experience === 'over10' ? '10+ yrs \u2014 high replacement cost'
-              : ctx.worktype === 'on_site' ? 'on-site role, narrower local pool'
-              : 'your profile vs. the talent pool';
   var conf = estimateConfidence();
-  function row(label, basis, r){
-    return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--divider);">' +
-      '<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:700;color:var(--navy);">' + label + '</div>' +
-      '<div style="font-size:9.5px;color:#8a8295;line-height:1.3;">' + basis + '</div></div>' +
+  function row(label, r){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--divider);">' +
+      '<div style="flex:1;min-width:0;font-size:11px;font-weight:700;color:var(--navy);">' + label + '</div>' +
       '<div style="flex-shrink:0;width:64px;text-align:right;font-size:10px;font-weight:800;color:' + r.c + ';">' + r.l + '</div></div>';
   }
   return '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;">' +
@@ -3606,10 +3595,10 @@ function buildAnalysisPanelHTML() {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="opacity:0.6;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
     '</summary>' +
     '<div style="margin-top:8px;">' +
-      '<div style="font-size:9.5px;color:#8a8295;margin-bottom:6px;line-height:1.4;">How likely the company is to say yes \u2014 read from their side.</div>' +
-      row('Their urgency', urgBasis, u) +
-      row('Room above the offer', roomBasis, o) +
-      row('Market scarcity', scarceBasis, t) +
+      '<div style="font-size:9.5px;color:#8a8295;margin-bottom:4px;line-height:1.4;">How likely the company is to say yes \u2014 read from their side.</div>' +
+      row('Their urgency', u) +
+      row('Room above the offer', o) +
+      row('Market scarcity', t) +
       '<div style="font-size:9.5px;color:#8a8295;margin-top:7px;">Confidence in this read: <strong style="color:var(--navy);">' + conf.level + '</strong> \u2014 ' + conf.note + '</div>' +
     '</div>' +
   '</details>';
