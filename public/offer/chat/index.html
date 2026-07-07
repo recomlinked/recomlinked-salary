@@ -1041,13 +1041,13 @@ document.addEventListener('DOMContentLoaded', function() {
       });
       try {
         if (!state.paid) {
-          ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
+          ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'].forEach(function(k) {
             if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
               discCanvasBlocks[k].teaser = true;
             }
           });
           // Restore collapsed position state
-          var hasStrat = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].some(function(k) {
+          var hasStrat = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'].some(function(k) {
             return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
           });
           if (hasStrat) discStrategyDone = true;
@@ -1323,7 +1323,6 @@ function getEnrichedContent(key) {
     leverage_risk:  fmtBlockers(s.blockers),
     emphasize:      p.amount_range ? ('Target ' + p.amount_range.low_pct + '\u2013' + p.amount_range.high_pct + '%\n' + (p.amount_range.explanation || '')) : '',
     avoid:          fmtTiming(s.timing),
-    raise_case:     fmtPrep(s.prep),
   };
   return map[key] || null;
 }
@@ -1334,7 +1333,7 @@ function rewriteKitWithRisk(newRisk) {
   SIM_STATE.context.risk = newRisk;
   state.offer_verdict = null;
   // Clear all strategy sections so they regenerate
-  ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
+  ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'].forEach(function(k) {
     if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].insight = ''; }
   });
   discPlanLoading = true;
@@ -3035,7 +3034,7 @@ var discCanvasBlocks = {
   opening_script: { filled: false, insight: '' },
   pushback: { filled: false, insight: '' },
   meeting_email: { filled: false, insight: '' },
-  raise_case: { filled: false, insight: '' },  levers: { filled: false, insight: '' },
+  levers: { filled: false, insight: '' },
 };
 var discStrategyLoading = false;
 var discStrategyDone = false;
@@ -3297,7 +3296,6 @@ function _generatePDFWithJsPDF() {
   drawFullWidth('levers', 'Non-Salary Levers', 'plan');
   drawFullWidth('pushback', 'Pushback Playbook', 'plan');
   drawFullWidth('fallback', 'Fallback Responses', 'plan');
-  drawFullWidth('raise_case', 'Sequencing Plan', 'plan');
 
   // ── Disclaimer ──
   y += 4;
@@ -3326,7 +3324,7 @@ function _generatePDFPrintFallback() {
     ]},
     { section: 'YOUR COUNTER KIT', items: [
       { key: 'opening_script', label: 'Phone Opener' }, { key: 'pushback', label: 'Pushback Playbook' }, { key: 'fallback', label: 'Fallback Responses' },
-      { key: 'meeting_email', label: 'Counter Email' }, { key: 'raise_case', label: 'Sequencing Plan' }
+      { key: 'meeting_email', label: 'Counter Email' }
     ]}
   ];
 
@@ -3372,13 +3370,12 @@ function _generatePDFPrintFallback() {
     pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
     if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
     meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
-    raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>'
   };
 
   function renderBlock(item, section) {
     var b = discCanvasBlocks[item.key];
     var icon = icons[item.key] || '';
-    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
     var isStratPlan = stratPlanKeys.indexOf(item.key) >= 0;
 
     if (b && b.filled) {
@@ -3410,8 +3407,6 @@ function _generatePDFPrintFallback() {
         } else if (item.key === 'meeting_email') {
           var sm = clean.match(/Subject:.*?(?=\s*Hi|\s*Dear|\s*Hey|\n)/i);
           teaserText = sm ? sm[0] : clean.slice(0, 40) + '...'; teaserBadge = 'Ready to send';
-        } else if (item.key === 'raise_case') {
-          teaserText = clean.slice(0, 45) + '...'; teaserBadge = '72-hour plan';
         } else {
           teaserText = clean.slice(0, 60) + '...';
         }
@@ -3478,7 +3473,6 @@ function _generatePDFPrintFallback() {
   html += renderBlock({key:'levers',label:'Non-Salary Levers'}, 'plan');
   html += renderBlock({key:'pushback',label:'Pushback Playbook'}, 'plan');
   html += renderBlock({key:'fallback',label:'Fallback Responses'}, 'plan');
-  html += renderBlock({key:'raise_case',label:'Sequencing Plan'}, 'plan');
 
   // Disclaimer — paid users only
   if (state.paid) {
@@ -3729,7 +3723,7 @@ function togglePlanBlock(el, key) {
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;transform:rotate(180deg);"><polyline points="6 9 12 15 18 9"/></svg>' +
       '</div>' +
       '<p style="font-size:11px;color:#1a3560;line-height:1.75;margin:0 0 8px;">' + (state.paid && discCanvasBlocks && discCanvasBlocks[key] && discCanvasBlocks[key].insight ? formatInsight(discCanvasBlocks[key].insight) : preview) + '</p>' +
-      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192','raise_case':'Unlock your sequencing plan \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
+      (state.paid ? '' : '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="font-size:10px;font-weight:600;color:var(--gold);text-decoration:none;">' + ({'leverage_risk':'Unlock the full leverage read \u2192','emphasize':'Unlock your ask stack \u2192','levers':'Unlock all 10 levers \u2192','opening_script':'Unlock your phone opener \u2192','pushback':'Unlock your pushback playbook \u2192','fallback':'Unlock your fallback responses \u2192','meeting_email':'Unlock your counter email \u2192'}[key]||('Unlock ' + lbl.toLowerCase() + ' \u2192')) + '</a>');
   }
 }
 
@@ -3775,7 +3769,6 @@ function renderCanvasHTML() {
     pushback: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
     if_yes: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
     meeting_email: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>',
-    raise_case: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
   };
 
   function block(key, label, subtitle) {
@@ -3837,7 +3830,6 @@ function renderCanvasHTML() {
     if (key === 'emphasize')     return { preview: firstSentence(clean), badge: '5 points' };
     if (key === 'opening_script') return { preview: firstSentence(clean), badge: '4 options' };
     if (key === 'pushback')       return { preview: firstSentence(clean), badge: '8 prepared' };
-    if (key === 'raise_case')    return { preview: firstSentence(clean), badge: 'One-page brief' };
     return { preview: firstSentence(clean), badge: '' };
   }
 
@@ -3946,7 +3938,6 @@ function renderCanvasHTML() {
       var BADGES = {
         opening_script: '4 options',
         pushback: '8 prepared',
-        raise_case: 'One-page brief',
         leverage_risk: '',
         emphasize: '5 points',
         avoid: '4 points',
@@ -3984,7 +3975,6 @@ function renderCanvasHTML() {
         pushback: 'Preparing recruiter pushback responses',
         if_yes: 'Planning your closing moves',
         meeting_email: 'Writing your counter email',
-        raise_case: 'Sequencing your 72-hour plan'
       };
       var loadMsg = loadingMessages[key] || 'Generating';
       var dots = '<span style="display:inline-flex;gap:3px;margin-right:6px;"><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.2s;"></span><span style="width:4px;height:4px;border-radius:50%;background:#c9a84c;opacity:0.3;animation:cvDotPulse 1.2s infinite 0.4s;"></span></span>';
@@ -4110,15 +4100,8 @@ function renderCanvasHTML() {
   html += planBlock('opening_script', 'Phone Opener', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('pushback', 'Pushback Playbook', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('fallback', 'Fallback Responses', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-  html += planBlock('raise_case', 'Sequencing Plan', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-
-  // YOUR STRATEGY
-  html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
-  html += '<div style="font-size:9px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.08em;padding:2px 4px;">Your strategy</div>';
-  html += '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:5px;">';
   html += planBlock('emphasize', 'Ask Stack', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('levers', 'Non-Salary Levers', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
-  html += '</div>';
 
   if (answeredCount >= 5) {
   }
@@ -4305,7 +4288,7 @@ function buildPaywallBubbleHTML(opts) {
     var _v = state.offer_verdict;
     if (mode === 'discovery' && _v && _v.room_low) {
       copy.title = 'You get one counter. Make it the right one.';
-      copy.subtitle = 'A strong counter typically <strong>adds thousands to your offer</strong>. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
+      copy.subtitle = 'A strong counter typically adds thousands to your offer. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
     }
   } catch (e) {}
 
@@ -4429,13 +4412,13 @@ function initDiscoveryMode(container) {
 
       // Force teaser on strategy/plan blocks for free users
       if (!state.paid) {
-        ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].forEach(function(k) {
+        ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'].forEach(function(k) {
           if (discCanvasBlocks[k] && discCanvasBlocks[k].filled) {
             discCanvasBlocks[k].teaser = true;
           }
         });
         // Restore collapsed state if strategy was previously generated
-        var hasStrategy = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'].some(function(k) {
+        var hasStrategy = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'].some(function(k) {
           return discCanvasBlocks[k] && discCanvasBlocks[k].filled;
         });
         if (hasStrategy) discStrategyDone = true;
@@ -4477,7 +4460,7 @@ function initDiscoveryMode(container) {
           state.discovery.step = DISC_FREE_QUESTIONS;
           // Apply kit
           var kitJson = JSON.parse(kitData.kit);
-          var KK = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+          var KK = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
           KK.forEach(function(k) {
             if (kitJson[k]) { discCanvasBlocks[k] = { insight: kitJson[k], filled: true, teaser: false }; }
           });
@@ -4528,7 +4511,7 @@ function initDiscoveryMode(container) {
 
     // If paid: strip teaser flags so full content shows
     if (state.paid) {
-      var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+      var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
       stratPlanKeys.forEach(function(key) {
         if (discCanvasBlocks[key] && discCanvasBlocks[key].teaser) {
           discCanvasBlocks[key].teaser = false;
@@ -4562,7 +4545,7 @@ function initDiscoveryMode(container) {
         return;
       }
       // Mark all strategy blocks as loading (not filled) until strategy API responds
-      var _stratLoadKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+      var _stratLoadKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
       _stratLoadKeys.forEach(function(k) {
         if (discCanvasBlocks[k]) { discCanvasBlocks[k].filled = false; discCanvasBlocks[k].teaser = false; }
       });
@@ -5086,10 +5069,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         _accLine +
         '</div>';
     }
-    var wa2=discDims.walkaway||0, rt2=discDims.risk_tol||0;
-    var how = (wa2>=70&&rt2>=65)?'Push hard \u2014 leverage and intent align':(wa2>=60&&rt2>=40)?'Counter carefully \u2014 solid position, measured approach':(wa2<40&&rt2>=65)?'Bold play \u2014 execute it perfectly, no slack in the framing':(wa2>=60&&rt2<40)?'Play it safe \u2014 you have leverage but want low friction':'';
-    var icon = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(245,207,86,0.9)" stroke-width="2.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>';
-
+    
     if (!showNumbers && !isPaid) {
       // Free user pre-unlock: blurred numbers
       inner = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
@@ -5100,7 +5080,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '</div>' +
         '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation.</span></div>' +
         '';
 
     } else if (!isPaid) {
@@ -5115,9 +5095,9 @@ function offerVerdictCardHtml(compact, showNumbers) {
           '<svg width="' + (compact?'20':'24') + '" height="' + (compact?'20':'24') + '" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
           '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         '</div>' + baseLine +
-        (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '<div style="margin-bottom:12px;"></div>') +
+        '<div style="margin-bottom:12px;"></div>' +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation.</span></div>' +
 
         '';
 
@@ -5125,9 +5105,9 @@ function offerVerdictCardHtml(compact, showNumbers) {
       // Paid: full numbers
       inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
         '<div style="font-size:' + (compact?'17px':'20px') + ';font-weight:800;color:#F5CF56;letter-spacing:-0.3px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' + baseLine +
-        (how ? '<div style="font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px;margin-bottom:12px;color:rgba(255,255,255,0.85);">' + icon + how + '</div>' : '') +
+        '<div style="margin-bottom:12px;"></div>' +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',v.counter_safe,recTier==='safe',false) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',v.counter_ambitious,recTier==='ambitious',false) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
+        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation.</span></div>' +
         '';
     }
   } else {
@@ -5148,7 +5128,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       '<div style="display:flex;gap:5px;padding-bottom:6px;">' +
         tierLocked('Safe ask', 0) + tierLocked('Strong ask', 1) + tierLocked('Bold ask', 2) +
       '</div>' +
-      '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation, not a single market number.</span></div>' +
+      '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation.</span></div>' +
       '';
   }
   return '<div style="background:linear-gradient(160deg,#2c2050 0%,#3a2d6e 100%);border:1px solid rgba(245,207,86,0.3);border-radius:10px;padding:18px 20px;margin-bottom:6px;">' + inner + '</div>';
@@ -5778,7 +5758,7 @@ async function generateDiscInsights() {
       body: JSON.stringify(teaserBody)
     });
     console.log('[teaser] response status:', teaserResp.status);
-    var KIT_KEYS = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+    var KIT_KEYS = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
     if (teaserResp.ok) {
       var teaserData = await teaserResp.json();
       var hookJson = teaserData.insights || {};
@@ -5849,7 +5829,7 @@ async function generateDiscInsights() {
       if_yes: 'Get the revised number in writing before you sign. A one-line confirmation email the same day locks it in.',
       meeting_email: 'Subject: Re: Offer. "Hi [Name], thank you again for the offer — I\'m excited about the team. Before I sign, I\'d like to align on compensation. I was targeting [counter]. If we can get there, I\'m ready to sign this week."',
       fallback: 'If base is blocked: 1) Pivot to the signing bonus immediately. 2) Ask for a committed 6-month review in writing. 3) Negotiate title as a proxy for future comp.',
-      raise_case: 'Your 72-hour plan: counter in writing first, give them a day to respond, take the call ready for pushback, get the final number in writing.',      levers: 'Beyond base: signing bonus, vacation days, remote days, title, start date, annual review timeline, performance bonus, relocation support, education budget, equity. Trade down the list \u2014 never up.'
+      levers: 'Beyond base: signing bonus, vacation days, remote days, title, start date, annual review timeline, performance bonus, relocation support, education budget, equity. Trade down the list \u2014 never up.'
     };
     Object.keys(fallbacks).forEach(function(key) {
       if (discCanvasBlocks[key]) {
@@ -5905,7 +5885,7 @@ async function generateDiscInsights() {
   console.log('[disc_insights] Sending', state.paid ? 'strategy (parallel)' : 'hooks', JSON.stringify({ blocker: blockerCode }));
 
   function applyInsights(insights, isPlanSection) {
-    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+    var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
     var positionKeys  = ['walkaway','risk_tol','urgency','talent','offer'];
     Object.keys(insights).forEach(function(dim) {
       if (discCanvasBlocks[dim] !== undefined) {
@@ -5970,7 +5950,7 @@ async function generateDiscInsights() {
         if (lc2) setCanvasHTML(lc2);
       }
       // Did the plan actually produce content? Check the 8 plan sections.
-      var _planKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+      var _planKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
       var _planFilled = _planKeys.filter(function(k){ return discCanvasBlocks[k] && discCanvasBlocks[k].insight; }).length;
       var _planOK = _planFilled >= 4; // need a real kit, not a couple of stragglers
       // Save after both calls complete with full content — only if the plan is real
@@ -5980,7 +5960,7 @@ async function generateDiscInsights() {
       if (state.paid && state.paid_token) {
         try {
           var _kitToStore = {};
-          var _kitKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+          var _kitKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
           _kitKeys.forEach(function(k) { if (discCanvasBlocks[k] && discCanvasBlocks[k].insight) _kitToStore[k] = discCanvasBlocks[k].insight; });
           fetch('/api/offer-kit-save', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -8212,7 +8192,7 @@ async function startCheckout(selectedPrice) {
           body: JSON.stringify(body),
         }).then(function(r) { return r.json(); }).then(function(data) {
         if (data && data.insights && Object.keys(data.insights).length > 0) {
-          var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email','raise_case'];
+          var stratPlanKeys = ['leverage_risk','emphasize','levers','opening_script','pushback','fallback','meeting_email'];
           Object.keys(data.insights).forEach(function(dim) {
             if (discCanvasBlocks[dim] !== undefined) {
               discCanvasBlocks[dim].insight = data.insights[dim];
