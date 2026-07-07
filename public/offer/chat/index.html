@@ -928,7 +928,9 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 </header>
 
 <!-- Mode navigation — standalone, outside bottom-panel so dimmed state never affects it -->
-<div id="mode-nav" style="display:none;padding:5px 16px;background:var(--bg);">
+<!-- TESTING PERIOD: mode switcher hidden to keep users inside the Counter Offer flow.
+     To re-enable, remove "display:none !important" below. -->
+<div id="mode-nav" style="display:none !important;padding:5px 16px;background:var(--bg);">
   <div style="display:flex;justify-content:center;width:100%;">
 <div class="mode-toggle" id="mode-toggle" role="tablist" aria-label="Mode">
   <button class="mode-toggle-btn disc active" id="mode-btn-disc" type="button" onclick="setMode('discovery')" role="tab" aria-selected="true" title="See your verdict and build your Counter Kit">
@@ -2770,15 +2772,17 @@ function insertModeBanner(mode) {
 // Reveal the toggle (unlocked + visible) once the simulation flow starts.
 // Before this point both halves are visible but locked (greyed) so the
 // user knows the modes exist without being able to break the flow.
+//
+// TESTING PERIOD: both functions below are no-ops so the mode switcher
+// never becomes visible, keeping users inside the Counter Offer flow.
+// To re-enable, restore the two lines that set nav.style.display = 'flex'.
 function showModeToggle() {
   var nav = $('mode-nav');
-  if (nav) { nav.style.display = 'flex'; nav.style.alignItems = 'center'; nav.style.justifyContent = 'center'; }
   updateModeToggleUI();
 }
 
 function unlockModeToggle() {
   var nav = $('mode-nav');
-  if (nav) { nav.style.display = 'flex'; nav.style.alignItems = 'center'; nav.style.justifyContent = 'center'; }
   updateModeToggleUI();
 }
 
