@@ -58,6 +58,7 @@
     +       '<a href="/about/" style="font-size:13px;color:#8a90a8;text-decoration:none;">About</a>'
     +       '<a href="/contact/" style="font-size:13px;color:#8a90a8;text-decoration:none;">Contact</a>'
     +       '<a href="/privacy-policy/" style="font-size:13px;color:#8a90a8;text-decoration:none;">Privacy</a>'
+    +       '<a href="/terms/" style="font-size:13px;color:#8a90a8;text-decoration:none;">Terms</a>'
     +     '</div>'
     +   '</div>'
     +   '<div style="text-align:center;font-size:12px;color:#2e3347;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);">'
