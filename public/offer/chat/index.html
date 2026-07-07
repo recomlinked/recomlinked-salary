@@ -5502,7 +5502,7 @@ function computeOfferVerdict() {
   // Magnitude normalization safety net: "85" -> 85,000. Only correct when plausible (>=10).
   if (base >= 10 && base < 1000) { base = base * 1000; ctx.base = String(base); }
   if (!base || base < 10000) return null;
-  var lo = 0.03, hi = 0.10;
+  var lo = 0.02, hi = 0.10;
   if (ctx.competing === 'yes') { lo += 0.02; hi += 0.04; }
   else if (ctx.competing === 'expecting') { lo += 0.01; hi += 0.02; }
   else if (ctx.competing === 'interviewing') { hi += 0.01; }
