@@ -5054,16 +5054,16 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var _accAll = tierAcceptance();
       var _accKey = name.indexOf('Safe') >= 0 ? 'safe' : name.indexOf('Strong') >= 0 ? 'moderate' : 'ambitious';
       var _accPct = _accAll[_accKey];
-      var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8C97A' : 'rgba(255,255,255,0.6)';
+      var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8A85C' : 'rgba(224,148,148,0.75)';
       var _accDisplay = (_accKey === 'moderate' && !(typeof state !== 'undefined' && state.paid)) ? 'XX' : _accPct;
       var _accLine = '<div style="font-size:8.5px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
-      var numColor = (locked || val === null) ? (isRec ? 'rgba(245,207,86,0.45)' : 'rgba(255,255,255,0.25)') : (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)');
-      return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.18);border:1px solid rgba(245,207,86,0.55);' : 'background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);') + '">' +
-        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.9)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
+      var numColor = (locked || val === null) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)';
+      return '<div style="flex:1;min-width:0;text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
+        '<div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
         (locked
           ? '<div style="display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
-              '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.6)') + '" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
-              '<span style="font-size:14px;font-weight:900;color:' + (isRec ? '#F5CF56' : 'rgba(255,255,255,0.85)') + ';filter:blur(7px);user-select:none;">' + fm(val !== null && val > 0 ? val : 97500) + '</span>' +
+              '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
+              '<span style="font-size:14px;font-weight:900;color:rgba(255,255,255,0.85);filter:blur(7px);user-select:none;">' + fm(val !== null && val > 0 ? val : 97500) + '</span>' +
             '</div>'
           : '<div style="font-size:14px;font-weight:900;color:' + numColor + ';">' + display + '</div>'
         ) +
@@ -5121,10 +5121,9 @@ function offerVerdictCardHtml(compact, showNumbers) {
     var recTier0 = rk0 === 'safe' ? 0 : rk0 === 'ambitious' ? 2 : 1;
     var RISK_LABELS0 = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
     function tierLocked(name, idx0) {
-      var isRec = idx0 === recTier0;
-      return '<div style="flex:1;min-width:0;text-align:center;padding:6px 4px;border-radius:7px;' + (isRec ? 'background:rgba(245,207,86,0.12);border:1px solid rgba(245,207,86,0.4);' : 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);') + '">' +
-        '<div style="font-size:8px;font-weight:700;letter-spacing:0.06em;color:' + (isRec ? 'rgba(245,207,86,0.7)' : 'rgba(255,255,255,0.9)') + ';">' + name + (isRec ? ' \u2605' : '') + '</div>' +
-        '<span class="' + (isRec ? 'verdict-shimmer' : 'verdict-shimmer-sm') + '" style="height:14px;width:58px;margin:2px auto;display:block;"></span>' +
+      return '<div style="flex:1;min-width:0;text-align:center;padding:6px 4px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">' +
+        '<div style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
+        '<span class="verdict-shimmer-sm" style="height:14px;width:58px;margin:2px auto;display:block;"></span>' +
         '</div>';
     }
     inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
