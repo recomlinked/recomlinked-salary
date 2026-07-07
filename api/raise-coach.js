@@ -837,13 +837,12 @@ Examples (write better than these, calibrated to THEIR specific situation):
 - pushback: "Every recruiter response to a counter is either a real constraint or a closing tactic — the response is completely different depending on which one it is."
 - fallback: "If base is blocked, you have exactly one window to pivot before the conversation closes — this is what you say in that window."
 - meeting_email: "Subject: Re: Senior Accountant offer — a quick note before I sign\\n\\nHi Sarah,\\n\\nThank you again for the offer — I'm genuinely excited about the team and the work ahead. Before I sign, I'd like to align on compensation so we can wrap this up cleanly. Based on the scope we discussed and the market for this role, I was hoping we could revisit the..."
-- raise_case: "The 48 hours after you send the counter are the most important — this is the exact sequence that keeps the momentum in your direction."
 
-Respond ONLY with valid JSON — exactly these 9 keys, one hook sentence each, no markdown:
-{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","raise_case":"..."}`,
-// Respond with all 8 keys.
+Respond ONLY with valid JSON — exactly these 8 keys, one hook sentence each, no markdown:
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"..."}`,
+// 8 keys total (7 strategy hooks + meeting_email).
       userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate all 8 hook sentences — one per key. Every key required.`,
-      maxTokens: 1200,
+      maxTokens: 1100,
     };
   }
 
@@ -907,18 +906,10 @@ fallback:
   3. The title upgrade: how a title change now creates comp leverage in the next role. One sentence on when to deploy it.
   End with: 'The fallback sequence is: base \u2192 signing \u2192 review \u2192 title. Never give two levers for nothing.'
 
-raise_case:
-  This is the SEQUENCING PLAN \u2014 their 72-hour playbook. Numbered steps:
-  1. [Send the counter email first \u2014 when, and why writing leads]
-  2. [The waiting window \u2014 how long, what silence means]
-  3. [The call \u2014 take it practiced, openers ready]
-  4. [Getting the final number in writing before signing]
-  5. [If the deadline is too tight \u2014 the exact extension script, one sentence in quotes]
-
-Return ONLY these 8 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
-{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"...","raise_case":"..."}`,
-// 8 keys total.
-      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 8 Counter Kit sections.`,
+Return ONLY these 7 keys as valid JSON. Values are plain text strings with \\n for line breaks. No markdown fences. No preamble.
+{"leverage_risk":"...","emphasize":"...","levers":"...","opening_script":"...","pushback":"...","fallback":"...","meeting_email":"..."}`,
+// 7 keys total.
+      userMessage: `Candidate's leverage profile:\n${answeredDims}\n\nGenerate the 7 Counter Kit sections.`,
       maxTokens: 12000,
     };
   }
