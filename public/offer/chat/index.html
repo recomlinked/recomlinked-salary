@@ -5093,7 +5093,11 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '</div>' +
         '<div style="display:flex;align-items:center;gap:8px;padding:10px 0 12px;margin-bottom:6px;">' +
           '<svg width="' + (compact?'20':'24') + '" height="' + (compact?'20':'24') + '" viewBox="0 0 24 24" fill="none" stroke="#F5CF56" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>' +
-          '<div style="font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;filter:blur(8px);user-select:none;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
+          '<div style="display:flex;align-items:center;gap:8px;font-size:' + (compact?'22px':'28px') + ';font-weight:900;color:#F5CF56;letter-spacing:-1px;cursor:pointer;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
+            '<span style="filter:blur(8px);user-select:none;">' + fm(v.room_low) + '</span>' +
+            '<span style="filter:none;opacity:0.65;font-weight:700;">\u2013</span>' +
+            '<span style="filter:blur(8px);user-select:none;">' + fm(v.room_high) + '</span>' +
+          '</div>' +
         '</div>' + baseLine +
         '<div style="margin-bottom:12px;"></div>' +
         '<div style="display:flex;gap:5px;padding-bottom:6px;">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
