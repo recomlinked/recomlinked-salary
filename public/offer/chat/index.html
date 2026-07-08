@@ -4008,10 +4008,7 @@ function renderCanvasHTML() {
   var _intakeDone2 = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
   html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
-  // Free users: the (exact) paywall sits directly under the locked verdict card
-  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
-    html += '<div style="margin:8px 0 4px;">' + buildPaywallBubbleHTML({ mode: 'discovery' }).html + '</div>';
-  }
+  // Free users: paywall now moved to the end of the kit (after Your plan) — see below
 
   var intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
 
@@ -4108,6 +4105,12 @@ function renderCanvasHTML() {
   }
 
   html += '</div>';
+
+  // Free users: paywall sits right after the last card (Non-Salary Levers),
+  // above the Download PDF section
+  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
+    html += '<div style="margin:8px 0 4px;">' + buildPaywallBubbleHTML({ mode: 'discovery' }).html + '</div>';
+  }
 
   // Download bar — after intake only
   html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
