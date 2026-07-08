@@ -1315,12 +1315,6 @@ function getEnrichedContent(key) {
     if (!em || !em.email_template) return '';
     return 'Subject: ' + (em.email_template.subject || '') + '\n\n' + (em.email_template.body || '');
   }
-  function fmtPrep(pr) {
-    if (!pr || !pr['30_day_prep_plan']) return '';
-    return pr['30_day_prep_plan'].map(function(w){
-      return 'Week ' + w.week + ' — ' + w.theme + ':\n' + (w.actions || []).map(function(a){ return '  \u2022 ' + a; }).join('\n');
-    }).join('\n\n');
-  }
   function fmtTiming(ti) {
     if (!ti) return '';
     var out = ti.timing_recommendation || '';
@@ -3820,15 +3814,6 @@ function renderCanvasHTML() {
     return '';
   }
 
-  function getFirstSentence(text) {
-    if (!text) return '';
-    var clean = text.replace(/\*\*/g, '');
-    var match = clean.match(/^[^.!?]*[.!?]/);
-    if (match && match[0].length < clean.length - 5) return match[0];
-    if (clean.length > 80) return clean.slice(0, 80) + '...';
-    return clean;
-  }
-
   function getTeaserForBlock(key, text) {
     if (!text) return { preview: '', badge: '' };
     var clean = text.replace(/\*\*/g, '');
@@ -5052,7 +5037,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var _accKey = name.indexOf('Safe') >= 0 ? 'safe' : name.indexOf('Strong') >= 0 ? 'moderate' : 'ambitious';
       var _accPct = _accAll[_accKey];
       var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8A85C' : 'rgba(224,148,148,0.75)';
-      var _accDisplay = (_accKey === 'moderate' && !(typeof state !== 'undefined' && state.paid)) ? 'XX' : _accPct;
+      var _accDisplay = _accPct;
       var _accLine = '<div class="tier-accept" style="font-size:10px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
       var numColor = (locked || val === null) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)';
       return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
@@ -5104,7 +5089,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
         baseLine +
         '<div style="margin-bottom:12px;"></div>' +
-        '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
+        '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis \u00b7 Confidence: ' + estimateConfidence().level + '. Weighed from multiple signals in your situation.</span></div>' +
         verdictGuaranteeHtml +
         '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="display:block;font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">Show all my numbers \u2192</a>' +
