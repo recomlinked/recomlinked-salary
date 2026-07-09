@@ -4111,12 +4111,14 @@ function renderCanvasHTML() {
   html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
   html += '<div style="margin-top:10px;padding:0 12px;">';
+  html += '<div style="display:flex;flex-direction:column;gap:10px;">';
   html += emailHeroBlock('meeting_email', 'Counter Email', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('opening_script', 'Phone Opener', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('pushback', 'Pushback Playbook', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('fallback', 'Fallback Responses', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('emphasize', 'Ask Stack', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
   html += planBlock('levers', 'Non-Salary Levers', discPlanLoading ? 'Analysing your offer…' : 'Completing your intake…');
+  html += '</div>';
   html += '</div>';
 
   // Rewrite strategy buttons — moved inside Your plan
