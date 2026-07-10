@@ -4104,7 +4104,7 @@ function renderCanvasHTML() {
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<details style="margin-top:2px;">';
   html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:10px 12px;background:var(--muted);border-radius:8px;">';
-  html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your plan</span>';
+  html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your Email & Scripts</span>';
   html += '<span style="font-size:9px;font-weight:600;color:var(--gold);white-space:nowrap;">Tap to expand</span>';
   html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
@@ -6224,7 +6224,7 @@ function showTailorQuestion(chatArea, idx) {
 
     // 5. Done bubble
     var doneWrap = el('div', 'coach-msg', '');
-    doneWrap.innerHTML = '<div class="bubble"><p>Your plan has been updated. <a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:700;text-decoration:none;">Unlock it to see everything \u2192</a></p></div>';
+    doneWrap.innerHTML = '<div class="bubble"><p>Your email & scripts have been updated. <a href="#" onclick="event.preventDefault();var pw=document.querySelector(\'.paywall-bubble\');if(pw)pw.scrollIntoView({behavior:\'smooth\'})" style="color:var(--gold);font-weight:700;text-decoration:none;">Unlock it to see everything \u2192</a></p></div>';
     chatArea.appendChild(doneWrap);
 
     setTimeout(function() {
