@@ -814,6 +814,13 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   .tier-num{font-size:28px !important;}
   .tier-accept{font-size:13px !important;margin-top:8px !important;}
 }
+@keyframes tCarouselScroll{
+  0%,20%{transform:translateX(0%);}
+  25%,45%{transform:translateX(-25%);}
+  50%,70%{transform:translateX(-50%);}
+  75%,95%{transform:translateX(-75%);}
+  100%{transform:translateX(0%);}
+}
 </style>
 </head>
 
@@ -4182,6 +4189,47 @@ function renderCanvasHTML() {
   html += '</div>';
 
   html += '</div>';
+
+  // ── Testimonial carousel — a fully separate section BELOW the entire Counter Kit card ──
+  // Placeholder content ("test.....") until real customer quotes exist. Avatars are real
+  // illustrated images (shared static assets, same as used in the Raise product).
+  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
+    var _tSlides = [
+      { avatar: '/raise/avatars/linda_w.png',stars: 5, amount: '+$test,...', quote: 'I was afraid to ask and lose the job, but this tool got me $9,000 more.', name: 'Linda W.', role: 'Data Scientist' },
+      { avatar: '/raise/avatars/angela.png', stars: 5, amount: '+$test,...', quote: "I'm terrible at talking about money in person. Just copied the email it gave me and it worked.", name: 'Angela T.', role: 'Physical Therapist' },
+      { avatar: '/raise/avatars/brian.png',  stars: 4, amount: '+$test,...', quote: 'This tool gave me the confidence to ask safely. I sent the counter and they accepted most of it.', name: 'Brian', role: 'Sales Manager' },
+      { avatar: '/raise/avatars/tamika.png', stars: 5, amount: '+$test,...', quote: 'I had no idea what to even ask for. This gave me a real number and I used it.', name: 'Tamika', role: 'Quality Control Lead' }
+    ];
+    html += '<div id="tCarousel" style="margin:14px 0 4px;padding:12px;">';
+    html += '<div style="position:relative;overflow:hidden;border-radius:16px;">';
+    html += '<div class="tCarouselTrack" style="display:flex;width:' + (_tSlides.length * 100) + '%;animation:tCarouselScroll ' + (_tSlides.length * 7) + 's infinite;">';
+    _tSlides.forEach(function(s) {
+      html += '<div style="width:' + (100 / _tSlides.length) + '%;flex-shrink:0;padding:0 6px;box-sizing:border-box;">';
+      html += '<div style="background:#fff;border:1px solid #E5E7EF;border-radius:16px;padding:22px 22px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+      html += '<div style="display:flex;align-items:center;justify-content:center;margin-bottom:14px;">';
+      html += '<div style="display:flex;gap:2px;">';
+      for (var _si = 0; _si < 5; _si++) {
+        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="' + (_si < s.stars ? '#D4AF37' : '#E0E0E0') + '"><path d="M12 1l3.09 6.26L22 8.27l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>';
+      }
+      html += '</div>';
+      html += '</div>';
+      html += '<p style="font-size:15px;font-weight:600;color:#1B2A3A;text-align:center;line-height:1.4;margin:0 0 16px;">&quot;' + s.quote + '&quot;</p>';
+      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;">';
+      html += '<img src="' + s.avatar + '" alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"/>';
+      html += '<div style="display:none;width:38px;height:38px;border-radius:50%;background:#F0F1F5;border:2px dashed #C4CAD6;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA7AF" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>';
+      html += '<div style="text-align:center;">';
+      html += '<div style="font-size:13px;font-weight:700;color:#1B2A3A;">' + s.name + '</div>';
+      html += '<div style="font-size:11px;color:#9AA7AF;">' + s.role + '</div>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
   return html;
 }
 
