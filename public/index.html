@@ -2,13 +2,192 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<meta http-equiv="refresh" content="0; url=/raise/"/>
-<title>Salary Negotiation Coach</title>
-<link rel="canonical" href="https://salary.recomlinked.com/raise/"/>
-<script>window.location.replace('/raise/');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Salary Negotiation Help | Recomlinked</title>
+<meta name="description" content="Get a job offer or want a raise? Answer one question and get the negotiation tool built for your exact situation."/>
+<link rel="canonical" href="https://salary.recomlinked.com/"/>
+<link rel="icon" type="image/x-icon" href="/favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png"/>
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-192.png"/>
+<link rel="manifest" href="/manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+<style>
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial');
+  ascent-override: 94%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+  size-adjust: 103%;
+}
+:root {
+  --bg: #f8f6fa;
+  --card: #ffffff;
+  --text: #2c2438;
+  --text2: #6b5f7a;
+  --text3: #6e6278;
+  --purple: #7B5CFC;
+  --purple-hover: #6A4CE8;
+  --purple-light: #f0e8f6;
+  --gold: #F5CF56;
+  --gold-hover: #E8C044;
+  --gold-text: #1a1520;
+  --border: rgba(139,111,165,0.1);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md: 0 8px 28px rgba(44,36,56,0.08);
+  --shadow-gold: 0 2px 12px rgba(232,184,76,0.25);
+  --radius: 14px;
+  --sans: 'DM Sans', 'DM Sans Fallback', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: #f5e6d8; }
+body {
+  background:
+    radial-gradient(circle at 15% 8%, rgba(123,92,252,0.07), transparent 40%),
+    radial-gradient(circle at 85% 92%, rgba(245,207,86,0.10), transparent 42%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--purple); text-decoration: none; }
+
+/* ── HEADER (exact match to other landing pages) ── */
+.site-header.menu-open { background: var(--card); }
+.site-header {
+  background: transparent;
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: none;
+  position: relative; top: 0; z-index: 100;
+}
+.logo-wrap { display: flex; align-items: center; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-decoration: none; }
+.logo-wrap:hover { text-decoration: none; }
+.logo-recom { background: var(--gold); color: var(--gold-text); padding: 2px 7px 2px 6px; border-radius: 3px 0 0 3px; }
+.logo-linked { color: var(--text); padding: 2px 6px 2px 5px; background: var(--purple-light); border-radius: 0 3px 3px 0; }
+.header-nav { display: flex; align-items: center; gap: 20px; }
+.header-nav a { font-size: 13px; font-weight: 500; color: var(--text3); text-decoration: none; white-space: nowrap; transition: color 0.15s; }
+.header-nav a:hover { color: var(--text); text-decoration: none; }
+.hamburger { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 4px; }
+.hamburger span { display: block; width: 20px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.2s; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.mobile-menu { display: none; position: fixed; inset: 0; top: 50px; background: var(--card); z-index: 200; padding: 8px 24px 32px; border-top: 1px solid var(--border); flex-direction: column; }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-size: 17px; font-weight: 600; color: var(--text); padding: 16px 0; text-decoration: none; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.mobile-menu a:hover { color: var(--purple); text-decoration: none; }
+.mobile-menu .menu-arrow { color: var(--text3); font-size: 14px; }
+@media (max-width: 560px) { .header-nav { display: none; } .hamburger { display: flex; } }
+@media (max-width: 480px) { .site-header.menu-open { background: var(--card); } .site-header { padding: 12px 16px; } h1 { letter-spacing: -0.6px; font-size: 26px; } }
+
+/* ── MAIN CONTENT ── */
+.main { display: flex; align-items: center; justify-content: center; padding: 40px 24px 80px; min-height: calc(100vh - 78px); }
+.wrap { max-width: 660px; width: 100%; text-align: center; }
+h1 {
+  font-family: var(--sans);
+  font-size: clamp(30px, 5.5vw, 44px);
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.accent { color: var(--purple); }
+h1 .accent { color: var(--purple); }
+h1 .hero-h1-line2 { font-weight: 500; display: inline-block; margin-top: 4px; }
+.sub { font-size: 15.5px; color: var(--text2); line-height: 1.6; margin-bottom: 40px; max-width: 440px; margin-left: auto; margin-right: auto; }
+.paths { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 26px; }
+@media (max-width: 560px) { .paths { grid-template-columns: 1fr; } }
+.path-card {
+  background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
+  padding: 30px 24px; text-align: left; display: block;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+}
+.path-card:hover { border-color: var(--purple); box-shadow: var(--shadow-md); transform: translateY(-3px); text-decoration: none; }
+.path-icon { width: 42px; height: 42px; border-radius: 11px; background: var(--purple-light); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+.path-title { font-size: 17.5px; font-weight: 800; color: var(--text); margin-bottom: 16px; letter-spacing: -0.2px; }
+.path-desc { font-size: 13px; color: var(--text3); line-height: 1.55; margin-bottom: 18px; }
+.path-cta { font-size: 13.5px; font-weight: 700; color: var(--gold-hover); display: inline-flex; align-items: center; gap: 4px; }
+.foot-note { font-size: 12px; color: var(--text3); }
+</style>
 </head>
-<body style="background:#07090f;color:#e8eaf2;font-family:-apple-system,'Segoe UI',sans-serif;padding:40px 20px;text-align:center;">
-<p>Redirecting to <a href="/raise/" style="color:#c9a84c;">/raise/</a>…</p>
+<body>
+
+<header class="site-header">
+  <a href="/" class="logo-wrap"><span class="logo-recom">recom</span><span class="logo-linked">linked</span></a>
+  <nav class="header-nav">
+    <a href="/raise/">Raise Plan</a>
+    <a href="/raise/coach/">AI Coach</a>
+    <a href="/offer/">Counter Offer</a>
+  </nav>
+  <button class="hamburger" id="hamburger" aria-label="Menu" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="/raise/">Raise Plan <span class="menu-arrow">&rarr;</span></a>
+  <a href="/raise/coach/">AI Coach <span class="menu-arrow">&rarr;</span></a>
+  <a href="/offer/">Counter Offer <span class="menu-arrow">&rarr;</span></a>
+</div>
+
+<main class="main">
+<div class="wrap">
+  <h1>Your <span class="accent">salary negotiation</span> tool<br><span class="hero-h1-line2">built for your exact situation</span></h1>
+  <p class="sub">Don't leave money on the table.</p>
+
+  <div class="paths">
+    <a href="/offer/" class="path-card" id="path-offer">
+      <div class="path-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7B5CFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+      </div>
+      <div class="path-title">Negotiate a new <span class="accent">job offer</span></div>
+      <div class="path-cta">Price my counter offer <span aria-hidden="true">&rarr;</span></div>
+    </a>
+
+    <a href="/raise/" class="path-card" id="path-raise">
+      <div class="path-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7B5CFC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+      </div>
+      <div class="path-title">Negotiate a <span class="accent">raise</span> at work</div>
+      <div class="path-cta">Build my raise case <span aria-hidden="true">&rarr;</span></div>
+    </a>
+  </div>
+
+  <p class="foot-note">No email needed for either &middot; About 2 minutes</p>
+</div>
+</main>
+
+<script>
+function toggleMenu() {
+  var btn = document.getElementById('hamburger');
+  var menu = document.getElementById('mobile-menu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  document.querySelector('.site-header').classList.toggle('menu-open', menu.classList.contains('open'));
+}
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('mobile-menu');
+  var btn = document.getElementById('hamburger');
+  if (menu && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) {
+    btn.classList.remove('open');
+    menu.classList.remove('open');
+    document.body.style.overflow = '';
+    document.querySelector('.site-header').classList.remove('menu-open');
+  }
+});
+</script>
 </body>
 </html>
