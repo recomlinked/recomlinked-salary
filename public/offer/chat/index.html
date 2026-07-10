@@ -5217,7 +5217,18 @@ function replayDiscHistory(chatArea) {
 }
 
 function renderDiscQuestion(idx) {
-  if (idx >= discOrderedQuestions.length || idx >= DISC_FREE_QUESTIONS) { generateDiscInsights(); return; }
+  if (idx >= discOrderedQuestions.length || idx >= DISC_FREE_QUESTIONS) {
+    var chatAreaDone = $('disc-chat');
+    if (chatAreaDone && !state.paid) {
+      var _finalInsight = 'That\u2019s everything needed. Your answers are weighed against multiple signals in your situation. Your risk read and negotiation position are free. Next: your exact number, the email to send, and how to handle pushback.';
+      typeReaction(_finalInsight, chatAreaDone).then(function() {
+        setTimeout(function() { generateDiscInsights(); }, 500);
+      });
+      return;
+    }
+    generateDiscInsights();
+    return;
+  }
   var q = discOrderedQuestions[idx];
   var chatArea = $('disc-chat');
   if (!chatArea) return;
