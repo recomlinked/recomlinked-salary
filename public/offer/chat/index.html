@@ -4447,7 +4447,19 @@ function initDiscoveryMode(container) {
       discWeaks = saved.weaks || discWeaks;
       discStep = saved.step || 0;
       discInsights = saved.insights || {};
-      if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
+      if (saved.canvasBlocks) {
+        // Merge onto the known-good defaults rather than replacing wholesale —
+        // a session saved before a schema change could be missing keys the
+        // current code expects (e.g. urgency), which would crash later when
+        // pickDiscAnswer tries to set discCanvasBlocks[missingKey].filled.
+        Object.keys(saved.canvasBlocks).forEach(function(k) {
+          if (discCanvasBlocks[k]) {
+            Object.assign(discCanvasBlocks[k], saved.canvasBlocks[k]);
+          } else {
+            discCanvasBlocks[k] = saved.canvasBlocks[k];
+          }
+        });
+      }
       // Restore SIM_STATE.context from saved answers so buildOfferCtx()
       // has the user's role, base, city etc. when generating the full kit
       if (saved.answers) {
