@@ -3460,8 +3460,7 @@ function _generatePDFPrintFallback() {
   }
 
   var _intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
-  var _showVerdictNumbers2 = state.paid ? true : (_intakeDone && discNumbersReady);
-  html += offerVerdictCardHtml(false, _showVerdictNumbers2);
+  html += offerVerdictCardHtml(false, _intakeDone && discNumbersReady);
 
   // YOUR POSITION
   html += '<div class="section-title">YOUR POSITION</div>';
@@ -4044,11 +4043,7 @@ function renderCanvasHTML() {
     html += '</div>';
   }
 
-  // Paid users see real numbers as soon as they're computable (base salary present),
-  // independent of whether the plan/strategy API calls succeed — those only affect
-  // the email/scripts section, not the verdict numbers, which are pure client-side math.
-  var _showVerdictNumbers = state.paid ? true : (_intakeDone2 && discNumbersReady);
-  html += offerVerdictCardHtml(true, _showVerdictNumbers);
+  html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
   // Free users: paywall now moved to the end of the kit (after Your plan) — see below
 
@@ -4452,19 +4447,7 @@ function initDiscoveryMode(container) {
       discWeaks = saved.weaks || discWeaks;
       discStep = saved.step || 0;
       discInsights = saved.insights || {};
-      if (saved.canvasBlocks) {
-        // Merge onto the known-good defaults rather than replacing wholesale —
-        // a session saved before a schema change could be missing keys the
-        // current code expects (e.g. urgency), which would crash later when
-        // pickDiscAnswer tries to set discCanvasBlocks[missingKey].filled.
-        Object.keys(saved.canvasBlocks).forEach(function(k) {
-          if (discCanvasBlocks[k]) {
-            Object.assign(discCanvasBlocks[k], saved.canvasBlocks[k]);
-          } else {
-            discCanvasBlocks[k] = saved.canvasBlocks[k];
-          }
-        });
-      }
+      if (saved.canvasBlocks) discCanvasBlocks = saved.canvasBlocks;
       // Restore SIM_STATE.context from saved answers so buildOfferCtx()
       // has the user's role, base, city etc. when generating the full kit
       if (saved.answers) {
@@ -5273,13 +5256,7 @@ function renderDiscQuestion(idx) {
   chatArea.appendChild(coachBubble);
 
   if (q.input) {
-    console.log('[renderDiscQuestion DIAGNOSTIC] Rendering input-type question:', q.id, 'at idx', idx);
-    var _inputUI = buildDiscInputUI(idx, q);
-    if (!_inputUI) {
-      console.error('[renderDiscQuestion DIAGNOSTIC] buildDiscInputUI returned falsy for question:', q.id);
-    }
-    chatArea.appendChild(_inputUI);
-    console.log('[renderDiscQuestion DIAGNOSTIC] Input UI appended successfully for:', q.id);
+    chatArea.appendChild(buildDiscInputUI(idx, q));
   } else {
     var chipsWrap = el('div', 'coach-msg', '');
     var opts = el('div', 'sim-pills-row', '');
@@ -5503,24 +5480,7 @@ function pickDiscAnswer(qIdx, opt, pill) {
   // Reaction line — typed in like a coach reply, next question waits
   // Delay so radar settles first, then reaction types in
   var _reactionDone = opt.note ? new Promise(function(res) {
-    setTimeout(function() {
-      try {
-        var _typed = typeReaction(opt.note, chatArea);
-        if (_typed && typeof _typed.then === 'function') {
-          _typed.then(res).catch(function(err) {
-            console.error('[pickDiscAnswer] typeReaction rejected, continuing anyway:', err && err.message);
-            res();
-          });
-        } else {
-          res();
-        }
-      } catch (_typeErr) {
-        console.error('[pickDiscAnswer] typeReaction threw, continuing anyway:', _typeErr && _typeErr.message);
-        res();
-      }
-    }, 500);
-    // Hard safety net: never let this hang forever, even if typeReaction never calls back
-    setTimeout(res, 8000);
+    setTimeout(function() { typeReaction(opt.note, chatArea).then(res); }, 500);
   }) : Promise.resolve();
 
   // Smooth scroll to user's answer
@@ -5591,19 +5551,6 @@ function computeOfferVerdict() {
   if (!ctx.base && state && state.discovery && state.discovery.answers) {
     var ans = state.discovery.answers;
     Object.keys(ans).forEach(function(k) { if (!ctx[k]) ctx[k] = ans[k]; });
-  }
-  // Last-resort fallback: read directly from localStorage in case in-memory state
-  // lost the value this session but the browser's persisted copy still has it.
-  if (!ctx.base) {
-    try {
-      var _raw = localStorage.getItem(LS_STATE);
-      if (_raw) {
-        var _parsed = JSON.parse(_raw);
-        var _rawBase = (_parsed.discovery && _parsed.discovery.answers && _parsed.discovery.answers.base)
-          || (_parsed.profile && _parsed.profile.base);
-        if (_rawBase) ctx.base = _rawBase;
-      }
-    } catch (e) {}
   }
   var base = parseInt(String(ctx.base || '').replace(/[^\d]/g, ''), 10) || 0;
   // Magnitude normalization safety net: "85" -> 85,000. Only correct when plausible (>=10).
