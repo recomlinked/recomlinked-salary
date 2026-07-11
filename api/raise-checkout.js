@@ -91,10 +91,15 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: `Price ID not configured for $${selectedPrice}` });
   }
 
-  if (isFreeOffer && !process.env.STRIPE_COUPON_FEEDBACK_100) {
+  // The "CREATOR100" promotion code's resolved Stripe ID. Overridable via
+  // env var if the code is ever rotated/replaced in the Dashboard, without
+  // needing a code change — falls back to the current known ID otherwise.
+  const FEEDBACK_PROMOTION_CODE_ID = process.env.FEEDBACK_PROMOTION_CODE_ID || 'promo_1Tf3CIK8c4f41ExBJMXWEwm5';
+
+  if (isFreeOffer && !FEEDBACK_PROMOTION_CODE_ID) {
     // Fail loud rather than silently falling back to a real charge —
     // someone who tapped "100% off" should never end up on a paid session.
-    console.error('[raise-checkout] STRIPE_COUPON_FEEDBACK_100 not configured');
+    console.error('[raise-checkout] FEEDBACK_PROMOTION_CODE_ID not configured');
     return res.status(500).json({ error: 'Free offer is not configured' });
   }
 
@@ -111,11 +116,11 @@ module.exports = async function handler(req, res) {
         quantity: 1,
       }],
       // discounts and allow_promotion_codes are mutually exclusive in the
-      // Stripe API — free-offer sessions auto-apply the coupon server-side
-      // so the customer never has to find/type a code; everyone else keeps
-      // the manual promo-code field for one-off cases.
+      // Stripe API — free-offer sessions auto-apply the promotion code
+      // server-side so the customer never has to find/type it themselves;
+      // everyone else keeps the manual promo-code field for one-off cases.
       ...(isFreeOffer
-        ? { discounts: [{ coupon: process.env.STRIPE_COUPON_FEEDBACK_100 }] }
+        ? { discounts: [{ promotion_code: FEEDBACK_PROMOTION_CODE_ID }] }
         : { allow_promotion_codes: true }),
       success_url: productCode === 'offer'
         ? `${BASE}/offer/chat/?session_id={CHECKOUT_SESSION_ID}`
