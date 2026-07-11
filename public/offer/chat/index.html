@@ -208,6 +208,37 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 }
 .btn-deep-dive:hover{color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.25);}
 
+.btn-pay-free{
+  width:100%;background:transparent;color:var(--gold2);
+  border:1.5px solid var(--gold2);border-radius:10px;padding:13px 14px;
+  font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:background 0.12s;
+}
+.btn-pay-free:hover{background:rgba(245,207,86,0.08);}
+.free-offer-divider{text-align:center;font-size:11px;color:rgba(255,255,255,0.4);margin:12px 0;}
+.free-offer-reveal{
+  background:#1a1436;border-radius:14px;padding:20px 18px;color:#fff;
+  border:1px solid rgba(245,207,86,0.3);margin-top:14px;
+}
+.free-offer-reveal .badge{
+  display:inline-block;background:rgba(245,207,86,0.18);color:var(--gold2);
+  font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;
+  letter-spacing:0.03em;margin-bottom:12px;
+}
+.free-offer-reveal p{font-size:12.5px;color:rgba(255,255,255,0.8);line-height:1.65;margin-bottom:14px;}
+.free-offer-reveal label{
+  display:flex;align-items:flex-start;gap:8px;font-size:12px;
+  color:rgba(255,255,255,0.75);line-height:1.5;margin-bottom:16px;cursor:pointer;
+}
+.free-offer-reveal label input{margin-top:2px;}
+.free-offer-code{
+  background:rgba(0,0,0,0.25);border-radius:10px;padding:12px 14px;
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;
+}
+.free-offer-code span:first-child{font-size:12px;color:rgba(255,255,255,0.6);}
+.free-offer-code span:last-child{font-size:14px;font-weight:800;letter-spacing:0.08em;color:var(--gold2);}
+
 .paywall-pitch{
   font-size:12.5px;color:rgba(255,255,255,0.8);
   line-height:1.6;margin:0 0 18px;
@@ -860,7 +891,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
       try {
         window.gtag('event', 'purchase', {
           product: 'offer',
-          value: p.value || 19,
+          value: p.value || 29,
           currency: 'USD',
           transaction_id: p.sid || '',
           transport_type: 'beacon',
@@ -912,7 +943,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
           localStorage.removeItem('rl_offer_discovery_backup');
           // Mark a completed purchase so it's reported to GA4/Ads once (after redirect, when gtag is ready)
           try {
-            localStorage.setItem('rl_pending_purchase', JSON.stringify({ sid: sid, value: (parseInt(localStorage.getItem('rl_offer_price'), 10) || 19) }));
+            localStorage.setItem('rl_pending_purchase', JSON.stringify({ sid: sid, value: (parseInt(localStorage.getItem('rl_offer_price'), 10) || 29) }));
           } catch(e) {}
           // Redirect with paid_token in URL — works regardless of localStorage state
           sessionStorage.removeItem('rl_verifying_payment');
@@ -3751,7 +3782,7 @@ function setCanvasHTML(el) {
   var _pwBtn = el.querySelector('.btn-pay[data-pw-go]');
   if (_pwBtn) {
     _pwBtn.onclick = function() {
-      var _p = parseInt(_pwBtn.getAttribute('data-pw-price'), 10) || 19;
+      var _p = parseInt(_pwBtn.getAttribute('data-pw-price'), 10) || 29;
       if (typeof startCheckout === 'function') startCheckout(_p);
       else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
     };
@@ -4341,14 +4372,7 @@ function buildPaywallBubbleHTML(opts) {
   opts = opts || {};
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
-  var selectedPrice = 19;
-  try {
-    var _base = parseInt(String(
-      (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
-      (state && state.profile && state.profile.base) || ''
-    ).replace(/[^\d]/g, ''), 10) || 0;
-    if (_base >= 100000) selectedPrice = 19; // flat $19 — $49 tier disabled for now
-  } catch (e) {}
+  var selectedPrice = 29; // flat $29
   try {
     var _v = state.offer_verdict;
     if (mode === 'discovery' && _v && _v.room_low) {
@@ -4361,6 +4385,8 @@ function buildPaywallBubbleHTML(opts) {
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
     '<button class="btn-pay" data-pw-go="1" data-pw-price="' + selectedPrice + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="free-offer-divider">or</div>' +
+    '<button class="btn-pay-free" data-pw-free-go="1">100% off code \u00b7 help others trust it works <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="trust-row paywall-trust">' +
       '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg>No subscription</span>' +
       '<span class="dot">\u00b7</span>' +
@@ -4368,6 +4394,13 @@ function buildPaywallBubbleHTML(opts) {
     '</div>' +
     '<div style="text-align:center;margin-top:4px;">' +
       '<a href="/terms/" target="_blank" rel="noopener" style="font-size:11px;color:rgba(255,255,255,0.45);text-decoration:underline;" onclick="event.stopPropagation();">Terms &amp; Conditions</a>' +
+    '</div>' +
+    '<div class="free-offer-reveal" data-free-reveal="1" style="display:none;">' +
+      '<span class="badge">100% off \u00b7 help others trust it works</span>' +
+      '<p>We want to know how the tool helped with your counter, and what happened after. In exchange for the code, there\u2019s a gentle agreement: reply to one short email soon telling us the result.</p>' +
+      '<label><input type="checkbox" data-free-agree="1" />I agree to reply when you follow up</label>' +
+      '<div class="free-offer-code"><span>your code</span><span>C-A-100</span></div>' +
+      '<button class="btn-pay" data-pw-free-continue="1">Continue to checkout \u00b7 no card needed <span class="btn-pay-arrow">\u2192</span></button>' +
     '</div>' +
   '</div>';
   return { html: html, price: selectedPrice };
@@ -4392,12 +4425,39 @@ function appendStandardPaywall(container, opts) {
   wrap.innerHTML = built.html;
   container.appendChild(wrap);
 
-  var ctaBtn = wrap.querySelector('.btn-pay');
+  var ctaBtn = wrap.querySelector('.btn-pay[data-pw-go]');
   if (ctaBtn) ctaBtn.onclick = function() {
     if (typeof startCheckout === 'function') startCheckout(built.price);
     else if (typeof initiateCheckout === 'function') initiateCheckout(built.price);
   };
 
+  // Secondary CTA: reveal the gentle-agreement panel instead of going
+  // straight to Stripe — the agreement lives *before* checkout, the coupon
+  // is applied automatically once they continue (no code to type).
+  var freeBtn = wrap.querySelector('[data-pw-free-go]');
+  var reveal = wrap.querySelector('[data-free-reveal]');
+  if (freeBtn && reveal) {
+    freeBtn.onclick = function() {
+      reveal.style.display = 'block';
+      freeBtn.style.display = 'none';
+      wrap.querySelector('.free-offer-divider').style.display = 'none';
+      reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      logSession('offer_paywall', { paywall_action: 'free_offer_shown' });
+    };
+  }
+
+  var freeContinueBtn = wrap.querySelector('[data-pw-free-continue]');
+  var freeAgree = wrap.querySelector('[data-free-agree]');
+  if (freeContinueBtn) {
+    freeContinueBtn.onclick = function() {
+      if (freeAgree && !freeAgree.checked) {
+        freeAgree.parentElement.style.color = '#ff9b9b';
+        freeAgree.focus();
+        return;
+      }
+      if (typeof startFreeCheckout === 'function') startFreeCheckout();
+    };
+  }
 }
 
 
@@ -6226,7 +6286,7 @@ function showTailorQuestion(chatArea, idx) {
         (SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) ||
         (state && state.profile && state.profile.base) || ''
       ).replace(/[^\d]/g, ''), 10) || 0;
-      var _pr2 = 19; // flat $19 — $49 tier disabled for now
+      var _pr2 = 29; // flat $29
       btn.innerHTML = 'Unlock exact numbers + your full Counter Kit \u00b7 $' + _pr2 + ' <span class="btn-pay-arrow">\u2192</span>';
     }
 
@@ -8295,6 +8355,102 @@ async function startCheckout(selectedPrice) {
 }
 
 
+// Same flow as startCheckout(), but for the "100% off, help us prove it
+// works" path — posts free_offer:true so the server auto-applies the
+// coupon (STRIPE_COUPON_FEEDBACK_100) via Stripe's discounts[] param.
+// The customer never sees or types a code; Stripe shows $0 due directly.
+async function startFreeCheckout() {
+  var ctx = buildOfferCtx();
+  ctx.blocker = SIM_STATE.blocker || 'other';
+  ctx.answers = (function() {
+    var ans = {};
+    discOrderedQuestions.slice(0, 16).forEach(function(q) {
+      if (q.dimTag) ans[q.dimTag] = SIM_STATE.context[q.id] || '';
+    });
+    return ans;
+  })();
+  ctx.dims = discDims; ctx.levers = discLevers; ctx.weaks = discWeaks;
+  try { localStorage.setItem('rl_offer_ctx', JSON.stringify(ctx)); } catch(e) {}
+  try { localStorage.setItem('rl_offer_price', '0'); } catch(e) {}
+
+  try {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'checkout_started', {
+        product: 'offer', value: 0, currency: 'USD', transport_type: 'beacon',
+        final_floor: (state && state.current_range) ? state.current_range.floor : null,
+        final_ceiling: (state && state.current_range) ? state.current_range.ceiling : null,
+        obstacle_code: (state && state.blocker && state.blocker.code) || '',
+        free_offer: true,
+      });
+    }
+    if (typeof window.clarity === 'function') {
+      window.clarity('set', 'funnel_stage', 'checkout_started_free');
+      window.clarity('event', 'checkout_started_free');
+    }
+  } catch (e) {}
+
+  // Distinct action string so it's visible as its own value in the
+  // existing "Paywall Action" column — no sheet schema change needed.
+  logSession('checkout', { paywall_action: 'checkout_started_free' });
+
+  var freeBtn = document.querySelector('[data-pw-free-continue]');
+  if (freeBtn) {
+    if (!document.getElementById('rl-spin-style')) {
+      const s = document.createElement('style');
+      s.id = 'rl-spin-style';
+      s.textContent = '@keyframes rl-spin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(s);
+    }
+    const spinner = `<svg class="rl-cta-spinner" width="14" height="14" viewBox="0 0 14 14" style="animation:rl-spin 0.8s linear infinite;vertical-align:middle;margin-left:6px;" xmlns="http://www.w3.org/2000/svg"><circle cx="7" cy="7" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="20" stroke-dashoffset="10" stroke-linecap="round"/></svg>`;
+    if (!freeBtn.dataset.origHtml) freeBtn.dataset.origHtml = freeBtn.innerHTML;
+    freeBtn.insertAdjacentHTML('beforeend', spinner);
+    freeBtn.style.pointerEvents = 'none';
+    freeBtn.setAttribute('disabled', 'true');
+  }
+
+  try {
+    const params = new URLSearchParams(location.search);
+    const refSource = params.get('ref') || (state.profile && state.profile.refSource) || (function(){ try{ return localStorage.getItem('rl_ref') || ''; }catch(e){ return ''; } })();
+    const checkoutProfile = state.profile || {
+      role: 'Not specified', country: 'US', company_situation: 'Not specified',
+      last_raise: 'Not specified', seniority: 'unknown', company_size: 'unknown',
+    };
+    const checkoutRange = state.current_range || { floor: 0, ceiling: 0 };
+    const checkoutObstacle = state.blocker || SIM_STATE.blocker || { code: 'other', label: 'Other' };
+
+    const res = await fetch(API_CHECKOUT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile_hash: profileHash(),
+        profile: checkoutProfile,
+        final_range: checkoutRange,
+        obstacle: checkoutObstacle,
+        refSource,
+        price: 29,          // underlying price object — coupon brings it to $0 server-side
+        free_offer: true,
+        product: 'offer',
+        offer_context: ctx,
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.url) throw new Error('No checkout URL');
+    window.location.href = data.url;
+  } catch (err) {
+    if (freeBtn) {
+      if (freeBtn.dataset.origHtml) {
+        freeBtn.innerHTML = freeBtn.dataset.origHtml;
+        delete freeBtn.dataset.origHtml;
+      }
+      freeBtn.style.pointerEvents = '';
+      freeBtn.removeAttribute('disabled');
+    }
+    showErrorBubble("Couldn't open checkout. Check your connection and try again, or email support@recomlinked.com.", null);
+  }
+}
+
+
 // Composes and renders the promo discount banner for returning users.
 // Inserted as a coach-msg element BEFORE the paywall bubble.
 // Returns the banner element (or null if promo has expired).
@@ -8307,7 +8463,7 @@ async function startCheckout(selectedPrice) {
 // (profile, range, obstacle, timing). Conversational style — uses regular
 // coach bubble aesthetic, not a dark card. Progressive reveal animation.
 // opts.animated: type headline + middle line, fade the rest. Default false (instant).
-// Pricing: flat $19 (the $49 high-base tier is disabled for now) — no promo, no discount.
+// Pricing: flat $29, plus a secondary 100%-off/feedback path — see buildPaywallBubbleHTML().
 async function renderPaywallBubble(opts) {
   opts = opts || {};
   state.paywall_shown = true;
