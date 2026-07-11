@@ -3460,7 +3460,8 @@ function _generatePDFPrintFallback() {
   }
 
   var _intakeDone = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
-  html += offerVerdictCardHtml(false, _intakeDone && discNumbersReady);
+  var _showVerdictNumbers2 = state.paid ? true : (_intakeDone && discNumbersReady);
+  html += offerVerdictCardHtml(false, _showVerdictNumbers2);
 
   // YOUR POSITION
   html += '<div class="section-title">YOUR POSITION</div>';
@@ -4043,7 +4044,11 @@ function renderCanvasHTML() {
     html += '</div>';
   }
 
-  html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
+  // Paid users see real numbers as soon as they're computable (base salary present),
+  // independent of whether the plan/strategy API calls succeed — those only affect
+  // the email/scripts section, not the verdict numbers, which are pure client-side math.
+  var _showVerdictNumbers = state.paid ? true : (_intakeDone2 && discNumbersReady);
+  html += offerVerdictCardHtml(true, _showVerdictNumbers);
 
   // Free users: paywall now moved to the end of the kit (after Your plan) — see below
 
@@ -5586,6 +5591,19 @@ function computeOfferVerdict() {
   if (!ctx.base && state && state.discovery && state.discovery.answers) {
     var ans = state.discovery.answers;
     Object.keys(ans).forEach(function(k) { if (!ctx[k]) ctx[k] = ans[k]; });
+  }
+  // Last-resort fallback: read directly from localStorage in case in-memory state
+  // lost the value this session but the browser's persisted copy still has it.
+  if (!ctx.base) {
+    try {
+      var _raw = localStorage.getItem(LS_STATE);
+      if (_raw) {
+        var _parsed = JSON.parse(_raw);
+        var _rawBase = (_parsed.discovery && _parsed.discovery.answers && _parsed.discovery.answers.base)
+          || (_parsed.profile && _parsed.profile.base);
+        if (_rawBase) ctx.base = _rawBase;
+      }
+    } catch (e) {}
   }
   var base = parseInt(String(ctx.base || '').replace(/[^\d]/g, ''), 10) || 0;
   // Magnitude normalization safety net: "85" -> 85,000. Only correct when plausible (>=10).
