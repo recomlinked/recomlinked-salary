@@ -5079,7 +5079,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
   if (liveV) {
     state.offer_verdict = {
       room_low: liveV.roomLow, room_high: liveV.roomHigh,
-      counter: liveV.counter, counter_safe: liveV.counterSafe,
+      counter: liveV.recommended, counter_safe: liveV.counterSafe,
       counter_moderate: liveV.counterModerate, counter_ambitious: liveV.counterAmbitious,
       risk: liveV.risk, recommended: liveV.recommended, base: liveV.base, leverage: liveV.leverage
     };
@@ -5594,7 +5594,6 @@ function computeOfferVerdict() {
   function r500(v) { return Math.max(500, Math.round(v / 500) * 500); }
   roomLow = r500(roomLow);
   roomHigh = Math.max(roomLow + 500, r500(roomHigh));
-  var counter = r500(base + roomHigh * 0.9);
   var counterSafe = r500(base + roomLow);
   var counterModerate = r500(base + roomHigh * 0.65);
   if (counterModerate <= counterSafe) counterModerate = counterSafe + 500;
@@ -5611,7 +5610,7 @@ function computeOfferVerdict() {
   else if (researchedMax > base) lev = 'Your market research \u2014 you counter with data, not hope';
   else if (ctx.deadline === 'under_24h' || ctx.deadline === '24_72h' || ctx.deadline === 'this_week') lev = 'Their tight deadline \u2014 pressure to close cuts both ways';
   else if (ctx.worktype === 'on_site') lev = 'The on-site requirement \u2014 a smaller local talent pool is leverage for those in it';
-  return { base: base, roomLow: roomLow, roomHigh: roomHigh, counter: counter, counterSafe: counterSafe, counterModerate: counterModerate, counterAmbitious: counterAmbitious, risk: riskPref, recommended: recommended, leverage: lev };
+  return { base: base, roomLow: roomLow, roomHigh: roomHigh, counterSafe: counterSafe, counterModerate: counterModerate, counterAmbitious: counterAmbitious, risk: riskPref, recommended: recommended, leverage: lev };
 }
 
 function buildOfferCtx() {
@@ -5638,7 +5637,7 @@ function buildOfferCtx() {
     jd_text: (ctx.jd_text || '').slice(0, 1500),
     room_low: v.room_low || v.roomLow || 0,
     room_high: v.room_high || v.roomHigh || 0,
-    counter: v.counter || 0,
+    counter: v.counter || v.recommended || 0,
     counter_safe: v.counter_safe || v.counterSafe || 0,
     counter_moderate: v.counter_moderate || v.counterModerate || 0,
     counter_ambitious: v.counter_ambitious || v.counterAmbitious || 0
