@@ -5256,7 +5256,13 @@ function renderDiscQuestion(idx) {
   chatArea.appendChild(coachBubble);
 
   if (q.input) {
-    chatArea.appendChild(buildDiscInputUI(idx, q));
+    console.log('[renderDiscQuestion DIAGNOSTIC] Rendering input-type question:', q.id, 'at idx', idx);
+    var _inputUI = buildDiscInputUI(idx, q);
+    if (!_inputUI) {
+      console.error('[renderDiscQuestion DIAGNOSTIC] buildDiscInputUI returned falsy for question:', q.id);
+    }
+    chatArea.appendChild(_inputUI);
+    console.log('[renderDiscQuestion DIAGNOSTIC] Input UI appended successfully for:', q.id);
   } else {
     var chipsWrap = el('div', 'coach-msg', '');
     var opts = el('div', 'sim-pills-row', '');
@@ -5480,7 +5486,24 @@ function pickDiscAnswer(qIdx, opt, pill) {
   // Reaction line — typed in like a coach reply, next question waits
   // Delay so radar settles first, then reaction types in
   var _reactionDone = opt.note ? new Promise(function(res) {
-    setTimeout(function() { typeReaction(opt.note, chatArea).then(res); }, 500);
+    setTimeout(function() {
+      try {
+        var _typed = typeReaction(opt.note, chatArea);
+        if (_typed && typeof _typed.then === 'function') {
+          _typed.then(res).catch(function(err) {
+            console.error('[pickDiscAnswer] typeReaction rejected, continuing anyway:', err && err.message);
+            res();
+          });
+        } else {
+          res();
+        }
+      } catch (_typeErr) {
+        console.error('[pickDiscAnswer] typeReaction threw, continuing anyway:', _typeErr && _typeErr.message);
+        res();
+      }
+    }, 500);
+    // Hard safety net: never let this hang forever, even if typeReaction never calls back
+    setTimeout(res, 8000);
   }) : Promise.resolve();
 
   // Smooth scroll to user's answer
