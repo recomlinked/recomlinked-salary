@@ -5780,9 +5780,25 @@ async function generateDiscInsights() {
     discPlanLoading = true;
     var lc0p = $('disc-canvas-live'); if (lc0p) setCanvasHTML(lc0p);
   } else {
-  // Free users: hooks teaser
-  discPlanLoading = true;
-  var lc0 = $('disc-canvas-live'); if (lc0) setCanvasHTML(lc0); // show loading state
+  // Free users — verdict numbers (room range + Safe/Strong/Bold tiers) come from
+  // computeOfferVerdict(), which is deterministic and needs no API call. Reveal
+  // them — blurred/locked behind the paywall — instantly. Only the plan-block
+  // TEASER TEXT (leverage_risk, emphasize, opening_script, pushback, fallback,
+  // levers, meeting_email) actually depends on the hook API, so that keeps
+  // loading in the background ("Reading your leverage and risk…" etc.) and
+  // swaps in silently when it resolves. Nothing about that swap-in behavior changes.
+  discNumbersReady = true;   // numbers are computed client-side — no need to wait
+  discPlanLoading = true;    // plan-block text placeholders still show until hooks arrive
+  hideKitBanner();
+  var lc0 = $('disc-canvas-live'); if (lc0) setCanvasHTML(lc0); // instant: blurred numbers + paywall CTA visible now
+
+  // Auto-show paywall 5 seconds after the kit reveals — no longer waits on the hook API
+  setTimeout(function() {
+    if (!state.paid && typeof showDiscPaywall === 'function') {
+      showDiscPaywall();
+    }
+  }, 5000);
+
   var isOfferProduct = true; // always offer in this flow
   var teaserBody = {
     mode: 'disc_insights',
@@ -5800,6 +5816,8 @@ async function generateDiscInsights() {
     dims: discDims, levers: discLevers, weaks: discWeaks
   };
 
+  // Hook API runs in parallel with the above — purely to fill in the plan-block
+  // teaser text once it's ready. Does not gate numbers or the paywall anymore.
   try {
     var teaserResp = await fetch('/api/raise-coach', {
       method: 'POST',
@@ -5823,32 +5841,12 @@ async function generateDiscInsights() {
     } else {
       console.warn('[teaser] non-ok status:', teaserResp.status);
     }
-    // Always reveal numbers and stop loading — regardless of API success
-    discNumbersReady = true;
     discPlanLoading = false;
-    if (!state.paid) hideKitBanner();
     var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-    // Auto-show paywall 3 seconds after kit reveals (free users only)
-    if (!state.paid) {
-      setTimeout(function() {
-        if (!state.paid && typeof showDiscPaywall === 'function') {
-          showDiscPaywall();
-        }
-      }, 5000);
-    }
   } catch(e) {
     console.warn('[teaser] fetch error:', e.message);
-    discNumbersReady = true;
     discPlanLoading = false;
     var lc = $('disc-canvas-live'); if (lc) setCanvasHTML(lc);
-    // Auto-show paywall on error too
-    if (!state.paid) {
-      setTimeout(function() {
-        if (!state.paid && typeof showDiscPaywall === 'function') {
-          showDiscPaywall();
-        }
-      }, 5000);
-    }
   }
 
   } // end free-user Phase 1
