@@ -3778,14 +3778,11 @@ function togglePlanBlock(el, key) {
 function setCanvasHTML(el) {
   if (!el) return;
   el.innerHTML = renderCanvasHTML();
-  // Wire the in-kit paywall button (canvas re-renders, so wire each time)
-  var _pwBtn = el.querySelector('.btn-pay[data-pw-go]');
-  if (_pwBtn) {
-    _pwBtn.onclick = function() {
-      var _p = parseInt(_pwBtn.getAttribute('data-pw-price'), 10) || 29;
-      if (typeof startCheckout === 'function') startCheckout(_p);
-      else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
-    };
+  // Wire the in-kit paywall — all buttons, not just the primary one
+  // (canvas re-renders on every state change, so this must run every time)
+  var pwRoot = el.querySelector('.paywall-bubble');
+  if (pwRoot) {
+    wirePaywallBubble(pwRoot);
     if (!(state && state.paid)) logPaywallSeenOnce();
   }
   // Cards start collapsed — user expands on demand
@@ -4398,12 +4395,61 @@ function buildPaywallBubbleHTML(opts) {
     '<div class="free-offer-reveal" data-free-reveal="1" style="display:none;">' +
       '<span class="badge">100% off \u00b7 help others trust it works</span>' +
       '<p>We want to know how the tool helped with your counter, and what happened after. In exchange for the code, there\u2019s a gentle agreement: reply to one short email soon telling us the result.</p>' +
-      '<label><input type="checkbox" data-free-agree="1" />I agree to reply when you follow up</label>' +
+      '<label><input type="checkbox" data-free-agree="1" checked />I agree to reply when you follow up</label>' +
       '<div class="free-offer-code"><span>your code</span><span>C-A-100</span></div>' +
       '<button class="btn-pay" data-pw-free-continue="1">Continue to checkout \u00b7 no card needed <span class="btn-pay-arrow">\u2192</span></button>' +
     '</div>' +
   '</div>';
   return { html: html, price: selectedPrice };
+}
+
+// Wires every button inside a rendered paywall-bubble root element:
+// primary $29 CTA, secondary 100%-off reveal toggle, and the reveal
+// panel's checkbox-gated "Continue to checkout". Called from BOTH render
+// paths — appendStandardPaywall() (chat-message bubble) and
+// setCanvasHTML() (in-kit bubble, embedded via buildPaywallBubbleHTML()
+// inside renderCanvasHTML()) — so a button added here never silently
+// works in one place and not the other again.
+function wirePaywallBubble(root, priceOverride) {
+  if (!root) return;
+
+  var ctaBtn = root.querySelector('.btn-pay[data-pw-go]');
+  if (ctaBtn) {
+    ctaBtn.onclick = function() {
+      var _p = priceOverride || parseInt(ctaBtn.getAttribute('data-pw-price'), 10) || 29;
+      if (typeof startCheckout === 'function') startCheckout(_p);
+      else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
+    };
+  }
+
+  // Secondary CTA: reveal the gentle-agreement panel instead of going
+  // straight to Stripe — the agreement lives *before* checkout, the coupon
+  // is applied automatically once they continue (no code to type).
+  var freeBtn = root.querySelector('[data-pw-free-go]');
+  var reveal = root.querySelector('[data-free-reveal]');
+  if (freeBtn && reveal) {
+    freeBtn.onclick = function() {
+      reveal.style.display = 'block';
+      freeBtn.style.display = 'none';
+      var divider = root.querySelector('.free-offer-divider');
+      if (divider) divider.style.display = 'none';
+      reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      logSession('offer_paywall', { paywall_action: 'free_offer_shown' });
+    };
+  }
+
+  var freeContinueBtn = root.querySelector('[data-pw-free-continue]');
+  var freeAgree = root.querySelector('[data-free-agree]');
+  if (freeContinueBtn) {
+    freeContinueBtn.onclick = function() {
+      if (freeAgree && !freeAgree.checked) {
+        freeAgree.parentElement.style.color = '#ff9b9b';
+        freeAgree.focus();
+        return;
+      }
+      if (typeof startFreeCheckout === 'function') startFreeCheckout();
+    };
+  }
 }
 
 function appendStandardPaywall(container, opts) {
@@ -4425,39 +4471,7 @@ function appendStandardPaywall(container, opts) {
   wrap.innerHTML = built.html;
   container.appendChild(wrap);
 
-  var ctaBtn = wrap.querySelector('.btn-pay[data-pw-go]');
-  if (ctaBtn) ctaBtn.onclick = function() {
-    if (typeof startCheckout === 'function') startCheckout(built.price);
-    else if (typeof initiateCheckout === 'function') initiateCheckout(built.price);
-  };
-
-  // Secondary CTA: reveal the gentle-agreement panel instead of going
-  // straight to Stripe — the agreement lives *before* checkout, the coupon
-  // is applied automatically once they continue (no code to type).
-  var freeBtn = wrap.querySelector('[data-pw-free-go]');
-  var reveal = wrap.querySelector('[data-free-reveal]');
-  if (freeBtn && reveal) {
-    freeBtn.onclick = function() {
-      reveal.style.display = 'block';
-      freeBtn.style.display = 'none';
-      wrap.querySelector('.free-offer-divider').style.display = 'none';
-      reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      logSession('offer_paywall', { paywall_action: 'free_offer_shown' });
-    };
-  }
-
-  var freeContinueBtn = wrap.querySelector('[data-pw-free-continue]');
-  var freeAgree = wrap.querySelector('[data-free-agree]');
-  if (freeContinueBtn) {
-    freeContinueBtn.onclick = function() {
-      if (freeAgree && !freeAgree.checked) {
-        freeAgree.parentElement.style.color = '#ff9b9b';
-        freeAgree.focus();
-        return;
-      }
-      if (typeof startFreeCheckout === 'function') startFreeCheckout();
-    };
-  }
+  wirePaywallBubble(wrap, built.price);
 }
 
 
