@@ -70,7 +70,7 @@ module.exports = async function handler(req, res) {
     refSource,
     price,
     product,
-    free_offer,   // NEW — true for the "100% off, tell us how it went" path
+    free_offer,   // NEW — true for the "50% off, help others trust it works" path (1-week test)
   } = req.body || {};
 
   if (!profile_hash || !profile || !final_range) {
@@ -81,8 +81,8 @@ module.exports = async function handler(req, res) {
 
   // Resolve selected price — default to $29 if not sent or invalid.
   // Free-offer sessions still ring up against the real $29 price object
-  // (so Stripe reporting/catalog stays honest) — the coupon below is what
-  // brings it to $0, not a separate $0 price.
+  // (so Stripe reporting/catalog stays honest) — the promotion code below
+  // is what brings it to $14.50 (50% off), not a separate discounted price.
   const selectedPrice = isFreeOffer ? 29 : (VALID_PRICES.includes(Number(price)) ? Number(price) : 29);
   const productCode = product === 'offer' ? 'offer' : 'raise';
   const priceId = PRICE_ID_MAP[selectedPrice];
@@ -91,14 +91,14 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: `Price ID not configured for $${selectedPrice}` });
   }
 
-  // The "CREATOR100" promotion code's resolved Stripe ID. Overridable via
-  // env var if the code is ever rotated/replaced in the Dashboard, without
-  // needing a code change — falls back to the current known ID otherwise.
-  const FEEDBACK_PROMOTION_CODE_ID = process.env.FEEDBACK_PROMOTION_CODE_ID || 'promo_1Tf3CIK8c4f41ExBJMXWEwm5';
+  // The "Feedback50" promotion code's resolved Stripe ID (1-week 50%-off
+  // test). Overridable via env var if the code is ever rotated/replaced in
+  // the Dashboard, without needing a code change.
+  const FEEDBACK_PROMOTION_CODE_ID = process.env.FEEDBACK_PROMOTION_CODE_ID || 'promo_1TsAtiK8c4f41ExBLbNuEGsA';
 
   if (isFreeOffer && !FEEDBACK_PROMOTION_CODE_ID) {
-    // Fail loud rather than silently falling back to a real charge —
-    // someone who tapped "100% off" should never end up on a paid session.
+    // Fail loud rather than silently falling back to full price —
+    // someone who tapped "50% off" should never get charged the full $29.
     console.error('[raise-checkout] FEEDBACK_PROMOTION_CODE_ID not configured');
     return res.status(500).json({ error: 'Free offer is not configured' });
   }
@@ -140,7 +140,7 @@ module.exports = async function handler(req, res) {
         obstacle_label:      metaStr(obs.label, 480),
         obstacle_free_text:  metaStr(obs.free_text, 480),
         refSource:    metaStr(refSource),
-        price_usd:    isFreeOffer ? '0' : String(selectedPrice),
+        price_usd:    isFreeOffer ? '14.5' : String(selectedPrice),
         feedback_program: isFreeOffer ? 'yes' : 'no',   // NEW — lets the webhook trigger the ~1 week follow-up
       },
     });
@@ -157,7 +157,7 @@ module.exports = async function handler(req, res) {
             obstacle: obs,
             email:    email || '',
             refSource: refSource || '',
-            price_usd: isFreeOffer ? 0 : selectedPrice,
+            price_usd: isFreeOffer ? 14.5 : selectedPrice,
             feedback_program: isFreeOffer,
             product: productCode,
             offer_context: req.body.offer_context || null,
@@ -181,7 +181,7 @@ module.exports = async function handler(req, res) {
       final_ceil:    final_range.ceiling,
       obstacle_code: obs.code || '',
       stripeSession: session.id,
-      price_usd:     isFreeOffer ? 0 : selectedPrice,
+      price_usd:     isFreeOffer ? 14.5 : selectedPrice,
       refSource:     refSource || '',
       source:        'salary.recomlinked.com',
     });
