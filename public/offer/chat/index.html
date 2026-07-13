@@ -4348,8 +4348,8 @@ function showLockedCoaching(container) {
 // subtitle — smaller line below the title
 var PAYWALL_COPY = {
   discovery: {
-    title:    'Your negotiation room is mapped. The kit is how you claim it.',
-    subtitle: 'The Counter Kit turns your room into exact numbers, a ready-to-send email, and a response to every pushback.'
+    title:    'You get one counter. Make it the right one.',
+    subtitle: 'A strong counter typically adds thousands to your offer. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where $29 isn\u2019t worth it.</strong>'
   },
   sim: {
     title:    'Practice every recruiter pushback until nothing surprises you.',
@@ -4370,13 +4370,6 @@ function buildPaywallBubbleHTML(opts) {
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
   var selectedPrice = 29; // flat $29
-  try {
-    var _v = state.offer_verdict;
-    if (mode === 'discovery' && _v && _v.room_low) {
-      copy.title = 'You get one counter. Make it the right one.';
-      copy.subtitle = 'A strong counter typically adds thousands to your offer. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where $' + selectedPrice + ' isn\u2019t worth it.</strong>';
-    }
-  } catch (e) {}
 
   var html = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
@@ -4742,7 +4735,7 @@ function initDiscoveryMode(container) {
       var trust = document.createElement('div');
       trust.className = 'opener-trust';
       trust.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text3,#9a93a8);display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
-      trust.innerHTML = '<span>No email needed</span><span style="opacity:0.5;">\u00b7</span><span>Takes about 2 minutes</span>';
+      trust.innerHTML = '<span>No email needed</span><span style="opacity:0.5;">\u00b7</span><span>Takes about 3 minutes</span>';
       bub.appendChild(trust);
     }
 
