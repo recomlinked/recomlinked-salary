@@ -509,7 +509,8 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
   <!-- RECENT activity ticker — real role/city/offer pulled from session data (NOT win amounts; the
        export has no outcome data). "$Xk offer" is the real base they entered, framed as activity, not a win. -->
   <style>
-    .wins-ticker{position:relative;overflow:hidden;background:linear-gradient(90deg,#FBF3EC,#F2ECFB);padding:7px 0;margin-bottom:40px;border-radius:16px;}
+    .wins-ticker{position:relative;overflow:hidden;background:linear-gradient(90deg,#FBF3EC,#F2ECFB);padding:7px 0;margin-top:16px;margin-bottom:40px;border-radius:16px;}
+    @media (max-width:480px){ .wins-ticker{margin-top:24px;} }
     .wins-ticker::before,.wins-ticker::after{content:"";position:absolute;top:0;bottom:0;width:64px;z-index:2;pointer-events:none;}
     .wins-ticker::before{left:0;background:linear-gradient(90deg,#FBF3EC,rgba(251,243,236,0));}
     .wins-ticker::after{right:0;background:linear-gradient(270deg,#F2ECFB,rgba(242,236,251,0));}
