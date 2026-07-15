@@ -4380,14 +4380,16 @@ function buildPaywallBubbleHTML(opts) {
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
     '<button class="btn-pay" data-pw-go="1" data-pw-price="' + selectedPrice + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
-    '<div class="guarantee-row" style="margin-top:14px;padding:12px 14px;background:rgba(245,207,86,0.08);border:1px solid rgba(245,207,86,0.25);border-radius:10px;">' +
-      '<p style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.02em;margin-bottom:3px;">Your position: <strong style="color:#F5CF56;">' + gTier.label + '</strong></p>' +
-      '<p style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.5;"><strong style="color:#F5CF56;">Counter Guarantee:</strong> if you counter your safe ask and don\u2019t receive it, we\u2019ll refund ' + gTier.multiplier + '\u00d7 what you paid.</p>' +
-    '</div>' +
-    '<div class="trust-row paywall-trust">' +
+    '<div class="trust-row paywall-trust" style="margin-top:10px;">' +
       '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg>No subscription</span>' +
       '<span class="dot">\u00b7</span>' +
       '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V5l8-3z"/><polyline points="9 12 11 14 15 9.5"/></svg>Stripe secure</span>' +
+      '<span class="dot">\u00b7</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>30-day access</span>' +
+    '</div>' +
+    '<div class="guarantee-row" style="margin-top:14px;padding:12px 14px;background:rgba(245,207,86,0.08);border:1px solid rgba(245,207,86,0.25);border-radius:10px;">' +
+      '<p style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.02em;margin-bottom:3px;">Your position: <strong style="color:#F5CF56;">' + gTier.label + '</strong></p>' +
+      '<p style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.5;"><strong style="color:#F5CF56;">Counter Guarantee:</strong> if you counter your safe ask and don\u2019t receive it, we\u2019ll refund ' + gTier.multiplier + '\u00d7 what you paid.</p>' +
     '</div>' +
     '<div style="text-align:center;margin-top:4px;">' +
       '<a href="/terms/" target="_blank" rel="noopener" style="font-size:11px;color:rgba(255,255,255,0.45);text-decoration:underline;" onclick="event.stopPropagation();">Terms &amp; Conditions</a>' +
