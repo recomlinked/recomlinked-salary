@@ -4194,8 +4194,38 @@ function renderCanvasHTML() {
 
   html += '</div>';
 
-  // Free users: paywall sits right after the last card (Non-Salary Levers),
-  // above the Download PDF section
+  // Free users: real proof sits right after the kit cards, BEFORE the paywall —
+  // people need to see evidence before being asked, not after (that's the fix:
+  // the old placeholder carousel used to render AFTER the paywall bubble, which
+  // meant nobody who'd already decided ever reached it).
+  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
+    html += '<div id="tVideo" style="margin:14px 12px 4px;">';
+    html += '<div style="background:#fff;border:1px solid #E5E7EF;border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
+    html += '<p style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;text-align:center;">See how it worked for Parisa</p>';
+    // Tap-to-play: poster image only until tapped, so nobody eats mobile data
+    // loading a video they never watch. Swap in the real poster/video paths
+    // once the compressed file is hosted.
+    html += '<div id="tVideoPlayer" style="position:relative;border-radius:12px;overflow:hidden;background:#0d0a1f;aspect-ratio:16/9;max-width:100%;margin:0 auto;cursor:pointer;" onclick="' +
+      'var v=document.createElement(\'video\');' +
+      'v.src=\'https://uar39wfkzm81kvim.public.blob.vercel-storage.com/testimonial-%2001.mp4\';' +
+      'v.setAttribute(\'controls\',\'\');' +
+      'v.setAttribute(\'playsinline\',\'\');' +
+      'v.setAttribute(\'autoplay\',\'\');' +
+      'v.style.cssText=\'width:100%;height:100%;object-fit:cover;display:block;\';' +
+      'this.replaceWith(v);' +
+    '">';
+    html += '<img src="/videos/testimonials/parisa-poster.jpg" alt="Parisa, Senior Financial Analyst" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display=\'none\';"/>';
+    html += '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(13,10,31,0.15);">';
+    html += '<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,0.25);">';
+    html += '<svg width="20" height="20" viewBox="0 0 24 24" fill="#7B5CFC" style="margin-left:2px;"><path d="M8 5v14l11-7z"/></svg>';
+    html += '</div></div>';
+    html += '</div>';
+    html += '<p style="font-size:13px;color:#1B2A3A;text-align:center;margin-top:12px;line-height:1.5;">&quot;It gave me the confidence to ask, while staying on the safe side.&quot;</p>';
+    html += '<p style="font-size:12px;font-weight:700;color:#1B2A3A;text-align:center;margin-top:6px;">Parisa &middot; Senior Financial Analyst &middot; <span style="color:#1A9E6C;">+$10,000</span></p>';
+    html += '</div>';
+    html += '</div>';
+  }
+
   if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
     html += '<div style="margin:8px 0 4px;">' + buildPaywallBubbleHTML({ mode: 'discovery' }).html + '</div>';
   }
@@ -4217,46 +4247,6 @@ function renderCanvasHTML() {
   html += '</div>';
 
   html += '</div>';
-
-  // ── Testimonial carousel — a fully separate section BELOW the entire Counter Kit card ──
-  // Placeholder content ("test.....") until real customer quotes exist. Avatars are real
-  // illustrated images (shared static assets, same as used in the Raise product).
-  if (_intakeDone2 && discNumbersReady && !(state && state.paid)) {
-    var _tSlides = [
-      { avatar: '/raise/avatars/linda_w.png',stars: 5, amount: '+$test,...', quote: 'I was afraid to ask and lose the job, but this tool got me $9,000 more.', name: 'Linda W.', role: 'Data Scientist' },
-      { avatar: '/raise/avatars/karen.png', stars: 5, amount: '+$test,...', quote: "I'm terrible at talking about money in person. Just copied the email it gave me and it worked.", name: 'Karen T.', role: 'Physical Therapist' },
-      { avatar: '/raise/avatars/brian.png',  stars: 4, amount: '+$test,...', quote: 'This tool gave me the confidence to ask safely. I sent the counter and they accepted most of it.', name: 'Brian', role: 'Sales Manager' },
-      { avatar: '/raise/avatars/tamika.png', stars: 5, amount: '+$test,...', quote: 'I had no idea what to even ask for. This gave me a real number and I used it.', name: 'Tamika', role: 'Quality Control Lead' }
-    ];
-    html += '<div id="tCarousel" style="margin:14px 0 4px;padding:12px;">';
-    html += '<div style="position:relative;overflow:hidden;border-radius:16px;">';
-    html += '<div class="tCarouselTrack" style="display:flex;width:' + (_tSlides.length * 100) + '%;animation:tCarouselScroll ' + (_tSlides.length * 7) + 's infinite;">';
-    _tSlides.forEach(function(s) {
-      html += '<div style="width:' + (100 / _tSlides.length) + '%;flex-shrink:0;padding:0 6px;box-sizing:border-box;">';
-      html += '<div style="background:#fff;border:1px solid #E5E7EF;border-radius:16px;padding:22px 22px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">';
-      html += '<div style="display:flex;align-items:center;justify-content:center;margin-bottom:14px;">';
-      html += '<div style="display:flex;gap:2px;">';
-      for (var _si = 0; _si < 5; _si++) {
-        html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="' + (_si < s.stars ? '#D4AF37' : '#E0E0E0') + '"><path d="M12 1l3.09 6.26L22 8.27l-5 4.87L18.18 20 12 16.77 5.82 20 7 13.14 2 8.27l6.91-1.01L12 1z"/></svg>';
-      }
-      html += '</div>';
-      html += '</div>';
-      html += '<p style="font-size:15px;font-weight:600;color:#1B2A3A;text-align:center;line-height:1.4;margin:0 0 16px;">&quot;' + s.quote + '&quot;</p>';
-      html += '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;">';
-      html += '<img src="' + s.avatar + '" alt="" style="width:38px;height:38px;border-radius:50%;object-fit:cover;display:block;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"/>';
-      html += '<div style="display:none;width:38px;height:38px;border-radius:50%;background:#F0F1F5;border:2px dashed #C4CAD6;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA7AF" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>';
-      html += '<div style="text-align:center;">';
-      html += '<div style="font-size:13px;font-weight:700;color:#1B2A3A;">' + s.name + '</div>';
-      html += '<div style="font-size:11px;color:#9AA7AF;">' + s.role + '</div>';
-      html += '</div>';
-      html += '</div>';
-      html += '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
-  }
 
   return html;
 }
