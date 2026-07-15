@@ -5878,6 +5878,17 @@ async function generateDiscInsights() {
           discCanvasBlocks[k].teaser = !state.paid; // paid users see full hooks unblurred
         }
       });
+      // Persist the freshly-filled blocks — without this, a page refresh restores
+      // an empty canvasBlocks (only the per-question save at answer-time runs,
+      // which is always BEFORE this hook fetch resolves) and the free-user
+      // restore path never re-fetches, so these five blocks get stuck on
+      // "Completing your intake…" forever after any refresh.
+      try {
+        state.discovery = state.discovery || {};
+        state.discovery.canvasBlocks = discCanvasBlocks;
+        state.discovery.insights = discInsights;
+        saveState();
+      } catch (e) {}
     } else {
       console.warn('[teaser] non-ok status:', teaserResp.status);
     }
