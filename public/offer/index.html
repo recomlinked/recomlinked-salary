@@ -162,7 +162,8 @@ button { font-family: var(--sans); cursor: pointer; }
 @media (min-width: 481px) { .h1-desktop-break { display: block; } }
 
 .cta-stack { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 28px auto 0; }
-@media (max-width: 480px) { .hero { padding: 56px 20px 24px; margin-bottom: 12px; } .hero h1 { letter-spacing: -0.6px; font-size: 26px; } }
+@media (max-width: 480px) { .hero { padding: 84px 20px 24px; margin-bottom: 12px; } .hero h1 { letter-spacing: -0.6px; font-size: 26px; } }
+@media (min-width: 481px) and (max-width: 1024px) { .hero { padding-top: 140px; } }
 
 /* ── 6. BUTTONS — Gold for action ─────────── */
 .cta-btn {
@@ -524,8 +525,8 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
     <p style="font-size:12px;color:var(--text3);margin-top:8px;text-align:center;letter-spacing:0.03em;">No email needed · About 3 minutes</p>
 
   <style>
-    .wins-ticker{position:relative;overflow:hidden;background:linear-gradient(90deg,#FBF3EC,#F2ECFB);padding:7px 0;margin-top:16px;margin-bottom:40px;border-radius:16px;}
-    @media (max-width:480px){ .wins-ticker{margin-top:24px;} }
+    .wins-ticker{position:relative;overflow:hidden;background:linear-gradient(90deg,#FBF3EC,#F2ECFB);padding:7px 0;margin-top:28px;margin-bottom:40px;border-radius:16px;}
+    @media (max-width:480px){ .wins-ticker{margin-top:36px;} }
     .wins-ticker::before,.wins-ticker::after{content:"";position:absolute;top:0;bottom:0;width:64px;z-index:2;pointer-events:none;}
     .wins-ticker::before{left:0;background:linear-gradient(90deg,#FBF3EC,rgba(251,243,236,0));}
     .wins-ticker::after{right:0;background:linear-gradient(270deg,#F2ECFB,rgba(242,236,251,0));}
