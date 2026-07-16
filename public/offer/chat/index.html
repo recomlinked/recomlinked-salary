@@ -4355,26 +4355,11 @@ var PAYWALL_COPY = {
 // opts.mode  — 'discovery' | 'sim' | 'coach'  (defaults to SIM_STATE.currentMode)
 // opts.logTag — string passed to logSession for analytics
 // Shared builder so the chat paywall and the in-kit paywall are byte-identical copy
-// Counter Guarantee tier — tied to the SAFE ask's acceptance likelihood
-// (tierAcceptance().safe), not the overall leverage score, since the
-// guarantee's payout trigger is specifically "you counter your safe ask
-// and don't receive it." Multiplier scales with how confident the model
-// actually is for this person — a real financial commitment, not just a
-// trust badge.
-function computeGuaranteeTier() {
-  var safeAcceptance = 50;
-  try { safeAcceptance = tierAcceptance().safe; } catch (e) {}
-  if (safeAcceptance >= 80) return { label: 'Strong', multiplier: 2 };
-  if (safeAcceptance >= 60) return { label: 'Moderate', multiplier: 1.5 };
-  return { label: 'Weak', multiplier: 1 };
-}
-
 function buildPaywallBubbleHTML(opts) {
   opts = opts || {};
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
   var selectedPrice = 29; // flat $29
-  var gTier = computeGuaranteeTier();
 
   var html = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
@@ -4386,12 +4371,21 @@ function buildPaywallBubbleHTML(opts) {
       '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V5l8-3z"/><polyline points="9 12 11 14 15 9.5"/></svg>Stripe secure</span>' +
       '<span class="dot">\u00b7</span>' +
       '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>30-day access</span>' +
+      '<span class="dot">\u00b7</span>' +
+      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>Full refund guarantee</span>' +
     '</div>' +
-    '<div class="guarantee-row" style="margin-top:14px;padding:12px 14px;background:rgba(245,207,86,0.08);border:1px solid rgba(245,207,86,0.25);border-radius:10px;">' +
-      '<p style="font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.02em;margin-bottom:3px;">Your position: <strong style="color:#F5CF56;">' + gTier.label + '</strong></p>' +
-      '<p style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.5;"><strong style="color:#F5CF56;">Counter Guarantee:</strong> if you counter your safe ask and don\u2019t receive it, we\u2019ll refund ' + gTier.multiplier + '\u00d7 what you paid.</p>' +
+    '<div style="text-align:center;margin-top:16px;">' +
+      '<button class="btn-pay" data-pw-coach-go="1">Book a coaching session \u00b7 $250 <span class="btn-pay-arrow">\u2192</span></button>' +
     '</div>' +
-    '<div style="text-align:center;margin-top:4px;">' +
+    '<div class="coach-reveal" data-coach-reveal="1" style="display:none;margin-top:14px;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;">' +
+      '<p style="font-size:12.5px;color:rgba(255,255,255,0.8);line-height:1.5;margin-bottom:12px;">We\u2019ll reach out to confirm within 24 hours.</p>' +
+      '<input type="text" data-coach-name placeholder="Name" style="width:100%;box-sizing:border-box;margin-bottom:8px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:13px;"/>' +
+      '<input type="email" data-coach-email placeholder="Email" style="width:100%;box-sizing:border-box;margin-bottom:8px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:13px;"/>' +
+      '<input type="tel" data-coach-phone placeholder="Phone number" style="width:100%;box-sizing:border-box;margin-bottom:12px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:13px;"/>' +
+      '<button class="btn-pay" data-coach-submit="1" style="width:100%;">Request a call \u2192</button>' +
+      '<p data-coach-status style="font-size:12px;color:#8fe3a8;text-align:center;margin-top:8px;display:none;">Thanks \u2014 we\u2019ll reach out within 24 hours to confirm a time.</p>' +
+    '</div>' +
+    '<div style="text-align:center;margin-top:16px;">' +
       '<a href="/terms/" target="_blank" rel="noopener" style="font-size:11px;color:rgba(255,255,255,0.45);text-decoration:underline;" onclick="event.stopPropagation();">Terms &amp; Conditions</a>' +
     '</div>' +
   '</div>';
@@ -4414,6 +4408,58 @@ function wirePaywallBubble(root, priceOverride) {
       var _p = priceOverride || parseInt(ctaBtn.getAttribute('data-pw-price'), 10) || 29;
       if (typeof startCheckout === 'function') startCheckout(_p);
       else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
+    };
+  }
+
+  // Coaching call — reveal a simple lead-capture form. No payment collected
+  // here; this just gets name/email/phone + 3 time options to a Sheet so
+  // the founder can follow up and confirm manually.
+  var coachBtn = root.querySelector('[data-pw-coach-go]');
+  var coachReveal = root.querySelector('[data-coach-reveal]');
+  if (coachBtn && coachReveal) {
+    coachBtn.onclick = function() {
+      coachReveal.style.display = 'block';
+      coachBtn.parentElement.style.display = 'none';
+      coachReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      logSession('offer_paywall', { paywall_action: 'coaching_form_shown' });
+    };
+  }
+
+  var coachSubmit = root.querySelector('[data-coach-submit]');
+  if (coachSubmit) {
+    coachSubmit.onclick = function() {
+      var name  = (root.querySelector('[data-coach-name]')  || {}).value || '';
+      var email = (root.querySelector('[data-coach-email]') || {}).value || '';
+      var phone = (root.querySelector('[data-coach-phone]') || {}).value || '';
+
+      if (!name.trim() || !email.trim() || !phone.trim()) {
+        coachSubmit.style.borderColor = '#ff9b9b';
+        return;
+      }
+
+      coachSubmit.setAttribute('disabled', 'true');
+      coachSubmit.style.opacity = '0.6';
+      coachSubmit.textContent = 'Sending\u2026';
+
+      logSession('offer_paywall', {
+        paywall_action: 'coaching_requested',
+        coach_name: name.trim(),
+        coach_email: email.trim(),
+        coach_phone: phone.trim(),
+      });
+
+      // logSession fires-and-forgets (no response to await), so just show
+      // the confirmation after a short beat rather than waiting on a promise.
+      setTimeout(function() {
+        var formFields = [
+          root.querySelector('[data-coach-name]'), root.querySelector('[data-coach-email]'),
+          root.querySelector('[data-coach-phone]'),
+        ];
+        formFields.forEach(function(f) { if (f) f.style.display = 'none'; });
+        coachSubmit.style.display = 'none';
+        var status = root.querySelector('[data-coach-status]');
+        if (status) status.style.display = 'block';
+      }, 500);
     };
   }
 }
