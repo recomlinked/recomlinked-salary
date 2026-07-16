@@ -4608,7 +4608,7 @@ function initDiscoveryMode(container) {
    // Offer product restore — skip Raise-era intro for paid users
     if (!state.paid) {
       var intro = el('div', 'coach-msg', '');
-      intro.innerHTML = '<div class="bubble"><p>Most job offers leave room to negotiate. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.</p></div>';
+      intro.innerHTML = '<div class="bubble"><p>Most job offers leave room to negotiate. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.</p></div>';
       chatArea.appendChild(intro);
     }
     // Replay previously answered questions as instant Q&A bubbles FIRST, so a resumed
@@ -4670,17 +4670,17 @@ function initDiscoveryMode(container) {
   introWrap.innerHTML = '<div class="bubble"><p><span class="typed-text"></span><span class="cursor"></span></p></div>';
   chatArea.appendChild(introWrap);
 
-  var introText = 'Most job offers leave room to negotiate. A few quick questions, and I\u2019ll show you two things: how risky a counter would be, your negotiation room in dollars.';
+  var introText = 'Most job offers leave room to negotiate. A few quick questions, and you\u2019ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.';
 
   // Personalize opening if user came from a specific blocker chip
   var profileReason = state.sim_reason || (state.profile && state.profile.reason) || '';
   var OPENER_MAP = {
-    'rescind': 'Rescinding an offer over a professional counter is extremely rare. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.',
-    'counter_number': 'The number isn’t a guess — it comes from how your offer was built. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.',
-    'deadline': 'A deadline makes the counter more urgent, not less possible. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.',
-    'fixed_band': '“The band is fixed” is often the opening position, not the final one. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.',
-    'first_offer': 'Your first offer is the one that anchors every salary for years. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.',
-    'greedy': 'Countering isn’t greedy — 73% of employers expect it. A few quick questions, and you’ll see: how risky a counter would be, your negotiation room in dollars, counter email, and more.'
+    'rescind': 'Rescinding an offer over a professional counter is extremely rare. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.',
+    'counter_number': 'The number isn’t a guess — it comes from how your offer was built. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.',
+    'deadline': 'A deadline makes the counter more urgent, not less possible. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.',
+    'fixed_band': '“The band is fixed” is often the opening position, not the final one. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.',
+    'first_offer': 'Your first offer is the one that anchors every salary for years. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.',
+    'greedy': 'Countering isn’t greedy — 73% of employers expect it. A few quick questions, and you’ll see: how risky your counter would be, your negotiation room in dollars, counter email, and more.'
   };
   if (profileReason && OPENER_MAP[profileReason]) {
     introText = OPENER_MAP[profileReason];
