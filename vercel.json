@@ -25,6 +25,9 @@
     { "src": "/offer/chat",            "status": 301, "headers": { "Location": "/offer/chat/" }      },
     { "src": "/offer/chat/",           "dest": "/offer/chat/index.html"      },
 
+    { "src": "/offer-v2",               "status": 301, "headers": { "Location": "/offer/" }           },
+    { "src": "/offer-v2/",              "status": 301, "headers": { "Location": "/offer/" }           },
+
     { "src": "/raise-case",           "status": 301, "headers": { "Location": "/raise-case/" }      },
     { "src": "/raise-case/",          "dest": "/raise-case/index.html"      },
 
