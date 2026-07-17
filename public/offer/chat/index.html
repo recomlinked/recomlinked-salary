@@ -4339,7 +4339,7 @@ function showLockedCoaching(container) {
 var PAYWALL_COPY = {
   discovery: {
     title:    'You get one counter. Make it the right one.',
-    subtitle: 'A strong counter typically adds thousands to your offer. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where $29 isn\u2019t worth it.</strong>'
+    subtitle: 'A strong counter typically adds thousands to your offer. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>'
   },
   sim: {
     title:    'Practice every recruiter pushback until nothing surprises you.',
@@ -4359,24 +4359,20 @@ function buildPaywallBubbleHTML(opts) {
   opts = opts || {};
   var mode = opts.mode || (SIM_STATE && SIM_STATE.currentMode) || 'discovery';
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
-  var selectedPrice = 29; // flat $29
+  var selectedPrice = 29; // Tier 1 flat price — kept as the function's return value for backward compatibility
 
   var html = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
-    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:20px;">' + copy.subtitle + '</p>' +
-    '<button class="btn-pay" data-pw-go="1" data-pw-price="' + selectedPrice + '">Get my counter \u00b7 $' + selectedPrice + ' <span class="btn-pay-arrow">\u2192</span></button>' +
-    '<div class="trust-row paywall-trust" style="margin-top:10px;">' +
-      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="14" x2="15" y2="20"/><line x1="15" y1="14" x2="9" y2="20"/></svg>No subscription</span>' +
-      '<span class="dot">\u00b7</span>' +
-      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V5l8-3z"/><polyline points="9 12 11 14 15 9.5"/></svg>Stripe secure</span>' +
-      '<span class="dot">\u00b7</span>' +
-      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>30-day access</span>' +
-      '<span class="dot">\u00b7</span>' +
-      '<span style="display:inline-flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>Full refund guarantee</span>' +
+    '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:18px;">' + copy.subtitle + '</p>' +
+
+    '<button class="btn-pay" data-pw-go="1" data-pw-price="29">Get my number &amp; email \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<button class="btn-pay" data-pw-tier2-go="1" style="margin-top:10px;background:linear-gradient(135deg,#F5CF56,#e0b93f);">Get the human-reviewed version \u00b7 $49 <span class="btn-pay-arrow">\u2192</span></button>' +
+    '<div class="tier2-reveal" data-tier2-reveal="1" style="display:none;margin-top:10px;padding:16px;background:rgba(245,207,86,0.07);border:1px solid rgba(245,207,86,0.3);border-radius:10px;">' +
+      '<p style="font-size:12.5px;color:rgba(255,255,255,0.85);line-height:1.6;margin-bottom:12px;">Takes up to 24 hours to deliver your human-reviewed version with deep market research. You\u2019ll get an email instantly after payment \u2014 just reply with your company name so we can be as specific as possible.</p>' +
+      '<button class="btn-pay" data-pw-go="1" data-pw-price="49" style="width:100%;">Continue to checkout \u00b7 $49 <span class="btn-pay-arrow">\u2192</span></button>' +
     '</div>' +
-    '<div style="text-align:center;margin-top:16px;">' +
-      '<button class="btn-pay" data-pw-coach-go="1">Book a coaching session \u00b7 $250 <span class="btn-pay-arrow">\u2192</span></button>' +
-    '</div>' +
+    '<button class="btn-pay" data-pw-coach-go="1" style="margin-top:10px;">Book 1:1 coaching session \u00b7 $250 <span class="btn-pay-arrow">\u2192</span></button>' +
+
     '<div class="coach-reveal" data-coach-reveal="1" style="display:none;margin-top:14px;padding:16px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:10px;">' +
       '<p style="font-size:12.5px;color:rgba(255,255,255,0.8);line-height:1.5;margin-bottom:12px;">We\u2019ll reach out to confirm within 24 hours.</p>' +
       '<input type="text" data-coach-name placeholder="Name" style="width:100%;box-sizing:border-box;margin-bottom:8px;padding:9px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:13px;"/>' +
@@ -4385,6 +4381,7 @@ function buildPaywallBubbleHTML(opts) {
       '<button class="btn-pay" data-coach-submit="1" style="width:100%;">Request a call \u2192</button>' +
       '<p data-coach-status style="font-size:12px;color:#8fe3a8;text-align:center;margin-top:8px;display:none;">Thanks \u2014 we\u2019ll reach out within 24 hours to confirm a time.</p>' +
     '</div>' +
+
     '<div style="text-align:center;margin-top:16px;">' +
       '<a href="/terms/" target="_blank" rel="noopener" style="font-size:11px;color:rgba(255,255,255,0.45);text-decoration:underline;" onclick="event.stopPropagation();">Terms &amp; Conditions</a>' +
     '</div>' +
@@ -4392,22 +4389,40 @@ function buildPaywallBubbleHTML(opts) {
   return { html: html, price: selectedPrice };
 }
 
-// Wires every button inside a rendered paywall-bubble root element:
-// primary $29 CTA, secondary 50%-off reveal toggle, and the reveal
-// panel's checkbox-gated "Continue to checkout". Called from BOTH render
-// paths — appendStandardPaywall() (chat-message bubble) and
-// setCanvasHTML() (in-kit bubble, embedded via buildPaywallBubbleHTML()
-// inside renderCanvasHTML()) — so a button added here never silently
-// works in one place and not the other again.
+// Wires every button inside a rendered paywall-bubble root element: BOTH
+// paid-tier CTAs ($29 Instant / $49 Verified, each reading its own price
+// from data-pw-price), the coaching lead-capture flow, and the reveal
+// panel's fields. Called from BOTH render paths — appendStandardPaywall()
+// (chat-message bubble) and setCanvasHTML() (in-kit bubble, embedded via
+// buildPaywallBubbleHTML() inside renderCanvasHTML()) — so a button added
+// here never silently works in one place and not the other again.
 function wirePaywallBubble(root, priceOverride) {
   if (!root) return;
 
-  var ctaBtn = root.querySelector('.btn-pay[data-pw-go]');
-  if (ctaBtn) {
+  // querySelectorAll, not querySelector — there are now TWO paid CTAs
+  // (Instant $29, Verified $49), each carrying its own data-pw-price.
+  var ctaBtns = root.querySelectorAll('.btn-pay[data-pw-go]');
+  ctaBtns.forEach(function(ctaBtn) {
     ctaBtn.onclick = function() {
-      var _p = priceOverride || parseInt(ctaBtn.getAttribute('data-pw-price'), 10) || 29;
+      var _p = parseInt(ctaBtn.getAttribute('data-pw-price'), 10) || priceOverride || 29;
       if (typeof startCheckout === 'function') startCheckout(_p);
       else if (typeof initiateCheckout === 'function') initiateCheckout(_p);
+    };
+  });
+
+  // $49 tier — reveal a short explanation (turnaround time + what happens
+  // next) before going to checkout, same pattern as the coaching reveal
+  // below. The actual "Continue to checkout" button inside this panel
+  // already carries data-pw-go/data-pw-price="49", so it's wired by the
+  // loop above — this only handles the reveal toggle itself.
+  var tier2Btn = root.querySelector('[data-pw-tier2-go]');
+  var tier2Reveal = root.querySelector('[data-tier2-reveal]');
+  if (tier2Btn && tier2Reveal) {
+    tier2Btn.onclick = function() {
+      tier2Reveal.style.display = 'block';
+      tier2Btn.style.display = 'none';
+      tier2Reveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      logSession('offer_paywall', { paywall_action: 'tier2_info_shown' });
     };
   }
 
@@ -4419,7 +4434,7 @@ function wirePaywallBubble(root, priceOverride) {
   if (coachBtn && coachReveal) {
     coachBtn.onclick = function() {
       coachReveal.style.display = 'block';
-      coachBtn.parentElement.style.display = 'none';
+      coachBtn.style.display = 'none';
       coachReveal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       logSession('offer_paywall', { paywall_action: 'coaching_form_shown' });
     };
