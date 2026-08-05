@@ -482,17 +482,17 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 #kitReveal .kr-skip{position:absolute;top:max(16px,env(safe-area-inset-top));right:14px;z-index:3;background:none;border:none;color:rgba(255,255,255,.55);font:600 10px/1 inherit;letter-spacing:1.2px;text-transform:uppercase;padding:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
 #kitReveal .kr-track{position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.08)}
 #kitReveal .kr-fill{height:100%;width:0;background:#c9a84c;animation:krProgress linear forwards}
-#kitReveal .kr-act{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;opacity:0;animation:krIn .6s cubic-bezier(.22,1,.36,1) both,krOut .35s cubic-bezier(.4,0,1,1) forwards}
+#kitReveal .kr-act{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;opacity:0;will-change:transform,opacity;animation:krIn .6s cubic-bezier(.22,1,.36,1) both,krOut .35s cubic-bezier(.4,0,1,1) forwards}
 #kitReveal .kr-h{font-size:19px;font-weight:300;line-height:1.4;margin-bottom:8px}
 #kitReveal .kr-sub{font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.45}
-#kitReveal .kr-pop{opacity:0;animation:krPop .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-pop{opacity:0;will-change:transform,opacity;animation:krPop .5s cubic-bezier(.22,1,.36,1) both}
 #kitReveal .kr-ring{margin-bottom:26px}
 #kitReveal .kr-meter{width:min(240px,72vw);margin-bottom:26px}
 #kitReveal .kr-bar{position:relative;height:5px;border-radius:3px;background:linear-gradient(90deg,#4e9f78 0%,#c9a84c 55%,#b25549 100%)}
 #kitReveal .kr-knob{position:absolute;top:-4px;left:2%;width:13px;height:13px;box-sizing:border-box;border-radius:50%;background:#f0edf6;border:2.5px solid #c9a84c;transform:translateX(-50%);animation:krSlide 1.1s cubic-bezier(.22,1,.36,1) both}
 #kitReveal .kr-ends{display:flex;justify-content:space-between;margin-top:9px;font-size:9.5px;color:rgba(255,255,255,.45)}
 #kitReveal .kr-blocks{display:flex;align-items:flex-start;justify-content:center;gap:4px;margin-bottom:26px}
-#kitReveal .kr-block{display:flex;flex-direction:column;align-items:center;gap:9px;width:60px;opacity:0;animation:krDrop .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-block{display:flex;flex-direction:column;align-items:center;gap:9px;width:60px;opacity:0;will-change:transform,opacity;animation:krDrop .5s cubic-bezier(.22,1,.36,1) both}
 #kitReveal .kr-block span{font-size:8.5px;line-height:1.3;min-height:23px;color:rgba(255,255,255,.55);text-align:center;letter-spacing:.2px}
 #kitReveal .kr-arm{transform:rotate(0deg);transform-origin:26px 26px;animation:krLever 1.15s cubic-bezier(.34,.8,.3,1) both}
 #kitReveal .kr-weight{opacity:0;animation:krFall .5s cubic-bezier(.5,0,.75,.9) both}
@@ -502,13 +502,13 @@ details p, .faq-a { font-size: 13px; color: var(--text2); line-height: 1.7; }
 #kitReveal .kr-frame{position:relative;padding:14px;border-radius:22px}
 #kitReveal .kr-frame>.kr-edge{position:absolute;inset:0;border:1px solid rgba(201,168,76,.45);border-radius:22px;opacity:0;animation:krIn .5s cubic-bezier(.22,1,.36,1) both}
 #kitReveal .kr-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-#kitReveal .kr-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:15px 9px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);opacity:0;animation:krTile .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:15px 9px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);opacity:0;will-change:transform,opacity;animation:krTile .5s cubic-bezier(.22,1,.36,1) both}
 #kitReveal .kr-tile svg{color:#c9a84c}
 #kitReveal .kr-tile b{font-size:11.5px;font-weight:500;line-height:1.25}
 #kitReveal .kr-glow{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.28) 0%,rgba(201,168,76,0) 70%);position:absolute}
 #kitReveal.kr-dissolve{animation:krDissolve .8s ease both}
-@keyframes krIn{0%{opacity:0;transform:scale(.78);filter:blur(8px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
-@keyframes krOut{0%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:0;transform:scale(1.08);filter:blur(4px)}}
+@keyframes krIn{0%{opacity:0;transform:scale(.78)}100%{opacity:1;transform:scale(1)}}
+@keyframes krOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}
 @keyframes krPop{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
 @keyframes krTile{0%{opacity:0;transform:translateY(10px) scale(.85)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes krSlide{0%{left:2%}100%{left:var(--kr-risk,50%)}}
@@ -1717,7 +1717,7 @@ document.addEventListener('click', function(e) {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     (function next() {
       playKitReveal(SAMPLE_DATA, function () {
-        setTimeout(next, 900);   // brief pause between loops
+        setTimeout(next, 250);   // brief pause between loops -- was 900ms, read as a lag/dead spot
       }, { container: box });
     })();
   }
