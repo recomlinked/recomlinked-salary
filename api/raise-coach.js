@@ -758,7 +758,7 @@ function buildOfferDiscPrompts(part, oc, answeredDims) {
 - Response deadline: ${DL[oc.deadline] || 'not specified'}
 - Competing offer: ${oc.competing || 'no'}
 - Hiring process speed: ${oc.speed || 'normal'} (chased/fast = strong hiring urgency = leverage)
-- Package extras: ${oc.extras || 'base only'}
+${oc.extras ? '- Package extras: ' + oc.extras : ''}
 - Work arrangement: ${oc.worktype || 'not specified'}${oc.worktype === 'on_site' ? ' (on-site = smaller local talent pool = added leverage)' : oc.worktype === 'remote' ? ' (remote = national talent pool = lean on other leverage)' : ''}
 - Employment status: ${oc.employment || 'not specified'}${oc.employment === 'employed_stable' ? ' (CAN WALK AWAY \u2014 the strongest position; counters carry near-zero real risk, but never phrase it as a threat)' : oc.employment === 'between_jobs' ? ' (weaker fallback \u2014 keep the counter warm and low-friction, NEVER let urgency or desperation show in any script)' : oc.employment === 'first_job' ? ' (first real offer \u2014 simple asks, extra reassurance about how normal countering is)' : oc.employment === 'employed_leaving' ? ' (employed but motivated to move \u2014 solid fallback, do not reveal the push factor)' : ''}
 - Industry: ${oc.industry || 'not specified'}${/gov|public|school|universit|educat|health|hospital|medic|nurs/i.test(oc.industry || '') ? ' (rigid pay bands are common in this sector \u2014 lead the levers with review timeline, vacation, and title rather than base stretch)' : /tech|software|startup|saas|fintech/i.test(oc.industry || '') ? ' (equity and signing bonuses are normal asks \u2014 bands flex more here)' : ' (use industry norms qualitatively only \u2014 never invent figures)'}
@@ -802,7 +802,7 @@ POSITION HOOKS \u2014 the candidate's 4 negotiation dimensions:
 - risk_tol = RISK TOLERANCE: their stated intent — how bold they want to play. Independent from walk-away power.
 - urgency = THEIR URGENCY: how badly the company needs this closed (process speed + deadline pressure).
 - talent = TALENT MARKET: how replaceable the candidate is and at what price (work arrangement pool size + years of experience + market research + local market).
-- offer = OFFER STRUCTURE: where the money sits and which levers exist (base + extras + company size band rigidity).
+- offer = OFFER STRUCTURE: where the money sits and which levers exist (base + company size band rigidity).
 
 Diagnostic \u2014 name the hidden risk or opportunity in that dimension of THEIR situation.
 NEVER mention specific dollar amounts or salary figures in diagnostic hooks.
@@ -869,7 +869,7 @@ levers:
   One sentence: when base is blocked, the negotiation isn't over \u2014 it moves to the levers below.
   Then EXACTLY these 10 levers, each ONE line, **bold name** \u2014 when to use it for THIS candidate:
   **Signing bonus** / **Vacation days** / **Remote or hybrid days** / **Title** / **Start date** / **Annual review timeline (in writing)** / **Performance bonus** / **Relocation support** / **Education budget** / **Equity or options**.
-  Order them by relevance to this candidate's situation (their extras, work arrangement, and role). End with one sentence on the trading rule: concede on levers, never on base, and never give two levers for nothing.
+  Order them by relevance to this candidate's situation (their work arrangement and role). End with one sentence on the trading rule: concede on levers, never on base, and never give two levers for nothing.
 
 emphasize:
   This is the ASK STACK \u2014 what to ask for and in what order. Format exactly:
@@ -925,7 +925,7 @@ DIMENSIONS:
 - risk_tol = RISK TOLERANCE \u2014 their stated intent. Note the interaction with walkaway: strong walkaway + safe risk = real power, conservative use; weak walkaway + ambitious risk = bold play that must be executed perfectly. The insight must call out this dynamic explicitly.
 - urgency = THEIR URGENCY \u2014 how badly the company needs this closed. Synthesize process speed and deadline. Tight deadline + fast process = they want it done, which is leverage. Slow process + no deadline = urgency is unclear, counter needs to create its own momentum (the sign-this-week line).
 - talent = TALENT MARKET \u2014 how replaceable they are and at what price. Synthesize work arrangement (remote = national pool, on-site = local scarcity), years of experience (seniority = scarcity), market research, and city. The read: how long and how expensive would replacing them be?
-- offer = OFFER STRUCTURE \u2014 where the money sits and what can move. Synthesize base vs extras (which levers are unused) and company size (band rigidity, signing-bonus likelihood).
+- offer = OFFER STRUCTURE \u2014 where the money sits and what can move. Synthesize the base against company size (band rigidity, signing-bonus likelihood) and note which levers are likely still unused.
 
 For each, calibrate by the dimension's score:
 - Strong (\u226565): the hidden risk of assuming it's enough, OR exactly how to deploy it without burning it. 2-3 sentences.
