@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Offer-Structure Method</title>
+<style>
+  :root{
+    --bg:#f8f6fa; --card:#fff; --text:#2c2438; --text2:#6b5f7a; --text3:#6e6278;
+    --purple:#7B5CFC; --purple-hover:#6A4CE8; --purple-light:#f0e8f6;
+    --gold:#F5CF56; --gold-hover:#E8C044; --gold-text:#1a1520;
+    --border:rgba(139,111,165,.12); --ink:#1a1420;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--text);}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 100px;}
+
+  /* ── nav ── */
+  .nav{display:flex;align-items:center;justify-content:space-between;padding:20px 20px;max-width:760px;margin:0 auto;}
+  .logo{font-weight:800;font-size:16px;}
+  .logo .a{background:var(--gold);padding:3px 8px;border-radius:5px;color:var(--gold-text);}
+  .logo .b{padding:3px 8px;color:var(--text);}
+
+  /* ── hero ── */
+  .hero{text-align:center;padding:50px 0 44px;}
+  .badge-top{display:inline-flex;align-items:center;gap:6px;background:var(--purple-light);color:var(--purple);
+    font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:7px 14px;
+    border-radius:20px;margin-bottom:22px;}
+  h1{font-size:38px;line-height:1.14;font-weight:800;letter-spacing:-.02em;margin:0 0 18px;color:var(--ink);}
+  h1 .hl{color:var(--purple);}
+  .lede{font-size:17px;line-height:1.6;color:var(--text2);max-width:520px;margin:0 auto;}
+
+  /* ── contrast block ── */
+  .contrast{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:44px 0;}
+  @media(max-width:560px){.contrast{grid-template-columns:1fr;}}
+  .c-card{border-radius:16px;padding:24px 22px;}
+  .c-no{background:#faf5f5;border:1.5px solid #f0dcdc;}
+  .c-yes{background:linear-gradient(160deg,#f6f2ff 0%,var(--purple-light) 100%);border:1.5px solid rgba(123,92,252,.25);}
+  .c-eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px;}
+  .c-no .c-eyebrow{color:#a45a5a;}
+  .c-yes .c-eyebrow{color:var(--purple);}
+  .c-h{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:9px;}
+  .c-p{font-size:13px;line-height:1.6;color:var(--text2);}
+
+  /* ── section ── */
+  .stitle{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--purple);margin:60px 0 8px;text-align:center;}
+  h2{font-size:26px;font-weight:800;letter-spacing:-.01em;text-align:center;margin:0 0 14px;color:var(--ink);}
+  .sec-sub{font-size:14.5px;color:var(--text2);text-align:center;max-width:480px;margin:0 auto 34px;line-height:1.6;}
+
+  /* ── signals ── */
+  .signal{display:flex;gap:18px;padding:22px 0;border-top:1px solid var(--border);}
+  .signal:first-child{border-top:none;}
+  .s-num{flex-shrink:0;width:34px;height:34px;border-radius:10px;background:var(--purple-light);
+    color:var(--purple);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;}
+  .s-body{flex:1;min-width:0;}
+  .s-h{font-size:15.5px;font-weight:800;color:var(--ink);margin-bottom:5px;}
+  .s-p{font-size:13.5px;line-height:1.65;color:var(--text2);}
+  .s-ex{margin-top:9px;font-size:12px;color:var(--text3);background:#faf9fc;border-radius:8px;
+    padding:9px 12px;line-height:1.5;}
+  .s-ex b{color:var(--text);}
+
+  /* ── how it becomes a number ── */
+  .steps{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:28px 26px;margin:20px 0;}
+  .step{display:flex;gap:14px;padding:13px 0;}
+  .step + .step{border-top:1px dashed var(--border);}
+  .st-n{flex-shrink:0;font-weight:800;color:var(--purple);font-size:13px;width:20px;}
+  .st-t{font-size:13.5px;line-height:1.6;color:var(--text2);}
+  .st-t b{color:var(--ink);}
+
+  /* ── honesty block ── */
+  .honest{background:var(--ink);color:#fff;border-radius:18px;padding:30px 26px;margin:50px 0;}
+  .honest h3{font-size:19px;font-weight:800;margin:0 0 12px;}
+  .honest p{font-size:13.5px;line-height:1.7;color:rgba(255,255,255,.72);margin:0 0 10px;}
+  .honest .row{display:flex;gap:10px;align-items:flex-start;margin-top:16px;}
+  .honest .row svg{flex-shrink:0;margin-top:2px;color:var(--gold);}
+  .honest .row b{color:#fff;}
+
+  /* ── data line ── */
+  .data{text-align:center;font-size:13px;color:var(--text2);margin:34px 0;padding:16px;
+    background:var(--card);border:1px solid var(--border);border-radius:12px;}
+  .data b{color:var(--ink);}
+
+  /* ── badge preview ── */
+  .bpreview{margin-top:60px;text-align:center;}
+  .bwrap{display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(123,92,252,.28);
+    border-radius:20px;padding:8px 15px 8px 10px;box-shadow:0 4px 14px rgba(123,92,252,.1);cursor:pointer;}
+  .bwrap .dot{width:20px;height:20px;border-radius:50%;background:var(--purple);display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;}
+  .bwrap .txt{font-size:11.5px;font-weight:700;color:var(--ink);}
+  .bwrap .txt b{color:var(--purple);}
+  .bwrap svg.chev{opacity:.4;}
+
+  .cta{text-align:center;margin-top:60px;}
+  .cta-b{display:inline-block;background:var(--gold);color:var(--gold-text);font-weight:800;
+    font-size:14.5px;padding:15px 30px;border-radius:12px;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="logo"><span class="a">recom</span><span class="b">linked</span></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="badge-top">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      The Offer-Structure Method
+    </div>
+    <h1>Your number isn't<br><span class="hl">a guess.</span> It's calculated.</h1>
+    <p class="lede">Every counter this tool recommends comes from a scoring method — five real signals about your situation, weighed the way an experienced negotiator would weigh them. Not a language model's opinion.</p>
+  </div>
+
+  <div class="contrast">
+    <div class="c-card c-no">
+      <div class="c-eyebrow">Ask a chatbot</div>
+      <div class="c-h">You get an opinion</div>
+      <div class="c-p">General knowledge, phrased confidently. It doesn't know what actually predicts whether a company has room to move — it's pattern-matching text, not scoring your situation.</div>
+    </div>
+    <div class="c-card c-yes">
+      <div class="c-eyebrow">The Offer-Structure Method</div>
+      <div class="c-h">You get a calculation</div>
+      <div class="c-p">Five signals from your actual answers, each scored, weighted, and combined into a range — the same factors a negotiator would actually weigh, applied consistently every time.</div>
+    </div>
+  </div>
+
+  <div class="stitle">The five signals</div>
+  <h2>What actually moves your number</h2>
+  <p class="sec-sub">Every one of these comes directly from an answer you give — nothing is inferred from vibes.</p>
+
+  <div class="signal">
+    <div class="s-num">01</div>
+    <div class="s-body">
+      <div class="s-h">Walk-Away Power</div>
+      <div class="s-p">How much you personally lose if this specific offer falls through. Governed by your employment status and whether you have competing offers in motion.</div>
+      <div class="s-ex"><b>Example:</b> a competing offer in hand scores meaningfully higher than being between jobs with none.</div>
+    </div>
+  </div>
+  <div class="signal">
+    <div class="s-num">02</div>
+    <div class="s-body">
+      <div class="s-h">Risk Tolerance</div>
+      <div class="s-p">How you described your own approach — safe, balanced, or ambitious. This doesn't change the room that exists; it changes which tier we recommend you actually ask for.</div>
+    </div>
+  </div>
+  <div class="signal">
+    <div class="s-num">03</div>
+    <div class="s-body">
+      <div class="s-h">Their Urgency</div>
+      <div class="s-p">How the process felt from their side — how fast they moved, how tight the deadline is, whether they followed up unprompted.</div>
+      <div class="s-ex"><b>Example:</b> two unprompted follow-ups scores as a real signal of urgency. A short deadline alone does not — it's weighed separately as pressure, not eagerness.</div>
+    </div>
+  </div>
+  <div class="signal">
+    <div class="s-num">04</div>
+    <div class="s-body">
+      <div class="s-h">Talent Market</div>
+      <div class="s-p">How replaceable you are in this specific role — driven by your years of experience and how common your work type is at this level.</div>
+    </div>
+  </div>
+  <div class="signal">
+    <div class="s-num">05</div>
+    <div class="s-body">
+      <div class="s-h">Offer Structure</div>
+      <div class="s-p">Where the money already sits — your anchor position relative to what you asked for, and how rigid compensation bands tend to be at a company this size.</div>
+    </div>
+  </div>
+
+  <div class="stitle">From five scores to one number</div>
+  <h2>How the range gets built</h2>
+
+  <div class="steps">
+    <div class="step"><div class="st-n">1</div><div class="st-t">Each of the five signals is scored from your specific answers — <b>not</b> a language model guessing, a fixed method applied the same way every time.</div></div>
+    <div class="step"><div class="st-n">2</div><div class="st-t">The five scores combine into a <b>leverage position</b> — how much room genuinely exists above your base offer.</div></div>
+    <div class="step"><div class="st-n">3</div><div class="st-t">That position sets your <b>range</b>, then splits into three real asks — Safe, Strong, and Bold — each with its own likelihood of being accepted.</div></div>
+    <div class="step"><div class="st-n">4</div><div class="st-t">Only after the number exists does AI get involved — to <b>write</b> the email and pushback responses around a number that was already decided by the method, not by it.</div></div>
+  </div>
+
+  <div class="honest">
+    <h3>What's calculated, and what's written</h3>
+    <p>We're not going to pretend AI has no role here — it does, and pretending otherwise wouldn't hold up. Here's exactly where the line sits.</p>
+    <div class="row">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M9 11l3 3L22 4"/></svg>
+      <p style="margin:0;"><b>Calculated, not generated:</b> your range, your three tiers, your risk score, your acceptance percentages. These come from the Offer-Structure Method's scoring — the same method, applied the same way, every time.</p>
+    </div>
+    <div class="row">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="m3 17 6-6 4 4 8-8"/></svg>
+      <p style="margin:0;"><b>AI-assisted:</b> the wording of your counter email and pushback responses. The number they're built around was already decided before any writing happens.</p>
+    </div>
+  </div>
+
+  <div class="bpreview">
+    <div class="stitle" style="margin-top:0;">On every result</div>
+    <h2 style="font-size:20px;">The badge you'll see</h2>
+    <div class="bwrap">
+      <div class="dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/></svg></div>
+      <div class="txt">Offer-structure analysis · <b>Verified method</b></div>
+      <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+
+  <div class="cta">
+    <a class="cta-b" href="/offer/chat/">See your number → </a>
+  </div>
+
+</div>
+</body>
+</html>
