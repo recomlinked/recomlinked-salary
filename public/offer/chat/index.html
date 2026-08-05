@@ -4028,7 +4028,60 @@ function buildKitRevealData() {
 }
 
 // Fires once per session, for free users only, after a real kit renders.
+// Returns '' when the reveal can play, or the name of the blocking condition.
+function kitRevealBlocker() {
+  if (_kitRevealPlayed) return 'already_played';
+  if (state && state.paid) return 'paid_user';
+  if (typeof playKitReveal !== 'function') return 'play_fn_missing';
+  try { if (sessionStorage.getItem('kr_played') === '1') return 'session_flag'; } catch (e) {}
+  if (typeof discStep === 'undefined' || typeof DISC_FREE_QUESTIONS === 'undefined') return 'no_step';
+  if (discStep < DISC_FREE_QUESTIONS) return 'intake_incomplete';
+  if (typeof discStrategyLoading !== 'undefined' && discStrategyLoading) return 'strategy_loading';
+  if (typeof discPlanLoading     !== 'undefined' && discPlanLoading)     return 'plan_loading';
+  var d; try { d = buildKitRevealData(); } catch (e) { return 'adapter_threw:' + e.message; }
+  if (!d || !d.blocks || d.blocks.length < 3) return 'blocks_' + ((d && d.blocks) ? d.blocks.length : 0);
+  return '';
+}
+
+// Console helper: krDebug() reports exactly what is holding the reveal back.
+window.krDebug = function () {
+  var out = { blocker: kitRevealBlocker() };
+  try { out.step = discStep; out.need = DISC_FREE_QUESTIONS; } catch (e) {}
+  try { out.loading = [!!discStrategyLoading, !!discPlanLoading]; } catch (e) {}
+  try { out.data = buildKitRevealData(); } catch (e) { out.data = 'threw: ' + e.message; }
+  try { out.sessionFlag = sessionStorage.getItem('kr_played'); } catch (e) {}
+  return out;
+};
+
+// Poll briefly after intake finishes: whichever call site runs first arms this,
+// and it fires the moment every condition is satisfied. Removes all reliance on
+// a single perfectly-timed call.
+var _kitRevealTimer = null;
+function armKitReveal() {
+  if (_kitRevealPlayed || _kitRevealTimer) return;
+  var tries = 0;
+  _kitRevealTimer = setInterval(function () {
+    tries++;
+    var why = kitRevealBlocker();
+    if (!why) {
+      clearInterval(_kitRevealTimer); _kitRevealTimer = null;
+      _kitRevealPlayed = true;
+      try { sessionStorage.setItem('kr_played', '1'); } catch (e) {}
+      try { playKitReveal(buildKitRevealData(), null); } catch (e) {}
+      return;
+    }
+    // stop on permanent blockers, or after ~24s of transient ones
+    if (why === 'already_played' || why === 'paid_user' || why === 'session_flag' || tries > 60) {
+      clearInterval(_kitRevealTimer); _kitRevealTimer = null;
+    }
+  }, 400);
+}
+
 function maybePlayKitReveal(_canvasEl) {
+  armKitReveal();
+}
+
+function _kitRevealLegacy(_canvasEl) {
   if (_kitRevealPlayed) return;
   if (state && state.paid) return;
   if (typeof playKitReveal !== 'function') return;
