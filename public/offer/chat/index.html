@@ -852,6 +852,42 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
   75%,95%{transform:translateX(-75%);}
   100%{transform:translateX(0%);}
 }
+
+
+/* ── Kit Reveal (Claude Design) ── */
+#kitReveal{position:fixed;inset:0;z-index:9999;background:radial-gradient(120% 100% at 50% 45%,#32275a 0%,#171126 78%);color:#f0edf6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+#kitReveal .kr-skip{position:absolute;top:max(16px,env(safe-area-inset-top));right:14px;z-index:3;background:none;border:none;color:rgba(255,255,255,.55);font:600 10px/1 inherit;letter-spacing:1.2px;text-transform:uppercase;padding:12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#kitReveal .kr-track{position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,.08)}
+#kitReveal .kr-fill{height:100%;width:0;background:#c9a84c;animation:krProgress linear forwards}
+#kitReveal .kr-act{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 30px;opacity:0;animation:krIn .6s cubic-bezier(.22,1,.36,1) both,krOut .35s cubic-bezier(.4,0,1,1) forwards}
+#kitReveal .kr-h{font-size:19px;font-weight:300;line-height:1.4;margin-bottom:8px}
+#kitReveal .kr-sub{font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.45}
+#kitReveal .kr-pop{opacity:0;animation:krPop .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-ring{margin-bottom:26px}
+#kitReveal .kr-meter{width:min(240px,72vw);margin-bottom:26px}
+#kitReveal .kr-bar{position:relative;height:5px;border-radius:3px;background:linear-gradient(90deg,#4e9f78 0%,#c9a84c 55%,#b25549 100%)}
+#kitReveal .kr-knob{position:absolute;top:-4px;left:2%;width:13px;height:13px;box-sizing:border-box;border-radius:50%;background:#f0edf6;border:2.5px solid #c9a84c;transform:translateX(-50%);animation:krSlide 1.1s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-ends{display:flex;justify-content:space-between;margin-top:9px;font-size:9.5px;color:rgba(255,255,255,.45)}
+#kitReveal .kr-asks{display:flex;align-items:flex-end;gap:20px;margin-bottom:26px}
+#kitReveal .kr-ask{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,.55)}
+#kitReveal .kr-ask i{display:block;width:46px;border-radius:5px;background:#c9a84c}
+#kitReveal .kr-frame{position:relative;padding:14px;border-radius:22px}
+#kitReveal .kr-frame>.kr-edge{position:absolute;inset:0;border:1px solid rgba(201,168,76,.45);border-radius:22px;opacity:0;animation:krIn .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#kitReveal .kr-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;padding:15px 9px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);opacity:0;animation:krTile .5s cubic-bezier(.22,1,.36,1) both}
+#kitReveal .kr-tile svg{color:#c9a84c}
+#kitReveal .kr-tile b{font-size:11.5px;font-weight:500;line-height:1.25}
+#kitReveal .kr-glow{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.28) 0%,rgba(201,168,76,0) 70%);position:absolute}
+#kitReveal.kr-dissolve{animation:krDissolve .8s ease both}
+@keyframes krIn{0%{opacity:0;transform:scale(.78);filter:blur(8px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes krOut{0%{opacity:1;transform:scale(1);filter:blur(0)}100%{opacity:0;transform:scale(1.08);filter:blur(4px)}}
+@keyframes krPop{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes krTile{0%{opacity:0;transform:translateY(10px) scale(.85)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes krSlide{0%{left:2%}100%{left:var(--kr-risk,50%)}}
+@keyframes krGrow{0%{height:0}100%{height:var(--kr-h,30px)}}
+@keyframes krProgress{0%{width:0}100%{width:100%}}
+@keyframes krDissolve{0%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){#kitReveal{display:none!important}}
 </style>
 </head>
 
@@ -2971,7 +3007,7 @@ var Q_CATEGORY_LABELS = {
   risk: 'Risk Tolerance', employment: 'Walk-Away Power', competing: 'Walk-Away Power',
   speed: 'Their Urgency', deadline: 'Their Urgency',
   worktype: 'Talent Market', city: 'Talent Market', experience: 'Talent Market', research: 'Talent Market',
-  base: 'Offer Structure', extras: 'Offer Structure', company_size: 'Offer Structure', posted_max: 'Offer Structure',
+  base: 'Offer Structure', company_size: 'Offer Structure', posted_max: 'Offer Structure',
   role: 'Role context', industry: 'Role context', jd: 'Role context',
 };
 
@@ -2985,12 +3021,6 @@ var DISC_Q_ALL = {
     { val: 'below', text: 'Yes \u2014 but the offer came in below', scores: {offer:60}, note: 'Useful signal. Your counter can point back to the number you already gave, instead of sounding like a new demand.', type: 'lever' },
     { val: 'above', text: 'Yes \u2014 but the offer is above what I said', scores: {offer:70}, note: 'Interesting signal. They had room to beat your expectation, which may mean the package has more flexibility.', type: 'lever' },
   ] },
-  extras: { id: 'extras', label: 'What else is in the offer?', dimTag: 'offer', options: [
-    { val: 'base_only', text: 'Just base salary', scores: {offer:45}, note: 'Base-only offer. That may leave other parts of the package open for negotiation.', type: 'neutral' },
-    { val: 'signing', text: 'A signing bonus', scores: {offer:70}, note: 'Good signal. The package already has more than one compensation lever, which gives the kit more to work with.', type: 'lever' },
-    { val: 'equity', text: 'Equity / stock', scores: {offer:65}, note: 'Equity noted. The counter can consider both immediate cash and long-term value.', type: 'lever' },
-    { val: 'signing_equity', text: 'Both signing bonus and equity', scores: {offer:80}, note: 'Full package. The ask needs to prioritize what matters most instead of pushing every lever at once.', type: 'lever' },
-  ]},
   deadline: { id: 'deadline', label: 'When do they want your answer?', dimTag: 'urgency', options: [
     { val: '24_72h', text: '24\u201372 hours', scores: {urgency:65}, note: 'Tight timeline. Your message needs to be clear, calm, and easy for them to act on quickly.', type: 'lever' },
     { val: 'this_week', text: 'This week (3\u20137 days)', scores: {urgency:55}, note: 'Good window. You have enough time to counter in writing before the conversation moves too fast.', type: 'lever' },
@@ -3055,7 +3085,7 @@ var OFFER_Q_ORDER = [
   // Group 3 — Talent Market
   'worktype', 'city', 'experience', 'research', 'posted_max',
   // Group 4 — Offer Structure
-  'extras', 'company_size',
+  'company_size',
   // Group 5 — Role Context
   'industry'
 ];
@@ -3574,7 +3604,7 @@ function calculateNegotiationScore() {
 // (urgency, offer room, talent scarcity). Deliberately EXCLUDES walkaway & risk_tol (user-side).
 function computeCompanyScore() {
   var u = discDims.urgency || 0;   // deadline + how the process felt (their eagerness)
-  var o = discDims.offer   || 0;   // room above offer: anchor, extras, company size, posted range
+  var o = discDims.offer   || 0;   // room above offer: anchor, company size, posted range
   var t = discDims.talent  || 0;   // scarcity/market: experience, worktype, market research
   // weighted: offer room matters most, then their urgency, then scarcity
   var cs = (o * 0.40) + (u * 0.34) + (t * 0.26);
@@ -3595,7 +3625,6 @@ function estimateConfidence() {
   if (ctx.deadline && ctx.deadline !== 'none') signals++;
   if (ctx.speed) signals++;
   if (ctx.anchor && ctx.anchor !== 'no_anchor') signals++;
-  if (ctx.extras && ctx.extras !== 'base_only') signals++;
   if (ctx.company_size) signals++;
   if (ctx.experience) signals++;
   if (ctx.worktype) signals++;
@@ -3603,7 +3632,7 @@ function estimateConfidence() {
   var hasResearch = ctx.research && String(ctx.research).replace(/[^\d]/g,'') !== '';
   if (hasPosted) signals += 2;      // explicit public range is a strong signal
   if (hasResearch) signals += 1;
-  if (signals >= 8) return { level: 'High', note: 'strong company-side signals' };
+  if (signals >= 7) return { level: 'High', note: 'strong company-side signals' };
   if (signals >= 5) return { level: 'Moderate', note: 'partial company-side signals' };
   return { level: 'Limited', note: 'few company-side signals \u2014 add the posted range for a sharper read' };
 }
@@ -3775,6 +3804,248 @@ function togglePlanBlock(el, key) {
   }
 }
 
+
+/* playKitReveal(data, onDone)
+   data — everything is optional; an act is simply omitted when its data is absent.
+     role       string   "Senior Quality Engineer"
+     confidence "Limited" | "Moderate" | "High"
+     signals    {label,value 0..1}[]   5 items → renders the position radar
+     risk       number 0..100          → renders the counter-risk meter
+     asks       string[]               e.g. ["Safe","Strong","Bold"]
+     blocks     string[]  which kit items exist:
+                email | playbook | risk | ask | phone | fallback | levers
+   onDone — called once, after the overlay dissolves or Skip is pressed.
+   No figures are ever printed: base / room values stay inside the kit itself. */
+(function () {
+  var ITEMS = [
+    { key: 'email',    label: 'Counter Email',      icon: 'M4 7H20V17H4V7Z M4 7L12 13L20 7' },
+    { key: 'playbook', label: 'Pushback Playbook',  icon: 'M5 7H19M5 12H19M5 17H13' },
+    { key: 'risk',     label: 'Counter Risk Meter', icon: 'M5 16A7 7 0 0 1 19 16M12 16L16 11' },
+    { key: 'ask',      label: 'Your Ask Stack',     icon: 'M5 17H19M7 12H19M9 7H19' },
+    { key: 'phone',    label: 'Phone Opener',       icon: 'M8 5H10L11 9L9 10C9.8 12.6 11.4 14.2 14 15L15 13L19 14V16C19 17.7 17.7 19 16 19C11 19 5 13 5 8C5 6.3 6.3 5 8 5Z' },
+    { key: 'fallback', label: 'Fallback Responses', icon: 'M12 5V11M12 11L7 17M12 11L17 17' },
+    { key: 'levers',   label: 'Negotiation Levers', icon: 'M7 5V19M17 5V19M7 9H4M17 14H20' }
+  ];
+  var ENTER = 0.6, EXIT = 0.35, GAP = 0.2;
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  function icon(d, size) {
+    return '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true">' +
+      '<path d="' + d + '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+  function radar(signals) {
+    var cx = 70, cy = 52, r = 38, n = signals.length, i, a, out = [], hull = [], dots = '', labels = '';
+    for (i = 0; i < n; i++) {
+      a = -Math.PI / 2 + i * 2 * Math.PI / n;
+      out.push((cx + r * Math.cos(a)).toFixed(1) + ',' + (cy + r * Math.sin(a)).toFixed(1));
+      var v = Math.max(0.15, Math.min(1, signals[i].value)), px = cx + r * v * Math.cos(a), py = cy + r * v * Math.sin(a);
+      hull.push(px.toFixed(1) + ',' + py.toFixed(1));
+      dots += '<circle class="kr-pop" cx="' + px.toFixed(1) + '" cy="' + py.toFixed(1) + '" r="2.4" fill="#c9a84c" style="animation-delay:var(--d' + i + ')"/>';
+      var lx = cx + (r + 12) * Math.cos(a), ly = cy + (r + 12) * Math.sin(a) + 3,
+          anchor = Math.abs(Math.cos(a)) < 0.25 ? 'middle' : (Math.cos(a) > 0 ? 'start' : 'end');
+      labels += '<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor +
+        '" font-size="8" fill="rgba(255,255,255,.55)">' + signals[i].label + '</text>';
+    }
+    return '<svg class="kr-ring" width="240" height="122" viewBox="-50 0 240 116" style="overflow:visible">' +
+      '<polygon points="' + out.join(' ') + '" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1"/>' +
+      '<polygon class="kr-pop" points="' + hull.join(' ') + '" fill="rgba(201,168,76,.14)" stroke="#c9a84c" stroke-width="1.2" style="animation-delay:var(--dh)"/>' +
+      dots + labels + '</svg>';
+  }
+
+  window.playKitReveal = function (data, onDone) {
+    data = data || {};
+    var done = false, _prevOverflow = '';
+    function finish() {
+      if (done) return; done = true;
+      try { document.body.style.overflow = _prevOverflow || ''; } catch (e) {}
+      try { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); } catch (e) {}
+      try { document.removeEventListener('keydown', _onKey); } catch (e) {}
+      if (onDone) onDone();
+    }
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { if (onDone) onDone(); return { skip: function () {} }; }
+
+    var blocks = data.blocks || ITEMS.map(function (i) { return i.key; });
+    var items = ITEMS.filter(function (i) { return blocks.indexOf(i.key) > -1; });
+    var ov = el('div'); ov.id = 'kitReveal'; ov.setAttribute('aria-hidden', 'true');
+
+    var skip = el('button', 'kr-skip', 'Skip'); skip.type = 'button';
+    skip.addEventListener('click', finish);
+    var _onKey = function (e) { if (e.key === 'Escape') finish(); };
+    document.addEventListener('keydown', _onKey);
+    var track = el('div', 'kr-track'), fill = el('div', 'kr-fill');
+    track.appendChild(fill); ov.appendChild(skip); ov.appendChild(track);
+
+    /* ---- build the acts that this user's data actually supports ---- */
+    var acts = [];
+    acts.push({ dur: 2.1, build: function (a) {
+      a.appendChild(el('div', 'kr-ring kr-pop',
+        '<svg width="80" height="80" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="34" fill="none" stroke="#c9a84c" stroke-width="1.3"/></svg>'));
+      a.appendChild(el('div', 'kr-h', 'Analysis complete.'));
+      a.appendChild(el('div', 'kr-sub', (data.role || 'Your job title') + (data.confidence ? ' · ' + data.confidence + ' confidence' : '')));
+    }});
+    if (data.signals && data.signals.length > 2) acts.push({ dur: 2.2, build: function (a, t) {
+      var w = el('div', null, radar(data.signals));
+      var s = w.firstChild; s.style.setProperty('--dh', (t + 0.3) + 's');
+      data.signals.forEach(function (_, i) { s.style.setProperty('--d' + i, (t + 0.8 + i * 0.1) + 's'); });
+      a.appendChild(s);
+      a.appendChild(el('div', 'kr-h', 'Your position, mapped.'));
+      a.appendChild(el('div', 'kr-sub', data.signals.length + ' signals, weighed from your answers.'));
+    }});
+    if (typeof data.risk === 'number') acts.push({ dur: 2.1, build: function (a, t) {
+      var m = el('div', 'kr-meter'), bar = el('div', 'kr-bar'), knob = el('div', 'kr-knob');
+      knob.style.setProperty('--kr-risk', Math.max(4, Math.min(96, data.risk)) + '%');
+      knob.style.animationDelay = (t + 0.3) + 's';
+      bar.appendChild(knob); m.appendChild(bar);
+      m.appendChild(el('div', 'kr-ends', '<span>Safe to counter</span><span>Higher risk</span>'));
+      a.appendChild(m);
+      a.appendChild(el('div', 'kr-h', 'Counter risk, scored.'));
+      a.appendChild(el('div', 'kr-sub', 'How far you can push before it backfires.'));
+    }});
+    if (data.asks && data.asks.length) acts.push({ dur: 2.1, build: function (a, t) {
+      var row = el('div', 'kr-asks');
+      data.asks.forEach(function (label, i) {
+        var col = el('div', 'kr-ask kr-pop'), bar = el('div');
+        var h = 22 + i * 14;
+        bar.style.cssText = 'display:block;width:46px;border-radius:5px;background:#c9a84c;height:' + h + 'px;opacity:' + (0.35 + i * 0.25).toFixed(2);
+        col.style.animationDelay = (t + 0.25 + i * 0.15) + 's';
+        col.appendChild(bar); col.appendChild(el('span', null, label));
+        row.appendChild(col);
+      });
+      a.appendChild(row);
+      a.appendChild(el('div', 'kr-h', 'Ways to ask.'));
+      a.appendChild(el('div', 'kr-sub', 'Each one with its odds of a yes.'));
+    }});
+    acts.push({ dur: 2.7, build: function (a, t) {
+      var frame = el('div', 'kr-frame'), edge = el('div', 'kr-edge'), grid = el('div', 'kr-grid');
+      edge.style.animationDelay = (t + 1.6) + 's';
+      items.forEach(function (it, i) {
+        var tile = el('div', 'kr-tile', icon(it.icon, 18) + '<b>' + it.label + '</b>');
+        tile.style.animationDelay = (t + 0.2 + i * 0.11) + 's';
+        grid.appendChild(tile);
+      });
+      frame.appendChild(edge); frame.appendChild(grid);
+      a.style.padding = '0 16px'; a.appendChild(frame);
+    }});
+    acts.push({ dur: 2.4, last: true, build: function (a) {
+      a.appendChild(el('div', 'kr-glow kr-pop'));
+      a.appendChild(el('div', 'kr-h', 'Everything is written.<br>It’s waiting below.'));
+    }});
+
+    /* ---- lay the acts on one clock ---- */
+    var t = 0, total;
+    acts.forEach(function (act) {
+      var node = el('div', 'kr-act');
+      act.build(node, t);
+      node.style.animationDelay = t + 's, ' + (t + act.dur - EXIT) + 's';
+      if (act.last) node.style.animationName = 'krIn';           // final act holds, overlay dissolves
+      Array.prototype.slice.call(node.querySelectorAll('.kr-pop')).forEach(function (p) {
+        if (!p.style.animationDelay) p.style.animationDelay = (t + 0.15) + 's';
+      });
+      ov.appendChild(node);
+      t += act.dur + GAP;
+    });
+    total = t - GAP + 0.8;
+    fill.style.animationDuration = total + 's';
+
+    _prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.body.appendChild(ov);
+    setTimeout(function () { ov.classList.add('kr-dissolve'); }, (total - 0.8) * 1000);
+    setTimeout(finish, total * 1000 + 60);
+    return { skip: finish };
+  };
+})();
+
+
+// ── Kit Reveal integration ────────────────────────────────────────
+// Builds the reveal's data payload from live app state. Nothing is
+// invented: every signal, tile and score comes from a real value.
+var _kitRevealPlayed = false;
+
+function buildKitRevealData() {
+  var ctx = (typeof SIM_STATE !== 'undefined' && SIM_STATE.context) ? SIM_STATE.context : {};
+  var blocks = (typeof discCanvasBlocks !== 'undefined') ? discCanvasBlocks : {};
+  var dims   = (typeof discDims !== 'undefined') ? discDims : {};
+  var out = {};
+
+  // role + confidence
+  var role = String(ctx.role || '').trim();
+  if (role) out.role = role.length > 42 ? role.slice(0, 40) + '\u2026' : role;
+  if (typeof estimateConfidence === 'function') {
+    var c = estimateConfidence();
+    if (c && c.level) out.confidence = c.level;
+  }
+
+  // radar — the five discovery dimensions, 0..100 -> 0..1
+  var DIMS = [
+    ['walkaway', 'Walk-away power'],
+    ['risk_tol', 'Risk tolerance'],
+    ['urgency',  'Their urgency'],
+    ['talent',   'Talent market'],
+    ['offer',    'Offer room']
+  ];
+  var sig = [];
+  for (var i = 0; i < DIMS.length; i++) {
+    var v = Number(dims[DIMS[i][0]]);
+    if (isFinite(v) && v > 0) sig.push({ label: DIMS[i][1], value: Math.max(0, Math.min(1, v / 100)) });
+  }
+  if (sig.length === DIMS.length) out.signals = sig;   // radar only if all five are real
+
+  // risk meter — invert the leverage score: strong position = safe to counter
+  var filled = sig.length;
+  if (filled === DIMS.length) {
+    var avg = 0;
+    for (var j = 0; j < DIMS.length; j++) avg += Number(dims[DIMS[j][0]]) || 0;
+    avg = avg / DIMS.length;
+    out.risk = Math.max(6, Math.min(94, Math.round(100 - avg)));
+  }
+
+  // ask tiers — only when the verdict actually produced them
+  var v2 = (state && state.offer_verdict) ||
+           (typeof computeOfferVerdict === 'function' ? computeOfferVerdict() : null);
+  if (v2 && v2.counterSafe && v2.counterAmbitious) out.asks = ['Safe', 'Strong', 'Bold'];
+
+  // tiles — design key -> app block key
+  var MAP = {
+    email: 'meeting_email', playbook: 'pushback', risk: 'leverage_risk',
+    ask: 'emphasize', phone: 'opening_script', fallback: 'fallback', levers: 'levers'
+  };
+  var have = [];
+  for (var k in MAP) {
+    if (Object.prototype.hasOwnProperty.call(MAP, k)) {
+      var bk = blocks[MAP[k]];
+      if (bk && bk.filled) have.push(k);
+    }
+  }
+  out.blocks = have;
+  return out;
+}
+
+// Fires once per session, for free users only, after a real kit renders.
+function maybePlayKitReveal(canvasEl) {
+  if (_kitRevealPlayed) return;
+  if (state && state.paid) return;
+  if (typeof playKitReveal !== 'function') return;
+  try { if (sessionStorage.getItem('kr_played') === '1') { _kitRevealPlayed = true; return; } } catch (e) {}
+  if (typeof discStrategyLoading !== 'undefined' && discStrategyLoading) return;
+  if (typeof discPlanLoading     !== 'undefined' && discPlanLoading)     return;
+  if (!canvasEl || !canvasEl.querySelector('.paywall-bubble')) return;
+
+  var data;
+  try { data = buildKitRevealData(); } catch (e) { return; }
+  if (!data || !data.blocks || data.blocks.length < 3) return;   // not enough to be worth a reveal
+
+  _kitRevealPlayed = true;
+  try { sessionStorage.setItem('kr_played', '1'); } catch (e) {}
+  try { playKitReveal(data, null); } catch (e) {}
+}
+
 function setCanvasHTML(el) {
   if (!el) return;
   el.innerHTML = renderCanvasHTML();
@@ -3784,6 +4055,7 @@ function setCanvasHTML(el) {
   if (pwRoot) {
     wirePaywallBubble(pwRoot);
     if (!(state && state.paid)) logPaywallSeenOnce();
+    try { maybePlayKitReveal(el); } catch (e) {}
   }
   // Cards start collapsed — user expands on demand
 }
@@ -5553,16 +5825,15 @@ function pickDiscAnswer(qIdx, opt, pill) {
       discCanvasBlocks.urgency.note = '';
     }
 
-    // ── offer: anchor + extras + company_size (average, base adds +10 via input path) ──
-    var anch=ctx.anchor||'', ext=ctx.extras||'', csz=ctx.company_size||'';
+    // ── offer: anchor + company_size (average, base adds +5 via input path) ──
+    var anch=ctx.anchor||'', csz=ctx.company_size||'';
     var anchB=anch==='no_anchor'?75:anch==='matched'?35:anch==='below'?60:anch==='above'?70:0;
-    var extB=ext==='signing'?70:ext==='equity'?65:ext==='signing_equity'?80:ext==='base_only'?45:0;
     var cszB=csz==='cs_1_50'?65:csz==='cs_51_200'?60:csz==='cs_201_1k'?55:csz==='cs_1k_5k'?50:csz==='cs_5k_plus'?45:0;
-    var ofPts=[anchB,extB,cszB].filter(Boolean);
+    var ofPts=[anchB,cszB].filter(Boolean);
     if (ofPts.length) {
       var ofScore=Math.round(ofPts.reduce(function(a,b){return a+b;},0)/ofPts.length);
       // Base salary adds +10 if entered
-      if (ctx.base) ofScore = Math.min(95, ofScore + 10);
+      if (ctx.base) ofScore = Math.min(95, ofScore + 5);
       discDims.offer=ofScore; discActive.offer=true;
       discCanvasBlocks.offer.filled=true;
       discCanvasBlocks.offer.strength=ofScore>=60?'strong':ofScore>=40?'neutral':'weak';
@@ -5673,14 +5944,13 @@ function computeOfferVerdict() {
   // Magnitude normalization safety net: "85" -> 85,000. Only correct when plausible (>=10).
   if (base >= 10 && base < 1000) { base = base * 1000; ctx.base = String(base); }
   if (!base || base < 10000) return null;
-  var lo = 0.02, hi = 0.10;
+  var lo = 0.02, hi = 0.105;
   if (ctx.competing === 'yes') { lo += 0.02; hi += 0.04; }
   else if (ctx.competing === 'expecting') { lo += 0.01; hi += 0.02; }
   else if (ctx.competing === 'interviewing') { hi += 0.01; }
   if (ctx.speed === 'chased') { lo += 0.01; hi += 0.02; }
   else if (ctx.speed === 'fast') { hi += 0.01; }
   if (ctx.deadline === 'under_24h' || ctx.deadline === '24_72h' || ctx.deadline === 'this_week') { hi += 0.005; }
-  if (ctx.extras === 'base_only') { hi += 0.005; }
   if (ctx.worktype === 'on_site') { hi += 0.01; }
   else if (ctx.worktype === 'hybrid') { hi += 0.005; }
   if (ctx.employment === 'employed_stable') { lo += 0.005; hi += 0.01; }
