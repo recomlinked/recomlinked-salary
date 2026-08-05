@@ -4069,17 +4069,17 @@ function renderCanvasHTML() {
 
   html += offerVerdictCardHtml(true, _intakeDone2 && discNumbersReady);
 
-  // ── Peer proof — REAL counts from the last real 30-day window (7/1-7/30/2026)
-  // of logged sessions, bucketed by salary band. NOT a live counter -- this is a
-  // point-in-time snapshot and needs updating periodically (see PEER_BANDS below).
+  // ── Peer proof — REAL counts across ALL logged sessions (6/15-7/30/2026),
+  // bucketed by salary band. NOT a live counter -- this is a point-in-time
+  // snapshot and needs updating periodically (see PEER_BANDS below).
   // Never show an invented number here -- only real historical session counts.
   if (_intakeDone2 && discNumbersReady) {
     var PEER_BANDS = [
-      { lo: 0,      hi: 50000,  n: 7  },
-      { lo: 50000,  hi: 75000,  n: 22 },
-      { lo: 75000,  hi: 100000, n: 7  },
-      { lo: 100000, hi: 150000, n: 16 },
-      { lo: 150000, hi: Infinity, n: 7 }
+      { lo: 0,      hi: 50000,  n: 16 },
+      { lo: 50000,  hi: 75000,  n: 37 },
+      { lo: 75000,  hi: 100000, n: 26 },
+      { lo: 100000, hi: 150000, n: 38 },
+      { lo: 150000, hi: Infinity, n: 15 }
     ];
     var _peerBase = parseInt(String((SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) || '').replace(/[^\d]/g, ''), 10) || 0;
     var _peerBand = null;
@@ -4093,7 +4093,7 @@ function renderCanvasHTML() {
         '<span style="width:20px;height:20px;border-radius:50%;background:#3a5a94;border:2px solid var(--page);margin-left:-7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:8px;font-weight:800;">RN</span>' +
         '<span style="width:20px;height:20px;border-radius:50%;background:var(--gold);border:2px solid var(--page);margin-left:-7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:7.5px;font-weight:800;">+' + (_peerBand.n - 2) + '</span>' +
       '</div>';
-      html += '<div style="font-size:10.5px;line-height:1.5;color:var(--t2);"><strong style="color:var(--t1);">' + _peerBand.n + ' people</strong> with offers near yours ran this in the last 30 days. Most had more room than they assumed.</div>';
+      html += '<div style="font-size:10.5px;line-height:1.5;color:var(--t2);"><strong style="color:var(--t1);">' + _peerBand.n + ' people</strong> with offers near yours have used this. Most had more room than they assumed.</div>';
       html += '</div>';
     }
   }
