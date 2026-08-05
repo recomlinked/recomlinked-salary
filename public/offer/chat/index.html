@@ -4028,14 +4028,17 @@ function buildKitRevealData() {
 }
 
 // Fires once per session, for free users only, after a real kit renders.
-function maybePlayKitReveal(canvasEl) {
+function maybePlayKitReveal(_canvasEl) {
   if (_kitRevealPlayed) return;
   if (state && state.paid) return;
   if (typeof playKitReveal !== 'function') return;
   try { if (sessionStorage.getItem('kr_played') === '1') { _kitRevealPlayed = true; return; } } catch (e) {}
   if (typeof discStrategyLoading !== 'undefined' && discStrategyLoading) return;
   if (typeof discPlanLoading     !== 'undefined' && discPlanLoading)     return;
-  if (!canvasEl || !canvasEl.querySelector('.paywall-bubble')) return;
+  // Intake must be finished. The paywall is appended to the chat area by
+  // showDiscPaywall(), NOT into the canvas -- so don't look for it in canvasEl.
+  if (typeof discStep === 'undefined' || typeof DISC_FREE_QUESTIONS === 'undefined') return;
+  if (discStep < DISC_FREE_QUESTIONS) return;
 
   var data;
   try { data = buildKitRevealData(); } catch (e) { return; }
@@ -6804,12 +6807,14 @@ function showDiscPaywall() {
     lockFreeModes();
     var _existPw = chatArea.querySelector('.paywall-bubble');
     setTimeout(function() { _existPw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 200);
+    try { maybePlayKitReveal(null); } catch (e) {}
     return;
   }
   appendStandardPaywall(chatArea, { mode: 'discovery' });
   lockFreeModes();
   var pw = chatArea.querySelector('.paywall-bubble');
   if (pw) setTimeout(function() { pw.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 150);
+  try { maybePlayKitReveal(null); } catch (e) {}
 }
 
 function triggerPlanPaywall() {
