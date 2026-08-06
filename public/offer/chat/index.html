@@ -4443,7 +4443,7 @@ function showLockedCoaching(container) {
 var PAYWALL_COPY = {
   discovery: {
     title:    'You get one counter. Make it the right one.',
-    subtitle: 'A strong counter typically adds thousands to your offer. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>'
+    subtitle: 'A strong counter typically adds thousands to your offer. <strong>There\u2019s no version of this math where $29 isn\u2019t worth it.</strong>'
   },
   sim: {
     title:    'Practice every recruiter pushback until nothing surprises you.',
@@ -4480,7 +4480,7 @@ function buildPaywallBubbleHTML(opts) {
         var _pwRoom = (Math.round(_pwLow / 500) === Math.round(_pwHigh / 500))
           ? _pwFm(_pwLow)
           : _pwFm(_pwLow) + '\u2013' + _pwFm(_pwHigh);
-        copy.subtitle = 'A strong counter can add ' + _pwRoom + ' to your offer. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>';
+        copy.subtitle = 'A strong counter can add ' + _pwRoom + ' to your offer. <strong>There\u2019s no version of this math where $29 isn\u2019t worth it.</strong>';
       }
     } catch (e) {}
   }
