@@ -4469,12 +4469,17 @@ function buildPaywallBubbleHTML(opts) {
     // Dynamic: name the user's own real computed room instead of the generic "thousands" —
     // falls back to the static line if the verdict isn't computed yet (base not entered).
     try {
-      var _pwV = (state && state.offer_verdict) || computeOfferVerdict();
-      if (_pwV && _pwV.roomLow && _pwV.roomHigh) {
+      // state.offer_verdict (cached) uses snake_case keys; a fresh computeOfferVerdict()
+      // call uses camelCase. Normalize both so this doesn't silently read undefined and
+      // fall through to the static line whenever a cached verdict exists.
+      var _pwVRaw = (state && state.offer_verdict) || computeOfferVerdict();
+      var _pwLow  = _pwVRaw && (_pwVRaw.roomLow  != null ? _pwVRaw.roomLow  : _pwVRaw.room_low);
+      var _pwHigh = _pwVRaw && (_pwVRaw.roomHigh != null ? _pwVRaw.roomHigh : _pwVRaw.room_high);
+      if (_pwLow && _pwHigh) {
         var _pwFm = function(n) { return '$' + Math.round(n).toLocaleString('en-US'); };
-        var _pwRoom = (Math.round(_pwV.roomLow / 500) === Math.round(_pwV.roomHigh / 500))
-          ? _pwFm(_pwV.roomLow)
-          : _pwFm(_pwV.roomLow) + '\u2013' + _pwFm(_pwV.roomHigh);
+        var _pwRoom = (Math.round(_pwLow / 500) === Math.round(_pwHigh / 500))
+          ? _pwFm(_pwLow)
+          : _pwFm(_pwLow) + '\u2013' + _pwFm(_pwHigh);
         copy.subtitle = 'A strong counter can add ' + _pwRoom + ' to your offer. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>';
       }
     } catch (e) {}
@@ -5319,13 +5324,56 @@ function offerVerdictCardHtml(compact, showNumbers) {
       counter_moderate: liveV.counterModerate, counter_ambitious: liveV.counterAmbitious,
       risk: liveV.risk, recommended: liveV.recommended, base: liveV.base, leverage: liveV.leverage
     };
+    // Persist immediately -- without this, state.offer_verdict only lived in memory for the
+    // current tab. On refresh, state reloaded from localStorage with offer_verdict still
+    // null, so the paywall subtitle (and anything else reading it before a fresh verdict
+    // recomputes) fell back to the generic static line instead of the user's real numbers.
+    try { saveState(); } catch (e) {}
   }
   var v = state && state.offer_verdict;
   var isPaid = !!(state && state.paid);
   var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
   var RISK_LABELS = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
   var _obase = parseInt(String((SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) || (state && state.profile && state.profile.base) || '').replace(/[^\d]/g, ''), 10) || 0;
-  var baseLine = _obase ? '<div style="font-size:10px;color:#fff;margin:-2px 0 18px;">on top of your $' + _obase.toLocaleString('en-US') + ' offer</div>' : '';
+  var baseLine = _obase ? '<div style="font-size:10px;color:#fff;margin:-2px 0 6px;">on top of your $' + _obase.toLocaleString('en-US') + ' offer</div>' : '';
+  // Tangible translation — expresses the room as a felt amount of time, not a career
+  // projection. Translates BOTH ends of the range (not just the low end) so the phrase
+  // carries the same spread the dollar range does: "20 days to 1 month," "1 to 2 months."
+  (function () {
+    if (!_obase || !v || !v.room_low || !v.room_high) return;
+
+    function toUnit(days) {
+      if (days < 7) return null;                          // too small to feel like anything
+      if (days < 25) return { unit: 'days', n: Math.round(days / 5) * 5 };
+      if (days < 45) return { unit: 'months', n: 1 };
+      return { unit: 'months', n: Math.round(days / 30) };
+    }
+    function say(n, unit) {
+      if (unit === 'months') return n + (n === 1 ? ' month' : ' months');
+      return n + (n === 1 ? ' day' : ' days');
+    }
+
+    var lo = toUnit(365 * (v.room_low  / _obase));
+    var hi = toUnit(365 * (v.room_high / _obase));
+    var label = '';
+    if (!lo && !hi) {
+      label = '';
+    } else if (!lo && hi) {
+      label = 'up to about ' + say(hi.n, hi.unit) + ' of your salary';
+    } else if (lo && !hi) {
+      label = 'about ' + say(lo.n, lo.unit) + ' of your salary';
+    } else if (lo.unit === hi.unit && lo.n === hi.n) {
+      label = 'about ' + say(lo.n, lo.unit) + ' of your salary';
+    } else if (lo.unit === hi.unit) {
+      label = 'about ' + lo.n + ' to ' + say(hi.n, hi.unit) + ' of your salary';
+    } else {
+      // Mixed units, e.g. "20 days to 1 month" — say each end with its own unit.
+      label = 'about ' + say(lo.n, lo.unit) + ' to ' + say(hi.n, hi.unit) + ' of your salary';
+    }
+    if (label) {
+      baseLine += '<div style="font-size:10px;color:rgba(255,255,255,0.6);margin:0 0 18px;">That\u2019s ' + label + '.</div>';
+    }
+  })();
   var inner;
   if (v && v.room_low && (showNumbers || isPaid)) {
     var rk = v.risk || 'balanced';
