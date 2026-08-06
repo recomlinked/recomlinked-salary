@@ -5324,11 +5324,17 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var _accKey = name.indexOf('Safe') >= 0 ? 'safe' : name.indexOf('Strong') >= 0 ? 'moderate' : 'ambitious';
       var _accPct = _accAll[_accKey];
       var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8A85C' : 'rgba(224,148,148,0.75)';
+      var _accSealColor = _accPct >= 75 ? '#1A9E6C' : _accPct >= 55 ? '#C9862B' : '#CC4444';
+      var _accBg    = _accPct >= 75 ? 'rgba(26,158,108,0.13)' : _accPct >= 55 ? 'rgba(201,134,43,0.13)' : 'rgba(204,68,68,0.13)';
       var _accDisplay = _accPct;
       // Sealed along with the dollar amount when locked -- odds were leaking the exact
       // "is it safe" reassurance for free while the number stayed hidden. Both now unlock together.
+      // Digits stay hidden (••%), but the real green/orange/red read is shown, per the
+      // founder's call -- this does let someone compare relative risk across the three tiers.
+      // (Sealed badge uses a slightly deeper shade than the paid text color for contrast
+      // against its own tinted background -- the paid state's colors are unchanged.)
       var _accLine = locked
-        ? '<div class="tier-accept" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;color:var(--gold);background:rgba(201,168,76,0.13);padding:3px 8px;border-radius:6px;margin-top:6px;letter-spacing:0.02em;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>\u2022\u2022% likely</div>'
+        ? '<div class="tier-accept" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;color:' + _accSealColor + ';background:' + _accBg + ';padding:3px 8px;border-radius:6px;margin-top:6px;letter-spacing:0.02em;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>\u2022\u2022% chance they say yes</div>'
         : '<div class="tier-accept" style="font-size:10px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
       var numColor = (locked || val === null) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)';
       return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
