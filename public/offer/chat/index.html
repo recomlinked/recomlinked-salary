@@ -4489,8 +4489,10 @@ function buildPaywallBubbleHTML(opts) {
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:18px;">' + copy.subtitle + '</p>' +
 
-    '<button class="btn-pay" data-pw-go="1" data-pw-price="29">Get my number &amp; email \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>' +
-    '<button class="btn-pay" data-pw-tier2-go="1" style="margin-top:10px;background:linear-gradient(135deg,#F5CF56,#e0b93f);">Add company research \u00b7 $49 <span class="btn-pay-arrow">\u2192</span></button>' +
+    (mode === 'discovery'
+      ? '<button class="btn-pay" data-pw-go="1" data-pw-price="29">Get my number, risk score &amp; email \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>'
+      : '<button class="btn-pay" data-pw-go="1" data-pw-price="29">Get my number &amp; email \u00b7 $29 <span class="btn-pay-arrow">\u2192</span></button>') +
+    '<button class="btn-pay" data-pw-tier2-go="1" style="margin-top:10px;background:linear-gradient(135deg,#F5CF56,#e0b93f);">Make it specific to my company \u00b7 $49 <span class="btn-pay-arrow">\u2192</span></button>' +
     '<div class="tier2-reveal" data-tier2-reveal="1" style="display:none;margin-top:10px;padding:16px;background:rgba(245,207,86,0.07);border:1px solid rgba(245,207,86,0.3);border-radius:10px;">' +
       '<p style="font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.6;margin-bottom:12px;">Takes up to 24 hours. You\u2019ll get an email instantly after payment \u2014 just reply with your company name so we can be as specific as possible.</p>' +
       '<button class="btn-pay" data-pw-go="1" data-pw-price="49" style="width:100%;">Continue to checkout \u00b7 $49 <span class="btn-pay-arrow">\u2192</span></button>' +
