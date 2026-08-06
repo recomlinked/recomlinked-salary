@@ -4465,6 +4465,21 @@ function buildPaywallBubbleHTML(opts) {
   var copy = Object.assign({}, PAYWALL_COPY[mode] || PAYWALL_COPY.discovery);
   var selectedPrice = 29; // Tier 1 flat price — kept as the function's return value for backward compatibility
 
+  if (mode === 'discovery') {
+    // Dynamic: name the user's own real computed room instead of the generic "thousands" —
+    // falls back to the static line if the verdict isn't computed yet (base not entered).
+    try {
+      var _pwV = (state && state.offer_verdict) || computeOfferVerdict();
+      if (_pwV && _pwV.roomLow && _pwV.roomHigh) {
+        var _pwFm = function(n) { return '$' + Math.round(n).toLocaleString('en-US'); };
+        var _pwRoom = (Math.round(_pwV.roomLow / 500) === Math.round(_pwV.roomHigh / 500))
+          ? _pwFm(_pwV.roomLow)
+          : _pwFm(_pwV.roomLow) + '\u2013' + _pwFm(_pwV.roomHigh);
+        copy.subtitle = 'A strong counter can add ' + _pwRoom + ' to your offer. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>';
+      }
+    } catch (e) {}
+  }
+
   var html = '<div class="bubble paywall-bubble">' +
     '<p class="paywall-headline"><strong>' + copy.title + '</strong></p>' +
     '<p style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;margin-bottom:18px;">' + copy.subtitle + '</p>' +
