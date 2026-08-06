@@ -841,7 +841,7 @@ body.sim-mode .bottom-panel{background:rgba(30,61,114,0.02);}
 @media (max-width:900px){
   .tier-row{flex-direction:column;gap:10px;}
   .tier-row>.tier-card{flex:none;width:100%;padding:16px 14px !important;}
-  .tier-label{font-size:14px !important;margin-bottom:10px !important;}
+  .tier-label{font-size:15px !important;margin-bottom:10px !important;}
   .tier-num{font-size:28px !important;}
   .tier-accept{font-size:13px !important;margin-top:8px !important;}
 }
@@ -4066,8 +4066,8 @@ function renderCanvasHTML() {
     var _riskNum = Math.max(8, Math.min(92, 100 - nScore));   // higher score = lower risk
     var _riskPaid = !!(state && state.paid);
     riskGaugeHtml += '<div style="background:#fff;border:1px solid var(--divider);border-radius:10px;padding:18px 16px;">';
-    riskGaugeHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
-    riskGaugeHtml += '<span style="display:flex;align-items:center;gap:7px;font-size:16px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
+    riskGaugeHtml += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;margin-bottom:16px;">';
+    riskGaugeHtml += '<span style="display:flex;align-items:center;gap:7px;font-size:19px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
     if (_riskPaid) {
       riskGaugeHtml += '<span style="font-size:13px;font-weight:800;color:' + _risk.c + ';">' + _risk.l + '</span>';
     } else {
@@ -4097,8 +4097,8 @@ function renderCanvasHTML() {
     // progress, instead of vanishing entirely. Matches the "Completing your intake..."
     // placeholder language already used by the kit items below.
     riskGaugeHtml += '<div style="background:#fff;border:1px solid var(--divider);border-radius:10px;padding:18px 16px;">';
-    riskGaugeHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">';
-    riskGaugeHtml += '<span style="display:flex;align-items:center;gap:7px;font-size:16px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
+    riskGaugeHtml += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 10px;margin-bottom:16px;">';
+    riskGaugeHtml += '<span style="display:flex;align-items:center;gap:7px;font-size:19px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
     riskGaugeHtml += '<span style="font-size:11px;font-weight:700;color:var(--t3);">Completing your intake…</span>';
     riskGaugeHtml += '</div>';
     riskGaugeHtml += '<div style="margin:6px 0;position:relative;height:8px;border-radius:5px;background:repeating-linear-gradient(90deg,#e2e5ec 0px,#e2e5ec 6px,#eef0f4 6px,#eef0f4 12px);"></div>';
@@ -4143,9 +4143,9 @@ function renderCanvasHTML() {
 
   // YOUR POSITION (now also contains Offer-structure analysis + Should You Negotiate, nested)
   html += '<details open style="margin-top:10px;">';
-  html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:10px 12px;background:var(--muted);border-radius:8px;">';
-  html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your position</span>';
-  html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
+  html += '<summary style="display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:13px 14px;background:var(--muted);border-radius:8px;">';
+  html += '<span style="font-size:14px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">Your position</span>';
+  html += '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding:0 12px 4px;">';
   var _dimChips = [
@@ -4238,9 +4238,9 @@ function renderCanvasHTML() {
   // YOUR COUNTER KIT — open by default now, so the email/scripts are visible immediately
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
   html += '<details open style="margin-top:2px;">';
-  html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:10px 12px;background:var(--muted);border-radius:8px;">';
-  html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your Email & Scripts</span>';
-  html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
+  html += '<summary style="display:flex;align-items:center;gap:9px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:13px 14px;background:var(--muted);border-radius:8px;">';
+  html += '<span style="font-size:14px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">Your Email & Scripts</span>';
+  html += '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
   html += '<div style="margin-top:10px;padding:0 12px;">';
   html += '<div style="display:flex;flex-direction:column;gap:10px;">';
@@ -4443,7 +4443,7 @@ function showLockedCoaching(container) {
 var PAYWALL_COPY = {
   discovery: {
     title:    'You get one counter. Make it the right one.',
-    subtitle: 'A strong counter typically adds thousands to your offer. Your number, your email, and your pushback responses are ready. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>'
+    subtitle: 'A strong counter typically adds thousands to your offer. <strong>There\u2019s no version of this math where it isn\u2019t worth it.</strong>'
   },
   sim: {
     title:    'Practice every recruiter pushback until nothing surprises you.',
@@ -5336,7 +5336,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
         : '<div class="tier-accept" style="font-size:10px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
       var numColor = (locked || val === null) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)';
       return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
-        '<div class="tier-label" style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
+        '<div class="tier-label" style="font-size:13px;font-weight:700;letter-spacing:0.03em;color:rgba(255,255,255,0.9);margin-bottom:9px;">' + name + '</div>' +
         (locked
           ? '<div style="display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer;margin:6px 0;" onclick="triggerPlanPaywall()" title="Unlock to reveal">' +
               '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
@@ -5356,7 +5356,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       // Post-intake, free: THE INVERSION — give the real range (magnitude), seal the
       // safety data (labels' dollar amounts + odds + risk gauge, sealed above). The number
       // creates the tension; the paywall is what resolves it.
-      inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
+      inner = '<div style="font-size:19px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;line-height:1.25;">You have room to earn more</div>' +
         '<div style="font-size:' + (compact?'22px':'26px') + ';font-weight:900;color:#F5CF56;letter-spacing:-0.4px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         baseLine +
         '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
@@ -5367,7 +5367,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
 
     } else {
       // Paid: full numbers
-      inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
+      inner = '<div style="font-size:19px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;line-height:1.25;">You have room to earn more</div>' +
         '<div style="font-size:' + (compact?'17px':'20px') + ';font-weight:800;color:#F5CF56;letter-spacing:-0.3px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' + baseLine +
         '<div style="margin-bottom:12px;"></div>' +
         '<div class="tier-row">' + tier('Safe ask',v.counter_safe,recTier==='safe',false) + tier('Strong ask',v.counter_moderate,recTier==='moderate',false) + tier('Bold ask',v.counter_ambitious,recTier==='ambitious',false) + '</div>' +
@@ -5381,12 +5381,12 @@ function offerVerdictCardHtml(compact, showNumbers) {
     // not a fourth, visually distinct product.
     function tierLoading(name) {
       return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
-        '<div class="tier-label" style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
+        '<div class="tier-label" style="font-size:13px;font-weight:700;letter-spacing:0.03em;color:rgba(255,255,255,0.9);margin-bottom:9px;">' + name + '</div>' +
         '<div style="display:flex;align-items:center;justify-content:center;margin:6px 0;"><span class="verdict-shimmer-sm" style="height:19px;width:52px;display:block;"></span></div>' +
         '<div style="height:14px;margin-top:5px;display:flex;justify-content:center;"><span class="verdict-shimmer-sm" style="height:10px;width:44px;display:block;"></span></div>' +
         '</div>';
     }
-    inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
+    inner = '<div style="font-size:19px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:8px;line-height:1.25;">You have room to earn more</div>' +
       '<div style="margin-bottom:6px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'26px') + ';width:180px;display:block;border-radius:6px;"></span></div>' + baseLine +
       '<div style="font-size:10.5px;color:rgba(255,255,255,0.4);line-height:1.5;margin:-10px 0 12px;">Reading your answers \u2026</div>' +
       '<div class="tier-row">' +
