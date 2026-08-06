@@ -4089,7 +4089,7 @@ function renderCanvasHTML() {
         '</div>' +
       '</div>';
       riskGaugeHtml += '<div style="display:flex;justify-content:space-between;font-size:9px;color:#9aa;margin-top:10px;"><span>Safe to counter</span><span>Higher risk</span></div>';
-      riskGaugeHtml += '<div style="font-size:11px;color:var(--t3);margin-top:12px;">Computed from your 5 signals — <a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">unlock to see the risk score</a></div>';
+      riskGaugeHtml += '<div style="font-size:11px;color:var(--t3);margin-top:12px;"><a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">unlock to see the risk score</a></div>';
     }
     riskGaugeHtml += '</div>';
   } else {
@@ -5359,7 +5359,6 @@ function offerVerdictCardHtml(compact, showNumbers) {
       inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
         '<div style="font-size:' + (compact?'22px':'26px') + ';font-weight:900;color:#F5CF56;letter-spacing:-0.4px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         baseLine +
-        '<div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.5;margin:-10px 0 12px;">The exact ask and whether it\u2019s safe to send are in the kit.</div>' +
         '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis <a href="/offer/methodology/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-weight:700;text-decoration:none;margin-left:2px;" onclick="event.stopPropagation();"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 11l3 3L22 4"/></svg>Check the Methodology</a> \u00b7 Confidence: ' + estimateConfidence().level + '.</span></div>' +
         '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="display:block;font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">Show all my numbers \u2192</a>' +
