@@ -5335,7 +5335,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
   var fm = function(n) { return '$' + Number(n || 0).toLocaleString('en-US'); };
   var RISK_LABELS = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
   var _obase = parseInt(String((SIM_STATE && SIM_STATE.context && SIM_STATE.context.base) || (state && state.profile && state.profile.base) || '').replace(/[^\d]/g, ''), 10) || 0;
-  var baseLine = _obase ? '<div style="font-size:10px;color:#fff;margin:-2px 0 6px;">on top of your $' + _obase.toLocaleString('en-US') + ' offer</div>' : '';
+  var baseLine = '';
   // Tangible translation — expresses the room as a felt amount of time, not a career
   // projection. Translates BOTH ends of the range (not just the low end) so the phrase
   // carries the same spread the dollar range does: "20 days to 1 month," "1 to 2 months."
@@ -5371,7 +5371,7 @@ function offerVerdictCardHtml(compact, showNumbers) {
       label = 'about ' + say(lo.n, lo.unit) + ' to ' + say(hi.n, hi.unit) + ' of your salary';
     }
     if (label) {
-      baseLine += '<div style="font-size:10px;color:rgba(255,255,255,0.6);margin:0 0 18px;">That\u2019s ' + label + '.</div>';
+      baseLine += '<div style="font-size:11px;font-weight:700;color:#fff;margin:0 0 18px;">That\u2019s ' + label + '.</div>';
     }
   })();
   var inner;
