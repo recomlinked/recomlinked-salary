@@ -3625,7 +3625,7 @@ function buildAnalysisPanelHTML() {
       '<div style="flex-shrink:0;width:64px;text-align:right;font-size:10px;font-weight:800;color:' + r.c + ';">' + r.l + '</div></div>';
   }
   return '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;">' +
-    '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;">' +
+    '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;background:var(--muted);border-radius:6px;padding:8px 10px;margin:-2px -6px;">' +
       '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
       '<span style="font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--navy);flex:1;">Offer-structure analysis</span>' +
       '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="opacity:0.6;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>' +
@@ -4049,21 +4049,47 @@ function renderCanvasHTML() {
     nLabel = getNegotiationLabel(nScore, (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced');
 
     // ── Counter Risk meter (visual, with score) — now the FIRST card, before the verdict ──
+    // Sealed for free users: the risk READ is the premium answer to "is it safe to ask" —
+    // giving it away free was undercutting the entire reason to unlock the kit.
     var _risk = nScore>=72 ? {l:'Low',c:'#1A9E6C'}
               : nScore>=55 ? {l:'Moderate-low',c:'#5a9e3a'}
               : nScore>=40 ? {l:'Moderate',c:'#C9A84C'}
               : nScore>=25 ? {l:'Moderate-high',c:'#d98a2b'}
               :              {l:'High',c:'#cc4444'};
     var _riskNum = Math.max(8, Math.min(92, 100 - nScore));   // higher score = lower risk
+    var _riskPaid = !!(state && state.paid);
     html += '<div style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:12px 14px;">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
     html += '<span style="display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
-    html += '<span style="font-size:12px;font-weight:800;color:' + _risk.c + ';">' + _risk.l + '</span>';
+    if (_riskPaid) {
+      html += '<span style="font-size:12px;font-weight:800;color:' + _risk.c + ';">' + _risk.l + '</span>';
+    } else {
+      html += '<span onclick="triggerPlanPaywall()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:800;color:var(--t3);cursor:pointer;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Assessed \u2014 locked</span>';
+    }
     html += '</div>';
-    html += '<div style="position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,#1A9E6C 0%,#C9A84C 55%,#cc4444 100%);">';
-    html += '<div style="position:absolute;top:-3px;left:calc(' + _riskNum + '% - 7px);width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid ' + _risk.c + ';box-shadow:0 1px 3px rgba(0,0,0,0.25);"></div>';
+    if (_riskPaid) {
+      html += '<div style="position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,#1A9E6C 0%,#C9A84C 55%,#cc4444 100%);">';
+      html += '<div style="position:absolute;top:-3px;left:calc(' + _riskNum + '% - 7px);width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid ' + _risk.c + ';box-shadow:0 1px 3px rgba(0,0,0,0.25);"></div>';
+      html += '</div>';
+      html += '<div style="display:flex;justify-content:space-between;font-size:9px;color:#9aa;margin-top:6px;"><span>Safe to counter</span><span>Higher risk</span></div>';
+    } else {
+      // Sealed: the gauge track renders (proves it was computed) but the needle position
+      // and the safe/high-risk labels — the actual read — are withheld, not just blurred.
+      html += '<div onclick="triggerPlanPaywall()" style="position:relative;height:8px;border-radius:5px;background:repeating-linear-gradient(90deg,#e2e5ec 0px,#e2e5ec 6px,#eef0f4 6px,#eef0f4 12px);cursor:pointer;"></div>';
+      html += '<div style="font-size:9px;color:var(--t3);margin-top:6px;">Computed from your 5 signals \u2014 <a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="color:var(--gold);font-weight:700;text-decoration:none;">unlock to see the read</a></div>';
+    }
     html += '</div>';
-    html += '<div style="display:flex;justify-content:space-between;font-size:9px;color:#9aa;margin-top:6px;"><span>Safe to counter</span><span>Higher risk</span></div>';
+  } else {
+    // Same card shell as the loaded state -- shown consistently while intake is still in
+    // progress, instead of vanishing entirely. Matches the "Completing your intake..."
+    // placeholder language already used by the kit items below.
+    html += '<div style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:12px 14px;">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
+    html += '<span style="display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 18a9 9 0 1 1 17 0"/><path d="M12 14l3.6-3.6"/><circle cx="12" cy="14" r="1.3" fill="currentColor" stroke="none"/></svg>Counter risk</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--t3);">Completing your intake\u2026</span>';
+    html += '</div>';
+    html += '<div style="position:relative;height:8px;border-radius:5px;background:repeating-linear-gradient(90deg,#e2e5ec 0px,#e2e5ec 6px,#eef0f4 6px,#eef0f4 12px);"></div>';
+    html += '<div style="font-size:9px;color:var(--t3);margin-top:6px;">Finishes once your intake is complete.</div>';
     html += '</div>';
   }
 
@@ -4101,10 +4127,9 @@ function renderCanvasHTML() {
   // Free users: paywall now moved to the end of the kit (after Your plan) — see below
 
   // YOUR POSITION (now also contains Offer-structure analysis + Should You Negotiate, nested)
-  html += '<details style="margin-top:10px;">';
+  html += '<details open style="margin-top:10px;">';
   html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:10px 12px;background:var(--muted);border-radius:8px;">';
   html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your position</span>';
-  html += '<span style="font-size:9px;font-weight:600;color:var(--gold);white-space:nowrap;">Tap to expand</span>';
   html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
   html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding:0 12px 4px;">';
@@ -4115,17 +4140,35 @@ function renderCanvasHTML() {
     { key:'talent',   label:'Talent market' },
     { key:'offer',    label:'Offer room' },
   ];
+  var _chipsPaid = !!(state && state.paid);
   _dimChips.forEach(function(d) {
     var blk = discCanvasBlocks[d.key] || {};
     var str = blk.strength || '';
-    var col = str==='strong'?'#1a9e6c':str==='neutral'?'#c9a84c':'#E05555';
-    var bg  = str==='strong'?'rgba(26,158,108,0.08)':str==='neutral'?'rgba(201,168,76,0.1)':'rgba(224,85,85,0.08)';
-    var bor = str==='strong'?'rgba(26,158,108,0.3)':str==='neutral'?'rgba(201,168,76,0.35)':'rgba(224,85,85,0.25)';
-    var label = str ? (str==='strong'?'Strong':str==='neutral'?'Medium':'Weak') : '—';
-    html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:' + bg + ';border:1px solid ' + bor + ';">' +
-      '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
-      '<span style="font-size:9px;font-weight:700;color:' + col + ';">' + label + '</span>' +
-      '</div>';
+    if (!str) {
+      // Not computed yet — same neutral placeholder regardless of paid status.
+      html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:rgba(154,141,184,0.08);border:1px solid rgba(154,141,184,0.25);">' +
+        '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
+        '<span style="font-size:9px;font-weight:700;color:#9a8db8;">\u2014</span>' +
+        '</div>';
+    } else if (!_chipsPaid) {
+      // Computed, but sealed for free users — ONE uniform neutral treatment for every
+      // chip regardless of its real strength. Color-coding the seal would leak exactly
+      // what the label hides (a green lock still reads as "this one's strong").
+      html += '<div onclick="triggerPlanPaywall()" style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:var(--muted);border:1px solid var(--divider);cursor:pointer;">' +
+        '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
+        '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+        '</div>';
+    } else {
+      // Paid — real, color-coded read.
+      var col = str==='strong'?'#1a9e6c':str==='neutral'?'#c9a84c':'#E05555';
+      var bg  = str==='strong'?'rgba(26,158,108,0.08)':str==='neutral'?'rgba(201,168,76,0.1)':'rgba(224,85,85,0.08)';
+      var bor = str==='strong'?'rgba(26,158,108,0.3)':str==='neutral'?'rgba(201,168,76,0.35)':'rgba(224,85,85,0.25)';
+      var label = str==='strong'?'Strong':str==='neutral'?'Medium':'Weak';
+      html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 9px;border-radius:20px;background:' + bg + ';border:1px solid ' + bor + ';">' +
+        '<span style="font-size:10px;font-weight:600;color:#2c2438;">' + d.label + '</span>' +
+        '<span style="font-size:9px;font-weight:700;color:' + col + ';">' + label + '</span>' +
+        '</div>';
+    }
   });
   html += '</div>';
 
@@ -4136,16 +4179,40 @@ function renderCanvasHTML() {
 
   // SHOULD YOU NEGOTIATE? card — nested inside Your position
   if (coreComplete) {
+    var _snPaid = !!(state && state.paid);
     html += '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;">';
-    html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;">';
+    html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;background:var(--muted);border-radius:6px;padding:8px 10px;margin:-2px -6px;">';
     html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
     html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">Should You Negotiate?</span>';
+    if (!_snPaid) html += '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
     html += '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="opacity:0.6;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
     html += '</summary>';
     html += '<div style="margin-top:8px;">';
-    html += '<p style="font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px;line-height:1.4;">' + nLabel.label + '</p>';
-    html += '<p style="font-size:11px;color:#555;line-height:1.5;margin:0 0 6px;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    if (_snPaid) {
+      html += '<p style="font-size:12px;font-weight:700;color:var(--navy);margin:0 0 6px;line-height:1.4;">' + nLabel.label + '</p>';
+      html += '<p style="font-size:11px;color:#555;line-height:1.5;margin:0 0 6px;"><strong>Your target:</strong> ' + nLabel.target + '</p>';
+    } else {
+      // Sealed: this is the actual "is it safe to ask" verdict -- the whole reason someone
+      // came here. Redacted bars (not blur) so it reads as computed-and-withheld, matching
+      // the reply-script and risk-gauge treatment elsewhere.
+      html += '<p style="font-size:11px;color:var(--t3);line-height:1.6;margin:0 0 8px;">Assessed from your 5 signals \u2014 the read is ready.</p>';
+      html += '<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:9px;">' +
+        '<div style="height:7px;border-radius:4px;background:linear-gradient(90deg,rgba(201,168,76,.28),rgba(201,168,76,.14));width:92%;"></div>' +
+        '<div style="height:7px;border-radius:4px;background:linear-gradient(90deg,rgba(201,168,76,.28),rgba(201,168,76,.14));width:70%;"></div>' +
+      '</div>';
+      html += '<a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="font-size:10.5px;font-weight:700;color:var(--gold);text-decoration:none;">Unlock to see the read \u2192</a>';
+    }
     html += '</div>';
+    html += '</details>';
+  } else {
+    // Same shell as the loaded card -- rendered consistently while intake is still in
+    // progress, instead of the section vanishing entirely.
+    html += '<details style="background:#fff;border:1px solid var(--divider);border-radius:8px;padding:10px 14px;margin-top:4px;" onclick="return false;">';
+    html += '<summary style="display:flex;align-items:center;gap:7px;cursor:default;list-style:none;background:var(--muted);border-radius:6px;padding:8px 10px;margin:-2px -6px;">';
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+    html += '<span style="font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.04em;flex:1;">Should You Negotiate?</span>';
+    html += '<span style="font-size:9px;font-weight:600;color:var(--t3);white-space:nowrap;">Completing your intake\u2026</span>';
+    html += '</summary>';
     html += '</details>';
   }
 
@@ -4153,12 +4220,11 @@ function renderCanvasHTML() {
   html += '</details>';
 
   if (intakeDone) {
-  // YOUR COUNTER KIT — collapsed by default so the verdict, risk, and paywall stay the focus
+  // YOUR COUNTER KIT — open by default now, so the email/scripts are visible immediately
   html += '<div style="height:1px;background:var(--divider);margin:4px 0;"></div>';
-  html += '<details style="margin-top:2px;">';
+  html += '<details open style="margin-top:2px;">';
   html += '<summary style="display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;outline:none;-webkit-tap-highlight-color:transparent;padding:10px 12px;background:var(--muted);border-radius:8px;">';
   html += '<span style="font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:0.06em;flex:1;">Your Email & Scripts</span>';
-  html += '<span style="font-size:9px;font-weight:600;color:var(--gold);white-space:nowrap;">Tap to expand</span>';
   html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.4" stroke-linecap="round" style="flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>';
   html += '</summary>';
   html += '<div style="margin-top:10px;padding:0 12px;">';
@@ -5244,7 +5310,11 @@ function offerVerdictCardHtml(compact, showNumbers) {
       var _accPct = _accAll[_accKey];
       var _accColor = _accPct >= 75 ? '#7ED9A8' : _accPct >= 55 ? '#E8A85C' : 'rgba(224,148,148,0.75)';
       var _accDisplay = _accPct;
-      var _accLine = '<div class="tier-accept" style="font-size:10px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
+      // Sealed along with the dollar amount when locked -- odds were leaking the exact
+      // "is it safe" reassurance for free while the number stayed hidden. Both now unlock together.
+      var _accLine = locked
+        ? '<div class="tier-accept" style="font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.3);margin-top:5px;letter-spacing:0.01em;">\u2022\u2022% likely</div>'
+        : '<div class="tier-accept" style="font-size:10px;font-weight:700;color:' + _accColor + ';margin-top:5px;letter-spacing:0.01em;">' + _accDisplay + '% likely accepted</div>';
       var numColor = (locked || val === null) ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)';
       return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
         '<div class="tier-label" style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
@@ -5263,20 +5333,14 @@ function offerVerdictCardHtml(compact, showNumbers) {
     }
     
 
-    if (!showNumbers && !isPaid) {
-      // Free user pre-unlock: blurred numbers
+    if (!isPaid) {
+      // Post-intake, free: THE INVERSION — give the real range (magnitude), seal the
+      // safety data (labels' dollar amounts + odds + risk gauge, sealed above). The number
+      // creates the tension; the paywall is what resolves it.
       inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
-        '<div style="margin-bottom:10px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
-        '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
-        '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis <a href="/offer/methodology/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-weight:700;text-decoration:none;margin-left:2px;" onclick="event.stopPropagation();"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 11l3 3L22 4"/></svg>Check the Methodology</a> \u00b7 Confidence: ' + estimateConfidence().level + '.</span></div>' +
-        '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="display:block;font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">Show all my numbers \u2192</a>' +
-        '';
-
-    } else if (!isPaid) {
-      // Post-intake, free: show "meaningful room detected", tier structure with locks, no numbers
-      inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
+        '<div style="font-size:' + (compact?'22px':'26px') + ';font-weight:900;color:#F5CF56;letter-spacing:-0.4px;margin-bottom:6px;">' + fm(v.room_low) + ' \u2013 ' + fm(v.room_high) + '</div>' +
         baseLine +
-        '<div style="margin-bottom:12px;"></div>' +
+        '<div style="font-size:10.5px;color:rgba(255,255,255,0.55);line-height:1.5;margin:-10px 0 12px;">That\u2019s real, calculated room \u2014 the exact ask and whether it\u2019s safe to send are in the kit.</div>' +
         '<div class="tier-row">' + tier('Safe ask',null,recTier==='safe',true) + tier('Strong ask',null,recTier==='moderate',true) + tier('Bold ask',null,recTier==='ambitious',true) + '</div>' +
         '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis <a href="/offer/methodology/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-weight:700;text-decoration:none;margin-left:2px;" onclick="event.stopPropagation();"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 11l3 3L22 4"/></svg>Check the Methodology</a> \u00b7 Confidence: ' + estimateConfidence().level + '.</span></div>' +
         '<a href="#" onclick="event.stopPropagation();event.preventDefault();kitUnlock(this)" style="display:block;font-size:11px;font-weight:700;color:var(--gold);text-decoration:none;">Show all my numbers \u2192</a>' +
@@ -5293,21 +5357,22 @@ function offerVerdictCardHtml(compact, showNumbers) {
         '';
     }
   } else {
-    // Locked state — same structure as filled, ??? placeholders
-    var rk0 = (SIM_STATE.context && SIM_STATE.context.risk) || 'balanced';
-    var recTier0 = rk0 === 'safe' ? 0 : rk0 === 'ambitious' ? 2 : 1;
-    var RISK_LABELS0 = { safe: 'Conservative', balanced: 'Balanced', ambitious: 'Ambitious' };
-    function tierLocked(name, idx0) {
-      return '<div class="tier-card" style="text-align:center;padding:6px 4px;border-radius:7px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">' +
+    // Loading state -- verdict not computed yet. Reuses the EXACT same tier-card markup
+    // (padding, lock icon slot, label position) as the free/paid states above, just with
+    // a shimmer in place of a value, so this reads as the same kit still filling in --
+    // not a fourth, visually distinct product.
+    function tierLoading(name) {
+      return '<div class="tier-card" style="text-align:center;padding:9px 4px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);">' +
         '<div class="tier-label" style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:rgba(255,255,255,0.9);margin-bottom:8px;">' + name + '</div>' +
-        '<span class="verdict-shimmer-sm" style="height:14px;width:58px;margin:2px auto;display:block;"></span>' +
+        '<div style="display:flex;align-items:center;justify-content:center;margin:6px 0;"><span class="verdict-shimmer-sm" style="height:19px;width:52px;display:block;"></span></div>' +
+        '<div style="height:14px;margin-top:5px;display:flex;justify-content:center;"><span class="verdict-shimmer-sm" style="height:10px;width:44px;display:block;"></span></div>' +
         '</div>';
     }
     inner = '<div style="font-size:16px;font-weight:800;color:#fff;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px;">You have room to earn more</div>' +
-      '<div style="margin-bottom:8px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'28px') + ';width:200px;display:block;"></span></div>' + baseLine +
-      '<div style="font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:8px;"></div>' +
+      '<div style="margin-bottom:6px;"><span class="verdict-shimmer" style="height:' + (compact?'22px':'26px') + ';width:180px;display:block;border-radius:6px;"></span></div>' + baseLine +
+      '<div style="font-size:10.5px;color:rgba(255,255,255,0.4);line-height:1.5;margin:-10px 0 12px;">Reading your answers \u2026</div>' +
       '<div class="tier-row">' +
-        tierLocked('Safe ask', 0) + tierLocked('Strong ask', 1) + tierLocked('Bold ask', 2) +
+        tierLoading('Safe ask') + tierLoading('Strong ask') + tierLoading('Bold ask') +
       '</div>' +
       '<div style="font-size:9.5px;color:rgba(255,255,255,0.5);margin:0 0 12px;line-height:1.4;display:flex;align-items:flex-start;gap:5px;">' + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>' + '<span>Offer-structure analysis <a href="/offer/methodology/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:3px;color:var(--gold);font-weight:700;text-decoration:none;margin-left:2px;" onclick="event.stopPropagation();"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 11l3 3L22 4"/></svg>Check the Methodology</a> \u00b7 Confidence: ' + estimateConfidence().level + '.</span></div>' +
       '';
