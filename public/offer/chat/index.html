@@ -4087,9 +4087,13 @@ function renderCanvasHTML() {
       // Sealed: the FULL colorful gradient track still renders -- that proves a real
       // spectrum was assessed. Only the needle (their exact position on it) is withheld;
       // the track color itself carries no information about where they land.
-      riskGaugeHtml += '<div onclick="triggerPlanPaywall()" style="position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,#1A9E6C 0%,#C9A84C 55%,#cc4444 100%);cursor:pointer;opacity:0.55;"></div>';
+      riskGaugeHtml += '<div onclick="triggerPlanPaywall()" style="position:relative;height:8px;border-radius:5px;background:linear-gradient(90deg,#1A9E6C 0%,#C9A84C 55%,#cc4444 100%);cursor:pointer;opacity:0.55;">' +
+        '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;">' +
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#5a5f72" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>' +
+        '</div>' +
+      '</div>';
       riskGaugeHtml += '<div style="display:flex;justify-content:space-between;font-size:9px;color:#9aa;margin-top:6px;"><span>Safe to counter</span><span>Higher risk</span></div>';
-      riskGaugeHtml += '<div style="font-size:9px;color:var(--t3);margin-top:6px;">Computed from your 5 signals — <a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="color:var(--gold);font-weight:700;text-decoration:none;">unlock to see the read</a></div>';
+      riskGaugeHtml += '<div style="font-size:9px;color:var(--t3);margin-top:6px;">Computed from your 5 signals — <a href="#" onclick="event.preventDefault();event.stopPropagation();triggerPlanPaywall();" style="color:var(--gold);font-weight:700;text-decoration:none;">unlock to see the risk score</a></div>';
     }
     riskGaugeHtml += '</div>';
   } else {
