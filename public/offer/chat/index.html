@@ -4037,11 +4037,7 @@ function renderCanvasHTML() {
 
   var filledCount = Object.values(discCanvasBlocks).filter(function(b) { return b.filled; }).length;
 
-  var html = '<div style="background:var(--card);border:1.5px solid var(--divider);border-radius:12px;overflow:hidden;margin-top:8px;">';
-  html += '<div style="background:var(--navy);padding:9px 14px;display:flex;align-items:center;justify-content:space-between;">';
-  html += '<span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:0.01em;">Counter Kit</span>';
-  html += '<a href="#" onclick="event.preventDefault();state&&state.paid?generateCanvasPDF():triggerPlanPaywall();" style="margin-left:auto;color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:4px;font-size:10px;text-decoration:none;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>PDF</a>';
-  html += '</div>';
+  var html = '';
   html += '<div style="padding:8px;display:flex;flex-direction:column;gap:5px;">';
 
   var _intakeDone2 = (typeof discStep !== 'undefined' && discStep >= DISC_FREE_QUESTIONS);
@@ -4343,7 +4339,7 @@ function renderCanvasHTML() {
   // Download bar — after intake only
   html += '<div style="padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--divider);background:var(--muted);">';
   html += '<span style="font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>offer-counter-kit.pdf</span>';
-  html += '<button onclick="state&&state.paid?generateCanvasPDF():triggerPlanPaywall()" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
+  html += '<button onclick="state&&state.paid?generateCanvasPDF():startCheckout(29)" style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:5px 12px;background:var(--gold);color:#fff;border:none;border-radius:6px;cursor:pointer;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download PDF</button>';
   html += '</div>';
   if (state && state.paid) {
     html += '<div style="padding:0 12px 10px;background:var(--muted);"><p class="pdf-keep-hint" style="margin:0;">Download the PDF to keep permanent access to your full kit \u2014 anytime, even offline.</p></div>';
@@ -4354,8 +4350,6 @@ function renderCanvasHTML() {
   html += '<div style="padding:12px;border-top:1px solid var(--divider);text-align:center;">';
 
   html += '<button onclick="startOverSession(\'Start a new Counter Kit? Your current one will be cleared.\')" style="font-size:11px;color:var(--t3);background:none;border:none;cursor:pointer;text-decoration:underline;padding:4px;">\u21ba Start a new Counter Kit</button>';
-  html += '</div>';
-
   html += '</div>';
 
   return html;
